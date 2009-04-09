@@ -1,0 +1,39 @@
+package nl.nikhef.jgridstart.gui;
+
+import java.awt.event.ActionEvent;
+import java.util.logging.Logger;
+
+import javax.swing.AbstractAction;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+public class ActionRevoke extends AbstractAction {
+    
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.view");
+    private JFrame parent = null;
+    
+    public ActionRevoke(JFrame parent) {
+	super();
+	this.parent = parent;
+	putValue(NAME, "Revoke...");
+	putValue(MNEMONIC_KEY, new Integer('R'));
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+	logger.finer("Action: "+getValue(NAME));
+	String message = 
+	    "<html><body>" +
+	    "<h1>Reqeust a revocation</h1>"+
+	    "<p>When your certificate has been ... blah ..." +
+	    "</html></body>";
+	Object [] options = { "Revoke", "Cancel" };
+	int ret = JOptionPane.showOptionDialog(parent,
+		message,
+		"Revoke certificate",
+		JOptionPane.YES_NO_OPTION,
+		JOptionPane.QUESTION_MESSAGE,
+		null, // no icon
+		options, options[0]);
+    }
+    
+}

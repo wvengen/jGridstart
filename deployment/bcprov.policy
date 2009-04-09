@@ -1,0 +1,14 @@
+// To use BouncyCastle with Java Web Start it needs certain permissions.
+// Either <all-permissions/> can be put in BouncyCastle's security, or this
+// file can be referenced from property java.security.policy, which avoids
+// a permission prompt for the BouncyCastle extension (in addition to the
+// permission prompt for the application itself). Note that for the latter
+// this file should be referenced with a full path which is not inside a jar
+// but on the webserver.
+grant {
+ // allow BouncyCastle to register itself
+ permission java.security.SecurityPermission "Security.insertProvider.BC";
+ permission java.security.SecurityPermission "putProviderProperty.BC";
+ // allow access to BouncyCastle properties
+ permission java.util.PropertyPermission "org.bouncycastle.*","read";
+};

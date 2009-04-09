@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="jgridstart" default="compile">
+	<description>jGridStart build file</description>
+
+	<!--
+	  - Property definitions
+	  -->
+	<!-- display name -->
+	<property name="target.title" value="jGridStart"/>
+	<!-- internal name -->
+	<property name="target.name" value="${ant.project.name}"/>
+	<!-- the program's version -->
+	<property name="target.version" value="0.0.3"/>
+	<!-- main class to execute -->
+	<property name="target.main" value="nl.nikhef.jgridstart.gui.Main"/>
+	<!-- java virtual machine version to compile for -->
+	<property name="target.jvmversion" value="1.5"/>
+	
+	<!-- Java Web Start base url (for use in JNLP files) -->
+	<property name="wwwbase" value="http://www.nikhef.nl/~wvengen/jgridstart03/"/>
+	
+	<!-- location of source files -->
+	<property name="dir.src" location="src"/>
+	<!-- location of compiled classes -->
+	<property name="dir.build" location="bin"/>
+	<!-- location of output files for deployment -->
+	<property name="dir.dist" location="deployment"/>
+	<!-- location of thirdparty libraries -->
+	<property name="dir.thirdparty" location="thirdparty"/>
+
+	<!-- reference to property file defining the properties
+	  -     keystore.file      java keystore file
+	  -     keystore.passwd    password for accessing the java keystore
+	  -     keystore.alias     alias pointing to certificate to sign with
+	  -  if the property file cannot be found or does not define a keystore.file
+	  -  that points to a file, a self-signed certificate is generated so you can 
+	  -  get started easily. For production, of course, you'll need your own
+	  -  secure certificate that users can trust. 
+	  -  An example keystore.properties could be as follows:
+	  -     keystore.file = ${dir.keystore}/keystore.ks
+	  -     keystore.alias = default
+	  -     keystore.passwd = mysecret
+	  --> 
+	<property name="dir.keystore" location=".."/>
+	<property file="${dir.keystore}/keystore.properties"/>
+
+	
+	<!-- dependencies -->
+	<property name="dep.bouncycastle" location="${dir.thirdparty}/bouncycastle/bcprov-jdk14-142.jar"/>
+	<property name="dep.cli" location="${dir.thirdparty}/commons-cli/commons-cli-1.2.jar"/>
+	<property name="dep.junit" location="${dir.thirdparty}/junit/junit-4.5.jar"/>
+	<property name="dep.xhtmlrenderer" location="${dir.thirdparty}/flyingsaucer/core-renderer-minimal.jar"/>
+	<path id="path.dependencies">
+		<!-- TODO use jdk13 library versions and test -->
+		<pathelement location="${dep.bouncycastle}"/>
+		<pathelement location="${dep.cli}"/>
+		<pathelement location="${dep.junit}"/>
+		<pathelement location="${dep.xhtmlrenderer}"/>
+	</path>
+
+	<!--
+	  - Initialisation and other setup
+	  -->
+
+	<!-- keystore; create one if not supplied -->
+	<available file="${keystore.file}" type="file" property="keystore.available"/>
+	<target name="keystore" unless="keystore.available">
+		<tempfile property="keystore.file" prefix="keystore" suffix=".ks"/>
+		<property name="keystore.tempfile" value="${keystore.file}"/>
+		<property name="keystore.alias" value="default"/>
+		<property name="keystore.passwd" value="xyz12345"/>
+		<genkey alias="${keystore.alias}" storepass="${keystore.passwd}" keystore="${keystore.file}"
+			validity="1" dname="CN=Test, OU=Test, O=Test, C=Test"/>
+	</target>
+
+	<!-- proguard -->
+	<taskdef resource="proguard/ant/task.properties"
+		classpath="${dir.thirdparty}/proguard/proguard.jar"/>
+	
+	<!-- timestamp -->
+	<target name="init">
+		<tstamp/>
+	</target>
+	
+	<!--
+	  - Compilation target
+	  -->
+	<target name="compile" depends="init">
+		<mkdir dir="${dir.build}"/>
+		<!-- compile java sources -->
+		<javac srcdir="${dir.src}" destdir="${dir.build}" target="${target.jvmversion}">
+			<classpath refid="path.dependencies" />
+		</javac>
+		<!-- and copy resources; skip VCS dirs (and other hidden .*)  -->
+		<copy todir="${dir.build}">
+			<fileset dir="${dir.src}">
+				<exclude name="**/*.java"/>
+				<exclude name="**/CVS"/>
+				<exclude name="**/.*"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<!--
+	  - Distribution creation target
+	  -->
+	<target name="dist" depends="compile,keystore">
+		<!-- pack into jar -->
+		<jar jarfile="${dir.dist}/${target.name}.large.jar">
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+				<attribute name="Main-Class" value="${target.main}"/>
+			</manifest>
+			<fileset dir="${dir.build}">
+				<exclude name="**/*Test.*"/>
+				<exclude name="**/AllTests.*"/>
+			</fileset>
+			<zipfileset src="${dep.cli}" excludes="META-INF/**"/>
+			<zipfileset src="${dep.xhtmlrenderer}" excludes="META-INF/** compare/** eeze/** utilities/**"/>
+			<zipfileset src="thirdparty/flyingsaucer/itext-paulo-155.jar" excludes="META-INF/** **/*.afm"/>
+			<zipfileset src="thirdparty/flyingsaucer/minium.jar" excludes="META-INF/**"/>
+		</jar>
+		<!-- minimize jar file; skipnonpubliclibraryclasses needed for java1.6 -->
+		<proguard obfuscate="false" skipnonpubliclibraryclasses="false">
+			<injar file="${dir.dist}/${target.name}.large.jar"/>
+			<outjar file="${dir.dist}/${target.name}.jar"/>
+			<libraryjar file="${java.home}/lib/rt.jar"/>
+			<libraryjar file="${java.home}/lib/jsse.jar"/>
+			<libraryjar file="${dep.bouncycastle}"/>
+			<keepclasseswithmembers access="public" name="${target.main}">
+				<method access="public static" type="void"
+					name="main" parameters="java.lang.String[]"/>
+			</keepclasseswithmembers>
+		</proguard>				
+		<delete file="${dir.dist}/${target.name}.large.jar"/>
+		<!-- sign it, required for java web start -->
+		<signjar keystore="${keystore.file}" jar="${dir.dist}/${target.name}.jar"
+			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
+		<delete file="${keystore.tempfile}" quiet="true"/>
+		<!-- substitute variables in java web start files -->
+		<copy file="${dir.dist}/${target.name}.jnlp.in" tofile="${dir.dist}/${target.name}.jnlp" />
+		<copy file="${dir.dist}/bcprov.jnlp.in" tofile="${dir.dist}/bcprov.jnlp" />
+		<replace dir="${dir.dist}">
+			<include name="${target.name}.jnlp"/>
+			<include name="bcprov.jnlp"/>
+			<replacefilter token="@wwwbase@" value="${wwwbase}"/>
+			<replacefilter token="@main@" value="${target.main}"/>
+		</replace>
+		<!-- copy bouncycastle jar to deployment area -->
+		<copy file="${dep.bouncycastle}" todir="${dir.dist}"/>
+	</target>
+	<target name="jar" depends="dist"/>
+
+	<!--
+	  - Cleaning target
+	  -->
+	<target name="clean">
+		<delete dir="${dir.build}"/>
+		<delete file="${dir.dist}/${target.name}.jar"/>
+		<delete file="${dir.dist}/${target.name}.jnlp"/>
+		<delete file="${dir.dist}/bcprov.jnlp"/>
+		<basename property="dep.bouncycastle.basename" file="${dep.bouncycastle}"/>
+		<delete file="${dir.dist}/${dep.bouncycastle.basename}"/>
+	</target>
+
+</project>

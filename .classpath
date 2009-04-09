@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="bin" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="thirdparty/bouncycastle/bcprov-jdk14-142.jar" sourcepath="thirdparty/bouncycastle/bcprov-jdk14-142-src.zip"/>
+	<classpathentry kind="lib" path="thirdparty/commons-cli/commons-cli-1.2.jar" sourcepath="thirdparty/commons-cli/commons-cli-1.2-sources.jar"/>
+	<classpathentry kind="lib" path="thirdparty/junit/junit-4.5.jar"/>
+	<classpathentry kind="lib" path="thirdparty/flyingsaucer/core-renderer-minimal.jar" sourcepath="/user/wvengen/wrk/workspace/flyingsaucer/flyingsaucer-R7final-src.zip"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

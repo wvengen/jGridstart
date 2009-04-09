@@ -1,0 +1,637 @@
+package nl.nikhef.jgridstart;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.CertificateParsingException;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPublicKey;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import nl.nikhef.jgridstart.util.CryptoUtils;
+import nl.nikhef.jgridstart.util.PasswordCache;
+
+import org.bouncycastle.asn1.DERConstructedSet;
+import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.jce.PrincipalUtil;
+import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PasswordFinder;
+
+/**
+ * Class containing everything related to a grid certificate. Each instance is
+ * directly bound to a ~/.globus/xxx directory containing the relevant files (or
+ * another base directory, which is the CertificateStore). This is at least a
+ * private key, and usually a certificate. A log can be expected as well (this
+ * class logs all actions to it) and a certificate signing request can be
+ * present too.
+ * 
+ * This class provides actions like request, revoke, import, export, etc.
+ * 
+ * This class is also a child of Properties. One can set and get any property
+ * desired, but some are specifically reserved and queried directly from the
+ * certificate and/or certificate signing request. Please see getProperty().
+ * 
+ * 
+ * After some more thinking this could actually involve a Java KeyStore as a
+ * custom backend for ~/.globus containing just a private key and a certificate.
+ * Then custom extensions can retrieve the CSR and other info. This would allow
+ * one to use other types of 'definitive' storage as well, like using a PKCS#12
+ * certificate instead of userkey.pem and certificate.pem for jGlobus, as
+ * mentioned on a mailing-list. For now I'll keep it as it is.
+ * 
+ * @author wvengen
+ */
+public class CertificatePair extends Properties {
+
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart");
+
+    /** The directory that represents this CertificatePair. */
+    protected File path = null;
+
+    /** The certificate. It is cached because it contains most important info. */
+    protected X509Certificate cert = null;
+    /** If no certificate exists we can get info from the CSR */
+    protected PKCS10CertificationRequest req = null;
+
+    // we need BouncyCastle as a provider for PKCS#12 keystore import/export
+    static {
+	if (Security.getProvider("BC") == null)
+	    Security.addProvider(new BouncyCastleProvider());
+    }
+
+    /** Create new empty certificate pair */
+    private CertificatePair() {
+	super();
+    }
+
+    /** New certificate pair of a directory */
+    public CertificatePair(File f) throws IOException {
+	super();
+	load(f);
+    }
+    
+    /** Return the value of a property. Usually this just returns the
+     * value set by setProperty, but there are some cases where the
+     * value is taken directly from the certificate or certificate
+     * signing request. Please see getSubjectPrincipalValue() for more info.
+     * 
+     * - valid
+     *     is "valid" if the certificate is valid, null otherwise
+     * - valid.notafter, valid.notbefore
+     *     localised validity interval
+     * - cert, request
+     *     is "present" when certificate respectively CSR are present
+     * - subject, issuer, usage
+     *     is "present" when child keys can be present
+     * - usage.any, usage.serverauth, usage.clientauth, usage.codesigning,
+     *   usage.emailprotection, usage.timestamping, usage.ocspsigning
+     *     are "true" when they are defined in the extended key usage
+     * - modulus
+     *     the public key's modulus
+     * 
+     * @param key property to get the value of
+     * @return value of the property, or null if not found.
+     */
+    public String getProperty(String key) {
+	if (key.equals("cert"))
+	    if (cert==null) return null;
+	    else return "present";
+	if (key.equals("request"))
+	    if (!getCSRFile().exists()) return null;
+	    else return "present";
+	if (key.equals("subject"))
+	    if (cert==null && req==null) return null;
+	    else return "present";
+	if (key.startsWith("subject."))
+	    return getSubjectPrincipalValue(key.substring(8));
+	if (key.equals("issuer"))
+	    if (cert==null) return null;
+	    else return "present";
+	if (key.startsWith("issuer."))
+	    return getIssuerPrincipalValue(key.substring(7));
+	try {
+	    if (key.equals("modulus"))
+		if (cert!=null) return ((RSAPublicKey)cert.getPublicKey()).getModulus().toString();
+		else if (req!=null) return ((RSAPublicKey)req.getPublicKey()).getModulus().toString();
+	    else return null;
+	    if (key.equals("valid")) {
+		if (cert==null) return null;
+		cert.checkValidity();
+		return "valid";
+	    }
+	    if (key.equals("valid.notbefore")) {
+		if (cert==null) return null;
+		return DateFormat.getDateInstance().format(cert.getNotBefore());
+	    }
+	    if (key.equals("valid.notafter")) {
+		if (cert==null) return null;
+		return DateFormat.getDateInstance().format(cert.getNotAfter());
+	    }
+	    if (key.startsWith("usage")) {
+		if (cert==null) return null;
+		List<String> usage = cert.getExtendedKeyUsage();
+		if (usage==null) return null;
+		if ( (key.equals("usage.any")
+			&& usage.contains(KeyPurposeId.anyExtendedKeyUsage)) ||
+		     (key.equals("usage.serverauth")
+			&& usage.contains(KeyPurposeId.id_kp_serverAuth)) ||
+		     (key.equals("usage.clientauth")
+			 && usage.contains(KeyPurposeId.id_kp_clientAuth)) ||
+		     (key.equals("usage.codesigning")
+			&& usage.contains(KeyPurposeId.id_kp_codeSigning)) ||
+		     (key.equals("usage.emailprotection")
+			&& usage.contains(KeyPurposeId.id_kp_emailProtection)) ||
+		     (key.equals("usage.timestamping")
+			&& usage.contains(KeyPurposeId.id_kp_timeStamping)) ||
+		     (key.equals("usage.ocspsigning")
+			&& usage.contains(KeyPurposeId.id_kp_OCSPSigning)) )
+		    return "true";
+		return null;
+	    }
+	} catch (Exception e) {
+	    return null;
+	}
+	return super.getProperty(key);
+    }
+
+    /** reset the contents to this object to the empty state */
+    public void clear() {
+	path = null;
+	cert = null;
+	req = null;
+	super.clear();
+    }
+
+    /** Load a certificate from a directory */
+    protected void load(File f) throws IOException {
+	clear();
+	path = f;
+
+	// make sure it's ok
+	new SecurityChecks(this).checkAll();
+
+	// read certificate or else CSR, not fatal if they don't exist. 
+	if (getCertFile().exists()) {
+	    PasswordFinder finder = PasswordCache.getInstance().getDecryptPasswordFinder(
+		    "Certificate from " + f.getName(), getCertFile().getCanonicalPath());
+	    cert = (X509Certificate) CryptoUtils.readPEM(new FileReader(getCertFile()), finder);
+	} else if (getCSRFile().exists()) {
+	    req = (PKCS10CertificationRequest) CryptoUtils.readPEM(
+		    new FileReader(getCSRFile()), null);
+	}
+    }
+
+    /**
+     * Import a CertificatePair from a keystore into a (new) directory.
+     * 
+     * @param src File to import from
+     * @param dst Directory to import into. On success, this directory could be
+     *            passed later to create a new CertificatePair which is equal to
+     *            the one returned by this method.
+     * @return a new CertificatePair representing the newly imported pair.
+     * @throws IOException
+     */
+    static public CertificatePair importFrom(File src, File dst)
+	    throws IOException {
+	if (!src.isFile())
+	    throw new IOException("Need file to import from: " + src);
+	if (!src.canRead())
+	    throw new IOException("Cannot read file to import from: " + src);
+
+	CertificatePair cert = new CertificatePair();
+	SecurityChecks checks = new SecurityChecks(cert);
+	cert.path = dst;
+	checks.checkAccessPath();
+
+	try {
+	    // try to read from PEM first
+	    cert.importFromPEM(src);
+	} catch (IOException e) {
+	    // try to read from PKCS#12
+	    cert.importFromPKCS(src);
+	}
+
+	// run checks on imported certificate
+	checks.checkAll();
+
+	return cert;
+    }
+
+    /**
+     * Import key and certificate from a PEM file, possibly overwriting the
+     * current data.
+     * 
+     * @param src
+     *            PEM file to import from
+     * @throws IOException
+     */
+    protected void importFromPEM(File src) throws IOException {
+	Object o;
+	FileReader fr = new FileReader(src);
+	int count = 0;
+	PasswordCache cache = PasswordCache.getInstance();
+	// process all items in the file
+	while ((o = CryptoUtils.readPEM(fr, cache.getDecryptPasswordFinder(
+		"PEM certificate " + src.getName(), src.getCanonicalPath()))) != null) {
+	    count++;
+	    if (o.getClass().isInstance(KeyPair.class)) {
+		// Extract and write private key
+		if (((KeyPair) o).getPrivate() != null) {
+		    PrivateKey privKey = ((KeyPair) o).getPrivate();
+		    CryptoUtils.writePEM(privKey, new FileWriter(getKeyFile()),
+			    cache.getDecryptPasswordFinder("private key for "
+				    + getPath().getName(), getKeyFile()
+				    .getCanonicalPath()));
+		}
+	    } else if (o.getClass().isInstance(X509Certificate.class)) {
+		// Extract and write certificate
+		cert = (X509Certificate) o;
+		CryptoUtils.writePEM(cert, new FileWriter(getCertFile()));
+	    } else if (o.getClass()
+		    .isInstance(PKCS10CertificationRequest.class)) {
+		// Extract and write certificate signing request (CSR)
+		req = (PKCS10CertificationRequest) o;
+		CryptoUtils.writePEM(req, new FileWriter(getCSRFile()));
+	    }
+	}
+
+	if (count == 0)
+	    throw new IOException("not a PEM file: " + src);
+    }
+
+    protected void importFromPKCS(File src) throws IOException {
+	try {
+	    PasswordCache pwcache = PasswordCache.getInstance();
+	    String storename = "PKCS#12 store " + src.getName();
+	    KeyStore store = KeyStore.getInstance("PKCS12", "BC");
+	    char[] pw = pwcache.getForDecrypt(storename, src.getCanonicalPath());
+	    if (pw == null) {
+		// user cancel
+		throw new KeyStoreException("User cancelled password entry");
+	    }
+	    store.load(new FileInputStream(src), pw);
+
+	    if (store.size() == 0)
+		throw new IOException("Not a PKCS#12 file: " + src);
+
+	    Certificate c = null;
+	    int i = 1;
+	    for (Enumeration<String> it = store.aliases(); it.hasMoreElements(); i++) {
+		String alias = it.nextElement();
+		if (store.isKeyEntry(alias)) {
+		    // TODO warn against multiple keys
+		    // TODO check it is a private key
+		    /*
+		     * // This could be done but passwords on entries aren't
+		     * very common // and it would be a hassle to ask the user
+		     * again. // TODO more general framework that just tries all
+		     * stored passwords // if we have the keys in software but
+		     * is careful for hardware // devices pw =
+		     * pwcache.get(storename, src.getCanonicalPath(), i); if
+		     * (pw==null) { // user cancel throw new
+		     * KeyStoreException("User cancelled password entry"); }
+		     */
+		    Key key = store.getKey(alias, null);
+		    CryptoUtils.writePEM(key, new FileWriter(getKeyFile()));
+		}
+		if ((c = store.getCertificate(alias)) != null) {
+		    // TODO warn against multiple certificates
+		    // TODO we want only lowest certificate for this key ...
+		    // TODO check it really is an instance of X509Certificate
+		    cert = (X509Certificate) c;
+		    CryptoUtils.writePEM(cert, new FileWriter(getCertFile()));
+		}
+	    }
+	} catch (KeyStoreException e) {
+	    // TODO Auto-generated catch block
+	    throw new IOException(e.getMessage());
+	    // throw new IOException("Not a valid PKCS#12 file: "+src);//, e);
+	} catch (NoSuchProviderException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	} catch (NoSuchAlgorithmException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	} catch (CertificateException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	} catch (UnrecoverableKeyException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+    }
+
+    public void exportTo(File src) {
+	// TODO
+    }
+
+    /** Generate a new private key+CSR pair.
+     * 
+     * @param dst Destination directory (subdir of a store)
+     * @param x509name certificate subject to request
+     * @return newly created CertificatePair
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws NoSuchProviderException
+     * @throws SignatureException
+     */
+    static public CertificatePair generateRequest(File dst, String x509name)
+	    throws IOException, NoSuchAlgorithmException, InvalidKeyException,
+	    NoSuchProviderException, SignatureException {
+	// functionally based on
+	// org.globus.tools.GridCertRequest.genCertificateRequest()
+
+	CertificatePair cert = new CertificatePair();
+	SecurityChecks checks = new SecurityChecks(cert);
+	cert.path = dst;
+	checks.checkAccessPath();
+
+	String sigAlgName = "MD5WithRSA";
+	String keyAlgName = "RSA";
+
+	X509Name name = new X509Name(x509name);
+
+	// Generate new key pair
+	// TODO log/progress
+	KeyPairGenerator keygen = KeyPairGenerator.getInstance(keyAlgName);
+	keygen.initialize(1024);
+	KeyPair keyPair = keygen.genKeyPair();
+	PrivateKey privKey = keyPair.getPrivate();
+	PublicKey pubKey = keyPair.getPublic();
+
+	// Generate certificate request
+	// TODO log/progress
+	DERConstructedSet derSet = new DERConstructedSet();
+	cert.req = new PKCS10CertificationRequest(
+		sigAlgName, name, pubKey, derSet, privKey);
+
+	// Save certificate request
+	// TODO log/progress
+	CryptoUtils.writePEM(cert.req, new FileWriter(cert.getCSRFile()));
+
+	// Save private key; permissions are ok by default
+	// TODO log/progress
+	PasswordCache cache = PasswordCache.getInstance();
+	CryptoUtils.writePEM(privKey, new FileWriter(cert.getKeyFile()), cache.getEncryptPasswordFinder(
+		"new certificate's private key", cert.getKeyFile().getCanonicalPath()));
+	
+	// check
+	checks.checkAll();
+
+	return cert;
+    }
+
+    /** get the source of this certificate, if any */
+    public File getPath() {
+	return path;
+    }
+
+    /**
+     * return the File containing the private key, or null if no certificate is
+     * loaded
+     */
+    protected File getKeyFile() {
+	if (path == null)
+	    return null;
+	return new File(getPath(), "userkey.pem");
+    }
+
+    /**
+     * return the File containing the certificate request, or null if no
+     * certificate is loaded. The file need not exist.
+     */
+    protected File getCSRFile() {
+	if (path == null)
+	    return null;
+	File f = new File(getPath(), "userrequest.pem");
+	// fallback to Grix's default "usercert_request.pem" if it exists
+	if (!f.exists()) {
+	    File f2 = new File(getPath(), "usercert_request.pem");
+	    if (f2.exists())
+		return f2;
+	}
+	return f;
+    }
+
+    /**
+     * return the File containing the certificate, or null if no certificate is
+     * loaded. The file need not exist.
+     */
+    protected File getCertFile() {
+	if (path == null)
+	    return null;
+	return new File(getPath(), "usercert.pem");
+    }
+
+    /**
+     * refresh an item from disk and update its status from online sources.
+     * 
+     * @return whether the refresh was successful or no
+     */
+    public boolean refresh() {
+	if (path == null)
+	    return false;
+	try {
+	    load(path);
+	} catch (IOException e) {
+	    return false;
+	}
+	return true;
+    }
+
+    /**
+     * return a value of a principal of the certificate issuer/subject. This is
+     * taken from the certificate when present. If that fails, the CSR is
+     * attempted. If that fails as well, null is returned. The value returned is
+     * meant for display purposes.
+     * 
+     * @param id one of X509Certificate.* (O, CN, ...)
+     * @param where true for subject, false for issuer
+     * @return string with value of requested principal, or null if not
+     *         available. If multiple entries are present, these are
+     *         concatenated using comma's.
+     */
+    protected String getPrincipalValue(DERObjectIdentifier id, boolean where) {
+	// use certificate, or else CSR, or else return null.
+	try {
+	    X509Name subject = null;
+	    if (cert != null) {
+		if (where) subject = PrincipalUtil.getSubjectX509Principal(cert);
+		else       subject = PrincipalUtil.getIssuerX509Principal(cert);
+	    } else {
+		if (req == null) return null;
+		if (!where) return null; // no issuer yet for CSR 
+		subject = req.getCertificationRequestInfo().getSubject();
+	    }
+	    Vector<String> cn = subject.getValues(id);
+	    if (cn.size() == 0) return null;
+	    String val = "";
+	    for (int i=0; i<cn.size(); i++) {
+		val += ", "+cn.get(i);
+	    }
+	    return val.substring(2);
+	} catch (CertificateEncodingException e) {
+	}
+	return null;
+    }
+    public String getSubjectPrincipalValue(DERObjectIdentifier id) {
+	return getPrincipalValue(id, true);
+    }
+    public String getIssuerPrincipalValue(DERObjectIdentifier id) {
+	return getPrincipalValue(id, false);
+    }
+
+    /** Get a principal value from the certificate issuer/subject by string.
+     * The string is matched with X509Name.DefaultLookup, see
+     * getSubjectPrincipalValue() for details. Apart from this some special
+     * string ids are provided:
+     * 
+     *   x-email
+     *       email address, one of the several fields
+     * 
+     * @param id name as present in X509Name.DefaultLookup
+     * @param where true for subject, false for issuer
+     * @return
+     */
+    protected String getPrincipalValue(String id, boolean where) {
+	String s;
+	// special cases
+	if (id.equals("x-email")) {
+	    if ((s=getPrincipalValue(X509Name.EmailAddress, where)) != null)
+		return s;
+	    return getPrincipalValue(X509Name.E, where);
+	}
+	// fallback to X509Name definition
+	return getPrincipalValue((DERObjectIdentifier)X509Name.DefaultLookUp.get(id), where);	
+    }
+    public String getSubjectPrincipalValue(String id) {
+	return getPrincipalValue(id, true);
+    }
+    public String getIssuerPrincipalValue(String id) {
+	return getPrincipalValue(id, false);
+    }
+
+
+    public String toString() {
+	if (cert == null && req == null)
+	    return "<empty " + this.getClass().getSimpleName() + ">";
+	String name = getSubjectPrincipalValue(X509Principal.CN);
+	String org = getSubjectPrincipalValue(X509Principal.O);
+	if (name == null && org == null)
+	    return "<unnamed " + this.getClass().getSimpleName() + ">";
+	return name + " (" + org + ")";
+    }
+
+    /**
+     * Security checks for the certificate directory. All checks have a void
+     * return type and throw an (TODO x) Exception on failure.
+     */
+    static protected class SecurityChecks {
+	protected CertificatePair cert = null;
+
+	public SecurityChecks(CertificatePair c) {
+	    cert = c;
+	}
+
+	/** Run all checks. */
+	public void checkAll() throws IOException {
+	    checkAccessPath();
+	    checkPrivateKey();
+	    checkCertificate();
+	}
+
+	/** Check access to certificate directory. Must exist. */
+	public void checkAccessPath() throws IOException {
+	    File f = cert.getPath();
+	    if (!f.exists())
+		throw new IOException("Certificate directory not found: " + f);
+	    if (!f.isDirectory())
+		throw new IOException(
+			"Certificate directory is not a directory: " + f);
+	    if (!f.canRead())
+		throw new IOException("Certificate directory cannot be read: "
+			+ f);
+	}
+
+	/**
+	 * Check that the private key is valid. It only checks that a private
+	 * key file is present and has a valid format, not if it can be
+	 * decrypted since we don't want to use the password.
+	 */
+	public void checkPrivateKey() throws IOException {
+	    File f = cert.getKeyFile();
+	    if (!f.exists())
+		throw new IOException("Private key not found: " + f);
+	    if (!f.isFile())
+		throw new IOException("Private key is not a file: " + f);
+	    if (!f.canRead())
+		throw new IOException("Private key cannot be read: " + f);
+	    // TODO check that others cannot read this key!
+	    try {
+		if (CryptoUtils.readPEM(new FileReader(f), null) == null)
+		    throw new IOException(
+			    "Private key file contains no private key: " + f);
+	    } catch (IOException e) {
+		// Since readPEM "throws IOException" the specific information
+		// that it might have been a PasswordException is lost :(
+		// So now I have to parse the message string ...
+		if (!e.getMessage().contains(
+			"org.bouncycastle.openssl.PasswordException"))
+		    throw e;
+	    }
+	}
+
+	/**
+	 * Check the certificate. This is only checked if the certificate really
+	 * exists, because it is optional (e.g. when the certificate signing
+	 * request was made but the certificate not received from the CA).
+	 */
+	public void checkCertificate() throws IOException {
+	    File f = cert.getCertFile();
+	    if (!f.exists())
+		return;
+	    if (!f.isFile())
+		throw new IOException("Certificate is not a file: " + f);
+	    if (!f.canRead())
+		throw new IOException("Certificate cannot be read: " + f);
+	    // check if certificate can be loaded
+	    // TODO cache certificate loading in cert?
+	    if (CryptoUtils.readPEM(new FileReader(f), null) == null)
+		throw new IOException(
+			"Certificate file contains no certificate: " + f);
+	}
+    }
+
+}

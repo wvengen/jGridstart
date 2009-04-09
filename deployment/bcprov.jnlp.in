@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="@wwwbase@" href="bcprov.jnlp">
+ <information>
+  <title>bcprov-jdk14</title>
+  <vendor>Sun Microsystems, Inc.</vendor>
+  <offline-allowed/>
+ </information>
+ <resources>
+  <jar href="bcprov-jdk14-142.jar"/>
+ </resources>
+ <component-desc/>
+</jnlp>

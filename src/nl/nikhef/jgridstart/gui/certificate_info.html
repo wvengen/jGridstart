@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Certificate of ${subject.cn}</title>
+	<style type="text/css"><!--
+	/*
+	h1         { font-weight: bold; font-size: 130%; margin-bottom: 1em; }
+
+	.valid-ok  { color: green; font-size: 110%; font-weight: bold; }
+	*[title]   { border-bottom: 1px dashed gray; } 
+	
+	table      { border-collapse: collapse; }
+	td, th     { border-top: 1px solid lightgray; border-bottom: 1px solid lightgray; padding: 0.3em; }
+	th         { font-weight: normal; text-align: left; font-style: italic; padding-right: 1em; }
+	td.modulus { overflow: hidden; text-overflow: ellipsis; }
+	*/
+	
+	body       { font-size: 10pt; }
+
+	h1           { font-weight: bold; font-size: 14pt; }
+	.topinfo-ok  { color: #006600; font-weight: bold; }
+	.topinfo-bad { color: #660000; font-weight: bold; }
+
+	.valid-ok  { color: green; font-size: 110%; font-weight: bold; }
+	.valid-no  { color: red; font-size: 110%; font-weight: bold; }
+	.pending   { color: #666666; }
+
+	td, th     { padding: 0.3em; }
+	th         { font-weight: normal; text-align: left; font-style: italic; }
+	//--></style>
+</head>
+<body>
+	<h1>Certificate of ${subject.cn}</h1>
+	${if !cert}
+		${if  request}<p class="topinfo-ok">This certificate is currently awaiting approval.</p>${endif}
+		${if !request}<p class="topinfo-bad">This certificate is incomplete, please consider removing it.</p>${endif}
+	${endif}
+
+	<table summary="certificate details" cellpadding="3">
+		<tr>
+			<th class="name">Name</th>
+			<td class="name">
+				${subject.cn} ${if subject.e}<tt>${subject.e}</tt>${endif}
+			</td>
+		</tr>
+		<tr>
+			<th class="org">Organisation</th>
+			<td class="org">${subject.o}</td>
+		</tr>
+		${if issuer}<tr>
+			<th class="issuer">Issuer</th>
+			<td class="issuer">${issuer.cn}</td>
+		</tr>${endif}
+		${if cert.sn}<tr>
+			<th class="serial">Serial</th>
+			<td class="serial"><a href="https://ca.dutchgrid.nl/medium/query/?id=${cert.sn}">${cert.sn}</a></td>
+		</tr>${endif}
+		<tr>
+			<th class="valid">Valid</th>
+			<td class="valid">
+				from ${valid.notbefore} until ${valid.notafter}
+				${if  valid}<span class="valid-ok" title="certificate is valid and can be used">&#x2713;</span>${endif}
+				${if !valid}<span class="valid-no" title="certificate is expired or revoked">&#x2715;</span>${endif}
+			</td>
+		</tr>
+		${if usage}<tr>
+			<th class="usage">Usage</th>
+			<td class="usage">
+				${if usage.any}<span title="usable for anything">any</span>, ${endif}
+				${if usage.clientauth}<span title="usable for client authentication like in a web browser">Client authentication</span>, ${endif}
+				${if usage.emailprotection}<span title="usable for signing and encrypting emails">Email protection</span>, ${endif}
+			</td>
+		</tr>${endif}
+		<tr>
+			<th class="vo">VOs</th>
+			<td class="vo">
+				<a href="https://voms.grid.sara.nl:8443/voms/pvier/">pvier</a>,
+				<a href="https://voms.grid.sara.nl:8443/voms/ncf">ncf</a>,
+				<i>pending:</i>
+				<a href="https://voms.grid.sara.nl:8443/voms/vlemed" class="pending">vlemed</a>
+			</td>
+		</tr>
+
+	</table>
+
+</body>
+</html>

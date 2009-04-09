@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0+" href="jgridstart.jnlp" codebase="@wwwbase@">
+ <information>
+  <title>jGridStart</title>
+  <vendor>Nikhef</vendor>
+  <homepage href="@wwwbase@"/>
+  <description>Setup your computer to work with the grid</description>
+ </information>
+ <security>
+  <all-permissions/>
+ </security>
+ <resources>
+  <j2se href="http://java.sun.com/products/autodl/j2se" version="1.3+"/>
+  <jar href="jgridstart.jar"/>
+  <extension name="BouncyCastle cryptography library" href="bcprov.jnlp"/>
+  <property name="java.security.policy" value="@wwwbase@/bcprov.policy"/>
+ </resources>
+ <application-desc main-class="@main@"/>
+</jnlp>
