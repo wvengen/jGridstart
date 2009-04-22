@@ -119,7 +119,8 @@ public class TemplatePane extends XHTMLPanel {
     }
     
     /** run user-supplied action on form submission */
-    protected void submit(String url) {
+    @Override
+    public void submit(String url) {
 	if (submitAction!=null) {
 	    ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "");
 	    submitAction.actionPerformed(e);

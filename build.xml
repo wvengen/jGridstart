@@ -53,6 +53,7 @@
 	<property name="dep.junit" location="${dir.thirdparty}/junit/junit-4.5.jar"/>
 	<property name="dep.swingworker" location="${dir.thirdparty}/swingworker/swing-worker-1.2.jar"/>
 	<property name="dep.xhtmlrenderer" location="${dir.thirdparty}/flyingsaucer/core-renderer-minimal.jar"/>
+	<property name="dep.itext" location="${dir.thirdparty}/flyingsaucer/iText-2.0.8.jar"/>
 	<path id="path.dependencies">
 		<!-- TODO use jdk13 library versions and test -->
 		<pathelement location="${dep.bouncycastle}"/>
@@ -118,9 +119,7 @@
 			<fileset dir="${dir.build}"/>
 			<zipfileset src="${dep.cli}" includes="**/*.class"/>
 			<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
-			<zipfileset src="${dep.xhtmlrenderer}" excludes="META-INF/** compare/** eeze/** utilities/**"/>
-			<zipfileset src="thirdparty/flyingsaucer/itext-paulo-155.jar" excludes="META-INF/** **/*.afm"/>
-			<zipfileset src="thirdparty/flyingsaucer/minium.jar" excludes="META-INF/**"/>
+			<zipfileset src="${dep.xhtmlrenderer}" includes="**/*.class" excludes="**/tool/**"/>
 		</jar>
 		<!-- minimize jar file; skipnonpubliclibraryclasses needed for java1.6 -->
 		<proguard obfuscate="false" skipnonpubliclibraryclasses="false">
@@ -130,6 +129,7 @@
 			<libraryjar file="${java.home}/lib/jsse.jar"/>
 			<libraryjar file="${dep.bouncycastle}"/>
 			<libraryjar file="${dep.junit}"/>
+			<libraryjar file="${dep.itext}"/>
 			<keepclasseswithmembers access="public">
 				<method access="public static" type="void"
 					name="main" parameters="java.lang.String[]"/>
