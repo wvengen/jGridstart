@@ -113,8 +113,9 @@ public class TemplatePane extends XHTMLPanel {
     }
     
     public boolean print() {
-	// TODO
-	return false;
+	PrintUtilities print = new PrintUtilities(this);
+	print.print();
+	return true;
     }
     
     /** run user-supplied action on form submission */
