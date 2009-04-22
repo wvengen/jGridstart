@@ -7,9 +7,11 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+
 public class ActionRevoke extends AbstractAction {
     
-    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.view");
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");
     private JFrame parent = null;
     
     public ActionRevoke(JFrame parent) {
@@ -17,6 +19,7 @@ public class ActionRevoke extends AbstractAction {
 	this.parent = parent;
 	putValue(NAME, "Revoke...");
 	putValue(MNEMONIC_KEY, new Integer('R'));
+	BareBonesActionLaunch.addAction("revoke", this);
     }
     
     public void actionPerformed(ActionEvent e) {

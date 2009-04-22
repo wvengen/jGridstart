@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart.ca;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Properties;
@@ -81,11 +82,15 @@ public class NikhefCA implements CA {
 	// return certificate by serial
 	URL url = new URL(base);
 	String[] pre = new String[] {
-		"action=retrieve_cert",
-		"serial="+reqserial,
+		"action", "retrieve_cert",
+		"serial", reqserial
 	};
-	Reader reader = ConnectionUtils.pageReader(url, pre, false);
-	return (X509Certificate)CryptoUtils.readPEM(reader, null);
+	String scert = ConnectionUtils.pageContents(url, pre, false);
+	StringReader reader = new StringReader(scert);
+	X509Certificate cert = (X509Certificate)CryptoUtils.readPEM(reader, null);
+	if (cert==null)
+	    throw new IOException("Certificate could not be retrieved: "+scert);
+	return cert;
     }
 
     /**
@@ -106,10 +111,11 @@ public class NikhefCA implements CA {
 	CryptoUtils.writePEM(req, reqWriter);
 	
 	String[] postdata = {
-		"action=submit",
-		"fullname="+name,
-		"email="+info.getProperty("email"),
-		"request="+reqWriter.toString(),
+		"action", "submit",
+		"fullname", name,
+		"email", info.getProperty("email"),
+		"request", reqWriter.toString(),
+		"submit", "Submit request"
 	};
 
 	URL url = new URL(base);
@@ -119,14 +125,15 @@ public class NikhefCA implements CA {
 
 	// TODO dodgy but I don't know how else to do it.
 	try {
-	    int index = answer.indexOf("Saving request as ") + 7;
-	    if (index == -1 || answer.indexOf("error") != -1 || answer.indexOf("Error") != -1) {
+	    String matchstr = "Saving request as";
+	    int index = answer.indexOf(matchstr);
+	    if (index == -1 || answer.indexOf("error:") != -1 || answer.indexOf("Error:") != -1) {
 		// means: not successful
 		logger.severe("Could not upload certification request.");
 		throw new /*UnableToUploadCertificationRequestException*/IOException(answer);
 	    }
 	    int index_end = answer.indexOf(".", index);
-	    serial = answer.substring(index, index_end);
+	    serial = answer.substring(index+matchstr.length(), index_end).trim();
 	} catch (RuntimeException e) {
 	    // TODO Auto-generated catch block
 	    // e.printStackTrace();
@@ -134,7 +141,7 @@ public class NikhefCA implements CA {
 	    throw e;
 	}
 
-	logger.finest("Answer from server: \n\n" + answer);
+	logger.info("Uploaded certificate signing request with serial "+serial);
 
 	return serial;
     }

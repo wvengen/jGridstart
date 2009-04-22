@@ -1,0 +1,59 @@
+/*
+ * Common markup (used in all pages)
+ */
+// TODO set font-size from system instead of absolutely
+body {
+	font-size: 14pt;
+}
+h1 {
+	font-weight: bold;
+	font-size: 18pt;
+}
+
+th {
+	font-weight: normal;
+	text-align: left;
+	font-style: italic;
+}
+
+/*
+ * Semantic markup: status
+ */
+.topinfo-ok {
+	color: #006600;
+	font-weight: bold;
+}
+.topinfo-bad {
+	color: #660000;
+	font-weight: bold;
+}
+
+.valid {
+	color: green;
+	font-size: 16pt;
+	font-weight: bold;
+}
+.invalid {
+	color: red;
+	font-size: 16pt;
+	font-weight: bold;
+}
+.pending {
+	color: #666666;
+}
+
+/*
+ * Semantic markup: activity bullet list
+ */
+.activitylist li.pending {
+	list-style-type: circle;
+	color: black;
+}
+.activitylist li.active {
+	list-style-type: circle;
+	font-weight: bold;
+}
+.activitylist li.finished {
+	list-style-type: disc;
+	color: green;
+}

@@ -6,6 +6,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
+import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.logging.LogManager;
 
@@ -41,7 +42,9 @@ public class Main {
     
     public static void tryRequest() {
 	try {
-	    store.generateRequest("CN=Piet Klaassen");
+	    Properties p = new Properties();
+	    p.setProperty("subject", "O=dutchgrid, O=users, CN=John Doe");
+	    store.generateRequest(p);
 	} catch (InvalidKeyException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
@@ -69,7 +72,7 @@ public class Main {
 	File f = new File("/tmp/certtest/packed-cert.p12");
 	try {
 	    CertificatePair cert = store.importFrom(f);
-	} catch (IOException e) {
+	} catch (Exception e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	    System.exit(1);

@@ -10,21 +10,26 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 import nl.nikhef.jgridstart.CertificatePair;
+import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 
 
 public class ActionImport extends AbstractAction {
     
-    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.view");
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");
     protected JFrame parent = null;
     protected CertificateStore store = null;
+    protected CertificateSelection selection = null;
     
-    public ActionImport(JFrame parent, CertificateStore store) {
+    public ActionImport(JFrame parent, CertificateStore store, CertificateSelection selection) {
 	super();
 	this.parent = parent;
 	this.store = store;
+	this.selection = selection;
 	putValue(NAME, "Import...");
 	putValue(MNEMONIC_KEY, new Integer('I'));
+	BareBonesActionLaunch.addAction("import", this);
     }
     
     public void actionPerformed(ActionEvent e) {
@@ -47,12 +52,12 @@ public class ActionImport extends AbstractAction {
 	logger.info("Importing certificate: "+f);
 	
 	try {
-	    // TODO get password from user when required
 	    CertificatePair cert = store.importFrom(f);
+	    selection.setSelection(store.indexOf(cert));
 	    //TODO selection.select(cert);
-	} catch(IOException e) {
+	} catch(Exception e) {
 	    logger.severe("Error importing certificate "+f+": "+e);
-	}	
+	}
     }
     
 }

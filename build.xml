@@ -44,17 +44,21 @@
 	<property name="dir.keystore" location=".."/>
 	<property file="${dir.keystore}/keystore.properties"/>
 
-	
-	<!-- dependencies -->
+	<!--
+	  - dependencies
+	  -->
+
 	<property name="dep.bouncycastle" location="${dir.thirdparty}/bouncycastle/bcprov-jdk14-142.jar"/>
 	<property name="dep.cli" location="${dir.thirdparty}/commons-cli/commons-cli-1.2.jar"/>
 	<property name="dep.junit" location="${dir.thirdparty}/junit/junit-4.5.jar"/>
+	<property name="dep.swingworker" location="${dir.thirdparty}/swingworker/swing-worker-1.2.jar"/>
 	<property name="dep.xhtmlrenderer" location="${dir.thirdparty}/flyingsaucer/core-renderer-minimal.jar"/>
 	<path id="path.dependencies">
 		<!-- TODO use jdk13 library versions and test -->
 		<pathelement location="${dep.bouncycastle}"/>
 		<pathelement location="${dep.cli}"/>
 		<pathelement location="${dep.junit}"/>
+		<pathelement location="${dep.swingworker}"/> <!-- for java1.5 and below -->
 		<pathelement location="${dep.xhtmlrenderer}"/>
 	</path>
 
@@ -111,11 +115,9 @@
 				<attribute name="Built-By" value="${user.name}"/>
 				<attribute name="Main-Class" value="${target.main}"/>
 			</manifest>
-			<fileset dir="${dir.build}">
-				<exclude name="**/*Test.*"/>
-				<exclude name="**/AllTests.*"/>
-			</fileset>
-			<zipfileset src="${dep.cli}" excludes="META-INF/**"/>
+			<fileset dir="${dir.build}"/>
+			<zipfileset src="${dep.cli}" includes="**/*.class"/>
+			<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
 			<zipfileset src="${dep.xhtmlrenderer}" excludes="META-INF/** compare/** eeze/** utilities/**"/>
 			<zipfileset src="thirdparty/flyingsaucer/itext-paulo-155.jar" excludes="META-INF/** **/*.afm"/>
 			<zipfileset src="thirdparty/flyingsaucer/minium.jar" excludes="META-INF/**"/>
@@ -127,7 +129,8 @@
 			<libraryjar file="${java.home}/lib/rt.jar"/>
 			<libraryjar file="${java.home}/lib/jsse.jar"/>
 			<libraryjar file="${dep.bouncycastle}"/>
-			<keepclasseswithmembers access="public" name="${target.main}">
+			<libraryjar file="${dep.junit}"/>
+			<keepclasseswithmembers access="public">
 				<method access="public static" type="void"
 					name="main" parameters="java.lang.String[]"/>
 			</keepclasseswithmembers>

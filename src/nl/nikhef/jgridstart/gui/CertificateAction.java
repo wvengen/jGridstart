@@ -21,7 +21,7 @@ import nl.nikhef.jgridstart.CertificateSelection;
  * @author wvengen
  */
 public abstract class CertificateAction extends AbstractAction implements ListSelectionListener {
-    static protected Logger logger = Logger.getLogger("nl.nikhef.jgridstart.view");
+    static protected Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");
 
     protected CertificatePair certificatePair = null;
     protected CertificateSelection selection = null;

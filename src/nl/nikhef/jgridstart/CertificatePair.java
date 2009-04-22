@@ -2,11 +2,15 @@ package nl.nikhef.jgridstart;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyException;
+import java.security.KeyManagementException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -21,24 +25,20 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import nl.nikhef.jgridstart.ca.*;
 import nl.nikhef.jgridstart.util.CryptoUtils;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
-import org.bouncycastle.asn1.DERConstructedSet;
+import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.X509Name;
@@ -46,7 +46,6 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PasswordFinder;
 
 /**
  * Class containing everything related to a grid certificate. Each instance is
@@ -93,11 +92,21 @@ public class CertificatePair extends Properties {
     /** Create new empty certificate pair */
     private CertificatePair() {
 	super();
+	Runtime.getRuntime().addShutdownHook(new Thread() {
+	   public void run() {
+	       if (path!=null) {
+		   try {
+		       CertificatePair.super.store(new FileOutputStream(getPropertiesFile()),
+		       "jGridstart certificate properties");
+		   } catch (IOException e) { }
+	       }
+	   }
+	});
     }
 
     /** New certificate pair of a directory */
     public CertificatePair(File f) throws IOException {
-	super();
+	this();
 	load(f);
     }
     
@@ -132,7 +141,7 @@ public class CertificatePair extends Properties {
 	    else return "present";
 	if (key.equals("subject"))
 	    if (cert==null && req==null) return null;
-	    else return "present";
+	    else return getSubjectPrincipalValue("x-full");;
 	if (key.startsWith("subject."))
 	    return getSubjectPrincipalValue(key.substring(8));
 	if (key.equals("issuer"))
@@ -162,20 +171,21 @@ public class CertificatePair extends Properties {
 		if (cert==null) return null;
 		List<String> usage = cert.getExtendedKeyUsage();
 		if (usage==null) return null;
-		if ( (key.equals("usage.any")
-			&& usage.contains(KeyPurposeId.anyExtendedKeyUsage)) ||
+		if ( key.equals("usage") ||
+		     (key.equals("usage.any")
+			&& usage.contains(KeyPurposeId.anyExtendedKeyUsage.toString())) ||
 		     (key.equals("usage.serverauth")
-			&& usage.contains(KeyPurposeId.id_kp_serverAuth)) ||
+			&& usage.contains(KeyPurposeId.id_kp_serverAuth.toString())) ||
 		     (key.equals("usage.clientauth")
-			 && usage.contains(KeyPurposeId.id_kp_clientAuth)) ||
+			 && usage.contains(KeyPurposeId.id_kp_clientAuth.toString())) ||
 		     (key.equals("usage.codesigning")
-			&& usage.contains(KeyPurposeId.id_kp_codeSigning)) ||
+			&& usage.contains(KeyPurposeId.id_kp_codeSigning.toString())) ||
 		     (key.equals("usage.emailprotection")
-			&& usage.contains(KeyPurposeId.id_kp_emailProtection)) ||
+			&& usage.contains(KeyPurposeId.id_kp_emailProtection.toString())) ||
 		     (key.equals("usage.timestamping")
-			&& usage.contains(KeyPurposeId.id_kp_timeStamping)) ||
+			&& usage.contains(KeyPurposeId.id_kp_timeStamping.toString())) ||
 		     (key.equals("usage.ocspsigning")
-			&& usage.contains(KeyPurposeId.id_kp_OCSPSigning)) )
+			&& usage.contains(KeyPurposeId.id_kp_OCSPSigning.toString())) )
 		    return "true";
 		return null;
 	    }
@@ -203,12 +213,15 @@ public class CertificatePair extends Properties {
 
 	// read certificate or else CSR, not fatal if they don't exist. 
 	if (getCertFile().exists()) {
-	    PasswordFinder finder = PasswordCache.getInstance().getDecryptPasswordFinder(
-		    "Certificate from " + f.getName(), getCertFile().getCanonicalPath());
-	    cert = (X509Certificate) CryptoUtils.readPEM(new FileReader(getCertFile()), finder);
+	    cert = (X509Certificate) PasswordCache.getInstance().
+	    	readPEM(getCertFile(), "Certificate from " + f.getName());
 	} else if (getCSRFile().exists()) {
 	    req = (PKCS10CertificationRequest) CryptoUtils.readPEM(
 		    new FileReader(getCSRFile()), null);
+	}
+	// read additional properties, not fatal if not present
+	if (getPropertiesFile().exists()) {
+	    super.load(new FileInputStream(getPropertiesFile()));
 	}
     }
 
@@ -221,9 +234,10 @@ public class CertificatePair extends Properties {
      *            the one returned by this method.
      * @return a new CertificatePair representing the newly imported pair.
      * @throws IOException
+     * @throws NoSuchAlgorithmException 
      */
     static public CertificatePair importFrom(File src, File dst)
-	    throws IOException {
+	    throws IOException, NoSuchAlgorithmException {
 	if (!src.isFile())
 	    throw new IOException("Need file to import from: " + src);
 	if (!src.canRead())
@@ -255,24 +269,22 @@ public class CertificatePair extends Properties {
      * @param src
      *            PEM file to import from
      * @throws IOException
+     * @throws NoSuchAlgorithmException 
      */
-    protected void importFromPEM(File src) throws IOException {
+    protected void importFromPEM(File src) throws IOException, NoSuchAlgorithmException {
 	Object o;
 	FileReader fr = new FileReader(src);
 	int count = 0;
-	PasswordCache cache = PasswordCache.getInstance();
 	// process all items in the file
-	while ((o = CryptoUtils.readPEM(fr, cache.getDecryptPasswordFinder(
-		"PEM certificate " + src.getName(), src.getCanonicalPath()))) != null) {
+	while ((o = PasswordCache.getInstance().
+		readPEM(fr, src, "PEM certificate "+src.getName())) != null) {
 	    count++;
 	    if (o.getClass().isInstance(KeyPair.class)) {
 		// Extract and write private key
 		if (((KeyPair) o).getPrivate() != null) {
 		    PrivateKey privKey = ((KeyPair) o).getPrivate();
-		    CryptoUtils.writePEM(privKey, new FileWriter(getKeyFile()),
-			    cache.getDecryptPasswordFinder("private key for "
-				    + getPath().getName(), getKeyFile()
-				    .getCanonicalPath()));
+		    PasswordCache.getInstance().writePEM(privKey, getKeyFile(),
+			    "private key for "+getPath().getName());
 		}
 	    } else if (o.getClass().isInstance(X509Certificate.class)) {
 		// Extract and write certificate
@@ -356,10 +368,15 @@ public class CertificatePair extends Properties {
 	// TODO
     }
 
-    /** Generate a new private key+CSR pair.
+    /** Generate a new private key+CSR pair. Details are taken from
+     * properties as follows, based on "Grid Certificate Profile"
+     * revision 0.26 ( http://www.ogf.org/documents/GFD.125.pdf ).
+     * 
+     *   subject
+     *     certificate subject to use (DN) 
      * 
      * @param dst Destination directory (subdir of a store)
-     * @param x509name certificate subject to request
+     * @param p Properties according to which to generate request
      * @return newly created CertificatePair
      * @throws IOException
      * @throws NoSuchAlgorithmException
@@ -367,7 +384,7 @@ public class CertificatePair extends Properties {
      * @throws NoSuchProviderException
      * @throws SignatureException
      */
-    static public CertificatePair generateRequest(File dst, String x509name)
+    static public CertificatePair generateRequest(File dst, Properties p)
 	    throws IOException, NoSuchAlgorithmException, InvalidKeyException,
 	    NoSuchProviderException, SignatureException {
 	// functionally based on
@@ -378,10 +395,10 @@ public class CertificatePair extends Properties {
 	cert.path = dst;
 	checks.checkAccessPath();
 
-	String sigAlgName = "MD5WithRSA";
+	String sigAlgName = "SHA1WithRSA";
 	String keyAlgName = "RSA";
 
-	X509Name name = new X509Name(x509name);
+	X509Name name = new X509Name(p.getProperty("subject"));
 
 	// Generate new key pair
 	// TODO log/progress
@@ -393,7 +410,7 @@ public class CertificatePair extends Properties {
 
 	// Generate certificate request
 	// TODO log/progress
-	DERConstructedSet derSet = new DERConstructedSet();
+	DERSet derSet = new DERSet();
 	cert.req = new PKCS10CertificationRequest(
 		sigAlgName, name, pubKey, derSet, privKey);
 
@@ -403,14 +420,50 @@ public class CertificatePair extends Properties {
 
 	// Save private key; permissions are ok by default
 	// TODO log/progress
-	PasswordCache cache = PasswordCache.getInstance();
-	CryptoUtils.writePEM(privKey, new FileWriter(cert.getKeyFile()), cache.getEncryptPasswordFinder(
-		"new certificate's private key", cert.getKeyFile().getCanonicalPath()));
+	PasswordCache.getInstance().writePEM(privKey, cert.getKeyFile(), 
+		"new certificate's private key");
 	
 	// check
 	checks.checkAll();
 
 	return cert;
+    }
+    
+    /** Upload the certificate signing request to its certificate authority 
+     * @throws SignatureException 
+     * @throws NoSuchProviderException 
+     * @throws IllegalStateException 
+     * @throws NoSuchAlgorithmException 
+     * @throws KeyException 
+     * @throws CertificateException 
+     * @throws IOException */
+    public void uploadRequest() throws CertificateException, KeyException, NoSuchAlgorithmException, IllegalStateException, NoSuchProviderException, SignatureException, IOException {
+	if (cert!=null) {
+	    logger.warning("Ignoring request to upload CSR since certificate is present: "+this);
+	    return;
+	}
+	setProperty("request.serial", getCA().uploadCertificationRequest(req, this));
+    }
+    
+    /** Download the certificate from the certificate authority */
+    public void downloadCertificate() throws IOException, KeyManagementException, NoSuchAlgorithmException {
+	if (cert!=null) {
+	    logger.warning("Ignoring request to download certificate when already present: "+this);
+	    return;
+	}
+	
+	cert = getCA().downloadCertificate(req, getProperty("request.serial"));
+	CryptoUtils.writePEM(cert, new FileWriter(getCertFile()));
+	// TODO security check
+    }
+    
+    /** Return the correct CA for this CertificatePair. Currently this is
+     * fixed, but eventually it should be possible to have certificates with
+     * different CA's. 
+     * @throws NoSuchAlgorithmException 
+     * @throws KeyManagementException */
+    protected CA getCA() throws KeyManagementException, NoSuchAlgorithmException {
+	return new NikhefCA();
     }
 
     /** get the source of this certificate, if any */
@@ -454,6 +507,17 @@ public class CertificatePair extends Properties {
 	    return null;
 	return new File(getPath(), "usercert.pem");
     }
+    
+    /**
+     * 
+     * return the File containing the additional properties, or null if no certificate
+     * is loaded. The file need not exist.
+     */
+    protected File getPropertiesFile() {
+	if (path == null)
+	    return null;
+	return new File(getPath(), "userinfo.properties");
+    }
 
     /**
      * refresh an item from disk and update its status from online sources.
@@ -463,11 +527,19 @@ public class CertificatePair extends Properties {
     public boolean refresh() {
 	if (path == null)
 	    return false;
+	// reload from disk
 	try {
 	    load(path);
+	    // try to download certificate if not present
+	    if (cert==null && getCA().checkStatusOfRequest(getProperty("request.serial")))
+		downloadCertificate();
+	    // TODO make sure request is uploaded if certificate still not present
 	} catch (IOException e) {
+	    // TODO proper error reporting or don't catch
 	    return false;
-	}
+	} catch (GeneralSecurityException e) {
+	    return false;
+	}	
 	return true;
     }
 
@@ -477,15 +549,17 @@ public class CertificatePair extends Properties {
      * attempted. If that fails as well, null is returned. The value returned is
      * meant for display purposes.
      * 
+     * TODO document behaviour when id==null
+     * 
      * @param id one of X509Certificate.* (O, CN, ...)
      * @param where true for subject, false for issuer
      * @return string with value of requested principal, or null if not
      *         available. If multiple entries are present, these are
-     *         concatenated using comma's.
+     *         concatenated using ', '.
      */
     protected String getPrincipalValue(DERObjectIdentifier id, boolean where) {
-	// use certificate, or else CSR, or else return null.
 	try {
+	    // determine source: certificate, else CSR, else return null.
 	    X509Name subject = null;
 	    if (cert != null) {
 		if (where) subject = PrincipalUtil.getSubjectX509Principal(cert);
@@ -495,15 +569,27 @@ public class CertificatePair extends Properties {
 		if (!where) return null; // no issuer yet for CSR 
 		subject = req.getCertificationRequestInfo().getSubject();
 	    }
-	    Vector<String> cn = subject.getValues(id);
-	    if (cn.size() == 0) return null;
-	    String val = "";
-	    for (int i=0; i<cn.size(); i++) {
-		val += ", "+cn.get(i);
+	    // get info from it
+	    if (id!=null) {
+		// return comma-separated list of values
+		Vector<?> cn = subject.getValues(id);
+		if (cn.size() == 0) return null;
+		String val = "";
+		for (int i=0; i<cn.size(); i++) {
+		    val += ", "+(String)cn.get(i);
+		}
+		return val.substring(2);
+	    } else {
+		// return '/'-separated representation of all
+		Vector<?> oids = subject.getOIDs();
+		Vector<?> values = subject.getValues();
+		String ret = "";
+		for (int i=0; i<oids.size(); i++) {
+		    ret += "/"+X509Name.DefaultSymbols.get(oids.get(i))+"="+(String)values.get(i);
+		}
+		return ret;
 	    }
-	    return val.substring(2);
-	} catch (CertificateEncodingException e) {
-	}
+	} catch (CertificateEncodingException e) { }
 	return null;
     }
     public String getSubjectPrincipalValue(DERObjectIdentifier id) {
@@ -520,6 +606,8 @@ public class CertificatePair extends Properties {
      * 
      *   x-email
      *       email address, one of the several fields
+     *   x-full
+     *       string of the whole subject or issuer, parts separated by '/'
      * 
      * @param id name as present in X509Name.DefaultLookup
      * @param where true for subject, false for issuer
@@ -532,6 +620,8 @@ public class CertificatePair extends Properties {
 	    if ((s=getPrincipalValue(X509Name.EmailAddress, where)) != null)
 		return s;
 	    return getPrincipalValue(X509Name.E, where);
+	} else if (id.equals("x-full")) {
+	    return getPrincipalValue((DERObjectIdentifier)null, where);
 	}
 	// fallback to X509Name definition
 	return getPrincipalValue((DERObjectIdentifier)X509Name.DefaultLookUp.get(id), where);	
@@ -607,8 +697,8 @@ public class CertificatePair extends Properties {
 		// Since readPEM "throws IOException" the specific information
 		// that it might have been a PasswordException is lost :(
 		// So now I have to parse the message string ...
-		if (!e.getMessage().contains(
-			"org.bouncycastle.openssl.PasswordException"))
+		if (!e.getMessage().contains("org.bouncycastle.openssl.PasswordException")&&
+		    !e.getMessage().contains("wrong password"))
 		    throw e;
 	    }
 	}

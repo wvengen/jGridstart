@@ -1,5 +1,13 @@
 package nl.nikhef.jgridstart.util;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -300,5 +308,42 @@ public class PasswordCache {
 	public void run() {
 	    invalidate(loc);
 	}
+    }
+    
+    /** Convenience method for CryptoUtils.readPEM() that uses this PasswordCache 
+     * @throws IOException 
+     * @throws NoSuchAlgorithmException */
+    public void writePEM(Object src, File f, String msg) throws NoSuchAlgorithmException, IOException {
+	writePEM(src, new FileWriter(f), f, msg);
+    }
+    /** Convenience method for CryptoUtils.readPEM() that uses this PasswordCache 
+     * @throws IOException 
+     * @throws NoSuchAlgorithmException */
+    public void writePEM(Object src, Writer writer, File f, String msg) throws NoSuchAlgorithmException, IOException {
+	CryptoUtils.writePEM(src, writer, getEncryptPasswordFinder(msg, f.getCanonicalPath()));
+    }
+    /** Convenience method for CryptoUtils.writePEM() that uses this PasswordCache.
+     * It invalidates the password when it was wrong, so it is important so use this
+     * method instead of calling CryptoUtils.writePEM() directly when reading a file
+     * with a password using the PasswordCache.
+     * @throws IOException */
+    public Object readPEM(Reader reader, File f, String msg) throws IOException {
+	Object o = null;
+	try {
+	    o = CryptoUtils.readPEM(reader, getDecryptPasswordFinder(msg, f.getCanonicalPath()));
+	} finally {
+	    // Invalidate password if no success so it is asked next time
+	    if (o==null) invalidate(f.getCanonicalPath());
+	}
+	return o;
+    }
+    /** Convenience method for CryptoUtils.writePEM() that uses this PasswordCache.
+     * It invalidates the password when it was wrong, so it is important so use this
+     * method instead of calling CryptoUtils.writePEM() directly when reading a file
+     * with a password using the PasswordCache.
+     * @throws IOException 
+     * @throws FileNotFoundException */
+    public Object readPEM(File f, String msg) throws FileNotFoundException, IOException {
+	return readPEM(new FileReader(f), f, msg);
     }
 }

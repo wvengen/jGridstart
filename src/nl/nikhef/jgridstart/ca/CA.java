@@ -10,7 +10,7 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
  * 
  * @author wvengen
  */
-interface CA {
+public interface CA {
 
     /**
      * Checks whether the certification request with the specified serial

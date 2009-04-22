@@ -3,12 +3,15 @@ package nl.nikhef.jgridstart.gui;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
+import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
 public class ActionAbout extends AbstractAction {
 
-    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.view");
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");
     private JFrame parent = null;
 
     public ActionAbout(JFrame parent) {
@@ -16,6 +19,7 @@ public class ActionAbout extends AbstractAction {
 	this.parent = parent;
 	putValue(NAME, "About...");
 	putValue(MNEMONIC_KEY, new Integer('A'));
+	BareBonesActionLaunch.addAction("about", this);
     }
 
     public void actionPerformed(ActionEvent e) {

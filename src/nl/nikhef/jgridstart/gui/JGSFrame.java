@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 
+import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -11,46 +13,39 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JTextPane;
 import javax.swing.BorderFactory;
 import java.awt.Dimension;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-
-import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.Enumeration;
+
 import javax.swing.border.BevelBorder;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.JScrollPane;
-
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
-import nl.nikhef.jgridstart.gui.util.BareBonesBrowserLaunch;
+import nl.nikhef.jgridstart.gui.util.TemplateButtonPane;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
 public class JGSFrame extends JFrame {
 
     private JPanel jContentPane = null;
     private JMenuBar jMenuBar = null;
-    private JPanel jPanel = null;
-    private ComponentTemplatePane certInfoPane = null;
+    private ComponentCertificateList certList = null; 
+    private TemplateButtonPane certInfoPane = null;
 
     private CertificateStore store = null;
-    private JPanel jPanel1 = null;
-    private JButton jButton = null;
-    private JButton jButton1 = null;
-    private JButton jButton2 = null;
-    private int buttonBorderWidth = 2;
-    private JScrollPane jScrollPane = null;
-    
     private CertificateSelection selection = null; 
+    
+    protected int identityIndex = -1;
+    protected JMenu identityMenu = null;
+    private ButtonGroup identityButtonGroup = null;
+    
+    private AbstractButton viewCertificateList = null;
+    private ActionViewCertificateList actionViewCertificateList = null;
 
     /**
      * This is the default constructor
@@ -73,14 +68,17 @@ public class JGSFrame extends JFrame {
 	this.setSize(550, 350);
 	this.setMinimumSize(new Dimension(400, 150));
 	this.setPreferredSize(new Dimension(600, 350));
-	this.setJMenuBar(getJMenuBar());
 	this.setContentPane(getJContentPane());
-	this.setTitle("jGridStart Mockup");
+	this.setJMenuBar(getJMenuBar());
+	this.setTitle("jGridStart (development version)");
 
 	store.load(System.getProperty("user.home")+"/.globus-test");
-	// TODO handle case when no certificates were found -> show getting started page
+
+	setViewCertificateList(false);
 	if (store.size() > 0)
-	    selection.setSelectionInterval(0, 0);
+	    selection.setSelection(0);
+	else
+	    updateSelection();
     }
 
     /**
@@ -92,8 +90,9 @@ public class JGSFrame extends JFrame {
 	if (jContentPane == null) {
 	    jContentPane = new JPanel();
 	    jContentPane.setLayout(new BorderLayout());
+	    certList = new ComponentCertificateList(store, selection);
+	    jContentPane.add(certList, BorderLayout.WEST);
 	    jContentPane.add(getJPanel(), BorderLayout.CENTER);
-	    jContentPane.add(new ComponentCertificateList(store, selection), BorderLayout.WEST);
 	}
 	return jContentPane;
     }
@@ -111,10 +110,13 @@ public class JGSFrame extends JFrame {
 	    // menu: Identities
 	    menu = new JMenu("Certificates");
 	    menu.setMnemonic('C');
-	    menu.add(new JMenuItem(new ActionRequest(this, store)));
-	    menu.add(new JMenuItem(new ActionImport(this, store)));
+	    menu.add(new JMenuItem(new ActionRequest(this, store, selection)));
+	    menu.add(new JMenuItem(new ActionImport(this, store, selection)));
 	    menu.addSeparator();
-	    addIdentities(menu);
+	    // identity list managed by getJPanel()
+	    identityIndex = menu.getMenuComponentCount();
+	    identityMenu = menu;
+	    identityButtonGroup = new ButtonGroup();
 	    menu.addSeparator();
 	    menu.add(new JMenuItem(new ActionQuit(this)));
 	    jMenuBar.add(menu);
@@ -136,9 +138,18 @@ public class JGSFrame extends JFrame {
 	    // menu: View
 	    menu = new JMenu("View");
 	    menu.setMnemonic('W');
-	    menu.add(new JCheckBoxMenuItem("Certificate list", true));
+	    actionViewCertificateList = new ActionViewCertificateList(certList, false);
+	    viewCertificateList = new JCheckBoxMenuItem(actionViewCertificateList);
+	    viewCertificateList.setSelected(false);
+	    menu.add(viewCertificateList);
 	    menu.add(new JMenuItem("Personal details...", 'P'));
-	    menu.add(new JMenuItem(new ActionRefresh(this, store)));
+	    menu.add(new JMenuItem(new ActionRefresh(this, store) {
+		public void actionPerformed(ActionEvent e) {
+		    super.actionPerformed(e);
+		    // update info pane as well; TODO move into ActionRefresh itself
+		    certInfoPane.refresh();
+		}
+	    }));
 	    jMenuBar.add(menu);
 	    
 	    // menu: Help
@@ -151,134 +162,92 @@ public class JGSFrame extends JFrame {
 	return jMenuBar;
     }
 
-    /** add a list of identities to the given menu
-     *  
-     * @param jMenu
-     */
-    private void addIdentities(JMenu jMenu) {
-	ButtonGroup group = new ButtonGroup();
-	for (int i=0; i < store.size(); i++) {
-	    CertificatePair cert = store.get(i);
-	    JRadioButtonMenuItem jrb = new JRadioButtonMenuItem();
-	    jrb.setText(cert.toString());
-	    jrb.addActionListener(
-		    new ActionSelectCertificate(this, cert, selection));
-	    group.add(jrb);
-	    jMenu.add(jrb);
-	    if (i==0) jrb.setSelected(true);
-	}
-    }
-
     /**
      * This method initializes jPanel	
      * 	
      * @return javax.swing.JPanel	
      */
     private JPanel getJPanel() {
-	if (jPanel == null) {
-	    jPanel = new JPanel();
-	    jPanel.setLayout(new BoxLayout(getJPanel(), BoxLayout.Y_AXIS));
-	    jPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-	    jPanel.add(getJScrollPane(), null);
-	    jPanel.add(getJPanel1(), null);
-	}
-	return jPanel;
-    }
-
-    /**
-     * This method initializes jTextPane	
-     * 	
-     * @return javax.swing.JTextPane	
-     */
-    private ComponentTemplatePane getJTextPane() {
 	if (certInfoPane == null) {
-	    certInfoPane = new ComponentTemplatePane(getClass().getResource("certificate_info.html"));
+	    certInfoPane = new TemplateButtonPane();
+	    certInfoPane.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+
 	    selection.addListSelectionListener(new ListSelectionListener() {
 		    public void valueChanged(ListSelectionEvent ev) {
-			CertificatePair c = selection.getCertificatePair();
-			certInfoPane.setProperties(c);
+			if (ev.getValueIsAdjusting()) return;
+			updateSelection();
 		    }
+	    });
+	    store.addListDataListener(new ListDataListener() {
+		// only single indices supported
+		public void intervalAdded(ListDataEvent e) {
+		    // add item to menu
+		    if (e.getIndex0() < 0) return;
+		    CertificatePair cert = store.get(e.getIndex0());
+		    JRadioButtonMenuItem jrb = new JRadioButtonMenuItem();
+		    jrb.setText(cert.toString());
+		    jrb.addActionListener(
+			    new ActionSelectCertificate(JGSFrame.this, cert, selection));
+		    identityButtonGroup.add(jrb);
+		    identityMenu.insert(jrb, identityIndex + e.getIndex0());
+		    // show certificate list if we went from 1 to 2 certificates
+		    if (store.size() == 2)
+			setViewCertificateList(true);
+		}
+		public void intervalRemoved(ListDataEvent e) {
+		    // remove item from menu
+		    if (e.getIndex0() < 0) return;
+		    JMenuItem item = identityMenu.getItem(identityIndex + e.getIndex0());
+		    // select previous index if it was currently selected
+		    if (item.isSelected()) {
+			int newIdx = e.getIndex0() - 1;
+			if (newIdx<0) newIdx=0;
+			selection.setSelection(newIdx);
+		    }
+		    identityButtonGroup.remove(item);
+		    identityMenu.remove(item);
+		}
+		public void contentsChanged(ListDataEvent e) {
+		    // TODO update description and refresh contentpane(!)
+		}
 	    });
 	}
 	return certInfoPane;
     }
-
-    /**
-     * This method initializes jPanel1	
-     * 	
-     * @return javax.swing.JPanel	
+    
+    /** Set the actionViewCertificateList and its gui views. Yes, this is terrible
+     * to put it in a method like this, but I don't know at this moment how to do it
+     * properly. TODO fix this
      */
-    private JPanel getJPanel1() {
-	if (jPanel1 == null) {
-	    jPanel1 = new JPanel();
-	    jPanel1.setLayout(new BoxLayout(getJPanel1(), BoxLayout.X_AXIS));
-	    jPanel1.setBorder(BorderFactory.createEmptyBorder(buttonBorderWidth, buttonBorderWidth, buttonBorderWidth, buttonBorderWidth));
-	    jPanel1.add(Box.createHorizontalGlue());
-	    jPanel1.add(getJButton2(), null);
-	    jPanel1.add(Box.createRigidArea(new Dimension(buttonBorderWidth,0)));
-	    jPanel1.add(getJButton1(), null);
-	    jPanel1.add(Box.createRigidArea(new Dimension(buttonBorderWidth,0)));
-	    jPanel1.add(getJButton(), null);
-	}
-	return jPanel1;
+    private void setViewCertificateList(boolean wantVisible) {
+	    actionViewCertificateList.putValue("SwingSelectedKey", new Boolean(wantVisible));
+	    viewCertificateList.setSelected(wantVisible);
+	    ActionEvent ev2 = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "");
+	    actionViewCertificateList.actionPerformed(ev2);
     }
-
-    /**
-     * This method initializes jButton	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getJButton() {
-	if (jButton == null) {
-	    jButton = new JButton();
-	    jButton.setText("Revoke");
-	    jButton.setName("jButton");
-	    jButton.setMnemonic(KeyEvent.VK_V);
+    
+    /** Effectuate a selection change in the gui. Current selection is
+     * managed by the class variable selection. */
+    private void updateSelection() {
+	try {
+	    certInfoPane.removeActions();
+	    // update contents and load template
+	    CertificatePair c = selection.getCertificatePair();
+	    if (c!=null) {
+		certInfoPane.setData(c);
+		certInfoPane.setPage(getClass().getResource("certificate_info.html"));
+		certInfoPane.addAction(new ActionRevoke(JGSFrame.this));
+	    } else {
+		certInfoPane.setPage(getClass().getResource("certificate_none_yet.html"));
+		certInfoPane.addAction(new ActionImport(JGSFrame.this, store, selection));
+		certInfoPane.addAction(new ActionRequest(JGSFrame.this, store, selection));
+	    }
+	} catch (IOException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
 	}
-	return jButton;
-    }
-
-    /**
-     * This method initializes jButton1	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getJButton1() {
-	if (jButton1 == null) {
-	    jButton1 = new JButton();
-	    jButton1.setName("jButton1");
-	    jButton1.setMnemonic(KeyEvent.VK_N);
-	    jButton1.setText("Renew");
-	}
-	return jButton1;
-    }
-
-    /**
-     * This method initializes jButton2	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getJButton2() {
-	if (jButton2 == null) {
-	    jButton2 = new JButton();
-	    jButton2.setText("Install");
-	    jButton2.setMnemonic(KeyEvent.VK_I);
-	}
-	return jButton2;
-    }
-
-    /**
-     * This method initializes jScrollPane	
-     * 	
-     * @return javax.swing.JScrollPane	
-     */
-    private JScrollPane getJScrollPane() {
-        if (jScrollPane == null) {
-    	jScrollPane = new JScrollPane();
-    	jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    	jScrollPane.setViewportView(getJTextPane());
-        }
-        return jScrollPane;
+	// also update selected item in menu
+	identityMenu.getItem(identityIndex + selection.getIndex()).setSelected(true);
     }
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"

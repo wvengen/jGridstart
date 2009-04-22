@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
+import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 
 
 public class ActionExport extends CertificateAction {
@@ -16,6 +17,7 @@ public class ActionExport extends CertificateAction {
 	super(parent, s);
 	putValue(NAME, "Export...");
 	putValue(MNEMONIC_KEY, new Integer('E'));
+	BareBonesActionLaunch.addAction("export", this);
     }
     //public ActionExport(JFrame parent) { this(parent, null); }
     

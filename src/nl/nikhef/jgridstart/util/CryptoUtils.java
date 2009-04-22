@@ -25,7 +25,6 @@ public class CryptoUtils {
      * @throws IOException
      */
     static public void writePEM(Object src, Writer writer) throws IOException {
-	// TODO password!
 	PEMWriter pemwriter = new PEMWriter(writer);
 	pemwriter.writeObject(src);
 	pemwriter.close();

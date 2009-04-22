@@ -1,76 +1,55 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html>
 <head>
-	<title>Certificate of ${subject.cn}</title>
-	<style type="text/css"><!--
-	/*
-	h1         { font-weight: bold; font-size: 130%; margin-bottom: 1em; }
-
-	.valid-ok  { color: green; font-size: 110%; font-weight: bold; }
-	*[title]   { border-bottom: 1px dashed gray; } 
-	
-	table      { border-collapse: collapse; }
-	td, th     { border-top: 1px solid lightgray; border-bottom: 1px solid lightgray; padding: 0.3em; }
-	th         { font-weight: normal; text-align: left; font-style: italic; padding-right: 1em; }
-	td.modulus { overflow: hidden; text-overflow: ellipsis; }
-	*/
-	
-	body       { font-size: 10pt; }
-
-	h1           { font-weight: bold; font-size: 14pt; }
-	.topinfo-ok  { color: #006600; font-weight: bold; }
-	.topinfo-bad { color: #660000; font-weight: bold; }
-
-	.valid-ok  { color: green; font-size: 110%; font-weight: bold; }
-	.valid-no  { color: red; font-size: 110%; font-weight: bold; }
-	.pending   { color: #666666; }
-
-	td, th     { padding: 0.3em; }
-	th         { font-weight: normal; text-align: left; font-style: italic; }
-	//--></style>
+	<title>Certificate of <c c="${subject.cn}"></c></title>
+	<link rel="stylesheet" type="text/css" href="stylesheet.css"/>
 </head>
 <body>
-	<h1>Certificate of ${subject.cn}</h1>
-	${if !cert}
-		${if  request}<p class="topinfo-ok">This certificate is currently awaiting approval.</p>${endif}
-		${if !request}<p class="topinfo-bad">This certificate is incomplete, please consider removing it.</p>${endif}
-	${endif}
+	<h1>Certificate of <c c="${subject.cn}"></c></h1>
+	<div if="!${cert}">
+	  <p class="topinfo-ok" if="${request}">This certificate is currently awaiting approval.</p>
+	  <p class="topinfo-bad" if="!${request}">This certificate is incomplete, please consider removing it.</p>
+	</div>
 
 	<table summary="certificate details" cellpadding="3">
 		<tr>
 			<th class="name">Name</th>
 			<td class="name">
-				${subject.cn} ${if subject.e}<tt>${subject.e}</tt>${endif}
+				<span c="${subject.cn}"></span> <tt c="${subject.e}"></tt>
 			</td>
 		</tr>
 		<tr>
 			<th class="org">Organisation</th>
-			<td class="org">${subject.o}</td>
+			<td class="org" c="${subject.o}"></td>
 		</tr>
-		${if issuer}<tr>
+		<tr if="${issuer}">
 			<th class="issuer">Issuer</th>
-			<td class="issuer">${issuer.cn}</td>
-		</tr>${endif}
-		${if cert.sn}<tr>
+			<td class="issuer" c="${issuer.cn}"></td>
+		</tr>
+		<tr if="${cert.sn}">
 			<th class="serial">Serial</th>
-			<td class="serial"><a href="https://ca.dutchgrid.nl/medium/query/?id=${cert.sn}">${cert.sn}</a></td>
-		</tr>${endif}
+			<td class="serial"><a href="https://ca.dutchgrid.nl/medium/query/?id=${cert.sn}" c="${cert.sn}"></a></td>
+		</tr>
 		<tr>
-			<th class="valid">Valid</th>
-			<td class="valid">
-				from ${valid.notbefore} until ${valid.notafter}
-				${if  valid}<span class="valid-ok" title="certificate is valid and can be used">&#x2713;</span>${endif}
-				${if !valid}<span class="valid-no" title="certificate is expired or revoked">&#x2715;</span>${endif}
+			<th class="validity">Valid</th>
+			<td class="validity">
+				<span if="${valid.notbefore}">
+				  from <c c="${valid.notbefore}"></c>
+				</span>
+				<span if="${valid.notafter}">
+				  until <c c="${valid.notafter}"></c>
+				</span>
+				<span if="${valid}" class="valid" title="certificate is valid and can be used">&#x2713;</span>
+				<span if="!${valid}" class="invalid" title="certificate is expired or revoked">&#x2715;</span>
 			</td>
 		</tr>
-		${if usage}<tr>
+		<tr if="${usage}">
 			<th class="usage">Usage</th>
 			<td class="usage">
-				${if usage.any}<span title="usable for anything">any</span>, ${endif}
-				${if usage.clientauth}<span title="usable for client authentication like in a web browser">Client authentication</span>, ${endif}
-				${if usage.emailprotection}<span title="usable for signing and encrypting emails">Email protection</span>, ${endif}
+				<span if="${usage.any}" title="usable for anything">any,</span> 
+				<span if="${usage.clientauth}" title="usable for client authentication like in a web browser">Client authentication,</span> 
+				<span if="${usage.emailprotection}" title="usable for signing and encrypting emails">Email protection,</span>
 			</td>
-		</tr>${endif}
+		</tr>
 		<tr>
 			<th class="vo">VOs</th>
 			<td class="vo">

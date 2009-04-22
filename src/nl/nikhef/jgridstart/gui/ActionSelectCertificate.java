@@ -10,7 +10,7 @@ import nl.nikhef.jgridstart.CertificateSelection;
 
 public class ActionSelectCertificate extends AbstractAction {
 
-    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.view");
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");
     protected JFrame parent = null;
     protected CertificatePair certificatePair = null;
     protected CertificateSelection selection = null;

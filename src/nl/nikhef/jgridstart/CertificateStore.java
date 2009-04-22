@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import nl.nikhef.jgridstart.util.PasswordCache;
@@ -172,6 +173,30 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
 	dst.mkdirs();
 	return dst;
     }
+    
+    /** Deletes a CertificatePair from the store. This removes it permanently
+     * from disk, so be careful. In the future it may be put into an archive
+     * instead.
+     * 
+     * TODO should this be called 'remove' or is that too dangerous?
+     * 
+     * @throws IOException 
+     */
+    public CertificatePair delete(int index) throws IOException {
+	// remove from list
+	CertificatePair cert = super.remove(index);
+	// and from disk; subdirs are not deleted
+	File[] items = cert.getPath().listFiles();
+	for (int i=0; i<items.length; i++)
+	    if (!items[i].delete())
+		throw new IOException("Could not remove file: "+items[i]);
+	if (!cert.getPath().delete())
+	    throw new IOException("Could not remove certificate directory "+cert.getPath()); 
+	return null;
+    }
+    public CertificatePair delete(CertificatePair cert) throws IOException {
+	return delete(indexOf(cert));
+    }
 
     /**
      * Import a PKCS#12 or PEM file into the CertificateStore by creating a new
@@ -180,8 +205,9 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
      * @param src File to import from
      * @return Newly created CertificatePair
      * @throws IOException
+     * @throws NoSuchAlgorithmException 
      */
-    public CertificatePair importFrom(File src) throws IOException {
+    public CertificatePair importFrom(File src) throws IOException, NoSuchAlgorithmException {
 	File dst = newItem();
 	// import
 	try {
@@ -196,16 +222,16 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
     
     /** Create a new certificate request in the CertificateStore
      *
-     * @param name CN to request for
+     * @param p Properties to use for generation. See CertificatePair.generateRequest()
      * @throws SignatureException 
      * @throws NoSuchProviderException 
      * @throws NoSuchAlgorithmException 
      * @throws InvalidKeyException 
      */
-    public CertificatePair generateRequest(String name) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
+    public CertificatePair generateRequest(Properties p) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
 	File dst = newItem();
 	try {
-	    CertificatePair cert = CertificatePair.generateRequest(dst, name);
+	    CertificatePair cert = CertificatePair.generateRequest(dst, p);
 	    add(cert);
 	    return cert;
 	} catch(IOException e) {

@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyException;
 import java.security.KeyPair;
@@ -30,7 +31,7 @@ import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 
 /**
  * A certificate authority that runs locally and signs using a
- * generated or supplied certificate. Ideal for testing. 
+ * generated certificate. Ideal for testing. 
  * 
  * @author wvengen
  * 
@@ -39,9 +40,16 @@ public class LocalCA implements CA {
     
     static final protected Logger logger = Logger.getLogger(LocalCA.class.getName());
     
+    /** temporary CA certificate used to sign requests (generated at instantiation) */
     protected X509Certificate cacert = null;
+    /** temporary CA private key used to sign requests (generated at instantiation) */
     protected PrivateKey cakey = null;
-    static protected int serial = 0;
+    /** serial number of last generated certificate */
+    static protected int serial = 1;
+    /** DN of local CA */
+    final protected String caDN = "CN=LocalCA Test Certificate";
+    /** number of seconds into the future generated certificates are valid */
+    final protected int validtime = 60 * 60; 
     
     /**
      * Creates a new LocalCA and generates a self-signed certificate to
@@ -62,14 +70,19 @@ public class LocalCA implements CA {
 	keygen.initialize(1024);
 	KeyPair keypair = keygen.generateKeyPair();
 	X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
-	certGen.setSerialNumber(BigInteger.ZERO);
-	certGen.setIssuerDN(new X500Principal("CN=LocalCA Test Certificate"));
+	certGen.setSerialNumber(BigInteger.ONE);
+	certGen.setIssuerDN(new X500Principal(caDN));
 	certGen.setNotBefore(new Date(System.currentTimeMillis()-50000));
-	certGen.setNotAfter(new Date(System.currentTimeMillis()+1*60*1000));
-	certGen.setSubjectDN(new X500Principal("CN=LocalCA Test Certificate"));
+	certGen.setNotAfter(new Date(System.currentTimeMillis()+validtime*1000));
+	certGen.setSubjectDN(new X500Principal(caDN));
 	certGen.setPublicKey(keypair.getPublic());
-	certGen.setSignatureAlgorithm("SHA256WithRSAEncryption");
-	
+	certGen.setSignatureAlgorithm("SHA1WithRSAEncryption");
+	// CA extensions as defined in http://www.ogf.org/documents/GFD.125.pdf
+	certGen.addExtension(X509Extensions.BasicConstraints, true,
+		new BasicConstraints(true));
+	certGen.addExtension(X509Extensions.KeyUsage, true,
+		new KeyUsage(KeyUsage.keyCertSign|KeyUsage.cRLSign));
+
 	cakey = keypair.getPrivate();
 	cacert = certGen.generate(cakey, "BC");
     }
@@ -88,7 +101,7 @@ public class LocalCA implements CA {
     
     /**
      * Return a Certificate. This creates a new Certificate based on the certificate
-     * signing request supplied. It is valid for an hour.
+     * signing request supplied.
      * 
      * Note that in the current implementation most attributes aren't copied.
      * 
@@ -107,10 +120,10 @@ public class LocalCA implements CA {
 	    certGen.setSerialNumber(BigInteger.valueOf(Integer.valueOf(reqserial)));
 	    certGen.setIssuerDN(cacert.getSubjectX500Principal());
 	    certGen.setNotBefore(new Date(System.currentTimeMillis()-50000));
-	    certGen.setNotAfter(new Date(System.currentTimeMillis()+1*60*1000));
+	    certGen.setNotAfter(new Date(System.currentTimeMillis()+validtime*1000));
 	    certGen.setSubjectDN(req.getCertificationRequestInfo().getSubject());
 	    certGen.setPublicKey(req.getPublicKey());
-	    certGen.setSignatureAlgorithm("SHA256WithRSAEncryption");
+	    certGen.setSignatureAlgorithm("SHA1WithRSAEncryption");
 	    certGen.addExtension(X509Extensions.AuthorityKeyIdentifier, false,
 		    new AuthorityKeyIdentifierStructure(cacert));
 	    certGen.addExtension(X509Extensions.SubjectKeyIdentifier, false,
@@ -118,36 +131,18 @@ public class LocalCA implements CA {
 	    certGen.addExtension(X509Extensions.BasicConstraints, true,
 		    new BasicConstraints(false));
 	    certGen.addExtension(X509Extensions.KeyUsage, true,
-		    new KeyUsage(KeyUsage.digitalSignature|KeyUsage.keyEncipherment));
+		    new KeyUsage(KeyUsage.digitalSignature|KeyUsage.keyEncipherment|
+			         KeyUsage.dataEncipherment));
 	    Vector<KeyPurposeId> extendedKeyUsage = new Vector<KeyPurposeId>();
 	    extendedKeyUsage.add(KeyPurposeId.id_kp_clientAuth);
 	    extendedKeyUsage.add(KeyPurposeId.id_kp_emailProtection);
-	    certGen.addExtension(X509Extensions.ExtendedKeyUsage, true,
+	    certGen.addExtension(X509Extensions.ExtendedKeyUsage, false,
 		    new ExtendedKeyUsage(extendedKeyUsage));
+	    // TODO implement internal CRL for testing and set cRLDistributionPoints
 	    cert = certGen.generate(cakey, "BC");
-	} catch (KeyException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (IllegalArgumentException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (NoSuchAlgorithmException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (NoSuchProviderException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (CertificateException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (IllegalStateException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (SignatureException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	} catch (GeneralSecurityException e) {
+	    throw new IOException("Could not sign certificate: "+e.getMessage());
 	}
-
 	return cert;
     }
 
