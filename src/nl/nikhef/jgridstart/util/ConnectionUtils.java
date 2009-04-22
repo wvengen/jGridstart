@@ -9,10 +9,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.logging.Logger;
 
 public class ConnectionUtils {
     
-    
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
     
     /** Return a Reader for a URL */
     public static Reader pageReader(URL url) throws IOException {
@@ -26,24 +27,24 @@ public class ConnectionUtils {
     /** Return a reader for a URL with pre/post data
      * 
      * @param url URL to submit to
-     * @param data Array of "key=value" strings
+     * @param data Array of "key","value","key2","value2",...
      * @param post true to post data, false for get
      * @return reader for reading from the URL
      * @throws IOException 
      */
     public static Reader pageReader(URL url, String[] data, boolean post) throws IOException {
-	return pageReader(url, createQueryString(data), post);
+	return pageReader(url, createQueryString(data, post), post);
     }
     /** Return the contents of a URL with pre/post data
      * 
      * @param url URL to submit to
-     * @param data Array of "key=value" strings
+     * @param data Array of "key","value","key2","value2",...
      * @param post true to post data, false for get
      * @return reader for reading from the URL
      * @throws IOException 
      */
     public static String pageContents(URL url, String[] data, boolean post) throws IOException {
-	return pageContents(url, createQueryString(data), post);
+	return pageContents(url, createQueryString(data, post), post);
     }
     
     /** Return the contents of a URL with pre or post data
@@ -80,7 +81,7 @@ public class ConnectionUtils {
 		// post: write data to stream
 		conn = url.openConnection();
 		// send post data if present
-		if (post && data != null) {
+		if (post) {
 		    conn.setDoOutput(true);
 		    OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
 		    wr.write(data);
@@ -93,6 +94,7 @@ public class ConnectionUtils {
 	    }
 	} else
 	    conn = url.openConnection();
+	logger.fine("Creating Reader for url: "+url);
 	// return reader for response
 	return new InputStreamReader(conn.getInputStream());
     }
@@ -103,11 +105,16 @@ public class ConnectionUtils {
      * @return single String with urlencoded data
      * @throws UnsupportedEncodingException 
      */
-    protected static String createQueryString(String[] data) throws UnsupportedEncodingException {
+    protected static String createQueryString(String[] data, boolean post) throws UnsupportedEncodingException {
 	String sdata = "";
-	for (int i=0; i<data.length; i++)
-	    sdata += "&amp;" + URLEncoder.encode(data[i], "UTF-8");
-	sdata = sdata.substring("&amp;".length());
+	String sep = "&";
+	for (int i=0; i<(data.length-1); i+=2) {
+	    String key = data[i]!=null ? data[i] : "";
+	    String val = data[i+1]!=null ? data[i+1] : "";
+	    sdata += sep + URLEncoder.encode(key, "UTF-8")
+	                 + "=" + URLEncoder.encode(val, "UTF-8");
+	}
+	sdata = sdata.substring(sep.length());
 	return sdata;
     }
 }

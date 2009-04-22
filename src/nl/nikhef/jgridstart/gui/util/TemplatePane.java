@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -92,6 +93,13 @@ public class TemplatePane extends XHTMLPanel {
     public void setPage(URL url) {
 	setDocument(url.toString());
     }
+    public URL getPage() {
+	try {
+	    return new URL(getDocument().getDocumentURI());
+	} catch (MalformedURLException e) {
+	    return null;
+	}
+    }
     /** Set the action to perform on form submission. If this is set
      * to null, the standard behaviour is done: posting data to the url
      * supplied by the form. */
@@ -102,6 +110,11 @@ public class TemplatePane extends XHTMLPanel {
     /** Return the HTMLDocument */
     public HTMLDocument getHTMLDocument() {
 	return (HTMLDocument)getDocument();
+    }
+    
+    public boolean print() {
+	// TODO
+	return false;
     }
     
     /** run user-supplied action on form submission */

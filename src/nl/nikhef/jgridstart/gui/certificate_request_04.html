@@ -1,0 +1,61 @@
+<html>
+<head>
+	<title>Request a new certificate</title>
+	<link rel="stylesheet" type="text/css" href="stylesheet-registration_form.css"/>
+</head>
+<body>
+	<h1>DutchGrid Certification Authorities Registration</h1>
+	
+	<table class="reserved">
+	  <tr>
+	    <th>Reserved for CA operations use</th>
+	    <td class="fillin" style="text-align: right">........ - ......</td>
+	  </tr>
+	  <tr>
+	    <td colspan="2" class="fillin"><span c="${subject}">/O=dutchgrid/O=users/O=somewhere/CN=John Doe</span></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <span class="check">&#x25a1;&nbsp;&nbsp;ID Document valid</span> &nbsp;&nbsp;
+          <span class="check">&#x25a1;&nbsp;&nbsp;PoP Challenge verified</span> &nbsp;&nbsp;
+          <span class="check">&#x25a1;&nbsp;&nbsp;RA Signature OK</span> &nbsp;&nbsp;
+        </td>
+      </tr>
+	</table>
+	
+	<div class="userdata">
+	  <table><tr>
+	    <td>
+	      <table class="userinfo">
+	        <tr><td colspan="2">Surname <div class="fillin" c="${surname}">Doe</div></td></tr>
+	        <tr><td colspan="2">Given names <div class="fillin" c="${givennanme}">John</div></td></tr>
+	        <tr>
+	          <td>Place of Birth <div class="fillin" c="${birthplace}">Someplace</div></td>
+	          <td style="text-align:right">Date of birth <div class="fillin" c="${birthdate}">01 Jan 1900</div></td>
+	        </tr>
+	        <tr><td colspan="2">Nationality <div class="fillin" c="${nationality}">NL</div></td></tr>
+	        <tr><td colspan="2">Identity paper type and number(s) <div class="fillin" c="${identity}">Passport NL12345678</div></td></tr>
+	        <tr><td colspan="2">SOFI number <span class="optional">(optional)</span><div class="fillin" c="${sofi}"></div></td></tr>
+	      </table>
+	    </td>
+	    <td class="sendto">
+	      Send this form by mail or fax to
+	      <pre c="${ra.address}">
+	        DutchGrid MS CA
+	        NIKHEF c/o Someone
+	        P.O. Box 12345
+	        NL 1009 DB Amsterdam
+	        The Netherlands
+	        
+	        fax: +31 20 592 5155
+	      </pre>
+	    </td>
+	  </tr></table>  
+	  
+	  The first twenty (20) characters of your proof-of-posession challenge:
+	  <div class="pop" c="${modulus.first20}">0123456789ABCDEF0123</div>
+	
+	</div>
+	
+</body>
+</html>

@@ -4,6 +4,7 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -152,4 +153,6 @@ public class TemplateWizard extends JDialog {
     
     // delegates to TemplatePane
     public HTMLDocument getHTMLDocument() { return pane.getHTMLDocument(); }
+    public URL getPage() { return pane.getPage(); }
+    public boolean print() throws PrinterException  { return pane.print(); }
 }

@@ -126,8 +126,8 @@ public class CertificatePair extends Properties {
      * - usage.any, usage.serverauth, usage.clientauth, usage.codesigning,
      *   usage.emailprotection, usage.timestamping, usage.ocspsigning
      *     are "true" when they are defined in the extended key usage
-     * - modulus
-     *     the public key's modulus
+     * - modulus, modulus.first20
+     *     the public key's modulus, and its first 20 characters
      * 
      * @param key property to get the value of
      * @return value of the property, or null if not found.
@@ -153,6 +153,9 @@ public class CertificatePair extends Properties {
 	    if (key.equals("modulus"))
 		if (cert!=null) return ((RSAPublicKey)cert.getPublicKey()).getModulus().toString();
 		else if (req!=null) return ((RSAPublicKey)req.getPublicKey()).getModulus().toString();
+	    if (key.equals("modulus.first20"))
+		if (cert!=null) return ((RSAPublicKey)cert.getPublicKey()).getModulus().toString().substring(0,20);
+		else if (req!=null) return ((RSAPublicKey)req.getPublicKey()).getModulus().toString().substring(0,20);
 	    else return null;
 	    if (key.equals("valid")) {
 		if (cert==null) return null;

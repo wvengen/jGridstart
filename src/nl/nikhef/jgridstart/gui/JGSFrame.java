@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Box;
@@ -14,6 +15,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.BorderFactory;
+import javax.swing.JScrollPane;
+
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -27,6 +30,7 @@ import javax.swing.event.ListSelectionListener;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.gui.util.PrintUtilities;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPane;
 import nl.nikhef.jgridstart.util.PasswordCache;
 

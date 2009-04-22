@@ -1,0 +1,64 @@
+/*
+ * CSS Stylesheet for registration form
+ */
+body {
+	border: 1px solid black;
+	font-family: sans-serif;
+}
+
+h1 {
+	text-align: center;
+	font-size: 16pt;
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+/*
+ * Reserved area
+ */
+table.reserved {
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+	background: #eeeeee;
+	width: 100%;
+	padding-left: 0.8em;
+	padding-right: 0.8em;
+}
+
+.reserved th {
+	font-style: italic;
+	font-weight: normal;
+	text-align: left;
+}
+
+.fillin {
+	font-family: monospace;
+	font-size: 12pt;
+	font-weight: bold;
+}
+span.check {
+	margin-right: 1.5em;
+}
+
+/*
+ * User data
+ */
+.userdata {
+	margin-left: 2.5em;
+	margin-right: 2.5em;
+}
+.userdata td, .userdata th {
+	height: 5.5ex;
+	vertical-align: top;
+}
+.pop {
+	font-family: monospace;
+	font-size: 12pt;
+	font-weight: bold;
+	letter-spacing: 0.3em;
+}
+.optional {
+	font-style: italic;
+	font-size: 8pt;
+	color: #888888;
+}

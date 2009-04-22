@@ -2,13 +2,18 @@ package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import javax.print.PrintService;
+import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -95,11 +100,17 @@ public class TemplateButtonPane extends JPanel {
     public void setPage(URL src) throws IOException {
 	contentpane.setPage(src);
     }
+    public URL getPage() {
+	return contentpane.getPage();
+    }
     public void setBackground(Color c) {
 	super.setBackground(c);
 	if (contentpane!=null) contentpane.setBackground(c);
     }
     public HTMLDocument getHTMLDocument() {
 	return contentpane.getHTMLDocument();
+    }
+    public boolean print() {
+	return contentpane.print();
     }
 }

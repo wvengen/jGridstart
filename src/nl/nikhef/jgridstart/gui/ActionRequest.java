@@ -1,6 +1,8 @@
 package nl.nikhef.jgridstart.gui;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.awt.print.PrinterException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -60,6 +62,7 @@ public class ActionRequest extends AbstractAction {
 	    pages.add(getClass().getResource("certificate_request_01.html"));
 	    pages.add(getClass().getResource("certificate_request_02.html"));
 	    pages.add(getClass().getResource("certificate_request_03.html"));
+	    pages.add(getClass().getResource("certificate_request_04.html"));
 	    setHandler(this);
 	}
 	
@@ -78,6 +81,17 @@ public class ActionRequest extends AbstractAction {
 		nextAction.setEnabled(false);
 	    }
 	    if (page==3) {
+		// set background colour to white
+		pane.setBackground(Color.WHITE);
+		// print form
+		try {
+		    print();
+		} catch (PrinterException e) {
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
+		}
+	    }
+	    if (page==4) {
 		// quit wizard
 		setVisible(false);
 		dispose();
@@ -126,9 +140,9 @@ public class ActionRequest extends AbstractAction {
 		    // TODO only upload if not yet done
 		    cert.uploadRequest();
 		    publish("state.submitcsr");
+		    publish("state.cancontinue");
 		    cert.downloadCertificate();
 		    publish("state.approved");
-		    publish("state.finished");
 		} catch (Exception e) {
 		    // TODO handle er
 		    e.printStackTrace();
@@ -146,7 +160,7 @@ public class ActionRequest extends AbstractAction {
 		for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
 		    String key = it.next();
 		    w.data().setProperty(key, "true");
-		    if (key.equals("state.finished"))
+		    if (key.equals("state.cancontinue"))
 			nextAction.setEnabled(true);
 		}
 		w.refresh();
