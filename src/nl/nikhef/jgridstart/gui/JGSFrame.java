@@ -251,7 +251,7 @@ public class JGSFrame extends JFrame {
 	    e.printStackTrace();
 	}
 	// also update selected item in menu
-	identityMenu.getItem(identityIndex + selection.getIndex()).setSelected(true);
+	if (selection.getIndex() >= 0)
+	    identityMenu.getItem(identityIndex + selection.getIndex()).setSelected(true);
     }
-
-}  //  @jve:decl-index=0:visual-constraint="10,10"
+}
