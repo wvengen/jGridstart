@@ -2,14 +2,17 @@ package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
@@ -18,11 +21,26 @@ import javax.swing.JScrollPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.xhtmlrenderer.render.Box;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xhtmlrenderer.extend.NamespaceHandler;
+import org.xhtmlrenderer.resource.XMLResource;
 import org.xhtmlrenderer.simple.XHTMLPanel;
+import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
 import org.xhtmlrenderer.swing.BasicPanel;
 import org.xhtmlrenderer.swing.FSMouseListener;
 import org.xhtmlrenderer.swing.LinkListener;
+import org.xhtmlrenderer.util.Configuration;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.AttributesImpl;
+import org.xml.sax.helpers.XMLFilterImpl;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 
 public class TemplatePane extends XHTMLPanel {
@@ -31,10 +49,12 @@ public class TemplatePane extends XHTMLPanel {
     
     protected Action submitAction = null;
     
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked") // getMouseTrackingListeners() returns unchecked List
     public TemplatePane() {
-	super();
-	setPreferredSize(new Dimension(400, 200)); // TODO set size from content
+	// make sure to have set in your xhtmlrenderer.conf
+	//   xr.load.xml-reader=nl.nikhef.jgridstart.gui.util.TemplatePane$TemplateXMLReader
+	// or the whole template thing won't work
+	setPreferredSize(new Dimension(550, 400)); // TODO set size from content
 	setFormSubmissionListener(this);
 	// don't open links in the same pane but in an external web browser instead.
 	// BareBonesActionLaunch also handles action: links
@@ -74,7 +94,7 @@ public class TemplatePane extends XHTMLPanel {
 	reloadDocument(getDocument());
     }
     public void setPage(URL url) {
-	setDocument(url.toString());
+        setDocument(url.toString());
     }
     public URL getPage() {
 	return getURL();
@@ -100,7 +120,99 @@ public class TemplatePane extends XHTMLPanel {
 	    submitAction.actionPerformed(e);
 	}
     }
-        
+    
+    /** Override setDocument() to process the template. This could have been
+     * done using xhtmlrenderer's configuration key
+     *   xr.load.xml-reader=nl.nikhef.jgridstart.gui.util.TemplatePane$TemplateXMLReader
+     * but I found no way to pass data to the class, which is needed for the
+     * variables. This is the setDocument() method that is called by each of
+     * the others.
+     */
+    @Override
+    public void setDocument(Document doc, String url, NamespaceHandler nsh) {
+	doTemplate(doc);
+	super.setDocument(doc, url, nsh);
+    }
+    @Override
+    public void setDocument(Document doc, String url) {
+	// resetListeners() is private so copy here :(
+        if (Configuration.isTrue("xr.use.listeners", true)) {
+            resetMouseTracker();
+        }
+	doTemplate(doc);
+        super.setDocument(doc, url, new XhtmlNamespaceHandler());
+    }
+    @Override
+    public void setDocument(InputStream stream, String url) {
+        setDocument(XMLResource.load(stream).getDocument(), url);
+    }
+
+    /** Processes an XML Node to apply the template recursively. */
+    protected void doTemplate(Node node) {
+	if (node.getNodeType() == Node.ELEMENT_NODE) {
+	    // expand variables in attributes
+	    NamedNodeMap attrs = node.getAttributes();
+	    for (int i=0; i<attrs.getLength(); i++) {
+		attrs.item(i).setNodeValue(parseExpression(attrs.item(i).getNodeValue()));
+	    }
+	    // apply "if" attributes
+	    Node ifNode = attrs.getNamedItem("if");
+	    if (ifNode!=null && !parseConditional(ifNode.getNodeValue())) {
+		node.getParentNode().removeChild(node);		
+		return;
+	    }
+	    // replace contents of "c" attributes
+	    Node cNode = attrs.getNamedItem("c");
+	    if (cNode!=null) {
+		NodeList nl = node.getChildNodes();
+		for (int i=0; i<nl.getLength(); i++)
+		    node.removeChild(nl.item(i));
+		node.appendChild(node.getOwnerDocument().createTextNode(cNode.getNodeValue()));
+	    }
+	    // set value where "name" attribute is set
+	    Node nameNode = attrs.getNamedItem("name");
+	    if (nameNode!=null && data.getProperty(nameNode.getNodeValue())!=null) {
+		Node valueAttr = node.getOwnerDocument().createAttribute("value");
+		valueAttr.setNodeValue(data.getProperty(nameNode.getNodeValue()));
+		attrs.setNamedItem(valueAttr);
+	    }
+	}
+	// recursively parse children
+	NodeList nl = node.getChildNodes();
+	for (int i=0; i<nl.getLength(); i++) {
+	    doTemplate(nl.item(i));
+	}
+    }
+
+    /** returns the result of a boolean expression */
+    // TODO more intelligent expression parsing, e.g. using JUEL
+    protected boolean parseConditional(String expr) {
+	if (expr==null) return true;
+	expr = expr.trim();
+	// handle negations
+	if (expr.startsWith("!"))
+	    return !parseConditional(expr.substring(1));
+	if (expr.equals("true")) return true;
+	if (expr.equals("false")) return false;
+	return !expr.equals("");
+    }
+    /** evaluates an expression by replacing variables */
+    // TODO more intelligent expression parsing, e.g. using JUEL
+    protected String parseExpression(String expr) {
+	// substitute variables
+	StringBuffer dstbuf = new StringBuffer();
+	final Pattern pat = Pattern.compile("(\\$\\{(.*?)\\})", Pattern.MULTILINE|Pattern.DOTALL);
+	Matcher match = pat.matcher(expr);
+	while (match.find()) {
+	    String key = match.group(2).trim();
+	    String sub = data!=null ? data.getProperty(key) : null;
+	    if (sub==null) sub="";
+	    match.appendReplacement(dstbuf, sub);
+	}
+	match.appendTail(dstbuf);
+	return dstbuf.toString();
+    }
+
     private static class Test {
 	public static void main(String[] args) throws Exception {
 	    final TemplatePane pane = new TemplatePane();
@@ -127,7 +239,7 @@ public class TemplatePane extends XHTMLPanel {
 		// check readonly attribute on form element and value from property
 		"<form><p><input type='checkbox' readonly='yes' name='chk'/> a checked readonly checkbox</p>"+
 		// check that submit button sets property values from elements
-		"<p>type <input type='text' name='txt' value='some text'/> and <input type='submit' value='submit'/></p></form>"+
+		"<p>type <input type='text' name='txt' value='**this is bad text**'/> and <input type='submit' value='submit'/></p></form>"+
 		// check a locked input element
 		"<p>this is a <input type='text' name='txtlocked' value='readonly'/> input element</p>"+
 		"</body>"+
@@ -135,6 +247,7 @@ public class TemplatePane extends XHTMLPanel {
 	    pane.data().setProperty("foo", "the contents of this foo variable");
 	    pane.data().setProperty("theurl", "http://www.w3.org/");
 	    pane.data().setProperty("chk", "true");
+	    pane.data().setProperty("txt", "some text");
 	    pane.data().setProperty("lock.txtlocked", "true");
 	    // don't set "bar"
 	    DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

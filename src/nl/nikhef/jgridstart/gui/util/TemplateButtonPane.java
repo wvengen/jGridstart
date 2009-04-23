@@ -2,18 +2,9 @@ package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.print.Printable;
-import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.net.URL;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
-
-import javax.print.PrintService;
-import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -21,7 +12,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.text.html.HTMLDocument;
+import org.w3c.dom.Document;
 
 
 /** A template pane in a scrolledwindow with buttons below */
@@ -107,8 +98,8 @@ public class TemplateButtonPane extends JPanel {
 	super.setBackground(c);
 	if (contentpane!=null) contentpane.setBackground(c);
     }
-    public HTMLDocument getHTMLDocument() {
-	return contentpane.getHTMLDocument();
+    public Document getDocument() {
+	return contentpane.getDocument();
     }
     public boolean print() {
 	return contentpane.print();

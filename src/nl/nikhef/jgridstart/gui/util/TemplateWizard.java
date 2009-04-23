@@ -14,9 +14,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.UIManager;
-import javax.swing.text.html.HTMLDocument;
-
-import nl.nikhef.jgridstart.gui.ActionRequest;
+import org.w3c.dom.Document;
 
 /**
  * HTML-based wizard dialog. One supplies it with a list of html templates and a
@@ -152,7 +150,7 @@ public class TemplateWizard extends JDialog {
     }
     
     // delegates to TemplatePane
-    public HTMLDocument getHTMLDocument() { return pane.getHTMLDocument(); }
+    public Document getHTMLDocument() { return pane.getDocument(); }
     public URL getPage() { return pane.getPage(); }
     public boolean print() throws PrinterException  { return pane.print(); }
 }
