@@ -1,50 +1,28 @@
 package nl.nikhef.jgridstart.gui.util;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseListener;
 import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.Action;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Element;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
-import javax.swing.text.html.FormView;
-import javax.swing.text.html.HTML;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
+import org.xhtmlrenderer.render.Box;
 import org.xhtmlrenderer.simple.XHTMLPanel;
+import org.xhtmlrenderer.swing.BasicPanel;
+import org.xhtmlrenderer.swing.FSMouseListener;
+import org.xhtmlrenderer.swing.LinkListener;
 
 
 public class TemplatePane extends XHTMLPanel {
@@ -53,20 +31,25 @@ public class TemplatePane extends XHTMLPanel {
     
     protected Action submitAction = null;
     
+    @SuppressWarnings("unchecked")
     public TemplatePane() {
 	super();
 	setPreferredSize(new Dimension(400, 200)); // TODO set size from content
-	/*
-	addHyperlinkListener(new HyperlinkListener() {
-	    public void hyperlinkUpdate(HyperlinkEvent e) {
-		if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-		    // use getDescription() because action: events may not be
-		    // recognised by URL so e.getURL() can be null.
-		    BareBonesActionLaunch.openURL(e.getDescription(), this);
-	       }
-	   }
+	setFormSubmissionListener(this);
+	// don't open links in the same pane but in an external web browser instead.
+	// BareBonesActionLaunch also handles action: links
+	List<FSMouseListener> ls = (List<FSMouseListener>)getMouseTrackingListeners();
+	for (Iterator<FSMouseListener> it = ls.iterator(); it.hasNext(); ) {
+	    FSMouseListener l = it.next();
+	    if (l instanceof LinkListener)
+		removeMouseTrackingListener(l);
+	}
+	addMouseTrackingListener(new LinkListener() {
+	    @Override
+            public void linkClicked(BasicPanel panel, String uri) {
+		BareBonesActionLaunch.openURL(uri, panel);
+	    }
 	});
-	*/
 	// TODO filter to replace "<tag .../>" by "<tag ...></tag>"
     }
     
@@ -94,22 +77,13 @@ public class TemplatePane extends XHTMLPanel {
 	setDocument(url.toString());
     }
     public URL getPage() {
-	try {
-	    return new URL(getDocument().getDocumentURI());
-	} catch (MalformedURLException e) {
-	    return null;
-	}
+	return getURL();
     }
     /** Set the action to perform on form submission. If this is set
      * to null, the standard behaviour is done: posting data to the url
      * supplied by the form. */
     public void setSubmitAction(Action e) {
 	submitAction = e;
-    }
-    
-    /** Return the HTMLDocument */
-    public HTMLDocument getHTMLDocument() {
-	return (HTMLDocument)getDocument();
     }
     
     public boolean print() {
@@ -126,7 +100,7 @@ public class TemplatePane extends XHTMLPanel {
 	    submitAction.actionPerformed(e);
 	}
     }
-    
+        
     private static class Test {
 	public static void main(String[] args) throws Exception {
 	    final TemplatePane pane = new TemplatePane();
@@ -138,18 +112,18 @@ public class TemplatePane extends XHTMLPanel {
 		// check substitution in ordinary attribute
 		"<p>Check that this points to <a href='${theurl}'>www.w3.org</a>.</p>"+
 		// check literal conditional
-		"<p>Basic conditionals are<font color='red' if='false'> not</font> "+
-			"<font color='green' if='true'>working</font></p>"+
+		"<p>Basic conditionals are<span style='color:red' if='false'> not</span> "+
+			"<span style='color:green' if='true'>working</span></p>"+
 		// check negated conditional on set property
-		"<p>Variable foo is<font color='red' if='!${foo}'> not</font> set</p>"+
+		"<p>Variable foo is<span style='color:red' if='!${foo}'> not</span> set</p>"+
 		// check conditional on set property
-		"<p>Variable foo is<font color='green' if='${foo}'> certainly</font> set</p>"+
+		"<p>Variable foo is<span style='color:green' if='${foo}'> certainly</span> set</p>"+
 		// check conditional on unset property
-		"<p>Variable bar is<font color='green' if='!${bar}'> not</font> set</p>"+
+		"<p>Variable bar is<span style='color:green' if='!${bar}'> not</span> set</p>"+
 		// check substitution with set property
 		"<p>And so foo is set to '<i c='${foo}'></i>', "+
 		// check substitution with unset property
-		"while bar is set to '<i c='${bar}'>(removed)</i>' (that's right, nothing).</p>"+
+		"while bar is set to '<i c='${bar}'>(removed)</i>' (should be empty).</p>"+
 		// check readonly attribute on form element and value from property
 		"<form><p><input type='checkbox' readonly='yes' name='chk'/> a checked readonly checkbox</p>"+
 		// check that submit button sets property values from elements
