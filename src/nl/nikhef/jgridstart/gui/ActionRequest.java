@@ -86,8 +86,6 @@ public class ActionRequest extends AbstractAction {
 		nextAction.setEnabled(false);
 	    }
 	    if (page==3) {
-		// set background colour to white
-		pane.setBackground(Color.WHITE);
 		// print form; enable close button after print dialog
 		nextAction.setEnabled(false);
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -121,7 +119,7 @@ public class ActionRequest extends AbstractAction {
 		super();
 		this.w = w;
 		// use clone to avoid synchronisation issues; not really tested though
-		p = (Properties)w.data().clone();
+		p = w.data(); //(Properties)w.data().clone();
 	    }
 
 	    /** worker thread that generates the certificate, etc. */

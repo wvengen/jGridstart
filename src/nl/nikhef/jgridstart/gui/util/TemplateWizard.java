@@ -108,7 +108,11 @@ public class TemplateWizard extends JDialog {
 	super.setVisible(visible);
     }
     
-    /** Initialize and build the dialog */
+    /** Initialize and build the dialog
+     * 
+     * The background colour is set to the default control background colour as
+     * specified by UIManager. It is still possible to override it in CSS/HTML.
+     */
     protected void initialize() {
 	setModal(true);
 	getContentPane().removeAll();
