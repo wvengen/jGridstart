@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -113,13 +114,10 @@ public class ActionRequest extends AbstractAction {
 	protected class GenerateWorker extends SwingWorker<Void, String> {
 	    /** gui element to refresh on update; don't use in worker thread! */
 	    protected TemplateWizard w;
-	    protected Properties p;
 
 	    public GenerateWorker(TemplateWizard w) {
 		super();
 		this.w = w;
-		// use clone to avoid synchronisation issues; not really tested though
-		p = w.data(); //(Properties)w.data().clone();
 	    }
 
 	    /** worker thread that generates the certificate, etc. */
@@ -129,13 +127,24 @@ public class ActionRequest extends AbstractAction {
 		    // Generate a keypair and certificate signing request
 		    // TODO make this configurable
 		    // TODO demo/tutorial DN
+		    // TODO check w.data() can safely be accessed in this thread
 		    if (cert==null) {
+			Properties p = new Properties(w.data());
 			p.setProperty("subject",
 			    "O=dutchgrid, O=users, " +
 			    "O="+p.getProperty("org")+", " +
 			    "CN="+p.getProperty("givenname")+
 			          " "+p.getProperty("surname"));
-			cert = store.generateRequest(p);
+			CertificatePair newCert = store.generateRequest(p);
+			// copy properties to certificate pair
+			for (Iterator<Map.Entry<Object, Object>> it =
+			    	w.data().entrySet().iterator(); it.hasNext(); ) {
+			    Map.Entry<Object, Object> e = it.next();
+			    newCert.put(e.getKey(), e.getValue());
+			}
+			// TODO check if cert can safely be set in this thread
+			cert = newCert;
+			setData(cert);
 			// now that request has been generated, lock fields
 			// used for that since they are in the request now
 			publish("lock.org");
