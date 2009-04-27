@@ -89,6 +89,9 @@ public class TemplateWizard extends JDialog {
 	nextAction.setEnabled(step < pages.size());
 	prevAction.setEnabled(step > 0);
 	if (handler!=null) handler.pageChanged(this, s);
+	// pack here to give child classes a chance to setPreferredSize()
+	// in their constructors or in setStep().
+	pack();
     }
     /** go to another page by relative distance */
     public void setStepRelative(int delta) {
@@ -108,7 +111,6 @@ public class TemplateWizard extends JDialog {
     /** Initialize and build the dialog */
     protected void initialize() {
 	setModal(true);
-	setPreferredSize(new Dimension(500, 400));
 	getContentPane().removeAll();
 	pane = new TemplateButtonPane();
 	getContentPane().add(pane);
@@ -128,8 +130,6 @@ public class TemplateWizard extends JDialog {
 	    }
 	};
 	pane.addAction(nextAction, true);
-
-	pack();
     }
     
     /** set the handler to be called when a page switch is done.

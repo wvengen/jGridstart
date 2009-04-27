@@ -1,8 +1,6 @@
 package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Dimension;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -10,7 +8,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -38,20 +35,7 @@ import org.xhtmlrenderer.swing.BasicPanel;
 import org.xhtmlrenderer.swing.FSMouseListener;
 import org.xhtmlrenderer.swing.LinkListener;
 import org.xhtmlrenderer.swing.SelectionHighlighter;
-import org.xhtmlrenderer.swing.SelectionHighlighter.CopyAction;
 import org.xhtmlrenderer.util.Configuration;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.AttributesImpl;
-import org.xml.sax.helpers.XMLFilterImpl;
-import org.xml.sax.helpers.XMLReaderFactory;
-
-import com.sun.org.apache.bcel.internal.generic.Select;
-
-import sun.util.logging.resources.logging;
 
 
 public class TemplatePane extends XHTMLPanel {
@@ -61,7 +45,8 @@ public class TemplatePane extends XHTMLPanel {
     
     @SuppressWarnings("unchecked") // getMouseTrackingListeners() returns unchecked List
     public TemplatePane() {
-	setPreferredSize(new Dimension(550, 400)); // TODO set size from content
+	super();
+	setPreferredSize(new Dimension(550, 350)); // TODO set size from content
 	setFormSubmissionListener(this);
 	// don't open links in the same pane but in an external web browser instead.
 	// BareBonesActionLaunch also handles action: links
@@ -88,7 +73,6 @@ public class TemplatePane extends XHTMLPanel {
 	getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
 		(KeyStroke)copyAction.getValue(Action.ACCELERATOR_KEY),
 		copyAction.getValue(Action.NAME));
-	// TODO filter to replace "<tag .../>" by "<tag ...></tag>"
     }
     
     public TemplatePane(URL src) throws IOException {

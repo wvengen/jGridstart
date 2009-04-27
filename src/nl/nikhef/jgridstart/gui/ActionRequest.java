@@ -1,6 +1,8 @@
 package nl.nikhef.jgridstart.gui;
 
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
 import java.util.Iterator;
@@ -11,6 +13,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 
@@ -59,6 +62,8 @@ public class ActionRequest extends AbstractAction {
 	
 	public RequestWizard() {
 	    super(parent);
+	    pane.setPreferredSize(null);
+	    setPreferredSize(new Dimension(600, 400)); // fit form in step 4
 	    pages.add(getClass().getResource("certificate_request_01.html"));
 	    pages.add(getClass().getResource("certificate_request_02.html"));
 	    pages.add(getClass().getResource("certificate_request_03.html"));
@@ -83,21 +88,26 @@ public class ActionRequest extends AbstractAction {
 	    if (page==3) {
 		// set background colour to white
 		pane.setBackground(Color.WHITE);
-		// print form
-		try {
-		    print();
-		} catch (PrinterException e) {
-		    // TODO Auto-generated catch block
-		    e.printStackTrace();
-		}
+		// print form; enable close button after print dialog
+		nextAction.setEnabled(false);
+		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
+			try {
+			    print();
+			    nextAction.setEnabled(true);
+			    setCursor(Cursor.getDefaultCursor());
+			} catch (PrinterException e) {
+			    // TODO Auto-generated catch block
+			    e.printStackTrace();
+			}
+		    }
+		});
 	    }
 	    if (page==4) {
 		// quit wizard
 		setVisible(false);
 		dispose();
-		// and select the newly created certificate in the main window
-		int index = store.indexOf(cert);
-		selection.setSelection(index);
 	    }
 	}
 
@@ -160,8 +170,17 @@ public class ActionRequest extends AbstractAction {
 		for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
 		    String key = it.next();
 		    w.data().setProperty(key, "true");
+		    // update next button
 		    if (key.equals("state.cancontinue"))
 			nextAction.setEnabled(true);
+		    // select certificate when created or update selection
+		    if (cert!=null) {
+			// forcibly update for other changes
+			// TODO create change listener for main window to catch refreshes and just refresh
+			int index = store.indexOf(cert);
+			selection.clearSelection();
+			selection.setSelection(index);
+		    }
 		}
 		w.refresh();
 	    }
