@@ -1,7 +1,11 @@
 package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Dimension;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +22,7 @@ import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -32,6 +37,8 @@ import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
 import org.xhtmlrenderer.swing.BasicPanel;
 import org.xhtmlrenderer.swing.FSMouseListener;
 import org.xhtmlrenderer.swing.LinkListener;
+import org.xhtmlrenderer.swing.SelectionHighlighter;
+import org.xhtmlrenderer.swing.SelectionHighlighter.CopyAction;
 import org.xhtmlrenderer.util.Configuration;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -42,13 +49,14 @@ import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.XMLFilterImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import com.sun.org.apache.bcel.internal.generic.Select;
+
 import sun.util.logging.resources.logging;
 
 
 public class TemplatePane extends XHTMLPanel {
     
     protected Properties data = new Properties();
-    
     protected Action submitAction = null;
     
     @SuppressWarnings("unchecked") // getMouseTrackingListeners() returns unchecked List
@@ -69,6 +77,17 @@ public class TemplatePane extends XHTMLPanel {
 		BareBonesActionLaunch.openURL(uri, panel);
 	    }
 	});
+	// allow selecting, and copying using Ctrl-C
+	SelectionHighlighter highlighter = new SelectionHighlighter();
+	highlighter.install(this);
+	SelectionHighlighter.CopyAction copyAction = new SelectionHighlighter.CopyAction();
+	copyAction.install(highlighter);
+	copyAction.putValue(Action.ACCELERATOR_KEY,
+		KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
+	getActionMap().put(copyAction.getValue(Action.NAME), copyAction);
+	getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+		(KeyStroke)copyAction.getValue(Action.ACCELERATOR_KEY),
+		copyAction.getValue(Action.NAME));
 	// TODO filter to replace "<tag .../>" by "<tag ...></tag>"
     }
     
@@ -134,7 +153,7 @@ public class TemplatePane extends XHTMLPanel {
     }
     @Override
     public void setDocument(Document doc, String url) {
-	// resetListeners() is private so copy here :(
+	// XHTMLPanel.resetListeners() is private so copy here :(
         if (Configuration.isTrue("xr.use.listeners", true)) {
             resetMouseTracker();
         }
