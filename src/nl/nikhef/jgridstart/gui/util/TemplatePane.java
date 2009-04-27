@@ -42,6 +42,8 @@ import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.XMLFilterImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import sun.util.logging.resources.logging;
+
 
 public class TemplatePane extends XHTMLPanel {
     
@@ -51,9 +53,6 @@ public class TemplatePane extends XHTMLPanel {
     
     @SuppressWarnings("unchecked") // getMouseTrackingListeners() returns unchecked List
     public TemplatePane() {
-	// make sure to have set in your xhtmlrenderer.conf
-	//   xr.load.xml-reader=nl.nikhef.jgridstart.gui.util.TemplatePane$TemplateXMLReader
-	// or the whole template thing won't work
 	setPreferredSize(new Dimension(550, 400)); // TODO set size from content
 	setFormSubmissionListener(this);
 	// don't open links in the same pane but in an external web browser instead.
@@ -169,12 +168,41 @@ public class TemplatePane extends XHTMLPanel {
 		    node.removeChild(nl.item(i));
 		node.appendChild(node.getOwnerDocument().createTextNode(cNode.getNodeValue()));
 	    }
-	    // set value where "name" attribute is set
+	    // fill form controls from data indicated by the "value" attribute
 	    Node nameNode = attrs.getNamedItem("name");
 	    if (nameNode!=null && data.getProperty(nameNode.getNodeValue())!=null) {
-		Node valueAttr = node.getOwnerDocument().createAttribute("value");
-		valueAttr.setNodeValue(data.getProperty(nameNode.getNodeValue()));
-		attrs.setNamedItem(valueAttr);
+		String dataValue = data.getProperty(nameNode.getNodeValue());
+		if (node.getNodeName().toLowerCase().equals("input")) {
+		    Node typeNode = attrs.getNamedItem("type");
+		    if (typeNode!=null) {
+			String type = typeNode.getNodeValue().toLowerCase();
+			// input elements with textual data
+			if (type.equals("text") || type.equals("password") || type.equals("hidden")) {
+			    Node valueAttr = node.getOwnerDocument().createAttribute("value");
+			    valueAttr.setNodeValue(dataValue);
+			    attrs.setNamedItem(valueAttr);
+			// boolean
+			} else if (type.equals("checkbox") || type.equals("radio")) {
+			    if (Boolean.valueOf(dataValue)) {
+				Node checkedAttr = node.getOwnerDocument().createAttribute("checked");
+				checkedAttr.setNodeValue("checked");
+				attrs.setNamedItem(checkedAttr);
+			    } else {
+				attrs.removeNamedItem("checked");
+			    }
+			} else {
+			    // TODO warn unsupported input type
+			}
+		    }
+		// textarea
+		} else if (node.getNodeName().toLowerCase().equals("textarea")) {
+			NodeList nl = node.getChildNodes();
+			for (int i=0; i<nl.getLength(); i++)
+			    node.removeChild(nl.item(i));
+			node.appendChild(node.getOwnerDocument().createTextNode(dataValue));
+		} else {
+		    // TODO warn unsupported element
+		}
 	    }
 	}
 	// recursively parse children
@@ -237,7 +265,7 @@ public class TemplatePane extends XHTMLPanel {
 		// check substitution with unset property
 		"while bar is set to '<i c='${bar}'>(removed)</i>' (should be empty).</p>"+
 		// check readonly attribute on form element and value from property
-		"<form><p><input type='checkbox' readonly='yes' name='chk'/> a checked readonly checkbox</p>"+
+		"<form><p><input type='checkbox' disabled='disabled' name='chk' id='chk'/> <label for='chk'>a checked readonly checkbox</label></p>"+
 		// check that submit button sets property values from elements
 		"<p>type <input type='text' name='txt' value='**this is bad text**'/> and <input type='submit' value='submit'/></p></form>"+
 		// check a locked input element
