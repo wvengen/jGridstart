@@ -221,6 +221,16 @@ public class TemplatePane extends XHTMLPanel {
 		    node.removeChild(nl.item(i));
 		node.appendChild(node.getOwnerDocument().createTextNode(cNode.getNodeValue()));
 	    }
+	    // readonly not implemented by xhtmlreader itself but disabled is
+	    // also if property lock.<name> is set make it readonly
+	    Node name = attrs.getNamedItem("name");
+	    Node rdNode = attrs.getNamedItem("readonly");
+	    if (rdNode!=null ||
+		    (name!=null && Boolean.valueOf(data().getProperty("lock."+name.getNodeValue()))) ) {
+		Node attr = node.getOwnerDocument().createAttribute("disabled");
+		attr.setNodeValue("disabled");
+		attrs.setNamedItem(attr);
+	    }
 	}
 	// recursively parse children
 	NodeList nl = node.getChildNodes();
@@ -360,7 +370,7 @@ public class TemplatePane extends XHTMLPanel {
 		// check substitution with unset property
 		"while bar is set to '<i c='${bar}'>(removed)</i>' (should be empty).</p>"+
 		// check readonly attribute on form element and value from property
-		"<form><p><input type='checkbox' disabled='disabled' name='chk' id='chk'/> <label for='chk'>a checked readonly checkbox</label></p>"+
+		"<form><p><input type='checkbox' readonly='readonly' name='chk' id='chk'/> <label for='chk'>a checked readonly checkbox</label></p>"+
 		// check that submit button sets property values from elements
 		"<p>type <input type='text' name='txt' value='**this is bad text**'/> and <input type='submit' name='show' value='submit'/></p></form>"+
 		// check a locked input element
