@@ -1,7 +1,7 @@
 /*
  * Common markup (used in all pages)
  */
-// TODO set font-size from system instead of absolutely
+/* TODO set font-size from system instead of absolutely */
 body {
 	font-size: 14pt;
 }
