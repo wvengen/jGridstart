@@ -90,8 +90,11 @@ public class TemplateWizard extends JDialog {
 	prevAction.setEnabled(step > 0);
 	if (handler!=null) handler.pageChanged(this, s);
 	// pack here to give child classes a chance to setPreferredSize()
-	// in their constructors or in setStep().
-	pack();
+	// in their constructors or in setStep(). This is only called if
+	// the window is not yet visible because pack()ing resets the
+	// dialog size to its preferred size, which is unwanted when the
+	// user resized the window.
+	if (!isVisible()) pack();
     }
     /** go to another page by relative distance */
     public void setStepRelative(int delta) {
