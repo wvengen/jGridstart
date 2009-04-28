@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +45,6 @@ import org.xhtmlrenderer.layout.LayoutContext;
 import org.xhtmlrenderer.render.BlockBox;
 import org.xhtmlrenderer.resource.XMLResource;
 import org.xhtmlrenderer.simple.XHTMLPanel;
-import org.xhtmlrenderer.simple.extend.XhtmlForm;
 import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
 import org.xhtmlrenderer.swing.BasicPanel;
 import org.xhtmlrenderer.swing.FSMouseListener;
@@ -130,11 +131,20 @@ public class TemplatePane extends XHTMLPanel {
     
     /** print the contents of this pane with the smallest possible printer margins;
      * a print dialog is shown first.
-     * Currently the output depends on size of this TemplatePane, which is
-     * quite annoying. TODO fix print sizing */
+     * TODO fix margins and related stuff
+     * 
+     * currently uses attempted fix from http://markmail.org/message/37rc4vaiz6peto5h */
     public boolean print() {
-	PrintUtilities print = new PrintUtilities(this);
-	print.print();
+	final PrinterJob printJob = PrinterJob.getPrinterJob();
+        printJob.setPrintable(new TemplatePrintable(this));
+        if (printJob.printDialog()) {
+            try {
+		printJob.print();
+	    } catch (PrinterException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+        }
 	return true;
     }
     
@@ -142,7 +152,23 @@ public class TemplatePane extends XHTMLPanel {
     @Override
     public void submit(String url) {
 	if (submitAction!=null) {
-	    ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "");
+	    String action = null;
+	    // find out which submit button was the source
+	    NodeList nl = getDocument().getElementsByTagName("input");
+	    for (int i=0; i<nl.getLength(); i++) {
+		Node node = nl.item(i);
+		Node type =  node.getAttributes().getNamedItem("type");
+		if (type==null) continue;
+		if (!type.getNodeValue().equals("submit")) continue;
+		Node name = node.getAttributes().getNamedItem("name");
+		if (name==null) continue;
+		if (url.contains(name.getNodeValue()+'=')) {
+		    action = name.getNodeValue();
+		    break;
+		}		
+	    }
+	    // and use that as command string in the action event
+	    ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, action);
 	    submitAction.actionPerformed(e);
 	}
     }
@@ -336,9 +362,11 @@ public class TemplatePane extends XHTMLPanel {
 		// check readonly attribute on form element and value from property
 		"<form><p><input type='checkbox' disabled='disabled' name='chk' id='chk'/> <label for='chk'>a checked readonly checkbox</label></p>"+
 		// check that submit button sets property values from elements
-		"<p>type <input type='text' name='txt' value='**this is bad text**'/> and <input type='submit' value='submit'/></p></form>"+
+		"<p>type <input type='text' name='txt' value='**this is bad text**'/> and <input type='submit' name='show' value='submit'/></p></form>"+
 		// check a locked input element
 		"<p>this is a <input type='text' name='txtlocked' value='readonly'/> input element</p>"+
+		// add print button
+		"<form><p>you can also <input type='submit' name='print' value='print'/> this page.</p></form>"+
 		"</body>"+
 		"</html>";		    
 	    pane.data().setProperty("foo", "the contents of this foo variable");
@@ -357,11 +385,14 @@ public class TemplatePane extends XHTMLPanel {
 	    frame.pack();
 	    pane.setSubmitAction(new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-		    JOptionPane.showMessageDialog(frame,
-			"Checkbox: "+pane.data().getProperty("chk")+"\n"+
-		    	"Text: "+pane.data().getProperty("txt"),
-			"Form submitted",
-			JOptionPane.INFORMATION_MESSAGE);
+		    if (e.getActionCommand().equals("show"))
+			JOptionPane.showMessageDialog(frame,
+				"Checkbox: "+pane.data().getProperty("chk")+"\n"+
+				"Text: "+pane.data().getProperty("txt"),
+				"Form submitted",
+				JOptionPane.INFORMATION_MESSAGE);
+		    else if (e.getActionCommand().equals("print"))
+			pane.print();
 		}
 	    });
 	    frame.setVisible(true);
