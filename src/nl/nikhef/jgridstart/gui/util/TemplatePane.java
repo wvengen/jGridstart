@@ -15,26 +15,42 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xhtmlrenderer.extend.NamespaceHandler;
+import org.xhtmlrenderer.extend.ReplacedElement;
+import org.xhtmlrenderer.extend.UserAgentCallback;
+import org.xhtmlrenderer.layout.LayoutContext;
+import org.xhtmlrenderer.render.BlockBox;
 import org.xhtmlrenderer.resource.XMLResource;
 import org.xhtmlrenderer.simple.XHTMLPanel;
+import org.xhtmlrenderer.simple.extend.XhtmlForm;
 import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
 import org.xhtmlrenderer.swing.BasicPanel;
 import org.xhtmlrenderer.swing.FSMouseListener;
 import org.xhtmlrenderer.swing.LinkListener;
 import org.xhtmlrenderer.swing.SelectionHighlighter;
+import org.xhtmlrenderer.swing.SwingReplacedElement;
+import org.xhtmlrenderer.swing.SwingReplacedElementFactory;
 import org.xhtmlrenderer.util.Configuration;
 
 
@@ -47,7 +63,6 @@ public class TemplatePane extends XHTMLPanel {
     public TemplatePane() {
 	super();
 	setPreferredSize(new Dimension(550, 350)); // TODO set size from content
-	setFormSubmissionListener(this);
 	// don't open links in the same pane but in an external web browser instead.
 	// BareBonesActionLaunch also handles action: links
 	List<FSMouseListener> ls = (List<FSMouseListener>)getMouseTrackingListeners();
@@ -73,6 +88,9 @@ public class TemplatePane extends XHTMLPanel {
 	getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
 		(KeyStroke)copyAction.getValue(Action.ACCELERATOR_KEY),
 		copyAction.getValue(Action.NAME));
+	// install custom form handling hooks
+	getSharedContext().setReplacedElementFactory(new TemplateSwingReplacedElementFactory());
+	setFormSubmissionListener(this);
     }
     
     public TemplatePane(URL src) throws IOException {
@@ -85,6 +103,8 @@ public class TemplatePane extends XHTMLPanel {
 	refresh();
     }
     public Properties data() {
+	// update properties from form
+	
 	return data;
     }
     /** Return the content of the html page's title tag */
@@ -175,42 +195,6 @@ public class TemplatePane extends XHTMLPanel {
 		    node.removeChild(nl.item(i));
 		node.appendChild(node.getOwnerDocument().createTextNode(cNode.getNodeValue()));
 	    }
-	    // fill form controls from data indicated by the "value" attribute
-	    Node nameNode = attrs.getNamedItem("name");
-	    if (nameNode!=null && data.getProperty(nameNode.getNodeValue())!=null) {
-		String dataValue = data.getProperty(nameNode.getNodeValue());
-		if (node.getNodeName().toLowerCase().equals("input")) {
-		    Node typeNode = attrs.getNamedItem("type");
-		    if (typeNode!=null) {
-			String type = typeNode.getNodeValue().toLowerCase();
-			// input elements with textual data
-			if (type.equals("text") || type.equals("password") || type.equals("hidden")) {
-			    Node valueAttr = node.getOwnerDocument().createAttribute("value");
-			    valueAttr.setNodeValue(dataValue);
-			    attrs.setNamedItem(valueAttr);
-			// boolean
-			} else if (type.equals("checkbox") || type.equals("radio")) {
-			    if (Boolean.valueOf(dataValue)) {
-				Node checkedAttr = node.getOwnerDocument().createAttribute("checked");
-				checkedAttr.setNodeValue("checked");
-				attrs.setNamedItem(checkedAttr);
-			    } else {
-				attrs.removeNamedItem("checked");
-			    }
-			} else {
-			    // TODO warn unsupported input type
-			}
-		    }
-		// textarea
-		} else if (node.getNodeName().toLowerCase().equals("textarea")) {
-			NodeList nl = node.getChildNodes();
-			for (int i=0; i<nl.getLength(); i++)
-			    node.removeChild(nl.item(i));
-			node.appendChild(node.getOwnerDocument().createTextNode(dataValue));
-		} else {
-		    // TODO warn unsupported element
-		}
-	    }
 	}
 	// recursively parse children
 	NodeList nl = node.getChildNodes();
@@ -246,6 +230,84 @@ public class TemplatePane extends XHTMLPanel {
 	}
 	match.appendTail(dstbuf);
 	return dstbuf.toString();
+    }
+    
+    /** class that returns forms elements with hooks to update the
+     * corresponding property (as returned by data() ) on change. Also
+     * sets form elements' initial value from properties. */
+    protected class TemplateSwingReplacedElementFactory extends SwingReplacedElementFactory {
+
+	@Override
+	public ReplacedElement createReplacedElement(LayoutContext context, BlockBox box,
+		UserAgentCallback uac, int cssWidth, int cssHeight) {
+	    ReplacedElement el = super.createReplacedElement(context, box, uac, cssWidth, cssHeight);
+	    if (el instanceof SwingReplacedElement)
+		bindProperty(box.getElement(), ((SwingReplacedElement)el).getJComponent());
+	    return el;
+	}
+
+	/** Add a listener that updates the properties bound to the
+	 * enclosing TemplatePane when the supplied component is changed. This
+	 * also sets the current value to the property's current value. If no
+	 * name is set on the element, nothing is bound. */
+	protected void bindProperty(Element e, JComponent c) {
+	    String name = e.getAttribute("name");
+	    String ivalue = e.getAttribute("value");
+	    if (name==null) return;
+	    String value = data.getProperty(name);
+	    // set property from input's value if it wasn't present already
+	    if (value==null && ivalue!=null) data.setProperty(name, ivalue);
+	    // how to get&set contents depends on type of control
+	    if (c instanceof JTextComponent) {
+		// text and password
+		if (value!=null)
+		    ((JTextComponent)c).setText(value);
+		((JTextComponent)c).getDocument().addDocumentListener(
+			new FormComponentListener(e));
+	    } else if (c instanceof AbstractButton) {
+		// checkbox (TODO and radiobutton?)
+		if (value!=null)
+		    ((AbstractButton)c).setSelected(Boolean.valueOf(value));
+		((AbstractButton)c).addChangeListener(
+			new FormComponentListener(e));
+	    }
+	    // TODO other form elements as well
+	    // TODO just copy hidden to properties?
+	}
+
+	protected class FormComponentListener implements DocumentListener, ChangeListener {
+
+	    protected Element el = null;
+
+	    public FormComponentListener(Element el) {
+		this.el = el;
+	    }
+
+	    /** Update the properties bound to the enclosing TemplatePane from a
+	     * document. This is called when a component's document is changed. */
+	    protected void documentUpdate(DocumentEvent e) {
+		String name = el.getAttribute("name");
+		javax.swing.text.Document doc = e.getDocument();
+		try {
+		    data.setProperty(name, doc.getText(0, doc.getLength()));
+		} catch (BadLocationException e1) { }
+	    }
+	    public void changedUpdate(DocumentEvent e)  { documentUpdate(e); }
+	    public void insertUpdate(DocumentEvent e)   { documentUpdate(e); }
+	    public void removeUpdate(DocumentEvent e)   { documentUpdate(e); }
+
+	    /** Update the properties bound to the enclosing TemplatePane
+	     * from a button. This is called when a button's state is changed. */
+	    public void stateChanged(ChangeEvent e) {
+		String name = el.getAttribute("name");
+		if (e.getSource() instanceof AbstractButton) {
+		    data.setProperty(name,
+			    Boolean.toString(((AbstractButton)e.getSource()).isSelected()));
+		} else {
+		    // TODO unreachable code
+		}
+	    }
+	}
     }
 
     private static class Test {
