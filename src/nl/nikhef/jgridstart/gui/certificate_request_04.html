@@ -12,7 +12,7 @@
 	    <td class="fillin" style="text-align: right">........ - ......</td>
 	  </tr>
 	  <tr>
-	    <td colspan="2" class="fillin"><span c="${subject}">/O=dutchgrid/O=users/O=somewhere/CN=John Doe</span></td>
+	    <td colspan="2" class="fillin-fixed"><span c="${subject}">/O=dutchgrid/O=users/O=somewhere/CN=John Doe</span></td>
       </tr>
       <tr>
         <td colspan="2">
@@ -25,8 +25,8 @@
 	
 	<div class="userdata">
 	  <table><tr>
-	    <td>
-	      <table class="userinfo">
+	    <td class="userinfo">
+	      <table>
 	        <tr><td colspan="2">Surname <div class="fillin" c="${surname}">Doe</div></td></tr>
 	        <tr><td colspan="2">Given names <div class="fillin" c="${givennanme}">John</div></td></tr>
 	        <tr>
@@ -35,27 +35,87 @@
 	        </tr>
 	        <tr><td colspan="2">Nationality <div class="fillin" c="${nationality}">NL</div></td></tr>
 	        <tr><td colspan="2">Identity paper type and number(s) <div class="fillin" c="${identity}">Passport NL12345678</div></td></tr>
-	        <tr><td colspan="2">SOFI number <span class="optional">(optional)</span><div class="fillin" c="${sofi}"></div></td></tr>
+	        <tr><td colspan="2">SOFI number <span class="comment">(optional)</span><div class="fillin" c="${sofi}"></div></td></tr>
 	      </table>
 	    </td>
-	    <td class="sendto">
-	      Send this form by mail or fax to
-	      <pre c="${ra.address}">
-	        DutchGrid MS CA
+	    <td class="ra">
+	      <h2 style="text-align:center">Send this form by mail or fax to</h2>
+	      <address c="${ra.address}">DutchGrid MS CA
 	        NIKHEF c/o Someone
 	        P.O. Box 12345
 	        NL 1009 DB Amsterdam
 	        The Netherlands
 	        
 	        fax: +31 20 592 5155
-	      </pre>
+	      </address>
 	    </td>
 	  </tr></table>  
 	  
-	  The first twenty (20) characters of your proof-of-posession challenge:
-	  <div class="pop" c="${modulus.first20}">0123456789ABCDEF0123</div>
-	
+	  <div class="pop">
+	    <h2>The first twenty (20) characters of your proof-of-possession challenge:</h2>
+	    <div class="fillin" c="${modulus.first20}">0123456789ABCDEF0123</div>
+	  </div>
+	  
+	  <div class="contact">
+	    <h2>Contact Information</h2>
+	  </div>
+	  
+	  <table class="userinfo">
+	    <tr>
+	      <td>Name <div class="fillin" c="${givenname} ${surname}">John Doe</div></td>
+	      <td>Streed addres <span class="comment">(physical delivery address)</span> <div class="fillin" c="${street}">Bar avenue 0</div></td>
+	    </tr>
+	    <tr>
+	      <td>Organisation <div class="fillin" c="${org}">Foo inc.</div></td>
+	      <td>ZIP code <div class="fillin" c="${zip}">1234AA</div></td>
+	    </tr>
+	    <tr>
+	      <td>Phone number <div class="fillin" c="${phone}">+31 (0)123 456789</div></td>
+	      <td>Place <span class="comment">(and province where applicable)</span> <div class="fillin" c="${place}">Heaven</div></td>
+	    </tr>
+	    <tr>
+	      <td>Email address <div class="fillin" c="${email}">john@heaven.mil</div></td>
+	    </tr>
+	  </table>
+	  
+	  <div class="signature">
+	    <h2>Signature</h2>
+	    
+        I have filled all data truthfully and to the best of my knowledge, and will
+	    abide by the <a href="http://ca.dutchgrid.nl/medium/policy/">certificate policy
+	    and practice statement</a> of the DutchGrid Certification Authority.
+	    
+	    <table><tr>
+	      <td class="signature-box" rowspan="2">Signature <div class="fillin"></div></td>
+	      <td class="signature-info">Place and date <div class="fillin"></div></td>
+	    </tr>
+	    <tr><td><br/><br/></td></tr></table>
+      </div>
+
 	</div>
-	
+
+
+	<table class="reserved">
+	  <tr><th colspan="2">Reserved for RA operations use</th></tr>
+
+	  <tr><td colspan="2" class="ra">
+        I, <span class="fillin"><sup>RA name</sup></span> have
+	    verified the identity of the requester based on the identity piece
+	    listed above, and confirm that the information is complete and
+	    accurate.
+	    I met the applicant in person on
+	    <span class="fillin"><sup>date and time of meeting</sup></span> at
+	    <span class="fillin"><sup>meeting place</sup></span> and have confirmed
+	    his affiliation with <span class="fillin"><sup>organisation name</sup></span>
+	    to the extent required in the
+	    <a href="http://ca.dutchgrid.nl/medium/policy/">certificate policy
+	    and practice statement</a>.
+	  </td></tr>
+	  <tr>
+        <td class="notes-box">Notes</td>
+		<td class="signature-box">Signature of registration authority<br/><br/><br/><br/></td>
+      </tr>
+    </table>
+    
 </body>
 </html>

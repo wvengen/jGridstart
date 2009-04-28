@@ -7,12 +7,31 @@ body {
 	background: white;
 	color: black;
 }
-
+body > * {
+	padding-left: 0.8em;
+	padding-right: 0.8em;
+}
 h1 {
 	text-align: center;
 	font-size: 16pt;
 	margin-top: 1em;
 	margin-bottom: 1em;
+}
+table {
+	table-layout: fixed; /* equal-width columns */
+}
+.comment {
+	font-style: italic;
+	font-size: 8pt;
+	color: #888888;
+}
+.fillin, .fillin-fixed {
+	font-family: monospace;
+	font-size: 12pt;
+	font-weight: bold;
+}
+.fillin {
+	min-height: 1.5em; /* ex seems to have problems :( */
 }
 
 /*
@@ -21,46 +40,104 @@ h1 {
 table.reserved {
 	border-top: 1px solid black;
 	border-bottom: 1px solid black;
+	padding: 1ex;
 	background: #eeeeee;
 	width: 100%;
-	padding-left: 0.8em;
-	padding-right: 0.8em;
 }
-
 .reserved th {
 	font-style: italic;
 	font-weight: normal;
 	text-align: left;
 }
-
-.fillin {
-	font-family: monospace;
-	font-size: 12pt;
-	font-weight: bold;
-}
 span.check {
 	margin-right: 1.5em;
 }
+.check {
+	white-space: nowrap;
+}
 
 /*
- * User data
+ * User data & contact information
  */
 .userdata {
-	margin-left: 2.5em;
-	margin-right: 2.5em;
+	margin: 1em 0.8em;
+}
+.userdata table {
+	width: 100%;
+	border-spacing: 0.5em;
 }
 .userdata td, .userdata th {
-	height: 5.5ex;
 	vertical-align: top;
 }
-.pop {
-	font-family: monospace;
-	font-size: 12pt;
-	font-weight: bold;
-	letter-spacing: 0.3em;
+.userdata .userinfo table {
+	border: 2px solid black;
+	width: 100%;
 }
-.optional {
+.userdata .userinfo td, .userdata .userinfo th {
+	padding: 0.05ex 0.3em 0.6ex 0.3em;
+	border-bottom: 1px solid gray;
+}
+
+.userdata .ra {
+	padding-left: 1em;
+	vertical-align: bottom;
+}
+.userdata .ra address {
+	margin: 1em 0 0 1em;
+	padding: 1em;
+	white-space: pre-line;
+	font-size: 13pt; 
+	font-style: normal;
+	border: 1px solid black;
+}
+h2 {
+	margin-top: 3ex;
+	margin-bottom: 1ex;
+	font-size: 14pt;
+	font-weight: normal;
+}
+.pop .fillin {
+	font-size: 13pt;
+	letter-spacing: 0.3em; /* unsupported by flying saucer :( */
+	border: 2px solid black;
+	padding: 0.6em 0.6em 0.2em 0.6em;
+	margin: 0 0.5em 0 0.5em;
+}
+
+/*
+ * Signature
+ */
+.signature-box, .signature-info {
+	font-weight: bold;
+	border: 2px solid black;
+}
+
+/*
+ * RA reserved area
+ */
+.reserved .ra {
+	line-height: 1.5;
+}
+.reserved .ra .fillin {
+	font-weight: normal;
 	font-style: italic;
-	font-size: 8pt;
+	margin-top: 0.2em;
+	border: 1px solid #aaaaaa;
 	color: #888888;
+	padding: 0.5ex 0 0.5ex 0;
+	font-size: 8pt;
+	height: 100%;
+	vertical-align: top;
+	text-align: right;
+	display: inline-block;
+	width: 15em;
+}
+.reserved .notes-box, .reserved .signature-box {
+	font-style: italic;
+	height: 10ex; /* not supported by flying saucer, so use <br/>s as well */
+	vertical-align: top;
+	font-weight: normal;
+}
+.reserved .signature-box {
+	border: 1px solid black;
 }
