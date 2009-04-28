@@ -5,6 +5,7 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
@@ -19,7 +20,6 @@ public class ActionExport extends CertificateAction {
 	putValue(MNEMONIC_KEY, new Integer('E'));
 	BareBonesActionLaunch.addAction("export", this);
     }
-    //public ActionExport(JFrame parent) { this(parent, null); }
     
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
@@ -40,5 +40,6 @@ public class ActionExport extends CertificateAction {
     public void doExport(File f) {
 	CertificatePair cert = getCertificatePair();
 	logger.info("Exporting certificate "+cert+" to: "+f);
+	JOptionPane.showMessageDialog(parent, "export not yet implemented");
     }
 }

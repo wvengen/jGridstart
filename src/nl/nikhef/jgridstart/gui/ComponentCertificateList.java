@@ -54,7 +54,7 @@ public class ComponentCertificateList extends JList {
 	    String name = cert.getSubjectPrincipalValue(X509Name.CN);
 	    String star = "", org = "";
 	    if (index==0) {
-		star = "<b color='#ffcc00' size=>&#x2730</b>";
+		star = "<b color='#ffcc00'>&#x2730</b>";
 	    }	
 	    if (cert.getSubjectPrincipalValue(X509Name.CN)!=null) {
 		org = "<br>\n&nbsp;<i style='font-size:80%;'>"+

@@ -132,13 +132,13 @@ public class JGSFrame extends JFrame {
 	    // menu: Certificate
 	    menu = new JMenu("Actions");
 	    menu.setMnemonic('A');
-	    menu.add(new JMenuItem("Request approval...", 'R'));
-	    menu.add(new JMenuItem("Install...", 'I'));
-	    menu.add(new JMenuItem("Request renewal...", 'N'));
+	    menu.add(new JMenuItem("Request approval...", 'R')).setEnabled(false);
+	    menu.add(new JMenuItem("Install...", 'I')).setEnabled(false);
+	    menu.add(new JMenuItem("Request renewal...", 'N')).setEnabled(false);
 	    menu.add(new JMenuItem(new ActionRevoke(this)));
 	    menu.addSeparator();
 	    menu.add(new JMenuItem(new ActionExport(this, selection)));
-	    menu.add(new JMenuItem("Change passphrase...", 'P'));
+	    menu.add(new JMenuItem("Change passphrase...", 'P')).setEnabled(false);
 	    menu.add(new JMenuItem(new ActionViewLog(this)));
 	    jMenuBar.add(menu);
 	    menu.getItem(0).setEnabled(false);
@@ -150,7 +150,7 @@ public class JGSFrame extends JFrame {
 	    viewCertificateList = new JCheckBoxMenuItem(actionViewCertificateList);
 	    viewCertificateList.setSelected(false);
 	    menu.add(viewCertificateList);
-	    menu.add(new JMenuItem("Personal details...", 'P'));
+	    menu.add(new JMenuItem("Personal details...", 'P')).setEnabled(false);
 	    menu.add(new JMenuItem(new ActionRefresh(this, store) {
 		public void actionPerformed(ActionEvent e) {
 		    super.actionPerformed(e);

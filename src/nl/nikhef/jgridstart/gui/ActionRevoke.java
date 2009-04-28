@@ -26,8 +26,9 @@ public class ActionRevoke extends AbstractAction {
 	logger.finer("Action: "+getValue(NAME));
 	String message = 
 	    "<html><body>" +
-	    "<h1>Reqeust a revocation</h1>"+
+	    "<h1>Request a revocation</h1>"+
 	    "<p>When your certificate has been ... blah ..." +
+	    "<p></p><p><em>Revocation is not yet implemented</em></p>" +
 	    "</html></body>";
 	Object [] options = { "Revoke", "Cancel" };
 	int ret = JOptionPane.showOptionDialog(parent,
