@@ -86,6 +86,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
      */
     public void load(File path) {
 	this.path = path;
+	if (!path.isDirectory()) return;
 	List<File> files = Arrays.asList(path.listFiles());
 	// add new items
 	for (Iterator<File> i = files.iterator(); i.hasNext();) {
