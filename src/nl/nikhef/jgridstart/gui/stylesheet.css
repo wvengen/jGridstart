@@ -1,13 +1,9 @@
 /*
  * Common markup (used in all pages)
  */
-/* TODO set font-size from system instead of absolutely */
-body {
-	font-size: 14pt;
-}
 h1 {
 	font-weight: bold;
-	font-size: 18pt;
+	font-size: 16pt;
 }
 
 th {
@@ -30,12 +26,12 @@ th {
 
 .valid {
 	color: green;
-	font-size: 16pt;
+	font-size: 14pt;
 	font-weight: bold;
 }
 .invalid {
 	color: red;
-	font-size: 16pt;
+	font-size: 14pt;
 	font-weight: bold;
 }
 .pending {

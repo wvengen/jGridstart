@@ -6,6 +6,7 @@ body {
 	font-family: sans-serif;
 	background: white;
 	color: black;
+	font-size: 10pt;
 }
 body > * {
 	padding-left: 0.8em;
@@ -13,21 +14,21 @@ body > * {
 }
 h1 {
 	text-align: center;
-	font-size: 16pt;
-	margin-top: 1em;
-	margin-bottom: 1em;
+	font-size: 14pt;
+	margin-top: 0.9em;
+	margin-bottom: 0.7em;
 }
 table {
 	table-layout: fixed; /* equal-width columns */
 }
 .comment {
 	font-style: italic;
-	font-size: 8pt;
+	font-size: 6pt;
 	color: #888888;
 }
 .fillin, .fillin-fixed {
 	font-family: monospace;
-	font-size: 12pt;
+	font-size: 11pt;
 	font-weight: bold;
 }
 .fillin {
@@ -40,7 +41,7 @@ table {
 table.reserved {
 	border-top: 1px solid black;
 	border-bottom: 1px solid black;
-	padding: 1ex;
+	padding: 0 1ex;
 	background: #eeeeee;
 	width: 100%;
 }
@@ -64,7 +65,6 @@ span.check {
 }
 .userdata table {
 	width: 100%;
-	border-spacing: 0.5em;
 }
 .userdata td, .userdata th {
 	vertical-align: top;
@@ -76,6 +76,7 @@ span.check {
 .userdata .userinfo td, .userdata .userinfo th {
 	padding: 0.05ex 0.3em 0.6ex 0.3em;
 	border-bottom: 1px solid gray;
+	font-size: 10pt;
 }
 
 .userdata .ra {
@@ -86,18 +87,18 @@ span.check {
 	margin: 1em 0 0 1em;
 	padding: 1em;
 	white-space: pre-line;
-	font-size: 13pt; 
+	font-size: 11pt; 
 	font-style: normal;
 	border: 1px solid black;
 }
 h2 {
-	margin-top: 3ex;
+	margin-top: 2ex;
 	margin-bottom: 1ex;
-	font-size: 14pt;
+	font-size: 12pt;
 	font-weight: normal;
 }
 .pop .fillin {
-	font-size: 13pt;
+	font-size: 11pt;
 	letter-spacing: 0.3em; /* unsupported by flying saucer :( */
 	border: 2px solid black;
 	padding: 0.6em 0.6em 0.2em 0.6em;
@@ -124,9 +125,9 @@ h2 {
 	margin-top: 0.2em;
 	border: 1px solid #aaaaaa;
 	color: #888888;
-	padding: 0.5ex 0 0.5ex 0;
-	font-size: 8pt;
-	height: 100%;
+	padding: 0;
+	font-size: 7pt;
+	height: 14pt;
 	vertical-align: top;
 	text-align: right;
 	display: inline-block;
