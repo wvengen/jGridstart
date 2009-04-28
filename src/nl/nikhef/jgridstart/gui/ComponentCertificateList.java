@@ -39,7 +39,7 @@ public class ComponentCertificateList extends JList {
      * Initialize this component, create its gui. Should be called only once.
      */
     protected void initialize() {
-	setPreferredSize(new Dimension(150, 200));
+	setMaximumSize(new Dimension(200, Integer.MAX_VALUE));
     }
     
     class CertificateCellRenderer extends DefaultListCellRenderer {
@@ -54,7 +54,7 @@ public class ComponentCertificateList extends JList {
 	    String name = cert.getSubjectPrincipalValue(X509Name.CN);
 	    String star = "", org = "";
 	    if (index==0) {
-		star = "<b color='#ffcc00'>✰</b>";
+		star = "<b color='#ffcc00' size=>&#x2730</b>";
 	    }	
 	    if (cert.getSubjectPrincipalValue(X509Name.CN)!=null) {
 		org = "<br>\n&nbsp;<i style='font-size:80%;'>"+

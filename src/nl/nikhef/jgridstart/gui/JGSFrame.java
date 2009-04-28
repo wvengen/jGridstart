@@ -10,6 +10,7 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
@@ -38,7 +39,7 @@ public class JGSFrame extends JFrame {
 
     private JPanel jContentPane = null;
     private JMenuBar jMenuBar = null;
-    private ComponentCertificateList certList = null; 
+    private JComponent certList = null; 
     private TemplateButtonPane certInfoPane = null;
 
     private CertificateStore store = null;
@@ -94,7 +95,10 @@ public class JGSFrame extends JFrame {
 	if (jContentPane == null) {
 	    jContentPane = new JPanel();
 	    jContentPane.setLayout(new BorderLayout());
-	    certList = new ComponentCertificateList(store, selection);
+	    certList = new JScrollPane(
+		    new ComponentCertificateList(store, selection),
+		    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+		    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	    jContentPane.add(certList, BorderLayout.WEST);
 	    jContentPane.add(getJPanel(), BorderLayout.CENTER);
 	}
