@@ -108,6 +108,10 @@ public class TemplatePane extends XHTMLPanel {
 	submitAction = e;
     }
     
+    /** print the contents of this pane with the smallest possible printer margins;
+     * a print dialog is shown first.
+     * Currently the output depends on size of this TemplatePane, which is
+     * quite annoying. TODO fix print sizing */
     public boolean print() {
 	PrintUtilities print = new PrintUtilities(this);
 	print.print();

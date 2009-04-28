@@ -1,7 +1,7 @@
 package nl.nikhef.jgridstart.gui.util;
 
 /*
- * Copied from this tutorial:
+ * Adapted from this tutorial:
  *
  * http://www.developerdotstar.com/community/node/124
  * http://www.apl.jhu.edu/~hall/java/Swing-Tutorial/Swing-Tutorial-Printing...
@@ -28,10 +28,17 @@ public class PrintUtilities implements Printable {
   public PrintUtilities(Component componentToBePrinted) {
     this.componentToBePrinted = componentToBePrinted;
   }
-
+  
   public void print() {
-    PrinterJob printJob = PrinterJob.getPrinterJob();
-    printJob.setPrintable(this);
+      print(null);
+  }
+
+  public void print(PageFormat pageFormat) {
+    PrinterJob printJob = getPrinterJob();
+    if (pageFormat!=null)
+	printJob.setPrintable(this, pageFormat);
+    else
+	printJob.setPrintable(this);
     if (printJob.printDialog())
       try {
         System.out.println("Calling PrintJob.print()");
@@ -92,5 +99,9 @@ public class PrintUtilities implements Printable {
   public static void enableDoubleBuffering(Component c) {
     RepaintManager currentManager = RepaintManager.currentManager(c);
     currentManager.setDoubleBufferingEnabled(true);
+  }
+  
+  public static PrinterJob getPrinterJob() {
+      return PrinterJob.getPrinterJob();
   }
 }
