@@ -12,13 +12,17 @@
 			<attribute name="javadoc_location" value="jar:thirdparty/commons-cli/commons-cli-javadoc-1.2.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="thirdparty/junit/junit-4.5.jar"/>
-	<classpathentry kind="lib" path="thirdparty/swingworker/swing-worker-1.2.jar" sourcepath="thirdparty/swingworker/swing-worker-src-1.2.zip">
+	<classpathentry kind="lib" path="thirdparty/junit/junit-4.5.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:thirdparty/swingworker/swing-worker-doc-1.2.zip!/"/>
+			<attribute name="javadoc_location" value="http://junit.org/junit/javadoc/4.5/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="thirdparty/flyingsaucer/core-renderer-minimal.jar" sourcepath="/user/wvengen/wrk/workspace/flyingsaucer/flyingsaucer-R7final-src.zip">
+	<classpathentry kind="lib" path="thirdparty/swingworker/swing-worker-1.2.jar" sourcepath="thirdparty/swingworker/swing-worker-src-1.2.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="https://swingworker.dev.java.net/nonav/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="thirdparty/flyingsaucer/core-renderer-minimal.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="http://pigeonholdings.com/projects/flyingsaucer/R8/javadoc/user/"/>
 		</attributes>
