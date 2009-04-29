@@ -1,8 +1,12 @@
 package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Dimension;
+import java.awt.Event;
+import java.awt.ItemSelectable;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
@@ -19,15 +23,20 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.xml.parsers.DocumentBuilder;
@@ -289,10 +298,22 @@ public class TemplatePane extends XHTMLPanel {
 	protected void bindProperty(Element e, JComponent c) {
 	    String name = e.getAttribute("name");
 	    String ivalue = e.getAttribute("value");
+	    // only for options the name is taken from enclosing select
+	    if (e.getTagName().toLowerCase().equals("option")) {
+		Node node;
+		while ((node = e.getParentNode()) != null) {
+		    if (node.getNodeName().toLowerCase().equals("select")) {
+			name = node.getAttributes().getNamedItem("name").getNodeValue();
+			break;
+		    }
+		}
+	    }
 	    if (name==null) return;
 	    String value = data.getProperty(name);
 	    // set property from input's value if it wasn't present already
 	    if (value==null && ivalue!=null) data.setProperty(name, ivalue);
+	    // we care about content controls, not scrollpanes
+	    if (c instanceof JScrollPane) c = (JComponent)((JScrollPane)c).getViewport().getView();
 	    // how to get&set contents depends on type of control
 	    if (c instanceof JTextComponent) {
 		// text and password
@@ -300,9 +321,30 @@ public class TemplatePane extends XHTMLPanel {
 		    ((JTextComponent)c).setText(value);
 		((JTextComponent)c).getDocument().addDocumentListener(
 			new FormComponentListener(e));
+	    } else if (c instanceof JComboBox || c instanceof JList) {
+		// combo box or list
+		// find selected items from document; see also listSelectionChanged()
+		// TODO implement multiple selection
+		int index = -1;
+		NodeList nodes = e.getElementsByTagName("option");
+		for (int i=0; i<nodes.getLength(); i++) {
+		    Node nodeValue = nodes.item(i).getAttributes().getNamedItem("value");
+		    if (nodeValue==null) continue;
+		    if (nodeValue.getNodeValue().equals(value)) {
+			    index = i;
+			    break;
+		    }
+		}
+		if (c instanceof JComboBox) {
+		    ((JComboBox)c).setSelectedIndex(index);
+		    ((JComboBox)c).addItemListener(new FormComponentListener(e));
+		} else if (c instanceof JList) {
+		    ((JList)c).setSelectedIndex(index);
+		    ((JList)c).addListSelectionListener(new FormComponentListener(e));
+		}
 	    } else if (c instanceof AbstractButton) {
-		// checkbox (TODO and radiobutton?)
-		if (value!=null)
+		// checkbox
+		if (Boolean.valueOf(value))
 		    ((AbstractButton)c).setSelected(Boolean.valueOf(value));
 		((AbstractButton)c).addChangeListener(
 			new FormComponentListener(e));
@@ -311,7 +353,7 @@ public class TemplatePane extends XHTMLPanel {
 	    // TODO just copy hidden to properties?
 	}
 
-	protected class FormComponentListener implements DocumentListener, ChangeListener {
+	protected class FormComponentListener implements DocumentListener, ChangeListener, ListSelectionListener, ItemListener {
 
 	    protected Element el = null;
 
@@ -343,6 +385,39 @@ public class TemplatePane extends XHTMLPanel {
 		    // TODO unreachable code
 		}
 	    }
+
+	    /** Update the properties bound to the enclosing TemplatePane
+	     * from a list. This is called when a list's state is changed.
+	     * 
+	     * The implementation looks somewhat clumsy. I have no access to the
+	     * underlying model since that is declared private. So I get the
+	     * selected index and look up the corresponding value from the
+	     * document.
+	     * TODO implement lists with multiple selections */
+	    protected void listSelectionChanged(Object source) {
+		String name = el.getAttribute("name");
+		int index = -1;
+		if (source instanceof JComboBox)
+		    index = ((JComboBox)source).getSelectedIndex();
+		else if (source instanceof JList)
+		    index = ((JList)source).getSelectedIndex();
+		// TODO warn if neither?
+		NodeList nodes = el.getElementsByTagName("option");
+		if (index>=0 && index<nodes.getLength()) {
+		    Node value = nodes.item(index).getAttributes().getNamedItem("value");
+		    if (value!=null)
+			data.setProperty(name, value.getNodeValue());
+		}
+	    }
+	    public void itemStateChanged(ItemEvent e) {
+		if (e.getStateChange() == ItemEvent.SELECTED)
+		    listSelectionChanged(e.getSource());
+	    }
+
+	    public void valueChanged(ListSelectionEvent e) {
+		if (e.getValueIsAdjusting()) return;
+		listSelectionChanged(e.getSource());
+	    }
 	}
     }
 
@@ -370,6 +445,8 @@ public class TemplatePane extends XHTMLPanel {
 		// check substitution with unset property
 		"while bar is set to '<i c='${bar}'>(removed)</i>' (should be empty).</p>"+
 		// check readonly attribute on form element and value from property
+		// select
+		"<p>And a <select name='sel'><option value='bad'>bad</option><option value='selected'>selected</option></select> select box</p>"+
 		"<form><p><input type='checkbox' readonly='readonly' name='chk' id='chk'/> <label for='chk'>a checked readonly checkbox</label></p>"+
 		// check that submit button sets property values from elements
 		"<p>type <input type='text' name='txt' value='**this is bad text**'/> and <input type='submit' name='show' value='submit'/></p></form>"+
@@ -384,6 +461,7 @@ public class TemplatePane extends XHTMLPanel {
 	    pane.data().setProperty("chk", "true");
 	    pane.data().setProperty("txt", "some text");
 	    pane.data().setProperty("lock.txtlocked", "true");
+	    pane.data().setProperty("sel", "selected");
 	    // don't set "bar"
 	    DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 	    pane.setDocument(builder.parse(new ByteArrayInputStream(testPage.getBytes())));
@@ -398,6 +476,7 @@ public class TemplatePane extends XHTMLPanel {
 		    if (e.getActionCommand().equals("show"))
 			JOptionPane.showMessageDialog(frame,
 				"Checkbox: "+pane.data().getProperty("chk")+"\n"+
+				"Selection: "+pane.data().getProperty("sel")+"\n"+
 				"Text: "+pane.data().getProperty("txt"),
 				"Form submitted",
 				JOptionPane.INFORMATION_MESSAGE);
