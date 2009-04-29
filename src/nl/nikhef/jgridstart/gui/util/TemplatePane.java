@@ -294,7 +294,8 @@ public class TemplatePane extends XHTMLPanel {
 	/** Add a listener that updates the properties bound to the
 	 * enclosing TemplatePane when the supplied component is changed. This
 	 * also sets the current value to the property's current value. If no
-	 * name is set on the element, nothing is bound. */
+	 * name is set on the element, nothing is bound.
+	 * TODO set property value from html form if not yet set */
 	protected void bindProperty(Element e, JComponent c) {
 	    String name = e.getAttribute("name");
 	    String ivalue = e.getAttribute("value");
@@ -310,8 +311,6 @@ public class TemplatePane extends XHTMLPanel {
 	    }
 	    if (name==null) return;
 	    String value = data.getProperty(name);
-	    // set property from input's value if it wasn't present already
-	    if (value==null && ivalue!=null) data.setProperty(name, ivalue);
 	    // we care about content controls, not scrollpanes
 	    if (c instanceof JScrollPane) c = (JComponent)((JScrollPane)c).getViewport().getView();
 	    // how to get&set contents depends on type of control
@@ -319,8 +318,7 @@ public class TemplatePane extends XHTMLPanel {
 		// text and password
 		if (value!=null)
 		    ((JTextComponent)c).setText(value);
-		((JTextComponent)c).getDocument().addDocumentListener(
-			new FormComponentListener(e));
+		((JTextComponent)c).getDocument().addDocumentListener(new FormComponentListener(e));
 	    } else if (c instanceof JComboBox || c instanceof JList) {
 		// combo box or list
 		// find selected items from document; see also listSelectionChanged()
@@ -336,18 +334,24 @@ public class TemplatePane extends XHTMLPanel {
 		    }
 		}
 		if (c instanceof JComboBox) {
-		    ((JComboBox)c).setSelectedIndex(index);
+		    if (value!=null)
+			((JComboBox)c).setSelectedIndex(index);
 		    ((JComboBox)c).addItemListener(new FormComponentListener(e));
 		} else if (c instanceof JList) {
-		    ((JList)c).setSelectedIndex(index);
+		    if (value!=null)
+			((JList)c).setSelectedIndex(index);
 		    ((JList)c).addListSelectionListener(new FormComponentListener(e));
 		}
+	    } else if (c instanceof JRadioButton) {
+		// radio button
+		if (value!=null)
+		    ((JRadioButton)c).setSelected(ivalue.equals(value));
+		((AbstractButton)c).addChangeListener(new FormComponentListener(e));
 	    } else if (c instanceof AbstractButton) {
 		// checkbox
-		if (Boolean.valueOf(value))
+		if (value!=null)
 		    ((AbstractButton)c).setSelected(Boolean.valueOf(value));
-		((AbstractButton)c).addChangeListener(
-			new FormComponentListener(e));
+		((AbstractButton)c).addChangeListener(new FormComponentListener(e));
 	    }
 	    // TODO other form elements as well
 	    // TODO just copy hidden to properties?
@@ -378,7 +382,10 @@ public class TemplatePane extends XHTMLPanel {
 	     * from a button. This is called when a button's state is changed. */
 	    public void stateChanged(ChangeEvent e) {
 		String name = el.getAttribute("name");
-		if (e.getSource() instanceof AbstractButton) {
+		if (e.getSource() instanceof JRadioButton &&
+			((JRadioButton)e.getSource()).isSelected())
+		    data.setProperty(name, el.getAttribute("value"));
+		else if (e.getSource() instanceof AbstractButton) {
 		    data.setProperty(name,
 			    Boolean.toString(((AbstractButton)e.getSource()).isSelected()));
 		} else {
@@ -444,9 +451,11 @@ public class TemplatePane extends XHTMLPanel {
 		"<p>And so foo is set to '<i c='${foo}'></i>', "+
 		// check substitution with unset property
 		"while bar is set to '<i c='${bar}'>(removed)</i>' (should be empty).</p>"+
-		// check readonly attribute on form element and value from property
 		// select
-		"<p>And a <select name='sel'><option value='bad'>bad</option><option value='selected'>selected</option></select> select box</p>"+
+		"<p>And a <select name='sel'><option value='bad'>bad</option><option value='selected'>selected</option></select> select box with "+
+		// radio buttons
+		"<input type='radio' name='rad' value='one'/>one or <input type='radio' name='rad' value='two'/>two radio buttons</p>"+
+		// check readonly attribute on form element and value from property
 		"<form><p><input type='checkbox' readonly='readonly' name='chk' id='chk'/> <label for='chk'>a checked readonly checkbox</label></p>"+
 		// check that submit button sets property values from elements
 		"<p>type <input type='text' name='txt' value='**this is bad text**'/> and <input type='submit' name='show' value='submit'/></p></form>"+
@@ -477,6 +486,7 @@ public class TemplatePane extends XHTMLPanel {
 			JOptionPane.showMessageDialog(frame,
 				"Checkbox: "+pane.data().getProperty("chk")+"\n"+
 				"Selection: "+pane.data().getProperty("sel")+"\n"+
+				"Radio: "+pane.data().getProperty("rad")+"\n"+
 				"Text: "+pane.data().getProperty("txt"),
 				"Form submitted",
 				JOptionPane.INFORMATION_MESSAGE);
