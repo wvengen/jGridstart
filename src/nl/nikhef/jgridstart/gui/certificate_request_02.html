@@ -9,20 +9,39 @@
 	<form><table>
 	  <tr>
 	    <th>Certificate type</th>
-	    <td>Users (personal)</td>
+	    <td colspan="2">Users (personal)</td>
 	  </tr>
 	  <tr>
 	    <th>Organisation</th>
-	    <td><input type="text" size="25" name="org"/></td>
+	    <td colspan="2"><select name="org">
+	      <option value="almeregrid">Almere Grid</option>
+	      <option value="amolf">Institute for Atomic and Molecular Physics (AMOLF)</option>
+	      <option value="astron">Netherlands Institute for Radio Astronomy (ASTRON)</option>
+	      <option value="cmbi">Centre for Molecular and Biomolecular Informatics (CMBI)</option>
+	      <option value="cosine">Cosine Science &amp; Computing BV</option>
+	      <option value="cwi">Centrum voor Wiskunde en Informatica (CWI)</option>
+	      <option value="dans">Data Archiving and networking Services (DANS)</option>
+	      <option>...</option>
+	      <option value="sara">SARA Reken- en Netwerkdiensten</option>
+	      <option value="surfnet">SURFnet</option>
+	      <option value="nikhef">Nationaal instituut voor subatomaire fysica (NIKHEF)</option>
+	    </select></td>
 	  </tr>
 	  <tr>
-	    <th>Certification level</th>
-	    <td>
-	      <input type="radio" name="level" value="medium" id="medium"/>
-	        <label for="medium">Medium</label>
-	      <input type="radio" name="level" value="demo" id="demo"/>
-	        <label for="demo">Demo</label>
-	    </td>
+	    <th rowspan="2">Certification level</th>
+	    <td><input type="radio" name="level" value="medium" id="medium"/></td>
+	    <td><label for="medium">Medium security, for use in national and European grid projects
+	          (<a href="http://www.eu-egee.org/">EGEE</a>,
+	           <a href="http://www.cern.ch/lcg">LCG</a>,
+	           <a href="http://www.vl-e.nl/">VL-e</a>,
+	           <a href="http://www.deisa.eu/">DEISA</a>,
+	           ...)</label></td>
+	  </tr>
+	  <tr>
+	    <td><input type="radio" name="level" value="demo" id="demo"/></td>
+	    <td><label for="demo">Demo certification,
+	          for students and conference demonstrations, works on
+	          <a href="http://www.cs.vu.nl/das2/">DAS-2</a></label></td>
 	  </tr>
 	</table></form>
 </body>

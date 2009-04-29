@@ -61,7 +61,6 @@ public class ActionRequest extends AbstractAction {
 	
 	public RequestWizard() {
 	    super(parent);
-	    pane.setPreferredSize(null);
 	    setPreferredSize(new Dimension(600, 400)); // fit form in step 4
 	    pages.add(getClass().getResource("certificate_request_01.html"));
 	    pages.add(getClass().getResource("certificate_request_02.html"));
@@ -146,6 +145,7 @@ public class ActionRequest extends AbstractAction {
 			// now that request has been generated, lock fields
 			// used for that since they are in the request now
 			publish("lock.org");
+			publish("lock.level");
 			publish("lock.givenname");
 			publish("lock.surname");
 			// update gui
