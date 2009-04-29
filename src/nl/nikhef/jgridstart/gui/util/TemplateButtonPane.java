@@ -62,8 +62,7 @@ public class TemplateButtonPane extends JPanel {
 	
 	buttonpane.add(new JButton(action), null);
 	buttonpane.add(Box.createRigidArea(new Dimension(btnBorderWidth, 0)));
-	repaint();
-	invalidate();
+	buttonpane.revalidate();
 	if (isDefault)
 	    contentpane.setSubmitAction(action);
     }

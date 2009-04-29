@@ -4,9 +4,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 
-import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
-import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -21,7 +19,6 @@ import javax.swing.JScrollPane;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.util.Enumeration;
 
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ListDataEvent;
@@ -31,7 +28,6 @@ import javax.swing.event.ListSelectionListener;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
-import nl.nikhef.jgridstart.gui.util.PrintUtilities;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPane;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
@@ -146,7 +142,7 @@ public class JGSFrame extends JFrame {
 	    // menu: View
 	    menu = new JMenu("View");
 	    menu.setMnemonic('W');
-	    actionViewCertificateList = new ActionViewCertificateList(certList, false);
+	    actionViewCertificateList = new ActionViewCertificateList(this, certList, false);
 	    viewCertificateList = new JCheckBoxMenuItem(actionViewCertificateList);
 	    viewCertificateList.setSelected(false);
 	    menu.add(viewCertificateList);
@@ -244,9 +240,11 @@ public class JGSFrame extends JFrame {
 	    if (c!=null) {
 		certInfoPane.setData(c);
 		certInfoPane.setPage(getClass().getResource("certificate_info.html"));
+		certInfoPane.removeActions();
 		certInfoPane.addAction(new ActionRevoke(JGSFrame.this));
 	    } else {
 		certInfoPane.setPage(getClass().getResource("certificate_none_yet.html"));
+		certInfoPane.removeActions();
 		certInfoPane.addAction(new ActionImport(JGSFrame.this, store, selection));
 		certInfoPane.addAction(new ActionRequest(JGSFrame.this, store, selection));
 	    }
