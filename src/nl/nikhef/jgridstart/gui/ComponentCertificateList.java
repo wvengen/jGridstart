@@ -60,7 +60,7 @@ public class ComponentCertificateList extends JList {
 		org = "<br>\n&nbsp;<i style='font-size:80%;'>"+
 			cert.getSubjectPrincipalValue(X509Name.O)+"</i>";
 	    }
-	    setText("<html><body width='100%'>"+name+star+org+"</html></body>");
+	    setText("<html><body width='100%' style='margin: 2pt;'>"+name+star+org+"</html></body>");
 
 	    return this;
 	}
