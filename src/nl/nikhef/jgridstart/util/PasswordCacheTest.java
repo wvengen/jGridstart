@@ -47,7 +47,7 @@ public class PasswordCacheTest extends TestCase {
 	Assert.assertNull(cache.getForDecrypt("", "barfoo"));
     }
 
-    public void testGetDencryptPasswordFinder() {
+    public void testGetDecryptPasswordFinder() {
 	cache.clear();
 	char[] pw = "aoksdJLKASjkl".toCharArray();
 	cache.set("bar", pw);
