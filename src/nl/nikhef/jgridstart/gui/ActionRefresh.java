@@ -2,9 +2,13 @@ package nl.nikhef.jgridstart.gui;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+
+import org.jdesktop.swingworker.SwingWorker;
+
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
@@ -25,7 +29,19 @@ public class ActionRefresh extends AbstractAction {
 
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
-	store.refresh();
+	setEnabled(false);
+	parent.setCursor(Cursor.WAIT_CURSOR);
+	new SwingWorker<Void, Void>() {
+	    @Override
+	    protected Void doInBackground() throws Exception {
+		store.refresh();
+		return null;
+	    }
+	    @Override
+	    protected void done() {
+		parent.setCursor(null);
+		setEnabled(true);
+	    }
+	}.execute();
     }
-
 }
