@@ -240,11 +240,9 @@ public class JGSFrame extends JFrame {
 	    if (c!=null) {
 		certInfoPane.setData(c);
 		certInfoPane.setPage(getClass().getResource("certificate_info.html"));
-		certInfoPane.removeActions();
 		certInfoPane.addAction(new ActionRevoke(JGSFrame.this));
 	    } else {
 		certInfoPane.setPage(getClass().getResource("certificate_none_yet.html"));
-		certInfoPane.removeActions();
 		certInfoPane.addAction(new ActionImport(JGSFrame.this, store, selection));
 		certInfoPane.addAction(new ActionRequest(JGSFrame.this, store, selection));
 	    }
