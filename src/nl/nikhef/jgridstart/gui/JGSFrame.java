@@ -5,6 +5,7 @@ import javax.swing.JPanel;
 import javax.swing.JFrame;
 
 import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -15,6 +16,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -185,15 +187,17 @@ public class JGSFrame extends JFrame {
 	    store.addListDataListener(new ListDataListener() {
 		// only single indices supported
 		public void intervalAdded(ListDataEvent e) {
+		    int index = e.getIndex0();
+		    if (index < 0) return;
 		    // add item to menu
-		    if (e.getIndex0() < 0) return;
-		    CertificatePair cert = store.get(e.getIndex0());
-		    JRadioButtonMenuItem jrb = new JRadioButtonMenuItem();
-		    jrb.setText(cert.toString());
-		    jrb.addActionListener(
-			    new ActionSelectCertificate(JGSFrame.this, cert, selection));
+		    CertificatePair cert = store.get(index);
+		    Action action = new ActionSelectCertificate(JGSFrame.this, cert, selection);
+		    if (index<9)
+			action.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control "+(index+1)));
+		    JRadioButtonMenuItem jrb = new JRadioButtonMenuItem(action);
+		    //jrb.setText(cert.toString());
 		    identityButtonGroup.add(jrb);
-		    identityMenu.insert(jrb, identityIndex + e.getIndex0());
+		    identityMenu.insert(jrb, identityIndex + index);
 		    // show certificate list if we went from 1 to 2 certificates
 		    if (store.size() == 2)
 			setViewCertificateList(true);

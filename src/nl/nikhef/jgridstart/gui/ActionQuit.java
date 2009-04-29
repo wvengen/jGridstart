@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart.gui;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 
@@ -19,6 +20,7 @@ public class ActionQuit extends AbstractAction {
 	this.parent = parent;
 	putValue(NAME, "Quit");
 	putValue(MNEMONIC_KEY, new Integer('Q'));
+	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control Q"));
 	BareBonesActionLaunch.addAction("quit", this);
     }
 

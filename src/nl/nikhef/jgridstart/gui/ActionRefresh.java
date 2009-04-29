@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart.gui;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 
 import org.jdesktop.swingworker.SwingWorker;
 
@@ -24,6 +25,7 @@ public class ActionRefresh extends AbstractAction {
 	this.store = store;
 	putValue(NAME, "Refresh");
 	putValue(MNEMONIC_KEY, new Integer('R'));
+	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("F5"));
 	BareBonesActionLaunch.addAction("refresh", this);
     }
 

@@ -6,6 +6,7 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
@@ -18,6 +19,7 @@ public class ActionExport extends CertificateAction {
 	super(parent, s);
 	putValue(NAME, "Export...");
 	putValue(MNEMONIC_KEY, new Integer('E'));
+	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control E"));
 	BareBonesActionLaunch.addAction("export", this);
     }
     

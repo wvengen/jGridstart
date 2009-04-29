@@ -2,12 +2,12 @@ package nl.nikhef.jgridstart.gui;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
@@ -29,6 +29,7 @@ public class ActionImport extends AbstractAction {
 	this.selection = selection;
 	putValue(NAME, "Import...");
 	putValue(MNEMONIC_KEY, new Integer('I'));
+	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control I"));
 	BareBonesActionLaunch.addAction("import", this);
     }
     

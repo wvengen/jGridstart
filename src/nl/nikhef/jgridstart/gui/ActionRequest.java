@@ -1,6 +1,5 @@
 package nl.nikhef.jgridstart.gui;
 
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -12,11 +11,9 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.text.html.HTML;
-import javax.swing.text.html.HTMLDocument;
 
 import org.jdesktop.swingworker.SwingWorker;
 
@@ -40,6 +37,7 @@ public class ActionRequest extends AbstractAction {
 	this.selection = selection;
 	putValue(NAME, "Request new...");
 	putValue(MNEMONIC_KEY, new Integer('R'));
+	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control N"));
 	BareBonesActionLaunch.addAction("request", this);
     }
     

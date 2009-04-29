@@ -2,6 +2,8 @@ package nl.nikhef.jgridstart.gui;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
+
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
@@ -19,6 +21,7 @@ public class ActionViewLog extends AbstractAction {
 	this.parent = parent;
 	putValue(NAME, "View log...");
 	putValue(MNEMONIC_KEY, new Integer('L'));
+	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control L"));
 	BareBonesActionLaunch.addAction("viewlog", this);
     }
 
