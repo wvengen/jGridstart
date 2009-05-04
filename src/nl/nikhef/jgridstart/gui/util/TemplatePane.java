@@ -41,6 +41,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -62,6 +63,7 @@ import org.xhtmlrenderer.swing.SelectionHighlighter;
 import org.xhtmlrenderer.swing.SwingReplacedElement;
 import org.xhtmlrenderer.swing.SwingReplacedElementFactory;
 import org.xhtmlrenderer.util.Configuration;
+import org.xml.sax.SAXException;
 
 
 public class TemplatePane extends XHTMLPanel {
@@ -225,10 +227,31 @@ public class TemplatePane extends XHTMLPanel {
 	    // replace contents of "c" attributes
 	    Node cNode = attrs.getNamedItem("c");
 	    if (cNode!=null) {
+		// erase existing contents
 		NodeList nl = node.getChildNodes();
 		for (int i=0; i<nl.getLength(); i++)
 		    node.removeChild(nl.item(i));
-		node.appendChild(node.getOwnerDocument().createTextNode(cNode.getNodeValue()));
+		node.setTextContent(null);
+		/* and add new content; it might have been nice to do
+		 *    node.appendChild(node.getOwnerDocument().createTextNode(cNode.getNodeValue()));
+		 * but that doesn't allow one to put html in variables. So a
+		 * new html document is created from the parsed node, and the
+		 * resulting html is put into the original document. */ 
+		try {
+		    byte[] data = ("<root>"+cNode.getNodeValue()+"</root>").getBytes();
+		    Document newDoc = DocumentBuilderFactory.newInstance().
+		    	newDocumentBuilder().parse(new ByteArrayInputStream(data));
+		    node.appendChild(node.getOwnerDocument().adoptNode(newDoc.getFirstChild()));
+		} catch (SAXException e) {
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
+		} catch (IOException e) {
+		    // TODO shouldn't happen
+		    e.printStackTrace();
+		}
 	    }
 	    // readonly not implemented by xhtmlreader itself but disabled is
 	    // also if property lock.<name> is set make it readonly
@@ -294,8 +317,7 @@ public class TemplatePane extends XHTMLPanel {
 	/** Add a listener that updates the properties bound to the
 	 * enclosing TemplatePane when the supplied component is changed. This
 	 * also sets the current value to the property's current value. If no
-	 * name is set on the element, nothing is bound.
-	 * TODO set property value from html form if not yet set */
+	 * name is set on the element, nothing is bound. */
 	protected void bindProperty(Element e, JComponent c) {
 	    String name = e.getAttribute("name");
 	    String ivalue = e.getAttribute("value");
@@ -313,12 +335,12 @@ public class TemplatePane extends XHTMLPanel {
 	    String value = data.getProperty(name);
 	    // we care about content controls, not scrollpanes
 	    if (c instanceof JScrollPane) c = (JComponent)((JScrollPane)c).getViewport().getView();
-	    // how to get&set contents depends on type of control
+	    // how to get&set contents depends on type of control.
 	    if (c instanceof JTextComponent) {
 		// text and password
 		if (value!=null)
 		    ((JTextComponent)c).setText(value);
-		((JTextComponent)c).getDocument().addDocumentListener(new FormComponentListener(e));
+		((JTextComponent)c).getDocument().addDocumentListener(new FormComponentListener(e, c));
 	    } else if (c instanceof JComboBox || c instanceof JList) {
 		// combo box or list
 		// find selected items from document; see also listSelectionChanged()
@@ -336,22 +358,22 @@ public class TemplatePane extends XHTMLPanel {
 		if (c instanceof JComboBox) {
 		    if (value!=null)
 			((JComboBox)c).setSelectedIndex(index);
-		    ((JComboBox)c).addItemListener(new FormComponentListener(e));
+		    ((JComboBox)c).addItemListener(new FormComponentListener(e, c));
 		} else if (c instanceof JList) {
 		    if (value!=null)
 			((JList)c).setSelectedIndex(index);
-		    ((JList)c).addListSelectionListener(new FormComponentListener(e));
+		    ((JList)c).addListSelectionListener(new FormComponentListener(e, c));
 		}
 	    } else if (c instanceof JRadioButton) {
 		// radio button
 		if (value!=null)
 		    ((JRadioButton)c).setSelected(ivalue.equals(value));
-		((AbstractButton)c).addChangeListener(new FormComponentListener(e));
+		((AbstractButton)c).addChangeListener(new FormComponentListener(e, c));
 	    } else if (c instanceof AbstractButton) {
 		// checkbox
 		if (value!=null)
 		    ((AbstractButton)c).setSelected(Boolean.valueOf(value));
-		((AbstractButton)c).addChangeListener(new FormComponentListener(e));
+		((AbstractButton)c).addChangeListener(new FormComponentListener(e, c));
 	    }
 	    // TODO other form elements as well
 	    // TODO just copy hidden to properties?
@@ -361,69 +383,79 @@ public class TemplatePane extends XHTMLPanel {
 
 	    protected Element el = null;
 
-	    public FormComponentListener(Element el) {
+	    public FormComponentListener(Element el, Object source) {
 		this.el = el;
+		// make sure data and component are in sync. This is an issue when
+		// the html has specified a default value but the property isn't
+		// defined. This call updates the property from the default value.
+		doUpdate(source);
 	    }
-
-	    /** Update the properties bound to the enclosing TemplatePane from a
-	     * document. This is called when a component's document is changed. */
-	    protected void documentUpdate(DocumentEvent e) {
+	    
+	    protected void doUpdate(Object source) {
 		String name = el.getAttribute("name");
-		javax.swing.text.Document doc = e.getDocument();
-		try {
-		    data.setProperty(name, doc.getText(0, doc.getLength()));
-		} catch (BadLocationException e1) { }
-	    }
-	    public void changedUpdate(DocumentEvent e)  { documentUpdate(e); }
-	    public void insertUpdate(DocumentEvent e)   { documentUpdate(e); }
-	    public void removeUpdate(DocumentEvent e)   { documentUpdate(e); }
-
-	    /** Update the properties bound to the enclosing TemplatePane
-	     * from a button. This is called when a button's state is changed. */
-	    public void stateChanged(ChangeEvent e) {
-		String name = el.getAttribute("name");
-		if (e.getSource() instanceof JRadioButton &&
-			((JRadioButton)e.getSource()).isSelected())
+		
+		if (source instanceof JRadioButton && ((JRadioButton)source).isSelected()) {
 		    data.setProperty(name, el.getAttribute("value"));
-		else if (e.getSource() instanceof AbstractButton) {
-		    data.setProperty(name,
-			    Boolean.toString(((AbstractButton)e.getSource()).isSelected()));
+		
+		} else if (source instanceof AbstractButton) {
+		    data.setProperty(name, Boolean.toString(((AbstractButton)source).isSelected()));
+		
+		} else if (source instanceof JComboBox || source instanceof JList) { 
+		    /** Update the properties bound to the enclosing TemplatePane
+		     * from a list. This is called when a list's state is changed.
+		     * 
+		     * The implementation looks somewhat clumsy. I have no access to the
+		     * underlying model since that is declared private. So I get the
+		     * selected index and look up the corresponding value from the
+		     * document.
+		     * TODO implement lists with multiple selections */
+		    int index = -1;
+		    if (source instanceof JComboBox)
+			index = ((JComboBox)source).getSelectedIndex();
+		    else if (source instanceof JList)
+			index = ((JList)source).getSelectedIndex();
+		    // TODO warn if neither?
+		    NodeList nodes = el.getElementsByTagName("option");
+		    if (index>=0 && index<nodes.getLength()) {
+			Node value = nodes.item(index).getAttributes().getNamedItem("value");
+			if (value!=null)
+			    data.setProperty(name, value.getNodeValue());
+		    }
+		
+		} else if (source instanceof JTextComponent) {
+		    // not used since document is used here
+		    data.setProperty(name, ((JTextComponent)source).getText());
+		} else if (source instanceof javax.swing.text.Document) {
+		    javax.swing.text.Document doc = (javax.swing.text.Document)source;
+		    try {
+			data.setProperty(name, doc.getText(0, doc.getLength()));
+		    } catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		    }
 		} else {
-		    // TODO unreachable code
+		    // TODO warn
+		    System.out.println("unrecognised update!");
 		}
 	    }
 
-	    /** Update the properties bound to the enclosing TemplatePane
-	     * from a list. This is called when a list's state is changed.
-	     * 
-	     * The implementation looks somewhat clumsy. I have no access to the
-	     * underlying model since that is declared private. So I get the
-	     * selected index and look up the corresponding value from the
-	     * document.
-	     * TODO implement lists with multiple selections */
-	    protected void listSelectionChanged(Object source) {
-		String name = el.getAttribute("name");
-		int index = -1;
-		if (source instanceof JComboBox)
-		    index = ((JComboBox)source).getSelectedIndex();
-		else if (source instanceof JList)
-		    index = ((JList)source).getSelectedIndex();
-		// TODO warn if neither?
-		NodeList nodes = el.getElementsByTagName("option");
-		if (index>=0 && index<nodes.getLength()) {
-		    Node value = nodes.item(index).getAttributes().getNamedItem("value");
-		    if (value!=null)
-			data.setProperty(name, value.getNodeValue());
-		}
+	    // document update (text fields)
+	    public void changedUpdate(DocumentEvent e)  { doUpdate(e.getDocument()); }
+	    public void insertUpdate(DocumentEvent e)   { doUpdate(e.getDocument()); }
+	    public void removeUpdate(DocumentEvent e)   { doUpdate(e.getDocument()); }
+	    // button update
+	    public void stateChanged(ChangeEvent e) {
+		doUpdate(e.getSource());
 	    }
+	    // combobox selection update
 	    public void itemStateChanged(ItemEvent e) {
 		if (e.getStateChange() == ItemEvent.SELECTED)
-		    listSelectionChanged(e.getSource());
+		    doUpdate(e.getSource());
 	    }
-
+	    // list selection update
 	    public void valueChanged(ListSelectionEvent e) {
-		if (e.getValueIsAdjusting()) return;
-		listSelectionChanged(e.getSource());
+		if (!e.getValueIsAdjusting())
+		    doUpdate(e.getSource());
 	    }
 	}
     }
@@ -463,6 +495,8 @@ public class TemplatePane extends XHTMLPanel {
 		"<p>this is a <input type='text' name='txtlocked' value='readonly'/> input element</p>"+
 		// add print button
 		"<form><p>you can also <input type='submit' name='print' value='print'/> this page.</p></form>"+
+		// test putting in html from a variable
+		"<div c='${somehtml}'>hmm, <span style='color:red'>you shouldn't see this text</span></div>"+
 		"</body>"+
 		"</html>";		    
 	    pane.data().setProperty("foo", "the contents of this foo variable");
@@ -471,6 +505,7 @@ public class TemplatePane extends XHTMLPanel {
 	    pane.data().setProperty("txt", "some text");
 	    pane.data().setProperty("lock.txtlocked", "true");
 	    pane.data().setProperty("sel", "selected");
+	    pane.data().setProperty("somehtml", "you should see <em>this</em> text");
 	    // don't set "bar"
 	    DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 	    pane.setDocument(builder.parse(new ByteArrayInputStream(testPage.getBytes())));
