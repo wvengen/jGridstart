@@ -2,6 +2,11 @@ package nl.nikhef.jgridstart.gui;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -42,6 +47,23 @@ public class ActionExport extends CertificateAction {
     public void doExport(File f) {
 	CertificatePair cert = getCertificatePair();
 	logger.info("Exporting certificate "+cert+" to: "+f);
-	JOptionPane.showMessageDialog(parent, "export not yet implemented");
+	try {
+	    cert.exportTo(f);
+	} catch (KeyStoreException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	} catch (NoSuchProviderException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	} catch (NoSuchAlgorithmException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	} catch (CertificateException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	} catch (IOException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
     }
 }

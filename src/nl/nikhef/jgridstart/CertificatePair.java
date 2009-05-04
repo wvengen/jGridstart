@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -46,6 +47,7 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PasswordFinder;
 
 /**
  * Class containing everything related to a grid certificate. Each instance is
@@ -367,8 +369,51 @@ public class CertificatePair extends Properties {
 	}
     }
 
-    public void exportTo(File src) {
-	// TODO
+    /** Export the certificate and private key to a file. Type is
+     * detected from the filename.
+     * 
+     * @param src destination to export to
+     * @throws CertificateException 
+     * @throws NoSuchAlgorithmException 
+     * @throws NoSuchProviderException 
+     * @throws KeyStoreException 
+     */
+    public void exportTo(File dst) throws IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException {
+	String ext = dst.getName().toLowerCase();
+	ext = ext.substring(ext.lastIndexOf('.')+1);
+	if (ext.equals("p12") || ext.equals("pfx")) {
+	    exportToPKCS(dst);
+	} else if (ext.equals("pem")) {
+	    // TODO
+	} else {
+	    throw new IOException("Cannot determine format to export to, unknown file extension: "+ext);
+	}
+    }
+    
+    /** Export the certificate and private key to a PKCS#12 file 
+     * @throws NoSuchProviderException 
+     * @throws KeyStoreException 
+     * @throws CertificateException 
+     * @throws NoSuchAlgorithmException */
+    protected void exportToPKCS(File dst) throws IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException {
+
+	// Create certificate chain TODO do proper chain
+	X509Certificate[] certchain = {cert}; // TODO include chain?
+	
+	// Create PKCS12 keystore with password
+	KeyStore store = KeyStore.getInstance("PKCS12", "BC");
+	store.load(null, null);
+	store.setKeyEntry("Foo key thingy", getPrivateKey(), null, certchain); // TODO proper alias
+	
+	// write file with password
+	PasswordCache pwcache = PasswordCache.getInstance();
+	String storename = "PKCS#12 store " + dst.getName();
+	char[] pw = pwcache.getForEncrypt(storename, dst.getCanonicalPath());
+	if (pw == null) {
+	    // user cancel
+	    throw new KeyStoreException("User cancelled password entry");
+	}
+	store.store(new FileOutputStream(dst), pw);
     }
 
     /** Generate a new private key+CSR pair. Details are taken from
@@ -520,6 +565,19 @@ public class CertificatePair extends Properties {
 	if (path == null)
 	    return null;
 	return new File(getPath(), "userinfo.properties");
+    }
+    
+    /** return the private key; decrypt password is requested from the user
+     * when required. 
+     * @throws IOException */
+    protected PrivateKey getPrivateKey() throws IOException {
+	FileReader reader = new FileReader(getKeyFile());
+	PasswordCache pwcache = PasswordCache.getInstance();
+	String storename = "private key";
+	PasswordFinder pwf = pwcache.getDecryptPasswordFinder(
+		storename, getKeyFile().getCanonicalPath());
+	PrivateKey privKey = ((KeyPair)CryptoUtils.readPEM(reader,pwf)).getPrivate(); 
+	return privKey;
     }
 
     /**

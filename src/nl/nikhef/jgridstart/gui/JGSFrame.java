@@ -131,7 +131,7 @@ public class JGSFrame extends JFrame {
 	    menu = new JMenu("Actions");
 	    menu.setMnemonic('A');
 	    menu.add(new JMenuItem("Request approval...", 'R')).setEnabled(false);
-	    menu.add(new JMenuItem("Install...", 'I')).setEnabled(false);
+	    menu.add(new JMenuItem(new ActionInstall(this, selection)));
 	    menu.add(new JMenuItem("Request renewal...", 'N')).setEnabled(false);
 	    menu.add(new JMenuItem(new ActionRevoke(this)));
 	    menu.addSeparator();
@@ -245,6 +245,7 @@ public class JGSFrame extends JFrame {
 		certInfoPane.setData(c);
 		certInfoPane.setPage(getClass().getResource("certificate_info.html"));
 		certInfoPane.addAction(new ActionRevoke(JGSFrame.this));
+		certInfoPane.addAction(new ActionInstall(JGSFrame.this, selection));
 	    } else {
 		certInfoPane.setPage(getClass().getResource("certificate_none_yet.html"));
 		certInfoPane.addAction(new ActionImport(JGSFrame.this, store, selection));
