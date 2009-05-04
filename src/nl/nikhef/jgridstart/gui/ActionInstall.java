@@ -27,6 +27,11 @@ public class ActionInstall extends CertificateAction {
 	BareBonesActionLaunch.addAction("install", this);
     }
     
+    public boolean isEnabled() {
+	CertificatePair cert = selection.getCertificatePair();
+	return cert!=null && Boolean.valueOf(cert.getProperty("cert"));
+    }
+    
     public void actionPerformed(ActionEvent e) {
 	CertificatePair cert = selection.getCertificatePair();
 	// TODO explain what'll happen in password dialog or option pane
