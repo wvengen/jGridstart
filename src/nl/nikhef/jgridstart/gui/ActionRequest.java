@@ -4,6 +4,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.jdesktop.swingworker.SwingWorker;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.Organisation;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 
@@ -45,6 +47,12 @@ public class ActionRequest extends AbstractAction {
 	logger.finer("Action: "+getValue(NAME));
 	TemplateWizard dlg = new RequestWizard();
 	Properties p = new Properties();
+	try {
+	    p.setProperty("organisations.html.options", Organisation.getAllOptionsHTML());
+	} catch (UnsupportedEncodingException e1) {
+	    // TODO Auto-generated catch block
+	    e1.printStackTrace();
+	}
 	p.setProperty("surname", "Klaassen");
 	p.setProperty("givenname", "Piet");
 	dlg.setData(p);
@@ -77,6 +85,9 @@ public class ActionRequest extends AbstractAction {
 		worker = null;
 	    }
 	    if (page==2) {
+		// set data from organisation selection
+		Organisation org = Organisation.get(data().getProperty("org"));
+		data().setProperty("ra.address", org.getAddress());
 		// on page two we need to execute the things
 		worker = new GenerateWorker(w);
 		worker.execute();
