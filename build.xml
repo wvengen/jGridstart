@@ -17,7 +17,7 @@
 	<property name="target.jvmversion" value="1.5"/>
 	
 	<!-- Java Web Start base url (for use in JNLP files) -->
-	<property name="wwwbase" value="http://www.nikhef.nl/~wvengen/jgridstart03/"/>
+	<property name="wwwbase" value="http://www.nikhef.nl/~wvengen/jgridstart03b/"/>
 	
 	<!-- location of source files -->
 	<property name="dir.src" location="src"/>
@@ -133,6 +133,13 @@
 			<keepclasseswithmembers access="public">
 				<method access="public static" type="void"
 					name="main" parameters="java.lang.String[]"/>
+			</keepclasseswithmembers>
+			<!-- logging is dynamically configured -->
+			<keepclasseswithmembers access="public" name="org.xhtmlrenderer.util.XRSimpleLogFormatter">
+				<method name="*"/>
+			</keepclasseswithmembers>
+			<keepclasseswithmembers access="public" name="org.xhtmlrenderer.util.Configuration">
+				<method name="*"/>
 			</keepclasseswithmembers>
 		</proguard>				
 		<delete file="${dir.dist}/${target.name}.large.jar"/>
