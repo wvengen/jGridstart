@@ -26,6 +26,8 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.text.DateFormat;
@@ -118,13 +120,13 @@ public class CertificatePair extends Properties {
      * signing request. Please see getSubjectPrincipalValue() for more info.
      * 
      * - valid
-     *     is "valid" if the certificate is valid, null otherwise
+     *     is "true" if the certificate is valid, null otherwise
      * - valid.notafter, valid.notbefore
      *     localised validity interval
      * - cert, request
-     *     is "present" when certificate respectively CSR are present
+     *     is "true" when certificate respectively CSR are present
      * - subject, issuer, usage
-     *     is "present" when child keys can be present
+     *     is "true" when child keys can be present
      * - usage.any, usage.serverauth, usage.clientauth, usage.codesigning,
      *   usage.emailprotection, usage.timestamping, usage.ocspsigning
      *     are "true" when they are defined in the extended key usage
@@ -137,10 +139,10 @@ public class CertificatePair extends Properties {
     public String getProperty(String key) {
 	if (key.equals("cert"))
 	    if (cert==null) return null;
-	    else return "present";
-	if (key.equals("request"))
+	    else return "true";
+	if (key.equals("true"))
 	    if (!getCSRFile().exists()) return null;
-	    else return "present";
+	    else return "true";
 	if (key.equals("subject"))
 	    if (cert==null && req==null) return null;
 	    else return getSubjectPrincipalValue("x-full");;
@@ -148,7 +150,7 @@ public class CertificatePair extends Properties {
 	    return getSubjectPrincipalValue(key.substring(8));
 	if (key.equals("issuer"))
 	    if (cert==null) return null;
-	    else return "present";
+	    else return "true";
 	if (key.startsWith("issuer."))
 	    return getIssuerPrincipalValue(key.substring(7));
 	try {
@@ -161,8 +163,10 @@ public class CertificatePair extends Properties {
 	    else return null;
 	    if (key.equals("valid")) {
 		if (cert==null) return null;
-		cert.checkValidity();
-		return "valid";
+		try { cert.checkValidity(); }
+		catch(CertificateExpiredException e) { return null; }
+		catch(CertificateNotYetValidException e) { return null; }
+		return "true";
 	    }
 	    if (key.equals("valid.notbefore")) {
 		if (cert==null) return null;
