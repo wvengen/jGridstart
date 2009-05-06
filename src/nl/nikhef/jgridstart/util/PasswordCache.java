@@ -335,9 +335,8 @@ public class PasswordCache {
 	CachePasswordFinder pwf = getEncryptPasswordFinder(msg, f.getCanonicalPath());
 	try {
 	    CryptoUtils.writePEM(src, writer, pwf);
-	} catch(IOException e) {
+	} finally {
 	    if (pwf.wasCancelled) throw new PasswordCancelledException();
-	    throw e;
 	}
     }
     /** Convenience method for CryptoUtils.writePEM() that uses this PasswordCache.
@@ -351,12 +350,10 @@ public class PasswordCache {
 	CachePasswordFinder pwf = getDecryptPasswordFinder(msg, f.getCanonicalPath());
 	try {
 	    o = CryptoUtils.readPEM(reader, pwf);
-	} catch(IOException e) {
-	    if (pwf.wasCancelled) throw new PasswordCancelledException();
-	    throw e;
 	} finally {
 	    // Invalidate password if no success so it is asked next time
 	    if (o==null) invalidate(f.getCanonicalPath());
+	    if (pwf.wasCancelled) throw new PasswordCancelledException();
 	}
 	return o;
     }

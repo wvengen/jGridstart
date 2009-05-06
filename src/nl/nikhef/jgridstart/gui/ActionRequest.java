@@ -25,6 +25,7 @@ import nl.nikhef.jgridstart.Organisation;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
+import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 public class ActionRequest extends AbstractAction {
     
@@ -51,6 +52,8 @@ public class ActionRequest extends AbstractAction {
 	p.setProperty("organisations.html.options", Organisation.getAllOptionsHTML());
 	p.setProperty("surname", "Klaassen");
 	p.setProperty("givenname", "Piet");
+	p.setProperty("country", "NL");
+	p.setProperty("level", "medium");
 	dlg.setData(p);
 	dlg.setVisible(true);
     }
@@ -132,39 +135,44 @@ public class ActionRequest extends AbstractAction {
 		// TODO demo/tutorial DN
 		// TODO check w.data() can safely be accessed in this thread
 		// TODO check error handling
-		if (cert==null) {
-		    Properties p = new Properties(w.data());
-		    p.setProperty("subject",
-			    "O=dutchgrid, O=users, " +
-			    "O="+p.getProperty("org")+", " +
-			    "CN="+p.getProperty("givenname")+
-			    " "+p.getProperty("surname"));
-		    CertificatePair newCert = store.generateRequest(p);
-		    // copy properties to certificate pair
-		    for (Iterator<Map.Entry<Object, Object>> it =
-			w.data().entrySet().iterator(); it.hasNext(); ) {
-			Map.Entry<Object, Object> e = it.next();
-			newCert.put(e.getKey(), e.getValue());
+		try {
+		    if (cert==null) {
+			Properties p = new Properties(w.data());
+			p.setProperty("subject",
+				"O=dutchgrid, O=users, " +
+				"O="+p.getProperty("org")+", " +
+				"CN="+p.getProperty("givenname")+
+				" "+p.getProperty("surname"));
+			CertificatePair newCert = store.generateRequest(p);
+			// copy properties to certificate pair
+			for (Iterator<Map.Entry<Object, Object>> it =
+			    w.data().entrySet().iterator(); it.hasNext(); ) {
+			    Map.Entry<Object, Object> e = it.next();
+			    newCert.put(e.getKey(), e.getValue());
+			}
+			// TODO check if cert can safely be set in this thread
+			cert = newCert;
+			setData(cert);
+			// now that request has been generated, lock fields
+			// used for that since they are in the request now
+			publish("lock.org");
+			publish("lock.level");
+			publish("lock.givenname");
+			publish("lock.surname");
+			// update gui
+			publish("state.keypair");
+			publish("state.gencsr");
 		    }
-		    // TODO check if cert can safely be set in this thread
-		    cert = newCert;
-		    setData(cert);
-		    // now that request has been generated, lock fields
-		    // used for that since they are in the request now
-		    publish("lock.org");
-		    publish("lock.level");
-		    publish("lock.givenname");
-		    publish("lock.surname");
-		    // update gui
-		    publish("state.keypair");
-		    publish("state.gencsr");
+		    // TODO only upload if not yet done
+		    cert.uploadRequest();
+		    publish("state.submitcsr");
+		    publish("state.cancontinue");
+		    cert.downloadCertificate();
+		    publish("state.approved");
+		} catch (PasswordCancelledException e) {
+		    // special state to go back a page
+		    publish("state.cancelled");
 		}
-		// TODO only upload if not yet done
-		cert.uploadRequest();
-		publish("state.submitcsr");
-		publish("state.cancontinue");
-		cert.downloadCertificate();
-		publish("state.approved");
 		return null;
 	    }
 
@@ -176,6 +184,11 @@ public class ActionRequest extends AbstractAction {
 		// update content pane
 		for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
 		    String key = it.next();
+		    // process cancel
+		    if (key.equals("state.cancelled")) {
+			setStepRelative(-1);
+			return;
+		    }
 		    w.data().setProperty(key, "true");
 		    // update next button
 		    if (key.equals("state.cancontinue"))
