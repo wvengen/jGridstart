@@ -1,6 +1,7 @@
 package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
@@ -84,7 +85,7 @@ public class TemplateWizard extends JDialog {
 	// no "Previous" at start; no "Next" beyond the final "Close"
 	if (s == pages.size()-1)
 	    cancelAction.putValue(Action.NAME, "Close");
-	nextAction.setEnabled(step < pages.size()-1);
+	nextAction.setEnabled(step < (pages.size()-1) );
 	prevAction.setEnabled(step > 0);
 	if (handler!=null) handler.pageChanged(this, s);
 	// pack here to give child classes a chance to setPreferredSize()
@@ -137,7 +138,7 @@ public class TemplateWizard extends JDialog {
 	nextAction.putValue(Action.MNEMONIC_KEY, new Integer('N'));
 	pane.addAction(nextAction, true);
 	// close window on escape
-	pane.buttonpane.add(Box.createHorizontalStrut(15));
+	pane.buttonpane.add(Box.createRigidArea(new Dimension(pane.btnBorderWidth*8, 0)));
 	cancelAction = new AbstractAction("Cancel") {
 	    public void actionPerformed(ActionEvent e) {
 		TemplateWizard.this.dispose();

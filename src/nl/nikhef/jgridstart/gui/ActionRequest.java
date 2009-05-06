@@ -92,13 +92,13 @@ public class ActionRequest extends AbstractAction {
 	    }
 	    if (page==3) {
 		// print form; enable close button after print dialog
-		nextAction.setEnabled(false);
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		cancelAction.setEnabled(false);
 		SwingUtilities.invokeLater(new Runnable() {
 		    public void run() {
 			try {
 			    print();
-			    nextAction.setEnabled(true);
+			    cancelAction.setEnabled(true);
 			    setCursor(Cursor.getDefaultCursor());
 			} catch (PrinterException e) {
 			    // TODO Auto-generated catch block
