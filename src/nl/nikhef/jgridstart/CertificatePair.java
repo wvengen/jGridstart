@@ -244,9 +244,13 @@ public class CertificatePair extends Properties {
      * @throws IOException
      * @throws NoSuchAlgorithmException 
      * @throws PasswordCancelledException 
+     * @throws CertificateException 
+     * @throws NoSuchProviderException 
+     * @throws KeyStoreException 
+     * @throws UnrecoverableKeyException 
      */
     static public CertificatePair importFrom(File src, File dst)
-	    throws IOException, NoSuchAlgorithmException, PasswordCancelledException {
+	    throws IOException, NoSuchAlgorithmException, PasswordCancelledException, UnrecoverableKeyException, KeyStoreException, NoSuchProviderException, CertificateException {
 	if (!src.isFile())
 	    throw new IOException("Need file to import from: " + src);
 	if (!src.canRead())
@@ -312,65 +316,46 @@ public class CertificatePair extends Properties {
 	    throw new IOException("not a PEM file: " + src);
     }
 
-    protected void importFromPKCS(File src) throws IOException, PasswordCancelledException {
-	try {
-	    PasswordCache pwcache = PasswordCache.getInstance();
-	    String storename = "PKCS#12 store " + src.getName();
-	    KeyStore store = KeyStore.getInstance("PKCS12", "BC");
-	    char[] pw = pwcache.getForDecrypt(storename, src.getCanonicalPath());
-	    if (pw == null) {
-		// user cancel
-		throw new KeyStoreException("User cancelled password entry");
-	    }
-	    store.load(new FileInputStream(src), pw);
+    protected void importFromPKCS(File src) throws IOException, PasswordCancelledException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+	PasswordCache pwcache = PasswordCache.getInstance();
+	String storename = "PKCS#12 store " + src.getName();
+	KeyStore store = KeyStore.getInstance("PKCS12", "BC");
+	char[] pw = pwcache.getForDecrypt(storename, src.getCanonicalPath());
+	if (pw == null) {
+	    // user cancel
+	    throw new KeyStoreException("User cancelled password entry");
+	}
+	store.load(new FileInputStream(src), pw);
 
-	    if (store.size() == 0)
-		throw new IOException("Not a PKCS#12 file: " + src);
+	if (store.size() == 0)
+	    throw new IOException("Not a PKCS#12 file: " + src);
 
-	    Certificate c = null;
-	    int i = 1;
-	    for (Enumeration<String> it = store.aliases(); it.hasMoreElements(); i++) {
-		String alias = it.nextElement();
-		if (store.isKeyEntry(alias)) {
-		    // TODO warn against multiple keys
-		    // TODO check it is a private key
-		    /*
-		     * // This could be done but passwords on entries aren't
-		     * very common // and it would be a hassle to ask the user
-		     * again. // TODO more general framework that just tries all
-		     * stored passwords // if we have the keys in software but
-		     * is careful for hardware // devices pw =
-		     * pwcache.get(storename, src.getCanonicalPath(), i); if
-		     * (pw==null) { // user cancel throw new
-		     * KeyStoreException("User cancelled password entry"); }
-		     */
-		    Key key = store.getKey(alias, null);
-		    CryptoUtils.writePEM(key, new FileWriter(getKeyFile()));
-		}
-		if ((c = store.getCertificate(alias)) != null) {
-		    // TODO warn against multiple certificates
-		    // TODO we want only lowest certificate for this key ...
-		    // TODO check it really is an instance of X509Certificate
-		    cert = (X509Certificate) c;
-		    CryptoUtils.writePEM(cert, new FileWriter(getCertFile()));
-		}
+	Certificate c = null;
+	int i = 1;
+	for (Enumeration<String> it = store.aliases(); it.hasMoreElements(); i++) {
+	    String alias = it.nextElement();
+	    if (store.isKeyEntry(alias)) {
+		// TODO warn against multiple keys
+		// TODO check it is a private key
+		/*
+		 * This could be done but passwords on entries aren't
+		 * very common and it would be a hassle to ask the user
+		 * again.
+		 * 
+		 * TODO more general framework that just tries all stored
+		 *      passwords if we have the keys in software but is
+		 *     careful for hardware devices
+		 */
+		Key key = store.getKey(alias, null);
+		CryptoUtils.writePEM(key, new FileWriter(getKeyFile()));
 	    }
-	} catch (KeyStoreException e) {
-	    // TODO Auto-generated catch block
-	    throw new IOException(e.getMessage());
-	    // throw new IOException("Not a valid PKCS#12 file: "+src);//, e);
-	} catch (NoSuchProviderException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (NoSuchAlgorithmException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (CertificateException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (UnrecoverableKeyException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    if ((c = store.getCertificate(alias)) != null) {
+		// TODO warn against multiple certificates
+		// TODO we want only lowest certificate for this key ...
+		// TODO check it really is an instance of X509Certificate
+		cert = (X509Certificate) c;
+		CryptoUtils.writePEM(cert, new FileWriter(getCertFile()));
+	    }
 	}
     }
 
@@ -453,7 +438,6 @@ public class CertificatePair extends Properties {
 	X509Name name = new X509Name(p.getProperty("subject"));
 
 	// Generate new key pair
-	// TODO log/progress
 	KeyPairGenerator keygen = KeyPairGenerator.getInstance(keyAlgName);
 	keygen.initialize(1024);
 	KeyPair keyPair = keygen.genKeyPair();
@@ -461,17 +445,14 @@ public class CertificatePair extends Properties {
 	PublicKey pubKey = keyPair.getPublic();
 
 	// Generate certificate request
-	// TODO log/progress
 	DERSet derSet = new DERSet();
 	cert.req = new PKCS10CertificationRequest(
 		sigAlgName, name, pubKey, derSet, privKey);
 
 	// Save certificate request
-	// TODO log/progress
 	CryptoUtils.writePEM(cert.req, new FileWriter(cert.getCSRFile()));
 
 	// Save private key; permissions are ok by default
-	// TODO log/progress
 	PasswordCache.getInstance().writePEM(privKey, cert.getKeyFile(), 
 		"new certificate's private key");
 	

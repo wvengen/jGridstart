@@ -1,6 +1,6 @@
 package nl.nikhef.jgridstart.gui.util;
 
-import javax.swing.JFrame;
+import java.awt.Component;
 import javax.swing.JOptionPane;
 
 /*
@@ -14,7 +14,7 @@ public class ErrorMessage {
      * @param title Title of the dialog
      * @param e Exception to get information from
      */
-    public static void error(JFrame parent, String title, Exception e) {
+    public static void error(Component parent, String title, Exception e) {
 	JOptionPane.showMessageDialog(parent, e.getMessage(),
 		title, JOptionPane.ERROR_MESSAGE);
     }
@@ -26,7 +26,7 @@ public class ErrorMessage {
      * @param parent Parent window
      * @param e Exception to get information from
      */
-    public static void internal(JFrame parent, Exception e) {
+    public static void internal(Component parent, Exception e) {
 	String s = "I'm sorry to report that an unexpected internal error occured.\n"
 	          +"Please contact technical support for help.\n";
 	// TODO include contact details for technical support

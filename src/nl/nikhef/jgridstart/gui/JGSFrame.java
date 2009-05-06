@@ -30,6 +30,7 @@ import javax.swing.event.ListSelectionListener;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPane;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
@@ -252,8 +253,7 @@ public class JGSFrame extends JFrame {
 		certInfoPane.addAction(new ActionRequest(JGSFrame.this, store, selection));
 	    }
 	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    ErrorMessage.internal(this, e);
 	}
 	// also update selected item in menu
 	if (selection.getIndex() >= 0)

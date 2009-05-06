@@ -257,8 +257,6 @@ public class OpenCA implements CA {
 	    int index_end = answer.indexOf(" ", index);
 	    serial = answer.substring(index, index_end);
 	} catch (RuntimeException e) {
-	    // TODO Auto-generated catch block
-	    // e.printStackTrace();
 	    logger.severe(e.getMessage());
 	    throw e;
 	}

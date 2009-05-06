@@ -142,17 +142,13 @@ public class TemplatePane extends XHTMLPanel {
      * a print dialog is shown first.
      * TODO fix margins and related stuff
      * 
-     * currently uses attempted fix from http://markmail.org/message/37rc4vaiz6peto5h */
-    public boolean print() {
+     * currently uses attempted fix from http://markmail.org/message/37rc4vaiz6peto5h 
+     * @throws PrinterException */
+    public boolean print() throws PrinterException {
 	final PrinterJob printJob = PrinterJob.getPrinterJob();
         printJob.setPrintable(new TemplatePrintable(this));
         if (printJob.printDialog()) {
-            try {
-		printJob.print();
-	    } catch (PrinterException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
+            printJob.print();
         }
 	return true;
     }
@@ -531,7 +527,11 @@ public class TemplatePane extends XHTMLPanel {
 				"Form submitted",
 				JOptionPane.INFORMATION_MESSAGE);
 		    else if (e.getActionCommand().equals("print"))
-			pane.print();
+			try {
+			    pane.print();
+			} catch (PrinterException e1) {
+			    e1.printStackTrace();
+			}
 		}
 	    });
 	    frame.setVisible(true);

@@ -37,16 +37,12 @@ public class CryptoUtils {
      * @param writer destination to write to
      * @param pwf PasswordFinder to obtain password from
      * @throws IOException
+     * @throws NoSuchAlgorithmException 
      */
-    static public void writePEM(Object src, Writer writer, PasswordFinder pwf) throws IOException {
+    static public void writePEM(Object src, Writer writer, PasswordFinder pwf) throws IOException, NoSuchAlgorithmException {
 	PEMWriter pemwriter = new PEMWriter(writer);
-	try {
-	    SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-	    pemwriter.writeObject(src, "DESEDE", pwf.getPassword(), random);
-	} catch (NoSuchAlgorithmException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+	SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+	pemwriter.writeObject(src, "DESEDE", pwf.getPassword(), random);
 	pemwriter.close();
     }
     

@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
@@ -100,7 +101,7 @@ public class TemplateButtonPane extends JPanel {
     public Document getDocument() {
 	return contentpane.getDocument();
     }
-    public boolean print() {
+    public boolean print() throws PrinterException {
 	return contentpane.print();
     }
 }

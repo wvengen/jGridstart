@@ -134,8 +134,6 @@ public class NikhefCA implements CA {
 	    int index_end = answer.indexOf(".", index);
 	    serial = answer.substring(index+matchstr.length(), index_end).trim();
 	} catch (RuntimeException e) {
-	    // TODO Auto-generated catch block
-	    // e.printStackTrace();
 	    logger.severe(e.getMessage());
 	    throw e;
 	}

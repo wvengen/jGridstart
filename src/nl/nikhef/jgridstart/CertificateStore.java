@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -209,8 +212,12 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
      * @throws IOException
      * @throws NoSuchAlgorithmException 
      * @throws PasswordCancelledException 
+     * @throws CertificateException 
+     * @throws NoSuchProviderException 
+     * @throws KeyStoreException 
+     * @throws UnrecoverableKeyException 
      */
-    public CertificatePair importFrom(File src) throws IOException, NoSuchAlgorithmException, PasswordCancelledException {
+    public CertificatePair importFrom(File src) throws IOException, NoSuchAlgorithmException, PasswordCancelledException, UnrecoverableKeyException, KeyStoreException, NoSuchProviderException, CertificateException {
 	File dst = newItem();
 	// import
 	try {

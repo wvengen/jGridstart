@@ -73,8 +73,7 @@ public class TemplateWizard extends JDialog {
 	try {
 	    pane.setPage(pages.get(step));
 	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    ErrorMessage.internal(this, e);
 	}
 	setTitle(pane.getTitle());
 	// no "Previous" at start; no "Next" beyond the final "Close"
