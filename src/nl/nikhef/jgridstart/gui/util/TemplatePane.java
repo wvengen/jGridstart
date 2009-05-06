@@ -236,11 +236,17 @@ public class TemplatePane extends XHTMLPanel {
 		 *    node.appendChild(node.getOwnerDocument().createTextNode(cNode.getNodeValue()));
 		 * but that doesn't allow one to put html in variables. So a
 		 * new html document is created from the parsed node, and the
-		 * resulting html is put into the original document. */ 
+		 * resulting html is put into the original document.
+		 * 
+		 * to make adoptNode() work, the following workaround is used
+		 *   http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4915524
+		 * 
+		 * TODO use DOM implementation from node for parsing */ 
 		try {
 		    byte[] data = ("<root>"+cNode.getNodeValue()+"</root>").getBytes();
-		    Document newDoc = DocumentBuilderFactory.newInstance().
-		    	newDocumentBuilder().parse(new ByteArrayInputStream(data));
+		    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		    factory.setAttribute("http://apache.org/xml/features/dom/defer-node-expansion", Boolean.FALSE);
+		    Document newDoc = factory.newDocumentBuilder().parse(new ByteArrayInputStream(data));
 		    node.appendChild(node.getOwnerDocument().adoptNode(newDoc.getFirstChild()));
 		} catch (SAXException e) {
 		    // TODO Auto-generated catch block
