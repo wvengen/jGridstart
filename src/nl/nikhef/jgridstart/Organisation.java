@@ -78,7 +78,7 @@ public class Organisation extends Properties {
     public String getProperty(String key) {
 	String val = super.getProperty(key);
 	if (val==null && containsKey("ref"))
-	    val = organisations.get(getProperty("ref")).getProperty(val);
+	    val = organisations.get(getProperty("ref")).getProperty(key);
 	return val;
     }
     
