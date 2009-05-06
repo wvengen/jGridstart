@@ -88,18 +88,6 @@ public class LocalCA implements CA {
     }
     
     /**
-     * Checks whether the certification request with the specified serial
-     * number is processed by the CA. This CA signs on the fly, so it
-     * always returns true.
-     * 
-     * @param serial the serial number of the request
-     * @return always returns true
-     */
-    public boolean checkStatusOfRequest(String serial) throws IOException {
-	return true;
-    }
-    
-    /**
      * Return a Certificate. This creates a new Certificate based on the certificate
      * signing request supplied.
      * 

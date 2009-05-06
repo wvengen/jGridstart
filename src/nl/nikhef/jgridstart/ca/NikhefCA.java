@@ -56,17 +56,6 @@ public class NikhefCA implements CA {
     }
 
     /**
-     * Checks whether the certification request with the specified serial
-     * number is processed by the CA.
-     * 
-     * @param serial the serial number of the request
-     * @return true if ready to download, false if not
-     */
-    public boolean checkStatusOfRequest(String serial) throws IOException {
-	return downloadCertificate(null, serial) != null;
-    }
-    
-    /**
      * Download a certificate from the OpenCA server.
      * 
      * @param req the certificate signing request that was sent (not used by NikhefCA)

@@ -79,49 +79,6 @@ public class OpenCA implements CA {
 	HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
     }
 
-    /**
-     * Checks whether the certification request with the specified serial
-     * number is processed by the CA.
-     * 
-     * This information is obtained by browsing through the request list because
-     * searching on serial number doesn't work.
-     * 
-     * TODO don't use indexOf on serial since partial matches return true now!
-     * 
-     * @param serial the serial number of the request
-     * @return true if ready to download, false if not
-     */
-    public boolean checkStatusOfRequest(String serial) throws IOException {
-	URL url = new URL(GrixProperty.getString("openca.base.url") + "?cmd=lists;action=newReqs");
-
-	String result = ConnectionUtils.pageContents(url);
-	if (result == null)
-	    throw new IOException("Could not read OpenCA page to check status of certificate signing request.");
-
-	if (result.indexOf(serial) != -1) {
-	    // found, means not processed yet
-	    logger.fine("Request serial "+serial+" not found on OpenCA page, this means the request is not processed yet.");
-	    return false;
-	}
-
-	while ((url = containsNextPage(result)) != null) {
-	    logger.fine("Next page url: " + url.toString());
-	    result = ConnectionUtils.pageContents(url);
-	    if (result == null)
-		throw new IOException("Could not read OpenCA page to check status of certificate signing request.");
-
-	    if (result.indexOf(serial) != -1) {
-		logger.fine("Request serial "+serial+" not found on OpenCA page, this means the request is not processed yet.");
-		return false; // still on list => not processed
-	    }
-	}
-
-	logger.fine("Request serial "+serial+" found on OpenCA page.");
-	return true;
-    }
-
-
-
     /** Return the URL of the next page in the list.
      * 
      * Note that this only works on OpenCA pages. This method may need updating when

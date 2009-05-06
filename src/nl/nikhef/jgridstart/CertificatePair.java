@@ -575,7 +575,7 @@ public class CertificatePair extends Properties {
 	try {
 	    load(path);
 	    // try to download certificate if not present
-	    if (cert==null && getCA().checkStatusOfRequest(getProperty("request.serial")))
+	    if (cert==null)
 		downloadCertificate();
 	    // TODO make sure request is uploaded if certificate still not present
 	} catch (IOException e) {

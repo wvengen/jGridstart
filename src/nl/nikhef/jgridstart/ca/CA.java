@@ -8,19 +8,20 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
 /**
  * Interface for communicating with an (online) Certification Authority (CA)
  * 
+ * This interface provides an abstraction layer to access a certification authority.
+ * It is up to each implementation to use the arguments available. A certificate
+ * signing request serial number can be returned by an implementation's
+ * uploadCertificateRequest() which is passed to downloadCertificate() later.
+ * When an implementation doesn't have or need a certificate signing request
+ * serial number, it can just return null from uploadCertificationRequest().
+ * 
+ *  If you are creating a new implementation and find that the current interface
+ *  provides insufficient information, please contact the developers, and we'll
+ *  see if an API update is sensible.
+ * 
  * @author wvengen
  */
 public interface CA {
-
-    /**
-     * Checks whether the certification request with the specified serial
-     * number is processed by the CA.
-     * 
-     * @param serial the serial number of the request
-     * @return true if ready to download, false if not
-     */
-    public boolean checkStatusOfRequest(String serial) throws IOException;
-    
     /**
      * Download a certificate from the CA.
      * 
