@@ -132,17 +132,24 @@ public class ActionRequest extends AbstractAction {
 	    protected Void doInBackground() throws Exception {
 		// Generate a keypair and certificate signing request
 		// TODO make this configurable
-		// TODO demo/tutorial DN
 		// TODO check w.data() can safely be accessed in this thread
 		// TODO check error handling
 		try {
 		    if (cert==null) {
 			Properties p = new Properties(w.data());
-			p.setProperty("subject",
-				"O=dutchgrid, O=users, " +
-				"O="+p.getProperty("org")+", " +
-				"CN="+p.getProperty("givenname")+
-				" "+p.getProperty("surname"));
+			// construct subject
+			String subject = "";
+			if (p.getProperty("level").equals("tutorial"))
+			    subject += "O=edgtutorial";
+			else
+			    subject += "O=dutchgrid";
+			if (p.getProperty("level").equals("demo"))
+			    subject += ", O=dutch-demo";
+			subject += ", O=users";
+			subject += ", CN=" + p.getProperty("givenname").trim() +
+				   " " + p.getProperty("surname").trim();
+			p.setProperty("subject", subject);
+			// generate request
 			CertificatePair newCert = store.generateRequest(p);
 			// copy properties to certificate pair
 			for (Iterator<Map.Entry<Object, Object>> it =
@@ -170,7 +177,7 @@ public class ActionRequest extends AbstractAction {
 		    cert.downloadCertificate();
 		    publish("state.approved");
 		} catch (PasswordCancelledException e) {
-		    // special state to go back a page
+		    // special state to go to the previous page
 		    publish("state.cancelled");
 		}
 		return null;
