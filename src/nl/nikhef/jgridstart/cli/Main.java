@@ -45,23 +45,7 @@ public class Main {
 	    Properties p = new Properties();
 	    p.setProperty("subject", "O=dutchgrid, O=users, CN=John Doe");
 	    store.generateRequest(p);
-	} catch (InvalidKeyException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	    System.exit(1);
-	} catch (NoSuchAlgorithmException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	    System.exit(1);
-	} catch (NoSuchProviderException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	    System.exit(1);
-	} catch (SignatureException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	    System.exit(1);
-	} catch (IOException e) {
+	} catch (Exception e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	    System.exit(1);

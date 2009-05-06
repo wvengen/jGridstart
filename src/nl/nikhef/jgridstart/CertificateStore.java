@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import nl.nikhef.jgridstart.util.PasswordCache;
+import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 import nl.nikhef.jgridstart.gui.util.ArrayListModel;
 
 public class CertificateStore extends ArrayListModel<CertificatePair> {
@@ -207,8 +208,9 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
      * @return Newly created CertificatePair
      * @throws IOException
      * @throws NoSuchAlgorithmException 
+     * @throws PasswordCancelledException 
      */
-    public CertificatePair importFrom(File src) throws IOException, NoSuchAlgorithmException {
+    public CertificatePair importFrom(File src) throws IOException, NoSuchAlgorithmException, PasswordCancelledException {
 	File dst = newItem();
 	// import
 	try {
@@ -228,8 +230,9 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
      * @throws NoSuchProviderException 
      * @throws NoSuchAlgorithmException 
      * @throws InvalidKeyException 
+     * @throws PasswordCancelledException 
      */
-    public CertificatePair generateRequest(Properties p) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
+    public CertificatePair generateRequest(Properties p) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, PasswordCancelledException {
 	File dst = newItem();
 	try {
 	    CertificatePair cert = CertificatePair.generateRequest(dst, p);

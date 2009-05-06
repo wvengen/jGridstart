@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 import nl.nikhef.jgridstart.ca.*;
 import nl.nikhef.jgridstart.util.CryptoUtils;
 import nl.nikhef.jgridstart.util.PasswordCache;
+import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERObjectIdentifier;
@@ -222,8 +223,8 @@ public class CertificatePair extends Properties {
 
 	// read certificate or else CSR, not fatal if they don't exist. 
 	if (getCertFile().exists()) {
-	    cert = (X509Certificate) PasswordCache.getInstance().
-	    	readPEM(getCertFile(), "Certificate from " + f.getName());
+	    cert = (X509Certificate)CryptoUtils.readPEM(
+		    new FileReader(getCertFile()), null);
 	} else if (getCSRFile().exists()) {
 	    req = (PKCS10CertificationRequest) CryptoUtils.readPEM(
 		    new FileReader(getCSRFile()), null);
@@ -244,9 +245,10 @@ public class CertificatePair extends Properties {
      * @return a new CertificatePair representing the newly imported pair.
      * @throws IOException
      * @throws NoSuchAlgorithmException 
+     * @throws PasswordCancelledException 
      */
     static public CertificatePair importFrom(File src, File dst)
-	    throws IOException, NoSuchAlgorithmException {
+	    throws IOException, NoSuchAlgorithmException, PasswordCancelledException {
 	if (!src.isFile())
 	    throw new IOException("Need file to import from: " + src);
 	if (!src.canRead())
@@ -279,8 +281,9 @@ public class CertificatePair extends Properties {
      *            PEM file to import from
      * @throws IOException
      * @throws NoSuchAlgorithmException 
+     * @throws PasswordCancelledException 
      */
-    protected void importFromPEM(File src) throws IOException, NoSuchAlgorithmException {
+    protected void importFromPEM(File src) throws IOException, NoSuchAlgorithmException, PasswordCancelledException {
 	Object o;
 	FileReader fr = new FileReader(src);
 	int count = 0;
@@ -311,7 +314,7 @@ public class CertificatePair extends Properties {
 	    throw new IOException("not a PEM file: " + src);
     }
 
-    protected void importFromPKCS(File src) throws IOException {
+    protected void importFromPKCS(File src) throws IOException, PasswordCancelledException {
 	try {
 	    PasswordCache pwcache = PasswordCache.getInstance();
 	    String storename = "PKCS#12 store " + src.getName();
@@ -381,8 +384,9 @@ public class CertificatePair extends Properties {
      * @throws NoSuchAlgorithmException 
      * @throws NoSuchProviderException 
      * @throws KeyStoreException 
+     * @throws PasswordCancelledException 
      */
-    public void exportTo(File dst) throws IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException {
+    public void exportTo(File dst) throws IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, PasswordCancelledException {
 	String ext = dst.getName().toLowerCase();
 	ext = ext.substring(ext.lastIndexOf('.')+1);
 	if (ext.equals("p12") || ext.equals("pfx")) {
@@ -398,8 +402,9 @@ public class CertificatePair extends Properties {
      * @throws NoSuchProviderException 
      * @throws KeyStoreException 
      * @throws CertificateException 
-     * @throws NoSuchAlgorithmException */
-    protected void exportToPKCS(File dst) throws IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException {
+     * @throws NoSuchAlgorithmException 
+     * @throws PasswordCancelledException */
+    protected void exportToPKCS(File dst) throws IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, PasswordCancelledException {
 
 	// Create certificate chain TODO do proper chain
 	X509Certificate[] certchain = {cert}; // TODO include chain?
@@ -407,16 +412,12 @@ public class CertificatePair extends Properties {
 	// Create PKCS12 keystore with password
 	KeyStore store = KeyStore.getInstance("PKCS12", "BC");
 	store.load(null, null);
-	store.setKeyEntry("Foo key thingy", getPrivateKey(), null, certchain); // TODO proper alias
+	store.setKeyEntry("Grid certificate", getPrivateKey(), null, certchain); // TODO proper alias
 	
 	// write file with password
 	PasswordCache pwcache = PasswordCache.getInstance();
 	String storename = "PKCS#12 store " + dst.getName();
 	char[] pw = pwcache.getForEncrypt(storename, dst.getCanonicalPath());
-	if (pw == null) {
-	    // user cancel
-	    throw new KeyStoreException("User cancelled password entry");
-	}
 	store.store(new FileOutputStream(dst), pw);
     }
 
@@ -435,10 +436,11 @@ public class CertificatePair extends Properties {
      * @throws InvalidKeyException
      * @throws NoSuchProviderException
      * @throws SignatureException
+     * @throws PasswordCancelledException 
      */
     static public CertificatePair generateRequest(File dst, Properties p)
 	    throws IOException, NoSuchAlgorithmException, InvalidKeyException,
-	    NoSuchProviderException, SignatureException {
+	    NoSuchProviderException, SignatureException, PasswordCancelledException {
 	// functionally based on
 	// org.globus.tools.GridCertRequest.genCertificateRequest()
 
@@ -573,14 +575,12 @@ public class CertificatePair extends Properties {
     
     /** return the private key; decrypt password is requested from the user
      * when required. 
-     * @throws IOException */
-    protected PrivateKey getPrivateKey() throws IOException {
+     * @throws IOException 
+     * @throws PasswordCancelledException */
+    protected PrivateKey getPrivateKey() throws IOException, PasswordCancelledException {
 	FileReader reader = new FileReader(getKeyFile());
 	PasswordCache pwcache = PasswordCache.getInstance();
-	String storename = "private key";
-	PasswordFinder pwf = pwcache.getDecryptPasswordFinder(
-		storename, getKeyFile().getCanonicalPath());
-	PrivateKey privKey = ((KeyPair)CryptoUtils.readPEM(reader,pwf)).getPrivate(); 
+	PrivateKey privKey = ((KeyPair)pwcache. readPEM(reader, getKeyFile(), "private key")).getPrivate();
 	return privKey;
     }
 

@@ -22,7 +22,7 @@
 			<attribute name="javadoc_location" value="https://swingworker.dev.java.net/nonav/javadoc/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="thirdparty/flyingsaucer/core-renderer-minimal.jar">
+	<classpathentry kind="lib" path="thirdparty/flyingsaucer/core-renderer-minimal.jar" sourcepath="/flyingsaucer/src">
 		<attributes>
 			<attribute name="javadoc_location" value="http://pigeonholdings.com/projects/flyingsaucer/R8/javadoc/user/"/>
 		</attributes>

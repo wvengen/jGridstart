@@ -18,6 +18,7 @@ import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.util.TempFileWriter;
+import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 
 public class ActionInstall extends CertificateAction {
@@ -52,6 +53,8 @@ public class ActionInstall extends CertificateAction {
 	    BareBonesActionLaunch.openURL(
 		    new File(pkcs.getPath()).toURI().toURL(),
 		    parent);
+	} catch (PasswordCancelledException e1) {
+	    // do nothing
 	} catch (Exception e1) {
 	    logger.severe("Error installing certificate "+cert+": "+e1);
 	    ErrorMessage.error(parent, "Install failed", e1);

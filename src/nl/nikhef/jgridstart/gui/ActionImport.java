@@ -15,6 +15,7 @@ import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
+import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 
 public class ActionImport extends AbstractAction {
@@ -57,7 +58,8 @@ public class ActionImport extends AbstractAction {
 	try {
 	    CertificatePair cert = store.importFrom(f);
 	    selection.setSelection(store.indexOf(cert));
-	    //TODO selection.select(cert);
+	} catch (PasswordCancelledException e) {
+	    // do nothing
 	} catch(Exception e) {
 	    logger.severe("Error importing certificate "+f+": "+e);
 	    ErrorMessage.error(parent, "Import failed", e);

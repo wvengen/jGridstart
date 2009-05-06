@@ -122,8 +122,9 @@ public class PasswordCache {
      *            Actual message is "Enter password to unlock "+msg
      * @param loc Location string
      * @return password
+     * @throws PasswordCancelledException 
      */
-    public char[] getForDecrypt(String msg, String loc) {
+    public char[] getForDecrypt(String msg, String loc) throws PasswordCancelledException {
 	// try if entry exists
 	if (passwords.containsKey(loc)) {
 	    touch(loc);
@@ -149,10 +150,12 @@ public class PasswordCache {
 		}
 	    });
 	    dialog.setVisible(true);
-	    if (((Integer)pane.getValue()) == JOptionPane.OK_OPTION) {
-		// store password and zero out for a little security
-		pw = pass.getPassword();
+	    if (((Integer)pane.getValue()) != JOptionPane.OK_OPTION) {
+		logger.fine("Dencryption password request cancelled for "+loc);
+		throw new PasswordCancelledException();
 	    }
+	    // store password and zero out for a little security
+	    pw = pass.getPassword();
 	    break;
 	case UI_CLI:
 	    logger.severe("UI_CLI not implemented");
@@ -178,7 +181,7 @@ public class PasswordCache {
      * @param loc Location string
      * @return password
      */
-    public char[] getForEncrypt(String msg, String loc) {
+    public char[] getForEncrypt(String msg, String loc) throws PasswordCancelledException {
 	// always ask for password when writing
 	// TODO focus is moved from password entry to ok button!!!
 	JOptionPane pane = new JOptionPane();
@@ -186,34 +189,34 @@ public class PasswordCache {
 	pane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
 	JLabel lbl1 = new JLabel("Enter password for saving "+msg+".");
 	JLabel lbl2 = new JLabel("Please enter the same password and avoid mistakes.");
+	JLabel lbl3 = new JLabel("<html><body><i>passwords don't match, try again.</i></body></html>");
 	final JPasswordField pass1 = new JPasswordField(25);
 	final JPasswordField pass2 = new JPasswordField(25);
-	pane.setMessage(new Object[] {lbl1, lbl2, pass1, pass2});
-	JDialog dialog = pane.createDialog(parent, "Enter password");
-	logger.fine("Requesting encryption password for "+loc);
-	javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	    public void run() {
-		pass1.requestFocusInWindow();
+	lbl3.setVisible(false);
+	do {
+	    pane.setMessage(new Object[] {lbl1, lbl2, lbl3, pass1, pass2});
+	    JDialog dialog = pane.createDialog(parent, "Enter password");
+	    logger.fine("Requesting encryption password for "+loc);
+	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		    pass1.requestFocusInWindow();
+		}
+	    });
+	    dialog.setVisible(true);
+	    // handle cancel
+	    if ( ((Integer)pane.getValue()) != JOptionPane.OK_OPTION ) {
+		Arrays.fill(pass1.getPassword(), '\0');
+		Arrays.fill(pass2.getPassword(), '\0');
+		logger.fine("Encryption password request cancelled for "+loc);
+		throw new PasswordCancelledException();
 	    }
-	});
-	dialog.setVisible(true);
-	if (((Integer)pane.getValue()) == JOptionPane.OK_OPTION) {
-	    // store password and zero out for a little security
-	    char[] pw1 = pass1.getPassword();
-	    char[] pw2 = pass2.getPassword();
-	    if (!Arrays.equals(pw1, pw2)) {
-		// TODO ask again
-		Arrays.fill(pw1, '\0');
-		Arrays.fill(pw2, '\0');
-		logger.severe("Passwords don't match.");
-		return null;
-	    }
-	    set(loc, pw1);
-	    Arrays.fill(pw2, '\0');
-	    return pw1;
-	}
-	logger.fine("Encryption password request cancelled for "+loc);
-	return null;
+	    lbl3.setVisible(true);
+	} while (!Arrays.equals(pass1.getPassword(), pass2.getPassword())); 
+	// store password and zero out for a little security
+	Arrays.fill(pass2.getPassword(), '\0');
+	char[] pw1 = pass1.getPassword();
+	set(loc, pw1);
+	return pw1;
     }
 
     /** Set a password for a location. Should not be used normally because the
@@ -255,7 +258,7 @@ public class PasswordCache {
      * @param index index in location
      * @return a new PasswordFinder
      */
-    public PasswordFinder getEncryptPasswordFinder(String msg, String loc) {
+    protected CachePasswordFinder getEncryptPasswordFinder(String msg, String loc) {
 	return new CachePasswordFinder(true, msg, loc);
     }
     /** Return a PasswordFinder that returns the cached password, or else
@@ -266,7 +269,7 @@ public class PasswordCache {
      * @param index index in location
      * @return a new PasswordFinder
      */
-    public PasswordFinder getDecryptPasswordFinder(String msg, String loc) {
+    protected CachePasswordFinder getDecryptPasswordFinder(String msg, String loc) {
 	return new CachePasswordFinder(false, msg, loc);
     }
     
@@ -274,6 +277,7 @@ public class PasswordCache {
     private class CachePasswordFinder implements PasswordFinder {
 	private String msg, loc;
 	private boolean write;
+	public boolean wasCancelled = false;
 	// TODO implement guess mode (all previous passwords) when no hardware device
 	public CachePasswordFinder(boolean write, String msg, String loc) {
 	    this.write = write;
@@ -281,10 +285,16 @@ public class PasswordCache {
 	    this.loc = loc;
 	}
         public char[] getPassword() {
-            if (write)
-        	return getForEncrypt(msg, loc);
-            else
-        	return getForDecrypt(msg, loc);
+            try {
+        	if (write)
+        	    return getForEncrypt(msg, loc);
+        	else
+        	    return getForDecrypt(msg, loc);
+            } catch (PasswordCancelledException e) {
+        	// store cancel state for exception handling later
+        	wasCancelled = true;
+        	return null;
+            }
         }
     }
 
@@ -312,25 +322,38 @@ public class PasswordCache {
     
     /** Convenience method for CryptoUtils.readPEM() that uses this PasswordCache 
      * @throws IOException 
-     * @throws NoSuchAlgorithmException */
-    public void writePEM(Object src, File f, String msg) throws NoSuchAlgorithmException, IOException {
+     * @throws NoSuchAlgorithmException 
+     * @throws PasswordCancelledException */
+    public void writePEM(Object src, File f, String msg) throws NoSuchAlgorithmException, IOException, PasswordCancelledException {
 	writePEM(src, new FileWriter(f), f, msg);
     }
     /** Convenience method for CryptoUtils.readPEM() that uses this PasswordCache 
      * @throws IOException 
-     * @throws NoSuchAlgorithmException */
-    public void writePEM(Object src, Writer writer, File f, String msg) throws NoSuchAlgorithmException, IOException {
-	CryptoUtils.writePEM(src, writer, getEncryptPasswordFinder(msg, f.getCanonicalPath()));
+     * @throws NoSuchAlgorithmException 
+     * @throws PasswordCancelledException */
+    public void writePEM(Object src, Writer writer, File f, String msg) throws NoSuchAlgorithmException, IOException, PasswordCancelledException {
+	CachePasswordFinder pwf = getEncryptPasswordFinder(msg, f.getCanonicalPath());
+	try {
+	    CryptoUtils.writePEM(src, writer, pwf);
+	} catch(IOException e) {
+	    if (pwf.wasCancelled) throw new PasswordCancelledException();
+	    throw e;
+	}
     }
     /** Convenience method for CryptoUtils.writePEM() that uses this PasswordCache.
      * It invalidates the password when it was wrong, so it is important so use this
      * method instead of calling CryptoUtils.writePEM() directly when reading a file
      * with a password using the PasswordCache.
-     * @throws IOException */
-    public Object readPEM(Reader reader, File f, String msg) throws IOException {
+     * @throws IOException 
+     * @throws PasswordCancelledException */
+    public Object readPEM(Reader reader, File f, String msg) throws IOException, PasswordCancelledException {
 	Object o = null;
+	CachePasswordFinder pwf = getDecryptPasswordFinder(msg, f.getCanonicalPath());
 	try {
-	    o = CryptoUtils.readPEM(reader, getDecryptPasswordFinder(msg, f.getCanonicalPath()));
+	    o = CryptoUtils.readPEM(reader, pwf);
+	} catch(IOException e) {
+	    if (pwf.wasCancelled) throw new PasswordCancelledException();
+	    throw e;
 	} finally {
 	    // Invalidate password if no success so it is asked next time
 	    if (o==null) invalidate(f.getCanonicalPath());
@@ -342,8 +365,17 @@ public class PasswordCache {
      * method instead of calling CryptoUtils.writePEM() directly when reading a file
      * with a password using the PasswordCache.
      * @throws IOException 
-     * @throws FileNotFoundException */
-    public Object readPEM(File f, String msg) throws FileNotFoundException, IOException {
+     * @throws FileNotFoundException 
+     * @throws PasswordCancelledException */
+    public Object readPEM(File f, String msg) throws FileNotFoundException, IOException, PasswordCancelledException {
 	return readPEM(new FileReader(f), f, msg);
+    }
+    
+    /** user cancelled password entry */
+    public class PasswordCancelledException extends Exception {
+	@Override
+	public String toString() {
+	    return "Password request was cancelled";
+	}
     }
 }

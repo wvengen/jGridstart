@@ -2,6 +2,8 @@ package nl.nikhef.jgridstart.util;
 
 import java.util.Arrays;
 
+import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
+
 import org.bouncycastle.openssl.PasswordFinder;
 
 import junit.framework.Assert;
@@ -20,7 +22,7 @@ public class PasswordCacheTest extends TestCase {
 	Assert.assertEquals(cache, PasswordCache.getInstance());
     }
 
-    public void testSet() {
+    public void testSet() throws PasswordCancelledException {
 	cache.clear();
 	char[] pw = "Xyz123zyX".toCharArray();
 	cache.set("foo", pw);
@@ -31,7 +33,7 @@ public class PasswordCacheTest extends TestCase {
 	Assert.assertNull(cache.getForDecrypt("", "bar"));
     }
 
-    public void testInvalidate() {
+    public void testInvalidate() throws PasswordCancelledException {
 	cache.clear();
 	cache.set("blah", "test".toCharArray());
 	Assert.assertNotNull(cache.getForDecrypt("", "blah"));
@@ -39,7 +41,7 @@ public class PasswordCacheTest extends TestCase {
 	Assert.assertNull(cache.getForDecrypt("", "blah"));
     }
     
-    public void testClear() {
+    public void testClear() throws PasswordCancelledException {
 	cache.set("foobar", "faosdifj".toCharArray());
 	cache.set("barfoo", "asduiofs".toCharArray());
 	cache.clear();
@@ -55,7 +57,7 @@ public class PasswordCacheTest extends TestCase {
 	Assert.assertTrue(Arrays.equals(f.getPassword(), pw));
     }
     
-    public void testTimeout() throws InterruptedException {
+    public void testTimeout() throws InterruptedException, PasswordCancelledException {
 	int timeout = 1;
 	cache.clear();
 	cache.setTimeout(timeout);

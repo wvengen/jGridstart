@@ -17,6 +17,7 @@ import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
+import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 
 public class ActionExport extends CertificateAction {
@@ -50,6 +51,8 @@ public class ActionExport extends CertificateAction {
 	logger.info("Exporting certificate "+cert+" to: "+f);
 	try {
 	    cert.exportTo(f);
+	} catch (PasswordCancelledException e) {
+	    // do nothing
 	} catch (Exception e) {
 	    logger.severe("Error exporting certificate "+f+": "+e);
 	    ErrorMessage.error(parent, "Export failed", e);
