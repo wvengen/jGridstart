@@ -23,6 +23,7 @@ import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.Organisation;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 
 public class ActionRequest extends AbstractAction {
@@ -47,12 +48,7 @@ public class ActionRequest extends AbstractAction {
 	logger.finer("Action: "+getValue(NAME));
 	TemplateWizard dlg = new RequestWizard();
 	Properties p = new Properties();
-	try {
-	    p.setProperty("organisations.html.options", Organisation.getAllOptionsHTML());
-	} catch (UnsupportedEncodingException e1) {
-	    // TODO Auto-generated catch block
-	    e1.printStackTrace();
-	}
+	p.setProperty("organisations.html.options", Organisation.getAllOptionsHTML());
 	p.setProperty("surname", "Klaassen");
 	p.setProperty("givenname", "Piet");
 	dlg.setData(p);

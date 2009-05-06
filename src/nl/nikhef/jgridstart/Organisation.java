@@ -51,7 +51,7 @@ public class Organisation extends Properties {
     }
     
     /** Returns a list of &gt;option&lt; elements to put in an html select */
-    public static String getAllOptionsHTML() throws UnsupportedEncodingException {
+    public static String getAllOptionsHTML() {
 	if (organisations==null) readAll();
 	String r = "";
 	for (Iterator<Organisation> it = organisations.values().iterator(); it.hasNext(); ) {
@@ -102,7 +102,7 @@ public class Organisation extends Properties {
     }
     
     /** Returns an html &gt;option&lt; tag for embedding in a &gt;select&lt; tag */
-    public String getOptionHTML() throws UnsupportedEncodingException {
+    public String getOptionHTML() {
 	return 
 		"<option value='"+getProperty("id")+"'>" +
 		getProperty("desc")+
