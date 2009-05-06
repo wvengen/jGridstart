@@ -45,11 +45,12 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
 	load(path);
     }
     
-    /** load certificates from the default directory */
+    /** load certificates from the default directory
+     * 
+     * This is $HOME/.globus/ by default, but if the hostname starts
+     * with "tutorial" we have something different.
+     */
     public void load() {
-	// Certificate directory: $HOME/.globus/ by default, but if the
-	// hostname starts with "tutorial" we have something different.
-	// Ends with a slash.
 	String hostname;
 	try {
 	    hostname = java.net.InetAddress.getLocalHost().getHostName();
