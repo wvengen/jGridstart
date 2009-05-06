@@ -46,22 +46,25 @@ public class ComponentCertificateList extends JList {
 	public Component getListCellRendererComponent(JList list, Object value,
 		int index, boolean isSelected, boolean cellHasFocus) {
 	    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-	    
 	    if (value==null) return this;
-	    
 	    // we want a more rich markup from the object
 	    CertificatePair cert = (CertificatePair)value;
-	    String name = cert.getSubjectPrincipalValue(X509Name.CN);
-	    String star = "", org = "";
+	    String s = "";
+	    // TODO icon showing certificate state
+	    // name of person
+	    s += cert.getSubjectPrincipalValue(X509Name.CN);
+	    // add star to default certificate
 	    if (index==0) {
-		star = "<b color='#ffcc00'>&#x2730</b>";
+		// TODO get default certificate from store (not yet implemented)
+		s += "<b color='#ffcc00'>&#x2730</b>";
 	    }	
+	    // organisations
 	    if (cert.getSubjectPrincipalValue(X509Name.CN)!=null) {
-		org = "<br>\n&nbsp;<i style='font-size:80%;'>"+
+		s += "<br>\n&nbsp;<i style='font-size:80%;'>"+
 			cert.getSubjectPrincipalValue(X509Name.O)+"</i>";
 	    }
-	    setText("<html><body width='100%' style='margin: 2pt;'>"+name+star+org+"</html></body>");
-
+	    // set html contents
+	    setText("<html><body width='100%' style='margin: 2pt;'>"+s+"</html></body>");
 	    return this;
 	}
     }
