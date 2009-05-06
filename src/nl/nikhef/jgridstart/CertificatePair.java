@@ -139,7 +139,7 @@ public class CertificatePair extends Properties {
 	if (key.equals("cert"))
 	    if (cert==null) return null;
 	    else return "true";
-	if (key.equals("true"))
+	if (key.equals("request"))
 	    if (!getCSRFile().exists()) return null;
 	    else return "true";
 	if (key.equals("subject"))
