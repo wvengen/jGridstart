@@ -11,7 +11,10 @@ import java.util.Properties;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import org.w3c.dom.Document;
 
@@ -32,6 +35,8 @@ public class TemplateWizard extends JDialog {
     protected Action nextAction = null;
     /** "Previous" action */
     protected Action prevAction = null;
+    /** "Cancel"/"Close" action */
+    protected Action cancelAction = null;
     /** Listener for page changes */
     protected PageListener handler = null;
 
@@ -77,14 +82,9 @@ public class TemplateWizard extends JDialog {
 	}
 	setTitle(pane.getTitle());
 	// no "Previous" at start; no "Next" beyond the final "Close"
-	if (s == pages.size()-1) {
-	    nextAction.putValue(Action.NAME, "Close");
-	    nextAction.putValue(Action.MNEMONIC_KEY, new Integer('C'));
-	} else {
-	    nextAction.putValue(Action.NAME, "Next");
-	    nextAction.putValue(Action.MNEMONIC_KEY, new Integer('N'));
-	}
-	nextAction.setEnabled(step < pages.size());
+	if (s == pages.size()-1)
+	    cancelAction.putValue(Action.NAME, "Close");
+	nextAction.setEnabled(step < pages.size()-1);
 	prevAction.setEnabled(step > 0);
 	if (handler!=null) handler.pageChanged(this, s);
 	// pack here to give child classes a chance to setPreferredSize()
@@ -129,12 +129,25 @@ public class TemplateWizard extends JDialog {
 	prevAction.putValue(Action.MNEMONIC_KEY, new Integer('P'));
 	pane.addAction(prevAction);
 	// "Next" button; name and mnemonic set in setStep()
-	nextAction = new AbstractAction() {
+	nextAction = new AbstractAction("Next") {
 	    public void actionPerformed(ActionEvent e) {
 		setStepRelative(1);
 	    }
 	};
+	nextAction.putValue(Action.MNEMONIC_KEY, new Integer('N'));
 	pane.addAction(nextAction, true);
+	// close window on escape
+	pane.buttonpane.add(Box.createHorizontalStrut(15));
+	cancelAction = new AbstractAction("Cancel") {
+	    public void actionPerformed(ActionEvent e) {
+		TemplateWizard.this.dispose();
+	    }
+	};
+	cancelAction.putValue(Action.MNEMONIC_KEY, new Integer('C'));
+	pane.addAction(cancelAction, false);
+	getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+		KeyStroke.getKeyStroke("ESCAPE"), "ESCAPE");
+	getRootPane().getActionMap().put("ESCAPE", cancelAction);
     }
     
     /** set the handler to be called when a page switch is done.
