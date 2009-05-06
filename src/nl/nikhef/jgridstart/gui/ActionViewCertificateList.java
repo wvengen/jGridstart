@@ -3,6 +3,8 @@ package nl.nikhef.jgridstart.gui;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
@@ -38,6 +40,6 @@ public class ActionViewCertificateList extends AbstractAction {
 	logger.finer("Action: "+getValue(NAME));
 	c.setVisible((Boolean)getValue("SwingSelectedKey"));
 	// need to relayout
-	parent.pack();
+	parent.validate();
     }
 }
