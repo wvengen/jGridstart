@@ -1,11 +1,6 @@
 package nl.nikhef.jgridstart.cli;
 
 import java.io.File;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.logging.LogManager;

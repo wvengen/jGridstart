@@ -1,8 +1,6 @@
 package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Dimension;
-import java.awt.Event;
-import java.awt.ItemSelectable;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
@@ -466,6 +464,7 @@ public class TemplatePane extends XHTMLPanel {
 	}
     }
 
+    @SuppressWarnings("unused")
     private static class Test {
 	public static void main(String[] args) throws Exception {
 	    final TemplatePane pane = new TemplatePane();

@@ -29,6 +29,7 @@ public class ActionRefresh extends AbstractAction {
 	BareBonesActionLaunch.addAction("refresh", this);
     }
 
+    @SuppressWarnings("deprecation") // for JFrame.setCursor()
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
 	setEnabled(false);

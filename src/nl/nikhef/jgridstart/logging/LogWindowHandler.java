@@ -74,11 +74,11 @@ public class LogWindowHandler extends Handler {
      *@return the Filter object
      */
     private Filter makeFilter(String filterName) {
-	Class<Filter> c = null;
+	Class<?> c = null;
 	Filter f = null;
 	try {
-	    c = (Class<Filter>) Class.forName(filterName);
-	    f = (Filter) c.newInstance();
+	    c = Class.forName(filterName);
+	    f = (Filter)c.newInstance();
 	} catch (Exception e) {
 	    System.out.println("There was a problem to load the filter class: "
 		    + filterName);
@@ -95,7 +95,7 @@ public class LogWindowHandler extends Handler {
      *@return Formatter object
      */
     private Formatter makeFormatter(String formatterName) {
-	Class c = null;
+	Class<?> c = null;
 	Formatter f = null;
 
 	try {

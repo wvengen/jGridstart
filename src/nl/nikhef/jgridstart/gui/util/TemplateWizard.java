@@ -1,7 +1,6 @@
 package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
