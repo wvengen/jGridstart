@@ -10,11 +10,13 @@ import java.security.cert.CertificateException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.util.TempFileWriter;
 
 
@@ -50,20 +52,9 @@ public class ActionInstall extends CertificateAction {
 	    BareBonesActionLaunch.openURL(
 		    new File(pkcs.getPath()).toURI().toURL(),
 		    parent);
-	} catch (KeyStoreException e1) {
-	    e1.printStackTrace();
-	} catch (NoSuchProviderException e1) {
-	    // TODO Auto-generated catch block
-	    e1.printStackTrace();
-	} catch (NoSuchAlgorithmException e1) {
-	    // TODO Auto-generated catch block
-	    e1.printStackTrace();
-	} catch (CertificateException e1) {
-	    // TODO Auto-generated catch block
-	    e1.printStackTrace();
-	} catch (IOException e1) {
-	    // TODO Auto-generated catch block
-	    e1.printStackTrace();
+	} catch (Exception e1) {
+	    logger.severe("Error installing certificate "+cert+": "+e1);
+	    ErrorMessage.error(parent, "Install failed", e1);
 	}
     }
 }

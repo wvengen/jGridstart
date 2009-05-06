@@ -7,12 +7,14 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 
 
 public class ActionImport extends AbstractAction {
@@ -58,6 +60,7 @@ public class ActionImport extends AbstractAction {
 	    //TODO selection.select(cert);
 	} catch(Exception e) {
 	    logger.severe("Error importing certificate "+f+": "+e);
+	    ErrorMessage.error(parent, "Import failed", e);
 	}
     }
     

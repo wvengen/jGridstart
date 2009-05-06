@@ -16,6 +16,7 @@ import javax.swing.KeyStroke;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 
 
 public class ActionExport extends CertificateAction {
@@ -49,21 +50,9 @@ public class ActionExport extends CertificateAction {
 	logger.info("Exporting certificate "+cert+" to: "+f);
 	try {
 	    cert.exportTo(f);
-	} catch (KeyStoreException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (NoSuchProviderException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (NoSuchAlgorithmException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (CertificateException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	} catch (Exception e) {
+	    logger.severe("Error exporting certificate "+f+": "+e);
+	    ErrorMessage.error(parent, "Export failed", e);
 	}
     }
 }
