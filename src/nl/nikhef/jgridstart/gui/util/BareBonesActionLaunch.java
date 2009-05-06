@@ -63,4 +63,9 @@ public class BareBonesActionLaunch extends BareBonesBrowserLaunch {
     public static void addAction(String name, Action a) {
 	actions.put(name, a);
     }
+    
+    /** Return a previously added action */
+    public static Action getAction(String name) {
+	return actions.get(name);
+    }
 }

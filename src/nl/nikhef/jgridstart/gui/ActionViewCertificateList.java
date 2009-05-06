@@ -30,7 +30,6 @@ public class ActionViewCertificateList extends AbstractAction {
 	putValue(MNEMONIC_KEY, new Integer('L'));
 	putValue("SwingSelectedKey", new Boolean(isSelected));
 	BareBonesActionLaunch.addAction("viewlist", this);
-	actionPerformed(null);
     }
     public ActionViewCertificateList(JFrame parent, JComponent c) {
 	this(parent, c, false);

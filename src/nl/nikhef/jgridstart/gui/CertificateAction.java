@@ -39,10 +39,23 @@ public abstract class CertificateAction extends AbstractAction implements ListSe
     public void setCertificatePair(CertificatePair cert) {
 	certificatePair = cert;
     }
+    
+    /** Returns whether this action should be enabled or not. This is
+     * called when the selection changes and updates the enabled-state.
+     * It is not possible to just override the isEnabled() method
+     * Swing gets confused about the enabled-ness of connected components
+     * when isEnabled() is modified.
+     * 
+     * By default it just returns isEnabled(), so the behaviour is
+     * unchanged from an ordinary Action. */
+    protected boolean wantsEnabled() {
+	return isEnabled();
+    }
 
     /** Catch it when the certificate selection is changed */
     public void valueChanged(ListSelectionEvent e) {
 	certificatePair = selection.getCertificatePair();
+	setEnabled(wantsEnabled());
     }
     
     /** Get the certificate to operate on. To be used by child classes. */

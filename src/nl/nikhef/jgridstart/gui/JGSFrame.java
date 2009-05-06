@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Box;
@@ -21,6 +22,9 @@ import javax.swing.KeyStroke;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ListDataEvent;
@@ -30,6 +34,7 @@ import javax.swing.event.ListSelectionListener;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPane;
 import nl.nikhef.jgridstart.util.PasswordCache;
@@ -49,8 +54,7 @@ public class JGSFrame extends JFrame {
     private ButtonGroup identityButtonGroup = null;
     
     private AbstractButton viewCertificateList = null;
-    private ActionViewCertificateList actionViewCertificateList = null;
-
+    
     /**
      * This is the default constructor
      */
@@ -68,23 +72,56 @@ public class JGSFrame extends JFrame {
 	store = new CertificateStore();
 	selection = new CertificateSelection(store);
 	PasswordCache.getInstance().setParent(this);
-	
+
+	// setup gui
 	this.setSize(550, 350);
 	this.setMinimumSize(new Dimension(400, 150));
 	this.setPreferredSize(new Dimension(600, 350));
 	this.setContentPane(getJContentPane());
-	this.setJMenuBar(getJMenuBar());
 	this.setTitle("jGridStart (development version)");
+
+	// create actions; they register themselves
+	new ActionRequest(this, store, selection);
+	new ActionImport(this, store, selection);
+	new ActionInstall(this, selection);
+	new ActionRevoke(this);
+	new ActionExport(this, selection);
+	new ActionViewLog(this);
+	new ActionViewCertificateList(this, certList, false);
+	new ActionRefresh(this, store) {
+	    public void actionPerformed(ActionEvent e) {
+		super.actionPerformed(e);
+		// update info pane as well; TODO move into ActionRefresh itself
+		certInfoPane.refresh();
+	    }
+	};
+	new ActionAbout(this);
+	
+	this.setJMenuBar(getJMenuBar());
 
 	store.load(System.getProperty("user.home")+"/.globus-test");
 
-	setViewCertificateList(false);
+	// select first certificate if present
+	// TODO select default certificate
 	if (store.size() > 0)
 	    selection.setSelection(0);
-	else
-	    updateSelection();
+	// show certificate list only if multiple certificates present
+	setViewCertificateList(store.size() > 1);
+	// make sure ui is up-to-date
+	updateSelection();
     }
-
+    
+    /** Return the action associated with an id as registered by the action.
+     * 
+     * Make sure you only reference actions that have been created before.
+     * Relevant Actions in this application should register themselves
+     * with BareBonesActionLaunch. */
+    protected Action getAction(String id) {
+	Action action = BareBonesActionLaunch.getAction(id);
+	assert(action!=null);
+	return action;
+    }
+    
     /**
      * This method initializes jContentPane
      * 
@@ -117,8 +154,8 @@ public class JGSFrame extends JFrame {
 	    // menu: Identities
 	    menu = new JMenu("Certificates");
 	    menu.setMnemonic('C');
-	    menu.add(new JMenuItem(new ActionRequest(this, store, selection)));
-	    menu.add(new JMenuItem(new ActionImport(this, store, selection)));
+	    menu.add(new JMenuItem(getAction("request")));
+	    menu.add(new JMenuItem(getAction("import")));
 	    menu.addSeparator();
 	    // identity list managed by getJPanel()
 	    identityIndex = menu.getMenuComponentCount();
@@ -132,38 +169,31 @@ public class JGSFrame extends JFrame {
 	    menu = new JMenu("Actions");
 	    menu.setMnemonic('A');
 	    menu.add(new JMenuItem("Request approval...", 'R')).setEnabled(false);
-	    menu.add(new JMenuItem(new ActionInstall(this, selection)));
+	    menu.add(new JMenuItem(getAction("install")));
 	    menu.add(new JMenuItem("Request renewal...", 'N')).setEnabled(false);
-	    menu.add(new JMenuItem(new ActionRevoke(this)));
+	    menu.add(new JMenuItem(getAction("revoke")));
 	    menu.addSeparator();
-	    menu.add(new JMenuItem(new ActionExport(this, selection)));
+	    menu.add(new JMenuItem(getAction("export")));
 	    menu.add(new JMenuItem("Change passphrase...", 'P')).setEnabled(false);
-	    menu.add(new JMenuItem(new ActionViewLog(this)));
+	    menu.add(new JMenuItem(getAction("viewlog")));
 	    jMenuBar.add(menu);
 	    menu.getItem(0).setEnabled(false);
 
 	    // menu: View
 	    menu = new JMenu("View");
 	    menu.setMnemonic('W');
-	    actionViewCertificateList = new ActionViewCertificateList(this, certList, false);
-	    viewCertificateList = new JCheckBoxMenuItem(actionViewCertificateList);
+	    viewCertificateList = new JCheckBoxMenuItem(getAction("viewlist"));
 	    viewCertificateList.setSelected(false);
 	    menu.add(viewCertificateList);
 	    menu.add(new JMenuItem("Personal details...", 'P')).setEnabled(false);
-	    menu.add(new JMenuItem(new ActionRefresh(this, store) {
-		public void actionPerformed(ActionEvent e) {
-		    super.actionPerformed(e);
-		    // update info pane as well; TODO move into ActionRefresh itself
-		    certInfoPane.refresh();
-		}
-	    }));
+	    menu.add(new JMenuItem(getAction("refresh")));
 	    jMenuBar.add(menu);
 	    
 	    // menu: Help
 	    jMenuBar.add(Box.createHorizontalGlue());
 	    menu = new JMenu("Help");
 	    menu.setMnemonic('H');
-	    menu.add(new JMenuItem(new ActionAbout(this)));
+	    menu.add(new JMenuItem(getAction("about")));
 	    jMenuBar.add(menu);
 	}
 	return jMenuBar;
@@ -229,10 +259,10 @@ public class JGSFrame extends JFrame {
      * properly. TODO fix this
      */
     private void setViewCertificateList(boolean wantVisible) {
-	    actionViewCertificateList.putValue("SwingSelectedKey", new Boolean(wantVisible));
+	    getAction("viewlist").putValue("SwingSelectedKey", new Boolean(wantVisible));
 	    viewCertificateList.setSelected(wantVisible);
 	    ActionEvent ev2 = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "");
-	    actionViewCertificateList.actionPerformed(ev2);
+	    getAction("viewlist").actionPerformed(ev2);
     }
     
     /** Effectuate a selection change in the gui. Current selection is
@@ -245,12 +275,12 @@ public class JGSFrame extends JFrame {
 	    if (c!=null) {
 		certInfoPane.setData(c);
 		certInfoPane.setPage(getClass().getResource("certificate_info.html"));
-		certInfoPane.addAction(new ActionRevoke(JGSFrame.this));
-		certInfoPane.addAction(new ActionInstall(JGSFrame.this, selection));
+		certInfoPane.addAction(getAction("revoke"));
+		certInfoPane.addAction(getAction("install"));
 	    } else {
 		certInfoPane.setPage(getClass().getResource("certificate_none_yet.html"));
-		certInfoPane.addAction(new ActionImport(JGSFrame.this, store, selection));
-		certInfoPane.addAction(new ActionRequest(JGSFrame.this, store, selection));
+		certInfoPane.addAction(getAction("import"));
+		certInfoPane.addAction(getAction("request"));
 	    }
 	} catch (IOException e) {
 	    ErrorMessage.internal(this, e);
