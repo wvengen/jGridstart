@@ -57,7 +57,8 @@ public class PasswordCache {
     protected JFrame parent = null;
     /** number of seconds after which passwords are forgotten */
     protected int timeout = 5 * 60;
-    
+    /** see setAlwaysAskForEncrypt() */
+    protected boolean alwaysAskForEncrypt = true;
     
     protected PasswordCache() {
 	passwords = new HashMap<String, char[]>();
@@ -182,7 +183,11 @@ public class PasswordCache {
      * @return password
      */
     public char[] getForEncrypt(String msg, String loc) throws PasswordCancelledException {
-	// always ask for password when writing
+	// always ask for password when writing, unless option set and present
+	if (!alwaysAskForEncrypt && passwords.containsKey(loc)) {
+	    touch(loc);
+	    return passwords.get(loc);
+	}
 	// TODO focus is moved from password entry to ok button!!!
 	JOptionPane pane = new JOptionPane();
 	pane.setMessageType(JOptionPane.PLAIN_MESSAGE);
@@ -248,6 +253,15 @@ public class PasswordCache {
 	    timers.remove(loc);
 	}
 	new ForgetTask(loc);
+    }
+    
+    /** Set whether or not to always ask a password for encryption. Usually
+     * you would want this, but for machine-generated temporary passwords this
+     * may not be desired. */
+    public boolean setAlwaysAskForEncrypt(boolean alwaysAsk) {
+	boolean old = alwaysAskForEncrypt;
+	alwaysAskForEncrypt = alwaysAsk;
+	return old;
     }
     
     /** Return a PasswordFinder that asks the user for a password when encrypting

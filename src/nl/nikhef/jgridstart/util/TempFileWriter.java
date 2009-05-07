@@ -151,7 +151,9 @@ public class TempFileWriter extends FileWriter {
 	    }
 	    Process p = Runtime.getRuntime().exec(chmodcmd);
 	    int ret = p.waitFor();
-	    logger.finest("Exec "+chmodcmd+" returns "+ret);
+	    String schmodcmd = "";
+	    for (int i=0; i<chmodcmd.length; i++) schmodcmd += " "+chmodcmd[i]; 
+	    logger.finest("exec"+schmodcmd+" returns "+ret);
 	    return ret == 0;
 	} catch (Exception e2) {
 	    return false;
