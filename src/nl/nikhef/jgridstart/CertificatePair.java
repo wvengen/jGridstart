@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -508,7 +509,7 @@ public class CertificatePair extends Properties {
      * return the File containing the private key, or null if no certificate is
      * loaded
      */
-    protected File getKeyFile() {
+    public File getKeyFile() {
 	if (path == null)
 	    return null;
 	return new File(getPath(), "userkey.pem");
@@ -518,7 +519,7 @@ public class CertificatePair extends Properties {
      * return the File containing the certificate request, or null if no
      * certificate is loaded. The file need not exist.
      */
-    protected File getCSRFile() {
+    public File getCSRFile() {
 	if (path == null)
 	    return null;
 	File f = new File(getPath(), "userrequest.pem");
@@ -535,7 +536,7 @@ public class CertificatePair extends Properties {
      * return the File containing the certificate, or null if no certificate is
      * loaded. The file need not exist.
      */
-    protected File getCertFile() {
+    public File getCertFile() {
 	if (path == null)
 	    return null;
 	return new File(getPath(), "usercert.pem");
@@ -559,8 +560,24 @@ public class CertificatePair extends Properties {
     protected PrivateKey getPrivateKey() throws IOException, PasswordCancelledException {
 	FileReader reader = new FileReader(getKeyFile());
 	PasswordCache pwcache = PasswordCache.getInstance();
-	PrivateKey privKey = ((KeyPair)pwcache. readPEM(reader, getKeyFile(), "private key")).getPrivate();
+	PrivateKey privKey = ((KeyPair)pwcache.readPEM(reader, getKeyFile(), "private key")).getPrivate();
 	return privKey;
+    }
+    
+    /** return the certificate, or null if not present. */
+    public X509Certificate getCertificate() {
+	return cert;
+    }
+    
+    /** return the certificate signing request, or null if not present */
+    public PKCS10CertificationRequest getCSR() throws IOException {
+	if (req==null) {
+	    if (!getCSRFile().isFile() || !getCSRFile().canRead())
+		return null;
+	    req = (PKCS10CertificationRequest)
+	    	CryptoUtils.readPEM(new FileReader(getCSRFile()), null);
+	}
+	return req;
     }
 
     /**
