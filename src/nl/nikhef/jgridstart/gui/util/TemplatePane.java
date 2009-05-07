@@ -258,7 +258,7 @@ public class TemplatePane extends XHTMLPanel {
 	    Node name = attrs.getNamedItem("name");
 	    Node rdNode = attrs.getNamedItem("readonly");
 	    if (rdNode!=null ||
-		    (name!=null && Boolean.valueOf(data().getProperty("lock."+name.getNodeValue()))) ) {
+		    (name!=null && Boolean.valueOf(data().getProperty(name.getNodeValue()+".lock"))) ) {
 		Node attr = node.getOwnerDocument().createAttribute("disabled");
 		attr.setNodeValue("disabled");
 		attrs.setNamedItem(attr);

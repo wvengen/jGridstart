@@ -50,6 +50,7 @@ public class ActionRequest extends AbstractAction {
 	TemplateWizard dlg = new RequestWizard();
 	Properties p = new Properties();
 	p.setProperty("organisations.html.options", Organisation.getAllOptionsHTML());
+	p.setProperty("organisations.html.options.volatile", "true");
 	p.setProperty("surname", "Klaassen");
 	p.setProperty("givenname", "Piet");
 	p.setProperty("country", "NL");
@@ -87,6 +88,7 @@ public class ActionRequest extends AbstractAction {
 		// set data from organisation selection
 		Organisation org = Organisation.get(data().getProperty("org"));
 		data().setProperty("ra.address", org.getAddress());
+		data().setProperty("ra.address.volatile", "true");
 		// on page two we need to execute the things
 		worker = new GenerateWorker(w);
 		worker.execute();
@@ -157,15 +159,16 @@ public class ActionRequest extends AbstractAction {
 			    Map.Entry<Object, Object> e = it.next();
 			    newCert.put(e.getKey(), e.getValue());
 			}
+			newCert.store();
 			// TODO check if cert can safely be set in this thread
 			cert = newCert;
 			setData(cert);
 			// now that request has been generated, lock fields
 			// used for that since they are in the request now
-			publish("lock.org");
-			publish("lock.level");
-			publish("lock.givenname");
-			publish("lock.surname");
+			publish("org.lock");
+			publish("level.lock");
+			publish("givenname.lock");
+			publish("surname.lock");
 			// update gui
 			publish("state.keypair");
 			publish("state.gencsr");
@@ -174,8 +177,8 @@ public class ActionRequest extends AbstractAction {
 		    cert.uploadRequest();
 		    publish("state.submitcsr");
 		    publish("state.cancontinue");
-		    cert.downloadCertificate();
-		    publish("state.approved");
+		    //cert.downloadCertificate();
+		    //publish("state.approved");
 		} catch (PasswordCancelledException e) {
 		    // special state to go to the previous page
 		    publish("state.cancelled");

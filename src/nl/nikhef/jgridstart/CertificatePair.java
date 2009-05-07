@@ -31,9 +31,13 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -64,6 +68,16 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  * This class is also a child of Properties. One can set and get any property
  * desired, but some are specifically reserved and queried directly from the
  * certificate and/or certificate signing request. Please see getProperty().
+ * When the object is loaded, properties found in the file indicated  by
+ * getPropertiesFile() are set. On destruction, the properties are written
+ * back as to provide transparent presistency. When a property shouldn't be
+ * written, one can set the property name with ".volatile" appended to "true"
+ * to make the property not persistent, e.g. with
+ * <code>
+ *   foo.html=&gt;b&lt;hi there&gt;/b&lt;
+ *   foo.html.volatile=true
+ * </code>
+ * the variable "foo.html" is not saved back to the properties file.
  * 
  * 
  * After some more thinking this could actually involve a Java KeyStore as a
@@ -100,8 +114,7 @@ public class CertificatePair extends Properties {
 	   public void run() {
 	       if (path!=null) {
 		   try {
-		       CertificatePair.super.store(new FileOutputStream(getPropertiesFile()),
-		       "jGridstart certificate properties");
+		       store();
 		   } catch (IOException e) { }
 	       }
 	   }
@@ -233,6 +246,28 @@ public class CertificatePair extends Properties {
 	    super.load(new FileInputStream(getPropertiesFile()));
 	}
     }
+    
+    /** Store the properties in the file indicated by getPropertiesFile() 
+     * @throws IOException 
+     * @throws FileNotFoundException */
+    public void store() throws FileNotFoundException, IOException {
+	Properties p = (Properties)CertificatePair.super.clone();
+	// remove volatile properties
+	ArrayList<String> propsToRemove = new ArrayList<String>();
+	for (Enumeration<Object> en=p.keys(); en.hasMoreElements(); ) {
+	    String key = (String)en.nextElement();
+	    if (Boolean.valueOf(p.getProperty(key+".volatile")))
+		propsToRemove.add(key);
+	}
+	for (Iterator<String> it = propsToRemove.iterator(); it.hasNext(); ) {
+	    String key = it.next();
+	    p.remove(key);
+	    p.remove(key+".volatile");
+	}
+	// and store
+	p.store(new FileOutputStream(getPropertiesFile()),
+		"jGridstart certificate properties");
+    }
 
     /**
      * Import a CertificatePair from a keystore into a (new) directory.
@@ -269,7 +304,7 @@ public class CertificatePair extends Properties {
 	    // try to read from PKCS#12
 	    cert.importFromPKCS(src);
 	}
-
+	
 	// run checks on imported certificate
 	checks.checkAll();
 
@@ -477,6 +512,7 @@ public class CertificatePair extends Properties {
 	    return;
 	}
 	setProperty("request.serial", getCA().uploadCertificationRequest(req, this));
+	store();
     }
     
     /** Download the certificate from the certificate authority */
