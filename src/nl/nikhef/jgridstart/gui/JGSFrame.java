@@ -96,10 +96,11 @@ public class JGSFrame extends JFrame {
 	    }
 	};
 	new ActionAbout(this);
-	
+	// now that the actions are available, the menu can be created
 	this.setJMenuBar(getJMenuBar());
 
-	store.load(System.getProperty("user.home")+"/.globus-test");
+	// load certificates from default location
+	store.load();
 
 	// select first certificate if present
 	// TODO select default certificate

@@ -49,6 +49,8 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
      * 
      * This is $HOME/.globus/ by default, but if the hostname starts
      * with "tutorial" we have something different.
+     * 
+     * TODO move this out of jGridStart and put it in a configfile
      */
     public void load() {
 	String hostname;
@@ -61,7 +63,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
 	if (hostname.startsWith("tutorial")) {
 	    certhome += "personal-dutchgrid-certificate";
 	} else {
-	    certhome += ".globus";
+	    certhome += ".globus-test"; // XXX only for testing
 	}
 	certhome += File.separator;
 	load(certhome);
