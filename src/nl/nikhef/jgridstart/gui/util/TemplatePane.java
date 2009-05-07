@@ -68,6 +68,8 @@ public class TemplatePane extends XHTMLPanel {
     
     protected Properties data = new Properties();
     protected Action submitAction = null;
+    /** The currently loaded URL, if available */
+    protected URL url = null;
     
     @SuppressWarnings("unchecked") // getMouseTrackingListeners() returns unchecked List
     public TemplatePane() {
@@ -113,8 +115,7 @@ public class TemplatePane extends XHTMLPanel {
 	refresh();
     }
     public Properties data() {
-	// update properties from form
-	
+	// properties from form elements are updated directly using listeners
 	return data;
     }
     /** Return the content of the html page's title tag */
@@ -123,13 +124,15 @@ public class TemplatePane extends XHTMLPanel {
     }
     /** Refresh the contents so that all parsing is redone */
     public void refresh() {
-	reloadDocument(getDocument());
+	if (getPage()!=null)
+	    reloadDocument(getPage().toString());
     }
     public void setPage(URL url) {
+	this.url = url;
         setDocument(url.toString());
     }
     public URL getPage() {
-	return getURL();
+	return url;
     }
     /** Set the action to perform on form submission. If this is set
      * to null, the standard behaviour is done: posting data to the url
