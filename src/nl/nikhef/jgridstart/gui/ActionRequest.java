@@ -87,6 +87,7 @@ public class ActionRequest extends AbstractAction {
 	    if (page==2) {
 		// set data from organisation selection
 		Organisation org = Organisation.get(data().getProperty("org"));
+		org.copyTo(data(), "org.");
 		data().setProperty("ra.address", org.getAddress());
 		data().setProperty("ra.address.volatile", "true");
 		// on page two we need to execute the things
@@ -98,7 +99,7 @@ public class ActionRequest extends AbstractAction {
 	    if (page==3) {
 		// print form; enable close button after print dialog
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		cancelAction.setEnabled(false);
+		cancelAction.setEnabled(Boolean.valueOf(data().getProperty("state.cancontinue")));
 		SwingUtilities.invokeLater(new Runnable() {
 		    public void run() {
 			try {
@@ -172,13 +173,11 @@ public class ActionRequest extends AbstractAction {
 			// update gui
 			publish("state.keypair");
 			publish("state.gencsr");
+			// TODO only upload if not yet done
+			cert.uploadRequest();
+			publish("state.submitcsr");
 		    }
-		    // TODO only upload if not yet done
-		    cert.uploadRequest();
-		    publish("state.submitcsr");
 		    publish("state.cancontinue");
-		    //cert.downloadCertificate();
-		    //publish("state.approved");
 		} catch (PasswordCancelledException e) {
 		    // special state to go to the previous page
 		    publish("state.cancelled");

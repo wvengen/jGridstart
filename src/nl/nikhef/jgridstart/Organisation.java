@@ -108,4 +108,18 @@ public class Organisation extends Properties {
 		getProperty("desc")+
 		"</option>";
     }
+    
+    /** Copy all properties to a Properties instance. These are volatile
+     * attributes since they are bound to an organisation, not a Certificate. */
+    public void copyTo(Properties p, String prefix) {
+	// copy from parent first
+	if (containsKey("ref"))
+	    organisations.get(getProperty("ref")).copyTo(p, prefix);
+	// then copy this organisation's properties
+	for (Enumeration<Object> en = keys(); en.hasMoreElements(); ) {
+	    String key = (String)en.nextElement();
+	    p.setProperty(prefix+key, getProperty(key));
+	    p.setProperty(prefix+key+".volatile", "true");
+	}
+    }
 }

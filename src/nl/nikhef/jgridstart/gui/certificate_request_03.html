@@ -22,10 +22,16 @@
 	    <td><input type="checkbox" name="state.submitcsr" disabled="disabled"/></td>
 	    <td>Submit certificate signing request to registration authority</td>
 	  </tr>
-	  <tr>
-	    <td><input type="checkbox" name="state.approved" disabled="disabled"/></td>
-	    <td>Wait for approval by the registration authority</td>
-	  </tr>
 	</table></form>
+
+    <p if="${state.submitcsr}">Your request has been generated and was
+    uploaded to the registration authority. Now you need to print the form
+    containing your personal details and certificate information, and bring
+    it to your registration authority,
+    <a href="mailto:${org.ra.email}" c="${org.ra.name}">**your agent**</a>
+    of <a href="${org.url}" c="${org.name}">**agent organisation**</a>.
+    Don't forget to bring your proof-of-identity, such as a passport or driving license.</p>
+
+    <p if="${state.submitcsr}">To continue to printing the form, press <em>Next</em>.</p>
 </body>
 </html>
