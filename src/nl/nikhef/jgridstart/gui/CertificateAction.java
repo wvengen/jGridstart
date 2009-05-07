@@ -54,6 +54,7 @@ public abstract class CertificateAction extends AbstractAction implements ListSe
 
     /** Catch it when the certificate selection is changed */
     public void valueChanged(ListSelectionEvent e) {
+	if (e.getValueIsAdjusting()) return;
 	certificatePair = selection.getCertificatePair();
 	setEnabled(wantsEnabled());
     }
