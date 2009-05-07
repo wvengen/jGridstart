@@ -9,7 +9,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="thirdparty/commons-cli/commons-cli-1.2.jar" sourcepath="thirdparty/commons-cli/commons-cli-1.2-sources.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:thirdparty/commons-cli/commons-cli-javadoc-1.2.jar!/"/>
+			<attribute name="javadoc_location" value="http://commons.apache.org/cli/api-release/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="thirdparty/junit/junit-4.5.jar">
