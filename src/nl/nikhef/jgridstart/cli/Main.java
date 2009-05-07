@@ -1,8 +1,14 @@
 package nl.nikhef.jgridstart.cli;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +26,7 @@ import org.apache.commons.cli.ParseException;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 public class Main {
 
@@ -54,6 +61,10 @@ public class Main {
 		actionList(line);
 	    if (line.hasOption("print"))
 		actionPrint(line);
+	    if (line.hasOption("import"))
+		actionImport(line);
+	    if (line.hasOption("get"))
+		actionGet(line);
 	    
 	} catch (Exception e) {
 	    logger.severe(e.getLocalizedMessage());
@@ -149,6 +160,20 @@ public class Main {
 	}
     }
     
+    /** import a certificate into the certificate store 
+     * @throws PasswordCancelledException 
+     * @throws IOException 
+     * @throws CertificateException 
+     * @throws NoSuchProviderException 
+     * @throws KeyStoreException 
+     * @throws UnrecoverableKeyException 
+     * @throws NoSuchAlgorithmException */
+    protected static void actionImport(CommandLine line) throws ParseException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, NoSuchProviderException, CertificateException, IOException, PasswordCancelledException {
+	// TODO implement and setup cli PasswordCache
+	throw new ParseException("import not implemented");
+	//store.importFrom(new File(line.getOptionValue("import")));
+    }
+    
     /** print a certificate 
      * @throws ParseException */
     protected static void actionPrint(CommandLine line) throws ParseException, IOException {
@@ -163,6 +188,14 @@ public class Main {
 	}
     }
     
+    /** get a certificate from its online source after signing 
+     * @throws IOException 
+     * @throws NoSuchAlgorithmException 
+     * @throws KeyManagementException */
+    protected static void actionGet(CommandLine line) throws ParseException, KeyManagementException, NoSuchAlgorithmException, IOException {
+	CertificatePair cert = getCertificate(line);
+	cert.downloadCertificate();
+    }
     
     
     /** Return a certificate as specified on the command-line */
