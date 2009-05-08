@@ -16,31 +16,34 @@ public class GridCertInstallerFirefox extends GridCertInstaller {
     
     /** install a base64-encoded PKCS12 client certificate into Firefox */ 
     public static void install(String pkcsfile, char[] pw) throws IOException {
-	// store password in temporary file
-	TempFileWriter pwfile = new TempFileWriter("jgridstart", ".pw");
-	pwfile.append(new String(pw));
-	pwfile.close();
-	
-	// get profiles
-	HashMap<String, String> profiles = getProfileFolders();
-	if (profiles.size()==0) return;
-	if (profiles.size()>1) {
-	    // TODO get selection
+	TempFileWriter pwfile = null;
+	try {
+	    // store password in temporary file
+	    pwfile = new TempFileWriter("jgridstart", ".pw");
+	    pwfile.append(new String(pw));
+	    pwfile.close();
+
+	    // get profiles
+	    HashMap<String, String> profiles = getProfileFolders();
+	    if (profiles.size()==0) return;
+	    if (profiles.size()>1) {
+		// TODO get selection
+	    }
+
+	    for (Iterator<String> it = profiles.keySet().iterator(); it.hasNext(); ) {
+		String profilename = it.next();
+		String profiledir = profiles.get(profilename);
+		String args[] = {
+			"-d", profiledir,		// directory with certificate store
+			"-i", pkcsfile,		// input certificate
+			"-w", pwfile.getPath()	// file with pkcs12 password
+		};
+		logger.info("Adding certificate "+pkcsfile+" to "+profiledir);
+		pk12Util(args);
+	    }
+	} finally {
+	    if (pwfile!=null) pwfile.delete();
 	}
-	
-	for (Iterator<String> it = profiles.keySet().iterator(); it.hasNext(); ) {
-	    String profilename = it.next();
-	    String profiledir = profiles.get(profilename);
-	    String args[] = {
-		    "-d", profiledir,		// directory with certificate store
-		    "-i", pkcsfile,		// input certificate
-		    "-w", pwfile.getPath()	// file with pkcs12 password
-	    };
-	    logger.info("Adding certificate "+pkcsfile+" to "+profiledir);
-	    pk12Util(args);
-	}
-	
-	pwfile.delete();
     }
     
     /** detect where Firefox profiles are present
