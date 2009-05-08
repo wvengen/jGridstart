@@ -188,7 +188,6 @@ public class JGSFrame extends JFrame {
 	    viewCertificateList = new JCheckBoxMenuItem(getAction("viewlist"));
 	    viewCertificateList.setSelected(false);
 	    menu.add(viewCertificateList);
-	    menu.add(new JMenuItem("Personal details...", 'P')).setEnabled(false);
 	    menu.add(new JMenuItem(getAction("refresh")));
 	    jMenuBar.add(menu);
 	    
