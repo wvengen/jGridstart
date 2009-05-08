@@ -1,6 +1,8 @@
 package nl.nikhef.jgridstart;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
@@ -10,6 +12,7 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -17,6 +20,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import nl.nikhef.jgridstart.util.CryptoUtils;
+import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 import nl.nikhef.jgridstart.gui.util.ArrayListModel;
@@ -35,13 +40,13 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
 
     /** new certificate store and load from path */
     public CertificateStore(String path) {
-	super();
+	this();
 	load(path);
     }
 
     /** new certificate store and load from path as File */
     public CertificateStore(File path) {
-	super();
+	this();
 	load(path);
     }
     
@@ -98,6 +103,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
 	// add new items
 	for (Iterator<File> i = files.iterator(); i.hasNext();) {
 	    File f = i.next();
+	    if (!f.isDirectory()) continue;
 	    boolean found = false;
 	    for (int j = 0; j < size(); j++) {
 		File a = get(j).getPath();
@@ -109,6 +115,10 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
 	    if (!found)
 		tryAdd(f);
 	}
+	// now if only one certificate is present it should be the
+	// default certificate
+	if (size()==1 && getDefault()==null)
+	    trySetDefault(get(0));
     }
 
     /**
@@ -133,6 +143,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
 	// add new items
 	for (Iterator<File> i = files.iterator(); i.hasNext();) {
 	    File f = i.next();
+	    if (!f.isDirectory()) continue;
 	    boolean found = false;
 	    for (int j = 0; j < size(); j++) {
 		File a = get(j).getPath();
@@ -144,6 +155,10 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
 	    if (!found)
 		tryAdd(f);
 	}
+	// now if only one certificate is present it should be the
+	// default certificate
+	if (size()==1 && getDefault()==null)
+	    trySetDefault(get(0));
     }
 
     /**
@@ -254,4 +269,54 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
 	}
     }
 
+    /** Return the default certificate. The default certificate is the one
+     * in ~/.globus (or the platform's equivalent). Normally this is a symlink
+     * to or copy of a certificate in the store.
+     * 
+     * TODO use stat or so to cache the result until file changes
+     * 
+     * @return Default CertificatePair, or null if not present or not matched. 
+     * @throws IOException */
+    public CertificatePair getDefault() {
+	File dflCertFile = new File(path, "usercert.pem"); 
+	X509Certificate dflCert;
+	try {
+	    dflCert = (X509Certificate)CryptoUtils.readPEM(
+	    	    new FileReader(dflCertFile), null);
+	} catch (IOException e) { return null; }
+	if (dflCert==null) return null;
+	for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {
+	    CertificatePair c = it.next();
+	    if (c.getCertificate()!=null && c.getCertificate().equals(dflCert))
+		return c;
+	}
+	// no match
+	// TODO handle case where default certificate is not in certificate store
+	return null;
+    }
+    
+    /** Make a Certificate Pair the default certificate. This is done by
+     * symlinking or copying it to ~/.globus (or the platform's equivalent)
+     * so that the globus toolkit and other compatible tools can use it. 
+     * @throws IOException */
+    public void setDefault(CertificatePair c) throws IOException {
+	CertificatePair oldDfl = getDefault();
+	File dflKey = new File(path, "userkey.pem");
+	File dflCert = new File(path, "usercert.pem");
+	if (c.getCertificate()==null)
+	    throw new IOException("Cannot set default to pending certificate: "+c);
+	// TODO check dflCert and dflKey are already present in certificate store!!!
+	FileUtils.CopyFile(c.getKeyFile(), dflKey);
+	FileUtils.CopyFile(c.getCertFile(), dflCert);
+	// update listeners
+	if (oldDfl!=null) notifyChanged(indexOf(oldDfl));
+	notifyChanged(indexOf(c));
+    }
+    public void trySetDefault(CertificatePair c) {
+	try {
+	    setDefault(c);
+	} catch(IOException e) {
+	    logger.warning("Could not optionally set default certificate: "+e.getMessage());
+	}
+    }
 }

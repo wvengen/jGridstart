@@ -53,8 +53,9 @@ public class ComponentCertificateList extends JList {
 	    // TODO icon showing certificate state
 	    // name of person
 	    s += cert.getSubjectPrincipalValue(X509Name.CN);
+	    CertificatePair dflCert = ((CertificateStore)getModel()).getDefault();
 	    // add star to default certificate
-	    if (index==0) {
+	    if ( cert.equals(dflCert) ) {
 		// TODO get default certificate from store (not yet implemented)
 		s += "<b color='#ffcc00'>&#x2730</b>";
 	    }	

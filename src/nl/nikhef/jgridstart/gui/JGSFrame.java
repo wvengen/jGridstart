@@ -86,6 +86,7 @@ public class JGSFrame extends JFrame {
 	new ActionInstall(this, selection);
 	new ActionRevoke(this);
 	new ActionExport(this, selection);
+	new ActionMakeDefault(this, store, selection);
 	new ActionViewLog(this);
 	new ActionViewCertificateList(this, certList, false);
 	new ActionRefresh(this, store) {
@@ -175,6 +176,7 @@ public class JGSFrame extends JFrame {
 	    menu.add(new JMenuItem(getAction("revoke")));
 	    menu.addSeparator();
 	    menu.add(new JMenuItem(getAction("export")));
+	    menu.add(new JMenuItem(getAction("makedefault")));
 	    menu.add(new JMenuItem("Change passphrase...", 'P')).setEnabled(false);
 	    menu.add(new JMenuItem(getAction("viewlog")));
 	    jMenuBar.add(menu);
