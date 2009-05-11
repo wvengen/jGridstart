@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -334,14 +335,21 @@ public class PasswordCache {
 	}
     }
     
-    /** Convenience method for CryptoUtils.readPEM() that uses this PasswordCache 
+    /** Convenience method for CryptoUtils.writePEM() that uses this PasswordCache.
+     * This one also sets the permissions to user-only for private keys.
+     *  
      * @throws IOException 
      * @throws NoSuchAlgorithmException 
      * @throws PasswordCancelledException */
     public void writePEM(Object src, File f, String msg) throws NoSuchAlgorithmException, IOException, PasswordCancelledException {
-	writePEM(src, new FileWriter(f), f, msg);
+	FileWriter writer = null;
+	if (src instanceof PrivateKey)
+	    writer = new PrivateFileWriter(f);
+	else
+	    writer = new FileWriter(f);
+	writePEM(src, writer, f, msg);
     }
-    /** Convenience method for CryptoUtils.readPEM() that uses this PasswordCache 
+    /** Convenience method for CryptoUtils.writePEM() that uses this PasswordCache 
      * @throws IOException 
      * @throws NoSuchAlgorithmException 
      * @throws PasswordCancelledException */

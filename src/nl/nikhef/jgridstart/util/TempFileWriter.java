@@ -15,12 +15,7 @@ import java.util.logging.Logger;
  * 
  * @author wvengen
  */
-public class TempFileWriter extends FileWriter {
-    static protected Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
-    
-    private File file = null;
-    private boolean permissionsSet = false;
-
+public class TempFileWriter extends PrivateFileWriter {
     /**
      * Create a temporary file
      * 
@@ -34,52 +29,8 @@ public class TempFileWriter extends FileWriter {
 	this(File.createTempFile(prefix, suffix));
     }
 
-    /** Return pathname string. See File.getPath() for details. */
-    public String getPath() {
-	return file.getPath();
-    }
-
     private TempFileWriter(File file) throws IOException {
 	super(file);
-	this.file = file;
 	file.deleteOnExit(); // that at the least
-    }
-
-    public void write(char[] cbuf) throws IOException {
-	ensurePermissions();
-	super.write(cbuf);
-    }
-
-    public void write(char[] cbuf, int off, int len) throws IOException {
-	ensurePermissions();
-	super.write(cbuf, off, len);
-    }
-
-    public void write(int c) throws IOException {
-	ensurePermissions();
-	super.write(c);
-    }
-
-    public void write(String str) throws IOException {
-	ensurePermissions();
-	super.write(str);
-    }
-
-    public void write(String str, int off, int len) throws IOException {
-	ensurePermissions();
-	super.write(str, off, len);
-    }
-
-    private void ensurePermissions() {
-	// make sure we have correct permissions before actually writing data
-	if (!permissionsSet) {
-	    FileUtils.chmod(file, true, true, false, true);
-	    permissionsSet = true;
-	}
-    }
-
-    public boolean delete() {
-	// delete file using new File to make it actually work on java 1.4.2
-	return (new File(getPath())).delete();
     }
 }
