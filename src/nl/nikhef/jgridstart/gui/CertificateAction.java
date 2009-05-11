@@ -56,7 +56,7 @@ public abstract class CertificateAction extends AbstractAction implements ListSe
     public void valueChanged(ListSelectionEvent e) {
 	if (e.getValueIsAdjusting()) return;
 	certificatePair = selection.getCertificatePair();
-	setEnabled(wantsEnabled());
+	setEnabled(certificatePair!=null && wantsEnabled());
     }
     
     /** Get the certificate to operate on. To be used by child classes. */
