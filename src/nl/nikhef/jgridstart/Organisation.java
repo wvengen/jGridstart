@@ -80,11 +80,11 @@ public class Organisation extends Properties {
 	for (Iterator<Organisation> it = organisations.values().iterator(); it.hasNext(); ) {
 	    Organisation org = it.next();
 	    r += org.getOptionHTML()+"\n";
-	    if (org.getProperty("id").equals(cert.getProperty("org")))
+	    if (cert!=null && org.getProperty("id").equals(cert.getProperty("org")))
 		hasOrg = true;
 	}
 	// create option for non-existent organisation
-	if (!hasOrg) {
+	if (cert!=null && !hasOrg) {
 	    String id = cert.getProperty("org");
 	    Organisation org = new Organisation(id);
 	    org.setProperty("name", id);
