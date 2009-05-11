@@ -29,6 +29,7 @@ public class CertificateRequest {
 	if (p.getProperty("level").equals("demo"))
 	    subject += ", O=dutch-demo";
 	subject += ", O=users";
+	subject += ", O=" + p.getProperty("org");
 	subject += ", CN=" + p.getProperty("givenname").trim() +
 	" " + p.getProperty("surname").trim();
 	p.setProperty("subject", subject);
