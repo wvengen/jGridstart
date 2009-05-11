@@ -19,7 +19,7 @@ public class ActionMakeDefault extends CertificateAction {
     public ActionMakeDefault(JFrame parent, CertificateStore store, CertificateSelection s) {
 	super(parent, s);
 	this.store = store;
-	putValue(NAME, "Make default...");
+	putValue(NAME, "Make default");
 	putValue(MNEMONIC_KEY, new Integer('D'));
 	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control D"));
 	BareBonesActionLaunch.addAction("makedefault", this);
