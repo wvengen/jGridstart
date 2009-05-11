@@ -49,15 +49,52 @@ public class Organisation extends Properties {
 	    organisations.get(keyParts[0]).setProperty(keyParts[1], allProps.getProperty(key));
 	}
     }
+    /** Returns the Organisation belonging to a CertificatePair, or null of not found.
+     *
+     * TODO check property and certificate subject are not out-of-sync
+     */
+    public static Organisation getFromCertificate(CertificatePair cert) {
+	// from direct property if set
+	if (cert.getProperty("org")!=null)
+	    return get(cert.getProperty("org"));
+	// else parse subject: find first id in certificate list
+	String[] orgs = cert.getProperty("subject.o").split(",\\s*");
+	for (int i=0; i<orgs.length; i++) {
+	    if (organisations.keySet().contains(orgs[i]))
+		return get(orgs[i]);
+	}
+	// nothing found ...
+	return null;
+    }
     
-    /** Returns a list of &gt;option&lt; elements to put in an html select */
-    public static String getAllOptionsHTML() {
+    /** Returns a list of &gt;option&lt; elements to put in an html select. The CertificatePair
+     * supplied is verified to exist in the options, or else a new option is added that has
+     * no existing organisation from the configuration file. This is needed to be able to
+     * support organisations that are not present in the configuration file. */
+    public static String getAllOptionsHTML(CertificatePair cert) {
+	// setup variables to detect if certificate organisation is present already
+	boolean hasOrg = false;
+	// add all organisations
 	if (organisations==null) readAll();
 	String r = "";
 	for (Iterator<Organisation> it = organisations.values().iterator(); it.hasNext(); ) {
-	    r += it.next().getOptionHTML()+"\n";
+	    Organisation org = it.next();
+	    r += org.getOptionHTML()+"\n";
+	    if (org.getProperty("id").equals(cert.getProperty("org")))
+		hasOrg = true;
+	}
+	// create option for non-existent organisation
+	if (!hasOrg) {
+	    String id = cert.getProperty("org");
+	    Organisation org = new Organisation(id);
+	    org.setProperty("name", id);
+	    org.setProperty("desc", id+" (unrecognised organisation)");
+	    r = org.getOptionHTML()+"\n" + r;
 	}
 	return r;
+    }
+    public static String getAllOptionsHTML() {
+	return getAllOptionsHTML(null);
     }
 
     ///

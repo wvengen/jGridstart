@@ -8,6 +8,8 @@ import java.awt.print.PrinterException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+
 import javax.swing.SwingUtilities;
 import org.jdesktop.swingworker.SwingWorker;
 
@@ -32,15 +34,29 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     /** working thread */
     protected SwingWorker<Void, String> worker = null;
 
+    /** New certificate request */
     public RequestWizard(Frame parent, CertificateStore store, CertificateSelection sel) {
 	super(parent);
 	this.store = store;
 	this.selection = sel;
     }
+    /** New certificate request */
     public RequestWizard(Dialog parent, CertificateStore store, CertificateSelection sel) {
 	super(parent);
 	this.store = store;
 	this.selection = sel;
+    }
+    /** View form of existing CertificatePair */
+    public RequestWizard(Frame parent, CertificatePair cert) {
+	super(parent);
+	this.cert = cert;
+	setData(cert);
+    }
+    /** View form of existing CertificatePair */
+    public RequestWizard(Dialog parent, CertificatePair cert) {
+	super(parent);
+	this.cert = cert;
+	setData(cert);
     }
     @Override
     protected void initialize() {
@@ -51,6 +67,13 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	pages.add(getClass().getResource("certificate_request_03.html"));
 	pages.add(getClass().getResource("certificate_request_04.html"));
 	setHandler(this);
+    }
+    @Override
+    public void setData(Properties p) {
+	super.setData(p);
+	// set static properties for the forms
+	data().setProperty("organisations.html.options", Organisation.getAllOptionsHTML(cert));
+	data().setProperty("organisations.html.options.volatile", "true");
     }
 
     /** called when page in wizard was changed */
@@ -63,9 +86,11 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	if (page==2) {
 	    // set data from organisation selection
 	    Organisation org = Organisation.get(data().getProperty("org"));
-	    org.copyTo(data(), "org.");
-	    data().setProperty("ra.address", org.getAddress());
-	    data().setProperty("ra.address.volatile", "true");
+	    if (org!=null) {
+		org.copyTo(data(), "org.");
+		data().setProperty("ra.address", org.getAddress());
+		data().setProperty("ra.address.volatile", "true");
+	    }
 	    // on page two we need to execute the things
 	    worker = new GenerateWorker(w);
 	    worker.execute();
@@ -113,8 +138,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    // TODO check w.data() can safely be accessed in this thread
 	    // TODO check error handling
 	    try {
+		// generate request when no key or certificate
 		if (cert==null) {
-			// generate request
 		    CertificateRequest.postFillData(w.data());
 		    CertificatePair newCert = store.generateRequest(w.data());
 		    // copy properties to certificate pair
@@ -123,23 +148,25 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 			Map.Entry<Object, Object> e = it.next();
 			newCert.put(e.getKey(), e.getValue());
 		    }
+		    // now that request has been generated, lock fields
+		    // used for that since they are in the request now
+		    newCert.setProperty("org.lock", "true");
+		    newCert.setProperty("level.lock", "true");
+		    newCert.setProperty("givenname.lock", "true");
+		    newCert.setProperty("surname.lock", "true");
+		    // and make sure data is saved
 		    newCert.store();
 		    // TODO check if cert can safely be set in this thread
 		    cert = newCert;
 		    setData(cert);
-		    // now that request has been generated, lock fields
-		    // used for that since they are in the request now
-		    publish("org.lock");
-		    publish("level.lock");
-		    publish("givenname.lock");
-		    publish("surname.lock");
-		    // update gui
-		    publish("state.keypair");
-		    publish("state.gencsr");
-		    // TODO only upload if not yet done
-		    cert.uploadRequest();
-		    publish("state.submitcsr");
+		    publish("state.certificate_created");
 		}
+		// upload request if it hasn't been done
+		if (!Boolean.valueOf(data().getProperty("request.submitted"))) {
+		    cert.uploadRequest();
+		    publish("state.cancontinue");
+		}
+		// make sure gui is updated and user can continue
 		publish("state.cancontinue");
 	    } catch (PasswordCancelledException e) {
 		// special state to go to the previous page
@@ -153,29 +180,29 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	 * and it is refreshed. This gives a template the opportunity to
 	 * change the display based on a property (e.g. a checkbox) */
 	protected void process(List<String> keys) {
-	    // update content pane
+	    // process messages
 	    for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
 		String key = it.next();
+		if (key==null) continue;
 		// process cancel
 		if (key.equals("state.cancelled")) {
 		    setStepRelative(-1);
 		    return;
 		}
-		w.data().setProperty(key, "true");
-		// update next button
-		if (key.equals("state.cancontinue"))
-		    nextAction.setEnabled(true);
-		// select certificate when created or update selection
-		if (cert!=null) {
-		    // forcibly update for other changes
-		    // TODO create change listener for main window to catch refreshes and just refresh
+		// select certificate in main view on creation
+		if (key.equals("state.certificate_created")) {
+		    assert(cert!=null);
 		    if (selection!=null) {
 			int index = store.indexOf(cert);
 			selection.clearSelection();
 			selection.setSelection(index);
 		    }
 		}
+		// update next button
+		if (key.equals("state.cancontinue"))
+		    nextAction.setEnabled(true);
 	    }
+	    // update content pane
 	    w.refresh();
 	}
     }

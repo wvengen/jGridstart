@@ -6,32 +6,61 @@
 <body>
 	<h1>Request a new certificate</h1>
 	
-	<p>Please wait while your certificate is being generated and sent to the
+	
+	<p if="!${request}">Please wait while your certificate is being generated and sent to the
 	registration authority over the internet.</p>
+	
+	<p if="${request}">Your certificate has already been generated<span if="${request.submitted}">
+	  and was sent to the registration authority over the internet</span>.
+	  <span if="!${request.submitted}">Please wait while your certificate is being sent to the
+	  registration authority over the internet.</span>
+	</p>
+	
 	
 	<form><table>
 	  <tr>
-	    <td><input type="checkbox" name="state.keypair" disabled="disabled"/></td>
+	    <td><input type="checkbox" name="request" disabled="disabled"/></td>
 	    <td>Generate key pair</td>
 	  </tr>
 	  <tr>
-	    <td><input type="checkbox" name="state.gencsr" disabled="disabled"/></td>
+	    <td><input type="checkbox" name="request" disabled="disabled"/></td>
 	    <td>Generate certificate signing request</td>
 	  </tr>
 	  <tr>
-	    <td><input type="checkbox" name="state.submitcsr" disabled="disabled"/></td>
-	    <td>Submit certificate signing request to registration authority</td>
+	    <td><input type="checkbox" name="request.submitted" disabled="disabled"/></td>
+	    <td>Submit certificate signing request to registration authority
+	      <i if="${cert}">(done elsewhere)</i>
+	    </td>
+	  </tr>
+	  <tr if="${cert}">
+	    <td><input type="checkbox" name="cert" disabled="disabled"/></td>
+	    <td>Verify identity with
+	      <a href="mailto:${org.ra.email}" c="${org.ra.name}">**your agent**</a>
+          of <a href="${org.url}" c="${org.name}">**agent organisation**</a>
+        </td>
+      </tr>
+	  <tr if="${cert}">
+	    <td><input type="checkbox" name="cert" disabled="disabled"/></td>
+	    <td>Download approved certificate</td>
 	  </tr>
 	</table></form>
 
-    <p if="${state.submitcsr}">Your request has been generated and was
-    uploaded to the registration authority. Now you need to print the form
-    containing your personal details and certificate information, and bring
-    it to your registration authority,
-    <a href="mailto:${org.ra.email}" c="${org.ra.name}">**your agent**</a>
-    of <a href="${org.url}" c="${org.name}">**agent organisation**</a>.
-    Don't forget to bring your proof-of-identity, such as a passport or driving license.</p>
 
-    <p if="${state.submitcsr}">To continue to printing the form, press <em>Next</em>.</p>
+	<div if="!${cert}">
+      <p if="${request.submitted}">Your request has been generated and was
+      uploaded to the registration authority. Now you need to print the form
+      containing your personal details and certificate information, and bring
+      it to your registration authority,
+      <a href="mailto:${org.ra.email}" c="${org.ra.name}">**your agent**</a>
+      of <a href="${org.url}" c="${org.name}">**agent organisation**</a>.
+      Don't forget to bring your proof-of-identity, such as a passport or driving license.</p>
+      <p if="${state.submitcsr}">To continue to printing the form, press <em>Next</em>.</p>
+    </div>
+    
+    <div if="${cert}">
+      <p>To again print the verification form, press <em>Next</em>.</p>
+    </div>
+
+
 </body>
 </html>

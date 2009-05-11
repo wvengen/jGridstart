@@ -145,6 +145,8 @@ public class CertificatePair extends Properties {
      *     are "true" when they are defined in the extended key usage
      * - modulus, modulus.first20
      *     the public key's modulus, and its first 20 characters
+     * - org
+     *     is returned when set, or guessed from subject if unset
      * 
      * @param key property to get the value of
      * @return value of the property, or null if not found.
@@ -166,6 +168,14 @@ public class CertificatePair extends Properties {
 	    else return "true";
 	if (key.startsWith("issuer."))
 	    return getIssuerPrincipalValue(key.substring(7));
+	if (key.equals("org")) {
+	    if (containsKey(key)) return super.getProperty(key);
+	    if (getProperty("subject")==null) return null;
+	    // return last defined organisation
+	    // TODO doesn't work when organisation unit is involved; need to move to Organisation
+	    String[] orgs = getProperty("subject.o").split(",\\s*");
+	    return orgs[orgs.length-1];
+	}
 	try {
 	    if (key.equals("modulus"))
 		if (cert!=null) return ((RSAPublicKey)cert.getPublicKey()).getModulus().toString();
@@ -512,6 +522,7 @@ public class CertificatePair extends Properties {
 	    return;
 	}
 	setProperty("request.serial", getCA().uploadCertificationRequest(req, this));
+	setProperty("request.submitted", "true");
 	store();
     }
     

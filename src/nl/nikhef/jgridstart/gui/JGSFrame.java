@@ -82,9 +82,10 @@ public class JGSFrame extends JFrame {
 
 	// create actions; they register themselves
 	new ActionRequest(this, store, selection);
+	new ActionViewRequest(this, selection, 2);
 	new ActionImport(this, store, selection);
 	new ActionInstall(this, selection);
-	new ActionRevoke(this);
+	new ActionRevoke(this, selection);
 	new ActionExport(this, selection);
 	new ActionMakeDefault(this, store, selection);
 	new ActionViewLog(this);
@@ -170,9 +171,9 @@ public class JGSFrame extends JFrame {
 	    // menu: Certificate
 	    menu = new JMenu("Actions");
 	    menu.setMnemonic('A');
-	    menu.add(new JMenuItem("Request approval...", 'R')).setEnabled(false);
+	    menu.add(new JMenuItem(getAction("viewrequest")));
 	    menu.add(new JMenuItem(getAction("install")));
-	    menu.add(new JMenuItem("Request renewal...", 'N')).setEnabled(false);
+	    menu.add(new JMenuItem("Renew certificate...", 'N')).setEnabled(false);
 	    menu.add(new JMenuItem(getAction("revoke")));
 	    menu.addSeparator();
 	    menu.add(new JMenuItem(getAction("export")));
@@ -180,7 +181,6 @@ public class JGSFrame extends JFrame {
 	    menu.add(new JMenuItem("Change passphrase...", 'P')).setEnabled(false);
 	    menu.add(new JMenuItem(getAction("viewlog")));
 	    jMenuBar.add(menu);
-	    menu.getItem(0).setEnabled(false);
 
 	    // menu: View
 	    menu = new JMenu("View");
