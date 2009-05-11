@@ -37,6 +37,11 @@ public class FileUtils {
      * Change file permissions
      * 
      * Not supported natively until java 1.6. Bad Java.
+     * Note that the ownerOnly argument differs from Java. When ownerOnly is
+     * true for Java's File.setReadable(), File.setWritable() or
+     * File.setExecutable(), the other/group permissions are left as they are.
+     * This method resets them instead. When ownerOnly is false, behaviour is
+     * as Java's.
      * 
      * @param file File to set permissions on
      * @param read  if reading should be allowed
@@ -58,6 +63,14 @@ public class FileUtils {
 	    Method setExecutable = File.class.getDeclaredMethod("setExecutable",
 		    new Class[] { boolean.class, boolean.class });
 
+	    // first remove all permissions if ownerOnly is wanted, because File.set*
+	    // doesn't touch other/group permissions when ownerOnly is true.
+	    if (ownerOnly) {
+		ret &= (Boolean)setReadable.invoke(file, new Object[]{ false, false });
+		ret &= (Boolean)setWritable.invoke(file, new Object[]{ false, false });
+		ret &= (Boolean)setExecutable.invoke(file, new Object[]{ false, false });
+	    }
+	    // then set owner/all permissions
 	    ret &= (Boolean)setReadable.invoke(file, new Object[] { read, ownerOnly });
 	    ret &= (Boolean)setWritable.invoke(file, new Object[] { write, ownerOnly });
 	    ret &= (Boolean)setExecutable.invoke(file, new Object[] { exec, ownerOnly });
