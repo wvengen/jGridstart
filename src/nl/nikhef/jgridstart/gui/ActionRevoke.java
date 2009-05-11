@@ -7,15 +7,13 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 
-public class ActionRevoke extends AbstractAction {
+public class ActionRevoke extends CertificateAction {
     
-    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");
-    private JFrame parent = null;
-    
-    public ActionRevoke(JFrame parent) {
-	super();
+    public ActionRevoke(JFrame parent, CertificateSelection s) {
+	super(parent, s);
 	this.parent = parent;
 	putValue(NAME, "Revoke...");
 	putValue(MNEMONIC_KEY, new Integer('R'));
