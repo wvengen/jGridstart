@@ -1,5 +1,8 @@
 package nl.nikhef.jgridstart;
 
+import java.awt.ItemSelectable;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -40,6 +43,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
+
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeListener;
 
 import nl.nikhef.jgridstart.ca.*;
 import nl.nikhef.jgridstart.util.CryptoUtils;
@@ -89,7 +95,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  * 
  * @author wvengen
  */
-public class CertificatePair extends Properties {
+public class CertificatePair extends Properties implements ItemSelectable {
 
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart");
 
@@ -255,6 +261,7 @@ public class CertificatePair extends Properties {
 	if (getPropertiesFile().exists()) {
 	    super.load(new FileInputStream(getPropertiesFile()));
 	}
+	notifyChanged();
     }
     
     /** Store the properties in the file indicated by getPropertiesFile() 
@@ -310,9 +317,11 @@ public class CertificatePair extends Properties {
 	try {
 	    // try to read from PEM first
 	    cert.importFromPEM(src);
+	    cert.notifyChanged();
 	} catch (IOException e) {
 	    // try to read from PKCS#12
 	    cert.importFromPKCS(src);
+	    cert.notifyChanged();
 	}
 	
 	// run checks on imported certificate
@@ -504,7 +513,7 @@ public class CertificatePair extends Properties {
 	
 	// check
 	checks.checkAll();
-
+	
 	return cert;
     }
     
@@ -523,6 +532,7 @@ public class CertificatePair extends Properties {
 	}
 	setProperty("request.serial", getCA().uploadCertificationRequest(req, this));
 	setProperty("request.submitted", "true");
+	notifyChanged();
 	store();
     }
     
@@ -535,6 +545,7 @@ public class CertificatePair extends Properties {
 	
 	cert = getCA().downloadCertificate(req, getProperty("request.serial"));
 	CryptoUtils.writePEM(cert, new FileWriter(getCertFile()));
+	notifyChanged();
 	// TODO security check
     }
     
@@ -832,4 +843,33 @@ public class CertificatePair extends Properties {
 	}
     }
 
+    /*
+     * ItemListener interface
+     */
+    private ArrayList<ItemListener> itemListeners = new ArrayList<ItemListener>();
+    /** @see java.awt.ItemSelectable#addItemListener(java.awt.event.ItemListener) */
+    public void addItemListener(ItemListener l) {
+	itemListeners.add(l);
+    }
+    /** @see java.awt.ItemSelectable#getSelectedObjects() */
+    public Object[] getSelectedObjects() {
+	return itemListeners.toArray();
+    }
+    /** @see java.awt.ItemSelectable#removeItemListener(java.awt.event.ItemListener) */
+    public void removeItemListener(ItemListener l) {
+	itemListeners.remove(l);
+    }
+    /** notify itemlisteners that the item was changed */
+    protected void notifyChanged() {
+	// TODO figure out what to do for console
+	SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+		ItemEvent e = new ItemEvent(CertificatePair.this, ItemEvent.ITEM_STATE_CHANGED, CertificatePair.this, 0);
+		for (Iterator<ItemListener> it = itemListeners.iterator(); it.hasNext(); ) {
+		    it.next().itemStateChanged(e);
+		}
+
+	    }
+	});
+    }
 }

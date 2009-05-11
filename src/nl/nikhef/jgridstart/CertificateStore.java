@@ -1,5 +1,7 @@
 package nl.nikhef.jgridstart;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -26,7 +28,7 @@ import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 import nl.nikhef.jgridstart.gui.util.ArrayListModel;
 
-public class CertificateStore extends ArrayListModel<CertificatePair> {
+public class CertificateStore extends ArrayListModel<CertificatePair> implements ItemListener {
 
     static protected Logger logger = Logger.getLogger("nl.nikhef.jgridstart");
 
@@ -195,6 +197,25 @@ public class CertificateStore extends ArrayListModel<CertificatePair> {
 	    throw new IOException("Maximum number of certificates reached"); // very unlikely
 	dst.mkdirs();
 	return dst;
+    }
+    
+    /** Hook parent to add an ItemListener when an item is added */
+    @Override
+    protected void notifyAdded(int start, int end) {
+	super.notifyAdded(start, end);
+	for (int i=start; i<=end; i++)
+	    get(i).addItemListener(this);
+    }
+    /** Hook parent to remove an ItemListener when an item is removed */
+    @Override
+    protected void notifyRemoved(int start, int end) {
+	for (int i=start; i<=end; i++)
+	    get(i).removeItemListener(this);
+	super.notifyRemoved(start, end);
+    }
+    /** ItemListener handler to catch changes in CertificatePair */
+    public void itemStateChanged(ItemEvent e) {
+	notifyChanged(indexOf(e.getItem()));
     }
     
     /** Deletes a CertificatePair from the store. This removes it permanently

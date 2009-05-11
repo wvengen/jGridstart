@@ -249,7 +249,7 @@ public class JGSFrame extends JFrame {
 		    identityMenu.remove(item);
 		}
 		public void contentsChanged(ListDataEvent e) {
-		    // TODO update description and refresh contentpane(!)
+		    certInfoPane.refresh();
 		}
 	    });
 	}
