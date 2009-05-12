@@ -6,8 +6,14 @@
 <body>
 	<h1>Certificate of <c c="${subject.cn}"></c></h1>
 	<div if="!${cert}">
-	  <p class="topinfo-ok" if="${request}">This certificate is currently awaiting approval.</p>
 	  <p class="topinfo-bad" if="!${request}">This certificate is incomplete, please consider removing it.</p>
+	  <div if="${request}">
+	    <p class="topinfo-ok" if="!${request.submitted}">Your request still <a href="action:viewrequest">needs to be submitted</a> to the certificate authority.</p>
+	    <div if="${request.submitted}">
+	      <p class="topinfo-ok" if="!${request.processed}">Your request is currently awaiting approval.</p>
+	      <p class="topinfo-ok" if="${request.processed}">Your request has been accepted, <a href="action:viewrequest">please retrieve it</a> to continue.</p>
+	    </div>
+	  </div>
 	</div>
 
 	<table summary="certificate details" cellpadding="3">

@@ -29,17 +29,17 @@
 	  <tr>
 	    <td><input type="checkbox" name="request.submitted" disabled="disabled"/></td>
 	    <td>Submit certificate signing request to registration authority
-	      <i if="${cert}">(done elsewhere)</i>
+	      <i if="${cert} and !${request.submitted}">(done elsewhere)</i>
 	    </td>
 	  </tr>
-	  <tr if="${cert}">
-	    <td><input type="checkbox" name="cert" disabled="disabled"/></td>
+	  <tr if="${cert} or ${request.approved}">
+	    <td><input type="checkbox" disabled="disabled" checked="checked"/></td>
 	    <td>Verify identity with
 	      <a href="mailto:${org.ra.email}" c="${org.ra.name}">**your agent**</a>
           of <a href="${org.url}" c="${org.name}">**agent organisation**</a>
         </td>
       </tr>
-	  <tr if="${cert}">
+	  <tr if="${cert} or ${request.submitted}">
 	    <td><input type="checkbox" name="cert" disabled="disabled"/></td>
 	    <td>Download approved certificate</td>
 	  </tr>
