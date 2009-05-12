@@ -700,7 +700,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	try {
 	    load(path);
 	    // see if certificate can be downloaded
-	    if (cert==null)
+	    if (!Boolean.valueOf(getProperty("request.processed")))
 		isCertificationRequestProcessed();
 	} catch (IOException e) {
 	    // TODO proper error reporting or don't catch

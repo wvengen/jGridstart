@@ -35,7 +35,7 @@
 	    </td>
 	  </tr>
 	  <tr if="${cert} or ${request.submitted}">
-	    <td><input type="checkbox" disabled="disabled" checked="checked"/></td>
+	    <td><input type="checkbox" disabled="disabled" name="request.processed"/></td>
 	    <td>Verify identity with
 	      <a href="mailto:${org.ra.email}" c="${org.ra.name}">**your agent**</a>
           of <a href="${org.url}" c="${org.name}">**agent organisation**</a>
