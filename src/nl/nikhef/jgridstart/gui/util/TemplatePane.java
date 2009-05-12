@@ -547,7 +547,7 @@ public class TemplatePane extends XHTMLPanel {
 	    pane.data().setProperty("theurl", "http://www.w3.org/");
 	    pane.data().setProperty("chk", "true");
 	    pane.data().setProperty("txt", "some text");
-	    pane.data().setProperty("lock.txtlocked", "true");
+	    pane.data().setProperty("txtlocked.lock", "true");
 	    pane.data().setProperty("sel", "selected");
 	    pane.data().setProperty("somehtml", "you should see <em>this</em> text");
 	    // don't set "bar"
