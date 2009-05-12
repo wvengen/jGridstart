@@ -50,6 +50,7 @@ import javax.swing.event.ChangeListener;
 import nl.nikhef.jgridstart.ca.*;
 import nl.nikhef.jgridstart.util.CryptoUtils;
 import nl.nikhef.jgridstart.util.PasswordCache;
+import nl.nikhef.jgridstart.util.PrivateFileWriter;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 import org.bouncycastle.asn1.DERSet;
@@ -264,7 +265,10 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	notifyChanged();
     }
     
-    /** Store the properties in the file indicated by getPropertiesFile() 
+    /** Store the properties in the file indicated by getPropertiesFile().
+     * This file is written with permissions so that only the user can read
+     * it, because it may contain personal information. 
+     * 
      * @throws IOException 
      * @throws FileNotFoundException */
     public void store() throws FileNotFoundException, IOException {
@@ -282,7 +286,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    p.remove(key+".volatile");
 	}
 	// and store
-	p.store(new FileOutputStream(getPropertiesFile()),
+	p.store(new PrivateFileWriter(getPropertiesFile()),
 		"jGridstart certificate properties");
     }
 
