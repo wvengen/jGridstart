@@ -545,9 +545,11 @@ public class CertificatePair extends Properties implements ItemSelectable {
      *  
      * @throws NoSuchAlgorithmException 
      * @throws KeyManagementException */
-    public boolean canDownloadCertificate() throws IOException, KeyManagementException, NoSuchAlgorithmException {
+    public boolean isCertificationRequestProcessed() throws IOException, KeyManagementException, NoSuchAlgorithmException {
 	boolean isProcessed = getCA().isCertificationRequestProcessed(req, getProperty("request.serial"));
+	boolean oldProcessed = Boolean.valueOf(getProperty("request.processed"));
 	setProperty("request.processed", Boolean.toString(isProcessed));
+	if (oldProcessed != isProcessed) notifyChanged();
 	return isProcessed;
     }
     
@@ -673,7 +675,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    load(path);
 	    // see if certificate can be downloaded
 	    if (cert==null)
-		canDownloadCertificate();
+		isCertificationRequestProcessed();
 	} catch (IOException e) {
 	    // TODO proper error reporting or don't catch
 	    return false;

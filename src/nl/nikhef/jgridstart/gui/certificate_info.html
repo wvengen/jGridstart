@@ -11,7 +11,7 @@
 	    <p class="topinfo-ok" if="!${request.submitted}">Your request still <a href="action:viewrequest">needs to be submitted</a> to the certificate authority.</p>
 	    <div if="${request.submitted}">
 	      <p class="topinfo-ok" if="!${request.processed}">Your request is currently awaiting approval.</p>
-	      <p class="topinfo-ok" if="${request.processed}">Your request has been accepted, <a href="action:viewrequest">please retrieve it</a> to continue.</p>
+	      <p class="topinfo-ok" if="${request.processed}">Your request has been accepted, you can now <a href="action:viewrequest">retrieve your certificate</a>.</p>
 	    </div>
 	  </div>
 	</div>

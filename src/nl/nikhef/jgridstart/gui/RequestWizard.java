@@ -61,7 +61,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     @Override
     protected void initialize() {
 	super.initialize();
-	setPreferredSize(new Dimension(600, 400)); // fit form in step 4
+	setPreferredSize(new Dimension(650, 450)); // fit form in step 4
 	pages.add(getClass().getResource("certificate_request_01.html"));
 	pages.add(getClass().getResource("certificate_request_02.html"));
 	pages.add(getClass().getResource("certificate_request_03.html"));
@@ -170,7 +170,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		publish("state.cancontinue");
 		// update downloadable status
 		if (!Boolean.valueOf(cert.getProperty("request.processed"))) {
-		    cert.canDownloadCertificate();
+		    cert.isCertificationRequestProcessed();
 		    publish((String)null);
 		}
 		// and download when needed

@@ -32,7 +32,7 @@
 	      <i if="${cert} and !${request.submitted}">(done elsewhere)</i>
 	    </td>
 	  </tr>
-	  <tr if="${cert} or ${request.approved}">
+	  <tr if="${cert} or ${request.submitted}">
 	    <td><input type="checkbox" disabled="disabled" checked="checked"/></td>
 	    <td>Verify identity with
 	      <a href="mailto:${org.ra.email}" c="${org.ra.name}">**your agent**</a>
