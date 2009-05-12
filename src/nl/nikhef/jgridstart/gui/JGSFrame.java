@@ -18,6 +18,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -211,15 +212,22 @@ public class JGSFrame extends JFrame {
 	    certInfoPane = new TemplateButtonPane();
 	    certInfoPane.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
+	    // use SwingUtilities.invokeLater() to update the gui because
+	    // these may be originating from a different worker thread
 	    selection.addListSelectionListener(new ListSelectionListener() {
 		    public void valueChanged(ListSelectionEvent ev) {
 			if (ev.getValueIsAdjusting()) return;
-			updateSelection();
+			SwingUtilities.invokeLater(new Runnable() {
+			    public void run() {
+				updateSelection();
+			    }
+			});			
 		    }
 	    });
 	    store.addListDataListener(new ListDataListener() {
 		// only single indices supported
 		public void intervalAdded(ListDataEvent e) {
+		    // TODO use SwingUtilities.invokeLater; problem with non-final ListDataEvent e
 		    int index = e.getIndex0();
 		    if (index < 0) return;
 		    // add item to menu
@@ -236,6 +244,7 @@ public class JGSFrame extends JFrame {
 			setViewCertificateList(true);
 		}
 		public void intervalRemoved(ListDataEvent e) {
+		    // TODO use SwingUtilities.invokeLater; problem with non-final ListDataEvent e
 		    // remove item from menu
 		    if (e.getIndex0() < 0) return;
 		    JMenuItem item = identityMenu.getItem(identityIndex + e.getIndex0());
@@ -249,7 +258,11 @@ public class JGSFrame extends JFrame {
 		    identityMenu.remove(item);
 		}
 		public void contentsChanged(ListDataEvent e) {
-		    certInfoPane.refresh();
+		    SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    certInfoPane.refresh();
+			}
+		    });			
 		}
 	    });
 	}
