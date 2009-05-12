@@ -3,7 +3,9 @@ package nl.nikhef.jgridstart.gui;
 import java.awt.event.ActionEvent;
 import java.util.Properties;
 import javax.swing.JFrame;
+import javax.swing.event.ListSelectionEvent;
 
+import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.Organisation;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
@@ -29,6 +31,17 @@ public class ActionViewRequest extends CertificateAction {
     public ActionViewRequest(JFrame parent, CertificateSelection s, int defaultPage) {
 	this(parent, s);
 	this.defaultPage = defaultPage;
+    }
+    
+    /** Name depends on state of selected certificate */
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+	CertificatePair cert = selection.getCertificatePair();
+	if (cert!=null && cert.getCertificate()!=null)
+	    putValue(NAME, "View request...");
+	else
+	    putValue(NAME, "Continue request...");
+	super.valueChanged(e);
     }
     
     public void actionPerformed(ActionEvent e) {
