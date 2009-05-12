@@ -294,7 +294,7 @@ public class TemplatePane extends XHTMLPanel {
 	    }
 	}
 	matcher.appendTail(newExpr);
-	expr = newExpr.toString();
+	expr = newExpr.toString().trim();
 	// parse boolean operations
 	Pattern ops = Pattern.compile("^(.*?)\\b(and|or)\\b(.*)$");
 	while ( (matcher=ops.matcher(expr)).find() ) {
@@ -530,16 +530,26 @@ public class TemplatePane extends XHTMLPanel {
 		"<div c='${somehtml}'>hmm, <span style='color:red'>you shouldn't see this text</span></div>"+
 		// and some conditional expression tests
 		"<p>Nothing should be shown after the colon: <span style='color:red'>" +
-		  "<span if='false'>1</span> " +
-		  "<span if='!true'>2</span> " +
-		  "<span if='(false)'>3</span> " +
-		  "<span if='(!true)'>4</span> " +
-		  "<span if='!(true)'>5</span> " +
-		  "<span if='((false))'>6</span> " +
-		  "<span if='!(!(false))'>7</span> " +
-		  "<span if='false and true'>8</span> " +
-		  "<span if='!(false or true)'>9</span> " +
-		  "<span if='(false or true) and false'>A</span> " +
+		    "<span if='false'>1</span> " +
+		    "<span if='!true'>2</span> " +
+		    "<span if='(false)'>3</span> " +
+		    "<span if='(!true)'>4</span> " +
+		    "<span if='!(true)'>5</span> " +
+		    "<span if='((false))'>6</span> " +
+		    "<span if='!(!(false))'>7</span> " +
+		    "<span if='false and true'>8</span> " +
+		    "<span if='!(false or true)'>9</span> " +
+		    "<span if='(false or true) and false'>A</span> " +
+		    // now (partly simulated) variable expansion
+		    "<span if=''>B</span> " +
+		    "<span if=' '>C</span> " +
+		    "<span if='${_nothing_}'>D</span> " +
+		    "<span if='(${_nothing_})'>E</span> " +
+		    "<span if='${_nothing_} and true'>F</span> " +
+		    "<span if='true and ${_nothing_}'>G</span> " +
+		    "<span if='${_nothing_} or ${_nothingelse_}'>H</span> " +
+		    "<span if='something and false'>I</span> " +
+		    "<span if='!something'>J</span> " +
 		  "</span></p>" +
 		"</body>"+
 		"</html>";		    
