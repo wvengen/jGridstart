@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -217,6 +218,7 @@ public class TemplatePane extends XHTMLPanel {
 	    }
 	    // apply "if" attributes
 	    Node ifNode = attrs.getNamedItem("if");
+	    System.out.println("----------------------");
 	    if (ifNode!=null && !parseConditional(ifNode.getNodeValue())) {
 		node.getParentNode().removeChild(node);		
 		return;
@@ -279,7 +281,36 @@ public class TemplatePane extends XHTMLPanel {
     protected boolean parseConditional(String expr) {
 	if (expr==null) return true;
 	expr = expr.trim();
+	System.out.println("parse: "+expr);
+	// add parentheses to boolean operators
+	//expr = expr.replaceAll("^(.*\\b)(and|or)(\\b.*)$", "($1)$2($3)");
+	// parse subexpressions within parentheses
+	Matcher matcher = Pattern.compile("(\\(.*\\))").matcher(expr);
+	StringBuffer newExpr = new StringBuffer();
+	while (matcher.find()) {
+	    String subExpr = matcher.group();
+	    if (subExpr.trim().equals("")) {
+		matcher.appendReplacement(newExpr, "");
+	    } else {
+		subExpr = subExpr.substring(1, subExpr.length()-1);
+		matcher.appendReplacement(newExpr, Boolean.toString(parseConditional(subExpr)));
+	    }
+	}
+	matcher.appendTail(newExpr);
+	expr = newExpr.toString();
+	// parse boolean operations
+	Pattern ops = Pattern.compile("^(.*?)\\b(and|or)\\b(.*)$");
+	while ( (matcher=ops.matcher(expr)).find() ) {
+	    boolean pre = parseConditional(matcher.group(1));
+	    String op = matcher.group(2);
+	    boolean post = parseConditional(matcher.group(3));
+	    if (op.equals("and"))
+		expr = Boolean.toString(pre && post);
+	    else if (op.equals("or"))
+		expr = Boolean.toString(pre || post);
+	}
 	// handle negations
+	System.out.println("    --> "+expr);
 	if (expr.startsWith("!"))
 	    return !parseConditional(expr.substring(1));
 	if (expr.equals("true")) return true;
@@ -501,6 +532,19 @@ public class TemplatePane extends XHTMLPanel {
 		"<form><p>you can also <input type='submit' name='print' value='print'/> this page.</p></form>"+
 		// test putting in html from a variable
 		"<div c='${somehtml}'>hmm, <span style='color:red'>you shouldn't see this text</span></div>"+
+		// and some conditional expression tests
+		"<p>Nothing should be shown after the colon: <span style='color:red'>" +
+		  "<span if='false'>1</span> " +
+		  "<span if='!true'>2</span> " +
+		  "<span if='(false)'>3</span> " +
+		  "<span if='(!true)'>4</span> " +
+		  "<span if='!(true)'>5</span> " +
+		  "<span if='((false))'>6</span> " +
+		  "<span if='!(!(false))'>7</span> " +
+		  "<span if='false and true'>8</span> " +
+		  "<span if='!(false or true)'>9</span> " +
+		  "<span if='(false or true) and false'>A</span> " +
+		  "</span></p>" +
 		"</body>"+
 		"</html>";		    
 	    pane.data().setProperty("foo", "the contents of this foo variable");
