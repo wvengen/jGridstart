@@ -49,6 +49,8 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
 /**
  * This class is used to download a certificate from an OpenCA server via http(s).
  * 
+ * TODO Suffers heavily from bit-rot, please review thoroughly before use.
+ * 
  * @author Markus Binsteiner
  * @author wvengen
  *
@@ -222,6 +224,11 @@ public class OpenCA implements CA {
 
 	return serial;
 
+    }
+    
+    public boolean isCertificationRequestProcessed(
+	    PKCS10CertificationRequest req, String reqserial) throws IOException {
+	return downloadCertificate(req, reqserial) != null;
     }
     
     // temporary property classes

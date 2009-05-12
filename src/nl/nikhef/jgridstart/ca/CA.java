@@ -23,6 +23,34 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
  */
 public interface CA {
     /**
+     * Uploads a user certificate signing request onto an CA.
+     * 
+     * @param req certification signing request
+     * @param info extra information that may be sent with the request (implementation-dependant)
+     * @return certificate signing request serial number
+     * @throws IOException 
+     */
+    public String uploadCertificationRequest(
+	    PKCS10CertificationRequest req, Properties info) throws IOException;
+
+    /**
+     * Checks to see if a certificate signing request was processed by a CA. When
+     * true, the certificate can be downloaded using downloadCertificate().
+     * 
+     * Implementers of this CA interface could, for example, just return if
+     * downloadCertificate() would complete without errors, optionally caching the
+     * fetched certificate.
+     * 
+     * @param req the certificate signing request that was sent
+     * @param serial the serial number of the certificate signing request that was returned
+     *               by submission of the certificate signing request 
+     * @return The X509Certificate signed by the certificate authority
+     * @throws IOException
+     */
+    public boolean isCertificationRequestProcessed(
+	    PKCS10CertificationRequest req, String reqserial) throws IOException;
+
+    /**
      * Download a certificate from the CA.
      * 
      * @param req the certificate signing request that was sent
@@ -33,15 +61,4 @@ public interface CA {
      */
     public X509Certificate downloadCertificate(
 	    PKCS10CertificationRequest req, String reqserial) throws IOException;
-
-    /**
-     * Uploads a user certificate signing request onto an CA.
-     * 
-     * @param req certification signing request
-     * @param info extra information that may be sent with the request (implementation-dependant)
-     * @return certificate signing request serial number
-     * @throws IOException 
-     */
-    public String uploadCertificationRequest(
-	    PKCS10CertificationRequest req, Properties info) throws IOException;
 }

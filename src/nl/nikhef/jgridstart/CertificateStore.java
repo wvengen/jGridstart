@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
+import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -125,8 +126,10 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 
     /**
      * refresh the certificate list from its source and each certificate as well
+     * @throws NoSuchAlgorithmException 
+     * @throws KeyManagementException 
      */
-    public void refresh() {
+    public void refresh() throws KeyManagementException, NoSuchAlgorithmException {
 	if (path == null) {
 	    logger.warning("Refresh of empty certificate store");
 	    return;

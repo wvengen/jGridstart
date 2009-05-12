@@ -31,6 +31,7 @@ public class NikhefCA implements CA {
     
     static final protected Logger logger = Logger.getLogger(NikhefCA.class.getName());
     
+    /** Base URL of certificate authority */
     protected String base = "http://www.nikhef.nl/~wvengen/testca/";
 
     /** Create new OpenCA plugin; initializes SSL configuration 
@@ -53,32 +54,6 @@ public class NikhefCA implements CA {
 	SSLContext sc = SSLContext.getInstance("SSL");
 	sc.init(null, trustAllCerts, new java.security.SecureRandom());
 	HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-    }
-
-    /**
-     * Download a certificate from the OpenCA server.
-     * 
-     * @param req the certificate signing request that was sent (not used by NikhefCA)
-     * @param serial the serial number of the certificate signing request that was returned
-     *               by submission of the certificate signing request 
-     * @return The X509Certificate signed by the certificate authority
-     * @throws IOException
-     */
-    public X509Certificate downloadCertificate(
-	    PKCS10CertificationRequest req, String reqserial) throws IOException {
-
-	// return certificate by serial
-	URL url = new URL(base);
-	String[] pre = new String[] {
-		"action", "retrieve_cert",
-		"serial", reqserial
-	};
-	String scert = ConnectionUtils.pageContents(url, pre, false);
-	StringReader reader = new StringReader(scert);
-	X509Certificate cert = (X509Certificate)CryptoUtils.readPEM(reader, null);
-	if (cert==null)
-	    throw new IOException("Certificate could not be retrieved: "+scert);
-	return cert;
     }
 
     /**
@@ -130,5 +105,39 @@ public class NikhefCA implements CA {
 	logger.info("Uploaded certificate signing request with serial "+serial);
 
 	return serial;
+    }
+    
+    public boolean isCertificationRequestProcessed(
+	    PKCS10CertificationRequest req, String reqserial) throws IOException {
+	return downloadCertificate(req, reqserial) != null;
+    }
+
+    /**
+     * Download a certificate from the Nikhef CA
+     * 
+     * @param req the certificate signing request that was sent (not used by NikhefCA)
+     * @param serial the serial number of the certificate signing request that was returned
+     *               by submission of the certificate signing request 
+     * @return The X509Certificate signed by the certificate authority
+     * @throws IOException
+     */
+    public X509Certificate downloadCertificate(
+	    PKCS10CertificationRequest req, String reqserial) throws IOException {
+	
+	if (reqserial==null || reqserial.equals(""))
+	    throw new IOException("Incomplete request information");
+
+	// return certificate by serial
+	URL url = new URL(base);
+	String[] pre = new String[] {
+		"action", "retrieve_cert",
+		"serial", reqserial
+	};
+	String scert = ConnectionUtils.pageContents(url, pre, false);
+	StringReader reader = new StringReader(scert);
+	X509Certificate cert = (X509Certificate)CryptoUtils.readPEM(reader, null);
+	if (cert==null)
+	    throw new IOException("Certificate could not be retrieved: "+scert);
+	return cert;
     }
 }

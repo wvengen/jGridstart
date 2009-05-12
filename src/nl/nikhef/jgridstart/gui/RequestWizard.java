@@ -162,12 +162,22 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    publish("state.certificate_created");
 		}
 		// upload request if it hasn't been done
-		if (!Boolean.valueOf(data().getProperty("request.submitted"))) {
+		if (!Boolean.valueOf(cert.getProperty("request.submitted"))) {
 		    cert.uploadRequest();
 		    publish("state.cancontinue");
 		}
 		// make sure gui is updated and user can continue
 		publish("state.cancontinue");
+		// update downloadable status
+		if (!Boolean.valueOf(cert.getProperty("request.processed"))) {
+		    cert.canDownloadCertificate();
+		    publish((String)null);
+		}
+		// and download when needed
+		if (cert.getCertificate()==null) {
+		    cert.downloadCertificate();
+		    publish((String)null);
+		}
 	    } catch (PasswordCancelledException e) {
 		// special state to go to the previous page
 		publish("state.cancelled");

@@ -88,6 +88,27 @@ public class LocalCA implements CA {
     }
     
     /**
+     * Uploads a user certificate signing request. This is a dummy method for LocalCA.
+     * 
+     * @param req certification signing request
+     * @param info extra information that may be sent with the request
+     * @return certificate signing request serial number
+     * @throws IOException 
+     */
+    public String uploadCertificationRequest(
+	    PKCS10CertificationRequest req, Properties info) throws IOException {
+	serial++;
+	return Integer.toString(serial);
+    }
+
+    /** Return whether the certificate signing request was processed. This local CA
+     * always processes a certificate on the fly, so it returns always true. */
+    public boolean isCertificationRequestProcessed(
+	    PKCS10CertificationRequest req, String reqserial) throws IOException {
+	return true;
+    }
+
+    /**
      * Return a Certificate. This creates a new Certificate based on the certificate
      * signing request supplied.
      * 
@@ -132,19 +153,5 @@ public class LocalCA implements CA {
 	    throw new IOException("Could not sign certificate: "+e.getMessage());
 	}
 	return cert;
-    }
-
-    /**
-     * Uploads a user certificate signing request. This is a dummy method for LocalCA.
-     * 
-     * @param req certification signing request
-     * @param info extra information that may be sent with the request
-     * @return certificate signing request serial number
-     * @throws IOException 
-     */
-    public String uploadCertificationRequest(
-	    PKCS10CertificationRequest req, Properties info) throws IOException {
-	serial++;
-	return Integer.toString(serial);
     }
 }

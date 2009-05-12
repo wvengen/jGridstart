@@ -540,6 +540,17 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	store();
     }
     
+    /** See if the certificate can be downloaded from the certificate authority. Also sets
+     * the property "request.processed" accordingly.
+     *  
+     * @throws NoSuchAlgorithmException 
+     * @throws KeyManagementException */
+    public boolean canDownloadCertificate() throws IOException, KeyManagementException, NoSuchAlgorithmException {
+	boolean isProcessed = getCA().isCertificationRequestProcessed(req, getProperty("request.serial"));
+	setProperty("request.processed", Boolean.toString(isProcessed));
+	return isProcessed;
+    }
+    
     /** Download the certificate from the certificate authority */
     public void downloadCertificate() throws IOException, KeyManagementException, NoSuchAlgorithmException {
 	if (cert!=null) {
@@ -548,8 +559,12 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	}
 	
 	cert = getCA().downloadCertificate(req, getProperty("request.serial"));
-	CryptoUtils.writePEM(cert, new FileWriter(getCertFile()));
-	notifyChanged();
+	if (cert!=null) {
+	    setProperty("request.processed", Boolean.toString(true));
+	    CryptoUtils.writePEM(cert, new FileWriter(getCertFile()));
+	    notifyChanged();
+	}
+	// TODO what when cert is null, throw Exception; can downloadCertificate() return null anyway?
 	// TODO security check
     }
     
@@ -559,7 +574,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws NoSuchAlgorithmException 
      * @throws KeyManagementException */
     protected CA getCA() throws KeyManagementException, NoSuchAlgorithmException {
-	return new NikhefCA();
+	final CA ca = new NikhefCA();
+	return ca;
     }
 
     /** get the source of this certificate, if any */
@@ -646,21 +662,20 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * refresh an item from disk and update its status from online sources.
      * 
      * @return whether the refresh was successful or no
+     * @throws NoSuchAlgorithmException 
+     * @throws KeyManagementException 
      */
-    public boolean refresh() {
+    public boolean refresh() throws KeyManagementException, NoSuchAlgorithmException {
 	if (path == null)
 	    return false;
 	// reload from disk
 	try {
 	    load(path);
-	    // try to download certificate if not present
+	    // see if certificate can be downloaded
 	    if (cert==null)
-		downloadCertificate();
-	    // TODO make sure request is uploaded if certificate still not present
+		canDownloadCertificate();
 	} catch (IOException e) {
 	    // TODO proper error reporting or don't catch
-	    return false;
-	} catch (GeneralSecurityException e) {
 	    return false;
 	}	
 	return true;
