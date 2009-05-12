@@ -1,12 +1,8 @@
 package nl.nikhef.jgridstart.install;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
-import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.util.FileUtils;
 
 /** Install a certificate into a certain browser. This is the general

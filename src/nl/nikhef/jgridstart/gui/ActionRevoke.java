@@ -1,9 +1,6 @@
 package nl.nikhef.jgridstart.gui;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
-
-import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 

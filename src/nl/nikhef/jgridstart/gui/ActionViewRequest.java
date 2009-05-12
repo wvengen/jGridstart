@@ -1,13 +1,11 @@
 package nl.nikhef.jgridstart.gui;
 
 import java.awt.event.ActionEvent;
-import java.util.Properties;
 import javax.swing.JFrame;
 import javax.swing.event.ListSelectionEvent;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.Organisation;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 

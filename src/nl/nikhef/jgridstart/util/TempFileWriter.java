@@ -1,9 +1,7 @@
 package nl.nikhef.jgridstart.util;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 /**
  * A more safe temporary file writer class

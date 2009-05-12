@@ -3,13 +3,8 @@ package nl.nikhef.jgridstart.gui;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.security.SecureRandom;
-import java.util.Random;
-
-import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.Timer;
-
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
