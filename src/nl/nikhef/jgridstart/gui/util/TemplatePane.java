@@ -218,7 +218,6 @@ public class TemplatePane extends XHTMLPanel {
 	    }
 	    // apply "if" attributes
 	    Node ifNode = attrs.getNamedItem("if");
-	    System.out.println("----------------------");
 	    if (ifNode!=null && !parseConditional(ifNode.getNodeValue())) {
 		node.getParentNode().removeChild(node);		
 		return;
@@ -281,7 +280,6 @@ public class TemplatePane extends XHTMLPanel {
     protected boolean parseConditional(String expr) {
 	if (expr==null) return true;
 	expr = expr.trim();
-	System.out.println("parse: "+expr);
 	// add parentheses to boolean operators
 	//expr = expr.replaceAll("^(.*\\b)(and|or)(\\b.*)$", "($1)$2($3)");
 	// parse subexpressions within parentheses
@@ -310,7 +308,6 @@ public class TemplatePane extends XHTMLPanel {
 		expr = Boolean.toString(pre || post);
 	}
 	// handle negations
-	System.out.println("    --> "+expr);
 	if (expr.startsWith("!"))
 	    return !parseConditional(expr.substring(1));
 	if (expr.equals("true")) return true;
