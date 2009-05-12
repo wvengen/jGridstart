@@ -3,6 +3,7 @@ package nl.nikhef.jgridstart.util;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.logging.Logger;
 
 /**
@@ -67,5 +68,36 @@ public class PrivateFileWriter extends FileWriter {
     public boolean delete() {
 	// delete file using new File to make it actually work on java 1.4.2
 	return (new File(getPath())).delete();
+    }
+    
+    /** Returns an output stream for this writer. While Java 1.6 accepts
+     * a FileWriter mostly, older versions still need an OutputStream in
+     * some places, e.g. like Properties.store().
+     * 
+     * TODO verify encoding; Properties.store() uses iso8859-1 but double check
+     */
+    public OutputStream getOutputStream() {
+	return new OutputStream() {
+	    @Override
+	    public void close() throws IOException {
+		PrivateFileWriter.this.close();
+	    }
+	    @Override
+	    public void flush() throws IOException {
+		PrivateFileWriter.this.flush();
+	    }
+	    @Override
+	    public void write(int b) throws IOException {
+		PrivateFileWriter.this.write(b);
+	    }
+	    @Override
+	    public void write(byte[] b) throws IOException {
+		PrivateFileWriter.this.write(new String(b));
+	    }
+	    @Override
+	    public void write(byte[] b, int off, int len) throws IOException {
+		PrivateFileWriter.this.write(new String(b, off, len));
+	    }
+	};
     }
 }

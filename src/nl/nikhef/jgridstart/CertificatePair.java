@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -35,6 +36,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -154,11 +156,21 @@ public class CertificatePair extends Properties implements ItemSelectable {
      *     the public key's modulus, and its first 20 characters
      * - org
      *     is returned when set, or guessed from subject if unset
+     *     
+     * You can postfix each property with ".html" to get an html representation.
+     * If no html representation is present, it just returns the same as the
+     * property without ".html".
      * 
      * @param key property to get the value of
      * @return value of the property, or null if not found.
      */
     public String getProperty(String key) {
+	// parse html
+	if (key.endsWith(".html")) {
+	    String r = getPropertyHtml(key.substring(0, key.length()-5));
+	    if (r!=null) return r;
+	}
+	// return generated property
 	if (key.equals("cert"))
 	    if (cert==null) return null;
 	    else return "true";
@@ -231,7 +243,28 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	} catch (Exception e) {
 	    return null;
 	}
+	// else return property set before with setProperty()
 	return super.getProperty(key);
+    }
+    /** Return a property in html format, or null if not defined. */
+    protected String getPropertyHtml(String key) {
+	// hyperlink organisations
+	if (key.endsWith(".o")) {
+	    String sorgs = getProperty(key);
+	    if (sorgs==null) return null;
+	    String[] orgs = sorgs.split(",\\s*");
+	    sorgs = "";
+	    for (int i=0; i<orgs.length; i++) {
+		Organisation org = Organisation.get(orgs[i]);
+		try {
+		    orgs[i] = org.getNameHTML();
+		} catch (Exception e) { }
+	    }
+	    sorgs = Arrays.toString(orgs);
+	    return sorgs.substring(1, sorgs.length()-1).trim();
+	}
+	// nothing by default
+	return null;
     }
 
     /** reset the contents to this object to the empty state */
@@ -285,8 +318,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    p.remove(key);
 	    p.remove(key+".volatile");
 	}
-	// and store
-	p.store(new PrivateFileWriter(getPropertiesFile()),
+	// and store with OutputStream for Java 1.5 and below
+	p.store(new PrivateFileWriter(getPropertiesFile()).getOutputStream(),
 		"jGridstart certificate properties");
     }
 

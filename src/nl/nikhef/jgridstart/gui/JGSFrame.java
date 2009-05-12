@@ -77,7 +77,7 @@ public class JGSFrame extends JFrame {
 	// setup gui
 	this.setSize(550, 350);
 	this.setMinimumSize(new Dimension(400, 150));
-	this.setPreferredSize(new Dimension(600, 350));
+	this.setPreferredSize(new Dimension(650, 350));
 	this.setContentPane(getJContentPane());
 	this.setTitle("jGridStart (development version)");
 

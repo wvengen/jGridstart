@@ -70,8 +70,12 @@ public class Organisation extends Properties {
     /** Returns a list of &gt;option&lt; elements to put in an html select. The CertificatePair
      * supplied is verified to exist in the options, or else a new option is added that has
      * no existing organisation from the configuration file. This is needed to be able to
-     * support organisations that are not present in the configuration file. */
-    public static String getAllOptionsHTML(CertificatePair cert) {
+     * support organisations that are not present in the configuration file.
+     *
+     * @param cert CertificatePair to include organisation from
+     * @param signup whether to restrict options to organisations for which one can signup
+     */
+    public static String getAllOptionsHTML(CertificatePair cert, boolean signupOnly) {
 	// setup variables to detect if certificate organisation is present already
 	boolean hasOrg = false;
 	// add all organisations
@@ -79,6 +83,8 @@ public class Organisation extends Properties {
 	String r = "";
 	for (Iterator<Organisation> it = organisations.values().iterator(); it.hasNext(); ) {
 	    Organisation org = it.next();
+	    String signup = org.getProperty("signup");
+	    if (signup!=null && !Boolean.valueOf(org.getProperty("signup")) && signupOnly) continue;
 	    r += org.getOptionHTML()+"\n";
 	    if (cert!=null && org.getProperty("id").equals(cert.getProperty("org")))
 		hasOrg = true;
@@ -92,6 +98,12 @@ public class Organisation extends Properties {
 	    r = org.getOptionHTML()+"\n" + r;
 	}
 	return r;
+    }
+    public static String getAllOptionsHTML(CertificatePair cert) {
+	return getAllOptionsHTML(cert, true);
+    }
+    public static String getAllOptionsHTML(boolean signupOnly) {
+	return getAllOptionsHTML(null, signupOnly);
     }
     public static String getAllOptionsHTML() {
 	return getAllOptionsHTML(null);
@@ -129,15 +141,21 @@ public class Organisation extends Properties {
 	return r;
     }
 
-    /** Returns the organisation's name in html */
-    public String getNameHTML() throws UnsupportedEncodingException {
+    /** Returns the organisation's description in html */
+    public String getDescriptionHTML() throws UnsupportedEncodingException {
 	String r = getProperty("desc");
-	if (r==null) r = getProperty("name");;
+	if (r==null) r = getProperty("name");
 	if (getProperty("url")!=null)
-	    r = "<a href='"+URLEncoder.encode(getProperty("url"), "UTF-8")+"'>"+r+"</a>";
+	    r = "<a href='"+getProperty("url")+"'>"+r+"</a>";
 	return r;
     }
-    
+    /** Returns the organisation's name in html */
+    public String getNameHTML() throws UnsupportedEncodingException {
+	String r = getProperty("name");
+	if (getProperty("url")!=null)
+	    r = "<a href='"+getProperty("url")+"'>"+r+"</a>";
+	return r;
+    }    
     /** Returns an html &gt;option&lt; tag for embedding in a &gt;select&lt; tag */
     public String getOptionHTML() {
 	return 
