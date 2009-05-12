@@ -19,12 +19,15 @@
 	
 	<form><table>
 	  <tr>
-	    <td><input type="checkbox" name="request" disabled="disabled"/></td>
+	    <td if="!(${request} or ${cert})"><input type="checkbox" disabled="disabled"/></td>
+	    <td if="${request} or ${cert}"><input type="checkbox" disabled="disabled" checked="checked"/></td>
 	    <td>Generate key pair</td>
 	  </tr>
 	  <tr>
 	    <td><input type="checkbox" name="request" disabled="disabled"/></td>
-	    <td>Generate certificate signing request</td>
+	    <td>Generate certificate signing request
+	      <i if="${cert} and !${request}">(done elsewhere)</i>
+	    </td>
 	  </tr>
 	  <tr>
 	    <td><input type="checkbox" name="request.submitted" disabled="disabled"/></td>

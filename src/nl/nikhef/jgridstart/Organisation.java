@@ -151,8 +151,12 @@ public class Organisation extends Properties {
     /** Returns the organisation's name in html */
     public String getNameHTML() throws UnsupportedEncodingException {
 	String r = getProperty("name");
-	if (getProperty("url")!=null)
-	    r = "<a href='"+getProperty("url")+"'>"+r+"</a>";
+	if (getProperty("url")!=null) {
+	    String title="";
+	    if (getProperty("desc")!=null)
+		title = " title='"+getProperty("desc")+"'";
+	    r = "<a href='"+getProperty("url")+"'"+title+">"+r+"</a>";
+	}
 	return r;
     }    
     /** Returns an html &gt;option&lt; tag for embedding in a &gt;select&lt; tag */
