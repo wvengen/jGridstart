@@ -2,9 +2,6 @@ package nl.nikhef.jgridstart.gui;
 
 import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
-import javax.swing.event.ListSelectionEvent;
-
-import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;

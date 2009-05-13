@@ -5,6 +5,7 @@ import java.io.File;
 import java.security.SecureRandom;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
@@ -26,8 +27,7 @@ public class ActionInstall extends CertificateAction {
     
     @Override
     public boolean wantsEnabled() {
-	CertificatePair cert = selection.getCertificatePair();
-	return cert!=null && Boolean.valueOf(cert.getProperty("cert"));
+	return getCertificatePair()!=null && getCertificatePair().getCertificate()!=null;
     }
 
     public void actionPerformed(ActionEvent e) {

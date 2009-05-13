@@ -1,6 +1,8 @@
 package nl.nikhef.jgridstart.gui;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
@@ -20,7 +22,7 @@ import nl.nikhef.jgridstart.CertificateSelection;
  * 
  * @author wvengen
  */
-public abstract class CertificateAction extends AbstractAction implements ListSelectionListener {
+public abstract class CertificateAction extends AbstractAction implements ListSelectionListener, ItemListener {
     static protected Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");
 
     protected CertificatePair certificatePair = null;
@@ -67,7 +69,15 @@ public abstract class CertificateAction extends AbstractAction implements ListSe
     /** Catch it when the certificate selection is changed */
     public void valueChanged(ListSelectionEvent e) {
 	if (e.getValueIsAdjusting()) return;
+	// remove itemlistener for previous pair
+	if (certificatePair!=null) certificatePair.removeItemListener(this);
 	certificatePair = selection.getCertificatePair();
+	certificatePair.addItemListener(this);
+	super.setEnabled(certificatePair!=null && wantsEnabled());
+    }
+    /** Catch it when the certificate itself is changed, needed for wantsEnabled()
+     * depending on the certificate state. */
+    public void itemStateChanged(ItemEvent e) {
 	super.setEnabled(certificatePair!=null && wantsEnabled());
     }
     

@@ -90,6 +90,7 @@ public class JGSFrame extends JFrame {
 	    public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
 		// update info pane as well; TODO move into ActionRefresh itself
+		updateSelection();
 		certInfoPane.refresh();
 	    }
 	};
@@ -255,6 +256,7 @@ public class JGSFrame extends JFrame {
 		public void contentsChanged(ListDataEvent e) {
 		    SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+			    updateSelection(); // for buttons
 			    certInfoPane.refresh();
 			}
 		    });			
