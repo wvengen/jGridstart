@@ -20,17 +20,22 @@ public class FileUtils {
     public static boolean CopyFile(File in, File out) throws IOException {
 	String[] cmd;
 	if (System.getProperty("os.name").startsWith("Windows")) {
-	    // windows
+	    // windows: first touch the destination, then xcopy. If the file
+	    // doesn't exist on copying, xcopy will ask whether you want to
+	    // create it as a directory or just copy a file, so we always
+	    // just put "F" in xcopy's stdin.
 	    cmd = new String[]{"xcopy.exe",
-		    in.getAbsolutePath(), out.getAbsolutePath(),
-		    "/x", "/q", "/y"};
+		    in.getAbsolutePath(),
+		    out.getAbsolutePath(),
+		    "/O", "/Q", "/Y"};
+	    return Exec(cmd, "F", new String()) == 0;
 	} else {
 	    // other, assume unix-like
 	    cmd = new String[]{"cp",
 		    "-f", "-p",
 		    in.getAbsolutePath(), out.getAbsolutePath()};
+	    return Exec(cmd) == 0;
 	}
-	return Exec(cmd) == 0;
     }
 
     /**
@@ -118,6 +123,11 @@ public class FileUtils {
     /** Execute a command and return the exit code 
      * @throws InterruptedException */
     public static int Exec(String[] cmd) throws IOException {
+	// Windows needs to capture input/output or application will hang
+	if (System.getProperty("os.name").startsWith("Windows")) {
+	    String foo = "";
+	    return Exec(cmd, foo);
+	}	
 	// log
 	String scmd = "";
 	for (int i=0; i<cmd.length; i++) scmd += " "+cmd[i]; 
@@ -139,17 +149,22 @@ public class FileUtils {
     /** Execute a command and return the exit code and store stdout and stderr.
      * 
      * @param cmd command to run
+     * @param input String to feed to process's stdin
      * @param output String to which stdin and stdout is appended.
      * 
      * @throws IOException 
      * @throws InterruptedException */
-    public static int Exec(String[] cmd, String output) throws IOException {
+    public static int Exec(String[] cmd, String input, String output) throws IOException {
 	// log
 	String scmd = "";
 	for (int i=0; i<cmd.length; i++) scmd += " "+cmd[i]; 
 	logger.finest("exec"+scmd);
 	// run
 	Process p = Runtime.getRuntime().exec(cmd);
+	if (input!=null) {
+	    p.getOutputStream().write(input.getBytes());
+	    p.getOutputStream().flush();
+	}
 	// retrieve output
 	String s = System.getProperty("line.separator");
 	String lineout, lineerr;
@@ -172,5 +187,9 @@ public class FileUtils {
 	}
 	logger.finest("exec"+scmd+" returns "+ret);
 	return ret;
+    }
+    
+    public static int Exec(String[] cmd, String output) throws IOException {
+	return Exec(cmd, null, output);
     }
 }

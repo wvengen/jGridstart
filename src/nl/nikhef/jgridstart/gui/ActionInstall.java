@@ -74,7 +74,8 @@ public class ActionInstall extends CertificateAction {
 	    char[] pw = new char[1]; // TODO Illegal key size exception if larger password :(
 	    for (int i=0; i<pw.length; i++) pw[i] = (char)(random.nextInt(128-32)+32);
 	    pkcs = new TempFileWriter("browser", ".p12");
-	    PasswordCache.getInstance().set(pkcs.getPath(), pw);
+	    // TODO change PasswordCache.set() to have File argument
+	    PasswordCache.getInstance().set(new File(pkcs.getPath()).getCanonicalPath(), pw);
 	    boolean oldAsk = PasswordCache.getInstance().setAlwaysAskForEncrypt(false);
 	    cert.exportTo(new File(pkcs.getPath()));
 	    PasswordCache.getInstance().setAlwaysAskForEncrypt(oldAsk);
