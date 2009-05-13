@@ -1,6 +1,7 @@
 package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.print.PrinterException;
 import java.io.IOException;
@@ -64,6 +65,7 @@ public class TemplateButtonPane extends JPanel {
 	buttonpane.add(new JButton(action), null);
 	buttonpane.add(Box.createRigidArea(new Dimension(btnBorderWidth, 0)));
 	buttonpane.revalidate();
+	buttonpane.repaint();
 	if (isDefault)
 	    contentpane.setSubmitAction(action);
     }

@@ -34,11 +34,13 @@ public class ActionViewRequest extends CertificateAction {
     /** Name depends on state of selected certificate */
     @Override
     public void valueChanged(ListSelectionEvent e) {
-	CertificatePair cert = selection.getCertificatePair();
-	if (cert!=null && cert.getCertificate()!=null)
-	    putValue(NAME, "View request...");
-	else
-	    putValue(NAME, "Continue request...");
+	if (!e.getValueIsAdjusting()) {
+	    CertificatePair cert = selection.getCertificatePair();
+	    if (cert!=null && cert.getCertificate()!=null)
+		putValue(NAME, "View request...");
+	    else
+		putValue(NAME, "Continue request...");
+	}
 	super.valueChanged(e);
     }
     

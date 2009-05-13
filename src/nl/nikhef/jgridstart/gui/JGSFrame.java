@@ -283,11 +283,15 @@ public class JGSFrame extends JFrame {
 	    // update contents and load template
 	    CertificatePair c = selection.getCertificatePair();
 	    if (c!=null) {
+		// certificate selected, show info and add buttons according to state
 		certInfoPane.setData(c);
 		certInfoPane.setPage(getClass().getResource("certificate_info.html"));
+		if (c.getCertificate()==null)
+		    certInfoPane.addAction(getAction("viewrequest"));
 		certInfoPane.addAction(getAction("revoke"));
 		certInfoPane.addAction(getAction("install"));
 	    } else {
+		// no certificate selected, present signup page
 		certInfoPane.setPage(getClass().getResource("certificate_none_yet.html"));
 		certInfoPane.addAction(getAction("import"));
 		certInfoPane.addAction(getAction("request"));
