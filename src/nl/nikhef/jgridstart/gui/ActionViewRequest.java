@@ -22,7 +22,7 @@ public class ActionViewRequest extends CertificateAction {
     
     public ActionViewRequest(JFrame parent, CertificateSelection s) {
 	super(parent, s);
-	putValue(NAME, "View request...");
+	putValue(NAME, "Request...");
 	putValue(MNEMONIC_KEY, new Integer('R'));
 	BareBonesActionLaunch.addAction("viewrequest", this);
     }
@@ -31,22 +31,9 @@ public class ActionViewRequest extends CertificateAction {
 	this.defaultPage = defaultPage;
     }
     
-    /** Name depends on state of selected certificate */
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-	if (!e.getValueIsAdjusting()) {
-	    CertificatePair cert = selection.getCertificatePair();
-	    if (cert!=null && cert.getCertificate()!=null)
-		putValue(NAME, "View request...");
-	    else
-		putValue(NAME, "Continue request...");
-	}
-	super.valueChanged(e);
-    }
-    
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
-	TemplateWizard dlg = new RequestWizard(parent, selection.getCertificatePair());
+	TemplateWizard dlg = new RequestWizard(parent, getCertificatePair());
 	dlg.setStep(defaultPage);
 	dlg.setVisible(true);
     }

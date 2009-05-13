@@ -119,8 +119,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	}
 	// now if only one certificate is present it should be the
 	// default certificate
-	if (size()==1 && getDefault()==null)
-	    trySetDefault(get(0));
+	trySetDefault();
     }
 
     /**
@@ -217,6 +216,10 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     }
     /** ItemListener handler to catch changes in CertificatePair */
     public void itemStateChanged(ItemEvent e) {
+	// now if only one certificate is present it should be the
+	// default certificate
+	trySetDefault();
+	// and notify selection change listeners
 	notifyChanged(indexOf(e.getItem()));
     }
     
@@ -341,5 +344,10 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	} catch(IOException e) {
 	    logger.warning("Could not optionally set default certificate: "+e.getMessage());
 	}
+    }
+    /** Set the default certificate when only one present */
+    protected void trySetDefault() {
+	if (size()==1 && getDefault()==null && get(0).getCertificate()!=null)
+	    trySetDefault(get(0));	
     }
 }

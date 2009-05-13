@@ -18,8 +18,8 @@
 	
 	<form><table>
 	  <tr>
-	    <td if="!(${request} or ${cert})"><input type="checkbox" disabled="disabled" name=".volatile"/></td>
-	    <td if="${request} or ${cert}"><input type="checkbox" disabled="disabled" checked="checked" name=".volatile"/></td>
+	    <td if="!(${request} or ${cert})"><input type="checkbox" disabled="disabled"/></td>
+	    <td if="${request} or ${cert}"><input type="checkbox" disabled="disabled" name="true"/></td>
 	    <td>Generate key pair</td>
 	  </tr>
 	  <tr>

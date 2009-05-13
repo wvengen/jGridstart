@@ -26,6 +26,7 @@ public abstract class CertificateAction extends AbstractAction implements ListSe
     protected CertificatePair certificatePair = null;
     protected CertificateSelection selection = null;
     protected JFrame parent = null;
+    protected boolean isWantEnabled = true;
 
     public CertificateAction(JFrame parent, CertificateSelection s) {
 	super();
@@ -49,14 +50,25 @@ public abstract class CertificateAction extends AbstractAction implements ListSe
      * By default it just returns isEnabled(), so the behaviour is
      * unchanged from an ordinary Action. */
     protected boolean wantsEnabled() {
-	return isEnabled();
+	return isWantEnabled;
+    }
+    
+    /** Sets the enabled state of this CertificateAction. Note that when
+     * no CertificatePair is currently selected, the action is always
+     * disabled. TODO explain better
+     * 
+     * @see AbstractAction.setEnabled() */
+    @Override
+    public void setEnabled(boolean e) {
+	isWantEnabled = e;
+	super.setEnabled(certificatePair!=null && e);
     }
 
     /** Catch it when the certificate selection is changed */
     public void valueChanged(ListSelectionEvent e) {
 	if (e.getValueIsAdjusting()) return;
 	certificatePair = selection.getCertificatePair();
-	setEnabled(certificatePair!=null && wantsEnabled());
+	super.setEnabled(certificatePair!=null && wantsEnabled());
     }
     
     /** Get the certificate to operate on. To be used by child classes. */

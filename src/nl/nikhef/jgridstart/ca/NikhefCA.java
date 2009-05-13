@@ -125,7 +125,7 @@ public class NikhefCA implements CA {
 	    PKCS10CertificationRequest req, String reqserial) throws IOException {
 	
 	if (reqserial==null || reqserial.equals(""))
-	    throw new IOException("Incomplete request information");
+	    throw new IOException("Cannot download certificate without request serial number");
 
 	// return certificate by serial
 	URL url = new URL(base);

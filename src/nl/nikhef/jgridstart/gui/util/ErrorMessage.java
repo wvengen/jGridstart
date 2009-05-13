@@ -15,7 +15,8 @@ public class ErrorMessage {
      * @param e Exception to get information from
      */
     public static void error(Component parent, String title, Exception e) {
-	JOptionPane.showMessageDialog(parent, e.getLocalizedMessage(),
+	e.printStackTrace();
+	JOptionPane.showMessageDialog(parent, e.toString(),
 		title, JOptionPane.ERROR_MESSAGE);
     }
     
@@ -30,7 +31,7 @@ public class ErrorMessage {
 	String s = "I'm sorry to report that an unexpected internal error occured.\n"
 	          +"Please contact technical support for help.\n";
 	// TODO include contact details for technical support
-	JOptionPane.showMessageDialog(parent, s+e.getLocalizedMessage(),
+	JOptionPane.showMessageDialog(parent, s+e.toString(),
 		"Internal problem", JOptionPane.ERROR_MESSAGE);
     }
 }

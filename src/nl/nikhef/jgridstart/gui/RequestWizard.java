@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.swing.AbstractAction;
 import javax.swing.SwingUtilities;
 import org.jdesktop.swingworker.SwingWorker;
 
@@ -74,6 +75,10 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	// set static properties for the forms
 	data().setProperty("organisations.html.options", Organisation.getAllOptionsHTML(cert));
 	data().setProperty("organisations.html.options.volatile", "true");
+	// workaround for checkboxes without a name; even with checked="checked" they
+	// would sometimes not be shown as checked (irregular behaviour though)
+	data().setProperty("true", "true");
+	data().setProperty("true.volatile", "true");
     }
 
     /** called when page in wizard was changed */
@@ -118,12 +123,16 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    setVisible(false);
 	    dispose();
 	}
+	// say "Close" when a certificate is present because everything is done by then
+	cancelAction.putValue(AbstractAction.NAME, "Close");
     }
 
     /** worker thread for generation of a certificate */
     protected class GenerateWorker extends SwingWorker<Void, String> {
 	/** gui element to refresh on update; don't use in worker thread! */
 	protected TemplateWizard w;
+	/** exception from background thread */
+	protected Exception e = null;
 
 	public GenerateWorker(TemplateWizard w) {
 	    super();
@@ -161,10 +170,13 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    setData(cert);
 		    publish("state.certificate_created");
 		}
-		// upload request if it hasn't been done
-		if (!Boolean.valueOf(cert.getProperty("request.submitted"))) {
-		    cert.uploadRequest();
-		    publish("state.cancontinue");
+		// upload request only if no certificate present yet
+		if (cert.getCertificate()==null) {
+		    // upload request if it hasn't been done
+		    if (!Boolean.valueOf(cert.getProperty("request.submitted"))) {
+			cert.uploadRequest();
+			publish("state.cancontinue");
+		    }
 		}
 		// make sure gui is updated and user can continue
 		publish("state.cancontinue");
@@ -173,13 +185,18 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    cert.isCertificationRequestProcessed();
 		    publish((String)null);
 		}
-		// and download when needed
-		if (cert.getCertificate()==null) {
+		// and download when needed and possible
+		if (cert.getCertificate()==null && 
+			Boolean.valueOf(cert.getProperty("request.processed"))) {
 		    cert.downloadCertificate();
 		    publish((String)null);
 		}
 	    } catch (PasswordCancelledException e) {
 		// special state to go to the previous page
+		publish("state.cancelled");
+	    } catch (Exception e) {
+		// store exception so it can be shown to the user
+		this.e = e;
 		publish("state.cancelled");
 	    }
 	    return null;
@@ -196,6 +213,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		if (key==null) continue;
 		// process cancel
 		if (key.equals("state.cancelled")) {
+		    if (e!=null)
+			ErrorMessage.error(getParent(), "Error during request", e);
 		    setStepRelative(-1);
 		    return;
 		}
