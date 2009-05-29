@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.gui.util;
+package nl.nikhef.xhtmlrenderer.swing;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -17,6 +17,18 @@ import org.xhtmlrenderer.simple.Graphics2DRenderer;
 import org.xhtmlrenderer.simple.XHTMLPanel;
 import org.xhtmlrenderer.simple.XHTMLPrintable;
 
+/**
+ * Fix for XHTMLPrintable to set document margins to the printer's margins.
+ * <p>
+ * Seems to work nicely on Windows, not yet so much on Linux.
+ * <p>
+ * This code was based on a
+ * <a href="http://markmail.org/message/37rc4vaiz6peto5h">thread</a>
+ * on xhtmlrenderer's users mailing list.
+ * 
+ * <p>
+ * TODO test more and finish
+ */
 class TemplatePrintable extends XHTMLPrintable {
 
     public TemplatePrintable(XHTMLPanel panel) {
