@@ -51,6 +51,7 @@
 	<property name="dep.bouncycastle" location="${dir.thirdparty}/bouncycastle/bcprov-jdk14-142.jar"/>
 	<property name="dep.cli" location="${dir.thirdparty}/commons-cli/commons-cli-1.2.jar"/>
 	<property name="dep.junit" location="${dir.thirdparty}/junit/junit-4.5.jar"/>
+	<property name="dep.abbot" location="${dir.thirdparty}/junit/abbot.jar"/>
 	<property name="dep.swingworker" location="${dir.thirdparty}/swingworker/swing-worker-1.2.jar"/>
 	<property name="dep.xhtmlrenderer" location="${dir.thirdparty}/flyingsaucer/core-renderer-minimal.jar"/>
 	<property name="dep.itext" location="${dir.thirdparty}/flyingsaucer/iText-2.0.8.jar"/>
@@ -59,6 +60,7 @@
 		<pathelement location="${dep.bouncycastle}"/>
 		<pathelement location="${dep.cli}"/>
 		<pathelement location="${dep.junit}"/>
+		<pathelement location="${dep.abbot}"/>
 		<pathelement location="${dep.swingworker}"/> <!-- for java1.5 and below -->
 		<pathelement location="${dep.xhtmlrenderer}"/>
 	</path>
@@ -129,6 +131,7 @@
 			<libraryjar file="${java.home}/lib/jsse.jar"/>
 			<libraryjar file="${dep.bouncycastle}"/>
 			<libraryjar file="${dep.junit}"/>
+			<libraryjar file="${dep.abbot}"/>
 			<libraryjar file="${dep.itext}"/>
 			<keepclasseswithmembers access="public">
 				<method access="public static" type="void"
