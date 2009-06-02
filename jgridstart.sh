@@ -1,7 +1,8 @@
 #!/bin/sh
+JAVA=java1.5
 BASE=`dirname $0`
 LIB="$BASE/thirdparty"
-CLASSPATH="$LIB/bouncycastle/bcprov-jdk14-142.jar:$LIB/commons-cli/commons-cli-1.2.jar:$LIB/flyingsaucer/core-renderer-minimal.jar:$BASE/bin"
+CLASSPATH="$LIB/bouncycastle/bcprov-jdk14-142.jar:$LIB/commons-cli/commons-cli-1.2.jar:$LIB/flyingsaucer/core-renderer-minimal.jar:$LIB/swingworker/swing-worker-1.2.jar:$BASE/bin"
 INVOKED_PROGRAM="$0"
 export BASE CLASSPATH INVOKED_PROGRAM
 
@@ -16,15 +17,15 @@ if [ "$1" = "test" ]; then
 	echo
 	CLASSPATH="$CLASSPATH:$LIB/junit/junit-4.5.jar:$LIB/junit/abbot.jar"
 	export CLASSPATH
-	java org.junit.runner.JUnitCore nl.nikhef.jgridstart.AllTests
+	$JAVA org.junit.runner.JUnitCore nl.nikhef.jgridstart.AllTests
 elif [ "$1" = "cli" ]; then
 	shift
-	java nl.nikhef.jgridstart.cli.Main $@
+	$JAVA nl.nikhef.jgridstart.cli.Main $@
 elif [ "$1" = "gui" ]; then
 	shift
-	java nl.nikhef.jgridstart.gui.Main $@
+	$JAVA nl.nikhef.jgridstart.gui.Main $@
 elif [ "$DISPLAY" ]; then
-	java nl.nikhef.jgridstart.gui.Main $@
+	$JAVA nl.nikhef.jgridstart.gui.Main $@
 else
-	java nl.nikhef.jgridstart.cli.Main $@
+	$JAVA nl.nikhef.jgridstart.cli.Main $@
 fi
