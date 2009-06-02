@@ -392,7 +392,7 @@ public class TemplatePanel extends XHTMLPanel {
 		    data.setProperty(name, Boolean.toString(((AbstractButton)source).isSelected()));
 		
 		} else if (source instanceof JComboBox || source instanceof JList) { 
-		    /** Update the properties bound to the enclosing TemplatePane
+		    /** Update the properties bound to the enclosing TemplatePanel
 		     * from a list. This is called when a list's state is changed.
 		     * 
 		     * The implementation looks somewhat clumsy. I have no access to the
@@ -414,7 +414,7 @@ public class TemplatePanel extends XHTMLPanel {
 		    }
 		
 		} else if (source instanceof JTextComponent) {
-		    // not used since document is used here
+		    // not used since javax.swing.text.Document is bound instead
 		    data.setProperty(name, ((JTextComponent)source).getText());
 		} else if (source instanceof javax.swing.text.Document) {
 		    javax.swing.text.Document doc = (javax.swing.text.Document)source;

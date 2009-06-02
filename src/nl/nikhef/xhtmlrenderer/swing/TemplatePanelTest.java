@@ -2,6 +2,7 @@ package nl.nikhef.xhtmlrenderer.swing;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
 import java.io.ByteArrayInputStream;
@@ -44,6 +45,8 @@ public class TemplatePanelTest extends ComponentTestFixture {
     private ComponentTester tester = null;
     /** Current component under test, created by createPanel */
     private TemplatePanel panel = null;
+    /** Current frame that contains the panel, also created by createPanel */
+    private Frame frame = null;
     /** Whether showFrame() is called for the first time, see createPanel() */
     private boolean isFirstTime = true;
     
@@ -69,7 +72,8 @@ public class TemplatePanelTest extends ComponentTestFixture {
 	panel.setDocument(TemplateDocumentTest.parseBody(body));
 	if (p!=null)
 	    panel.setData(p);
-	showFrame(panel);
+	frame = showFrame(panel);
+	waitForWindow(frame, true);
 	// On Mac OS X I have seen the first test fail because the window wasn't
 	// realised fully even when showFrame returned (It couldn't find any
 	// child component). To work around this, we wait a little when this is
@@ -324,6 +328,7 @@ public class TemplatePanelTest extends ComponentTestFixture {
     }
     
     /** Test that dating the properties refreshes the document */
+    @Test
     public void testSetDataRefresh() throws Exception {
 	createPanel("<input type='text' name='txt'/>");
 	JTextField field = (JTextField)find(new ClassMatcher(JTextField.class));
@@ -336,6 +341,7 @@ public class TemplatePanelTest extends ComponentTestFixture {
 	assertEquals("well", field.getText());
     }
     /** Test that refresh reparses the document */
+    @Test
     public void testRefresh() throws Exception {
 	createPanel("<input type='text' name='txt'/>");
 	JTextField field = (JTextField)find(new ClassMatcher(JTextField.class));
@@ -345,6 +351,36 @@ public class TemplatePanelTest extends ComponentTestFixture {
 	// note that swing needs some time before the gui is fully updated
 	field = (JTextField)find(new ClassMatcher(JTextField.class));
 	assertEquals("well", field.getText());
+    }
+    
+    /** Test that the first form element receives the focus on display and
+     *  input can be entered. */
+    @Test
+    public void testFocusInput() throws Exception {
+	createPanel("<input type='text' name='txt'/>");
+	assertTrue(find(new ClassMatcher(JTextField.class)).hasFocus());
+	// We don't want to need to click the field before input can be entered.
+	// On Windows and Mac OS X it does seem to work by default, on Linux it
+	// works only when the focus policy is click-to-focus.
+	//getRobot().click((JTextField)find(new ClassMatcher(JTextField.class)));
+	getRobot().keyString("test input");
+	assertEquals("test input", panel.data().getProperty("txt"));
+    }
+    /** Test that the first form element receives the focus on display and
+     *  input can be entered, and a second one gets it after tab. */
+    @Test
+    public void testFocusInput2() throws Exception {
+	createPanel("<input type='text' name='txt'/><input type='checkbox' name='chk'/>");
+	// We don't want to need to click the field before input can be entered.
+	// On Windows and Mac OS X it does seem to work by default, on Linux it
+	// works only when the focus policy is click-to-focus.
+	//getRobot().click((JTextField)find(new ClassMatcher(JTextField.class)));
+	getRobot().keyString("test input");
+	assertEquals("test input", panel.data().getProperty("txt"));
+	getRobot().keyStroke('\t');
+	assertTrue(find(new ClassMatcher(JToggleButton.class)).hasFocus());
+	getRobot().keyStroke(' ');
+	assertTrue(Boolean.valueOf(panel.data().getProperty("chk")));
     }
 
     
