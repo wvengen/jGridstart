@@ -88,7 +88,7 @@ import org.xhtmlrenderer.util.Configuration;
  *   panel.data().setProperty("url", "http://www.example.com/");
  *   if (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
  *   	panel.data().setProperty("special", "true");
- *   panel.data().setProperty("copyright", "&lt;p&gt;&amp;copy; by &lt;i&gt;Example&lt;/i&gt; Inc.&lt;/p&gt;");
+ *   panel.data().setProperty("copyright", "&amp;copy; by &lt;i&gt;Example&lt;/i&gt; Inc.");
  *   panel.setDocument(document);
  * </code></pre>
  * <p>
