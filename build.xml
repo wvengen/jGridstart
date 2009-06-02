@@ -118,7 +118,11 @@
 				<attribute name="Built-By" value="${user.name}"/>
 				<attribute name="Main-Class" value="${target.main}"/>
 			</manifest>
-			<fileset dir="${dir.build}"/>
+			<fileset dir="${dir.build}">
+				<!-- remove non-production files -->
+				<exclude name="**/test*"/>
+				<exclude name="**/package.html"/>
+			</fileset>
 			<zipfileset src="${dep.cli}" includes="**/*.class"/>
 			<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
 			<zipfileset src="${dep.xhtmlrenderer}" includes="**/*.class" excludes="**/tool/**"/>
