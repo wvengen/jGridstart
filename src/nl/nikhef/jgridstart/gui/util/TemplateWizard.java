@@ -1,10 +1,12 @@
 package nl.nikhef.jgridstart.gui.util;
 
+import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import org.w3c.dom.Document;
+import org.xhtmlrenderer.extend.NamespaceHandler;
 
 /**
  * HTML-based wizard dialog. One supplies it with a list of html templates and a
@@ -31,7 +34,7 @@ public class TemplateWizard extends JDialog {
     /** currently active step (base 0), -1 for not initialized */
     protected int step = -1;
     /** actual dialog content with HTML and buttons */
-    protected TemplateButtonPane pane = null;
+    protected TemplateButtonPanel pane = null;
     /** "Next" action */
     protected Action nextAction = null;
     /** "Previous" action */
@@ -49,19 +52,6 @@ public class TemplateWizard extends JDialog {
     public TemplateWizard(Dialog owner, Properties p) { this(owner); setData(p); }
     public TemplateWizard(Frame owner, Properties p)  { this(owner); setData(p);  }
 
-    /** set the template's properties */
-    public void setData(Properties p) {
-	pane.setData(p);
-    }
-    /** return the template's properties */
-    public Properties data() {
-	return pane.data();
-    }
-    /** refresh the currently shown document */
-    public void refresh() {
-	pane.refresh();
-    }
-
     /** set the currently displayed page */
     // TODO describe behaviour, especially what happens in last step
     //      (based on handler being present or not)
@@ -76,12 +66,8 @@ public class TemplateWizard extends JDialog {
 	}
 	// set new contents and get title from that as well
 	step = s;
-	try {
-	    pane.setPage(pages.get(step));
-	} catch (IOException e) {
-	    ErrorMessage.internal(this, e);
-	}
-	setTitle(pane.getTitle());
+	pane.setDocument(pages.get(step).toString());
+	setTitle(pane.getDocumentTitle());
 	// no "Previous" at start; no "Next" beyond the final "Close"
 	if (s == pages.size()-1)
 	    cancelAction.putValue(Action.NAME, "Close");
@@ -118,7 +104,7 @@ public class TemplateWizard extends JDialog {
     protected void initialize() {
 	setModal(true);
 	getContentPane().removeAll();
-	pane = new TemplateButtonPane();
+	pane = new TemplateButtonPanel();
 	getContentPane().add(pane);
 	pane.setBackground(UIManager.getColor("control"));
 	// "Previous" button
@@ -168,8 +154,39 @@ public class TemplateWizard extends JDialog {
 	void pageChanged(TemplateWizard w, int page);
     }
     
-    // delegates to TemplatePane
-    public Document getHTMLDocument() { return pane.getDocument(); }
-    public URL getPage() { return pane.getPage(); }
-    public boolean print() throws PrinterException  { return pane.print(); }
+    // delegates to TemplatePanel
+    public String getDocumentTitle() {
+	return pane.getDocumentTitle();
+    }
+    public void refresh() {
+	pane.refresh();
+    }
+    public void setData(Properties p) {
+	pane.setData(p);
+    }
+    public Properties data() {
+	return pane.data();
+    }
+    public void setDocument(String url) {
+	pane.setDocument(url);
+    }
+    public void setDocument(File file) throws Exception {
+	pane.setDocument(file);
+    }
+    public void setDocument(Document doc, String url) {
+	pane.setDocument(doc, url);
+    }
+    public void setDocument(Document doc, String url, NamespaceHandler nsh) {
+	pane.setDocument(doc, url, nsh);
+    }
+    public Document getDocument() {
+	return pane.getDocument();
+    }
+    public void setBackground(Color c) {
+	super.setBackground(c);
+	if (pane!=null) pane.setBackground(c);
+    }
+    public boolean print() throws PrinterException {
+	return pane.print();
+    }
 }

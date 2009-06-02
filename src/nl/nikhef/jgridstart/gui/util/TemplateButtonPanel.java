@@ -2,8 +2,12 @@ package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.print.PrinterException;
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 import javax.swing.Action;
@@ -13,28 +17,60 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+
+import nl.nikhef.xhtmlrenderer.swing.TemplatePanel;
+
 import org.w3c.dom.Document;
+import org.xhtmlrenderer.extend.NamespaceHandler;
+import org.xhtmlrenderer.swing.BasicPanel;
+import org.xhtmlrenderer.swing.LinkListener;
+import org.xhtmlrenderer.swing.SelectionHighlighter;
 
 
-/** A template pane in a scrolledwindow with buttons below */
-public class TemplateButtonPane extends JPanel {
+/** A template pane in a scrolledwindow with buttons below. */
+public class TemplateButtonPanel extends JPanel {
     
     /** the actual html template pane */
-    protected TemplatePane contentpane = null;
+    protected TemplatePanel contentpane = null;
     /** pane containing the buttons */
     protected JPanel buttonpane = null;
     /** empty space around buttons */
     protected final int btnBorderWidth = 2;
     
-    public TemplateButtonPane() {
+    public TemplateButtonPanel() {
 	super();
-	// add TemplatePane in scrollview
+	
+	// add TemplatePanel in scrollview
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-	contentpane = new TemplatePane();
+	contentpane = new TemplatePanel();
 	JScrollPane scroll = new JScrollPane();
     	scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     	scroll.setViewportView(contentpane);
 	add(scroll, null);
+	
+	// open links with an external web browser
+	contentpane.replaceLinkListener(new LinkListener() {
+	    @Override
+            public void linkClicked(BasicPanel panel, String uri) {
+		BareBonesActionLaunch.openURL(uri, panel);
+	    }
+	});
+	
+	// allow selecting and copying using Ctrl-C
+	/*
+	SelectionHighlighter highlighter = new SelectionHighlighter();
+	highlighter.install(contentpane);
+	SelectionHighlighter.CopyAction copyAction = new SelectionHighlighter.CopyAction();
+	copyAction.install(highlighter);
+	copyAction.putValue(Action.ACCELERATOR_KEY,
+		KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
+	getActionMap().put(copyAction.getValue(Action.NAME), copyAction);
+	getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+		(KeyStroke)copyAction.getValue(Action.ACCELERATOR_KEY),
+		copyAction.getValue(Action.NAME));
+	*/
+	
 	// add button pane
 	buttonpane = new JPanel();
 	buttonpane.setLayout(new BoxLayout(buttonpane, BoxLayout.X_AXIS));
@@ -43,9 +79,9 @@ public class TemplateButtonPane extends JPanel {
 	add(buttonpane, null);
     }
     
-    public TemplateButtonPane(URL src) throws IOException {
+    public TemplateButtonPanel(String src) throws IOException {
 	this();
-	setPage(src);
+	setDocument(src);
     }
     
     /** remove all buttons currently present */
@@ -77,8 +113,8 @@ public class TemplateButtonPane extends JPanel {
     }
     
     // plain delegates TODO complete
-    public String getTitle() {
-	return contentpane.getTitle();
+    public String getDocumentTitle() {
+	return contentpane.getDocumentTitle();
     }
     public void refresh() {
 	contentpane.refresh();
@@ -89,18 +125,24 @@ public class TemplateButtonPane extends JPanel {
     public Properties data() {
 	return contentpane.data();
     }
-    public void setPage(URL src) throws IOException {
-	contentpane.setPage(src);
+    public void setDocument(String url) {
+	contentpane.setDocument(url);
     }
-    public URL getPage() {
-	return contentpane.getPage();
+    public void setDocument(File file) throws Exception {
+	contentpane.setDocument(file);
+    }
+    public void setDocument(Document doc, String url) {
+	contentpane.setDocument(doc, url);
+    }
+    public void setDocument(Document doc, String url, NamespaceHandler nsh) {
+	contentpane.setDocument(doc, url, nsh);
+    }
+    public Document getDocument() {
+	return contentpane.getDocument();
     }
     public void setBackground(Color c) {
 	super.setBackground(c);
 	if (contentpane!=null) contentpane.setBackground(c);
-    }
-    public Document getDocument() {
-	return contentpane.getDocument();
     }
     public boolean print() throws PrinterException {
 	return contentpane.print();

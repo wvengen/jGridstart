@@ -32,7 +32,7 @@ import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
-import nl.nikhef.jgridstart.gui.util.TemplateButtonPane;
+import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
 public class JGSFrame extends JFrame {
@@ -40,7 +40,7 @@ public class JGSFrame extends JFrame {
     private JPanel jContentPane = null;
     private JMenuBar jMenuBar = null;
     private JComponent certList = null; 
-    private TemplateButtonPane certInfoPane = null;
+    private TemplateButtonPanel certInfoPane = null;
 
     private CertificateStore store = null;
     private CertificateSelection selection = null; 
@@ -61,8 +61,6 @@ public class JGSFrame extends JFrame {
 
     /**
      * This method initializes this
-     * 
-     * @return void
      */
     private void initialize() {
 	store = new CertificateStore();
@@ -205,7 +203,7 @@ public class JGSFrame extends JFrame {
      */
     private JPanel getJPanel() {
 	if (certInfoPane == null) {
-	    certInfoPane = new TemplateButtonPane();
+	    certInfoPane = new TemplateButtonPanel();
 	    certInfoPane.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
 	    // use SwingUtilities.invokeLater() to update the gui because
@@ -280,26 +278,22 @@ public class JGSFrame extends JFrame {
     /** Effectuate a selection change in the gui. Current selection is
      * managed by the class variable selection. */
     private void updateSelection() {
-	try {
-	    certInfoPane.removeActions();
-	    // update contents and load template
-	    CertificatePair c = selection.getCertificatePair();
-	    if (c!=null) {
-		// certificate selected, show info and add buttons according to state
-		certInfoPane.setData(c);
-		certInfoPane.setPage(getClass().getResource("certificate_info.html"));
-		if (c.getCertificate()==null)
-		    certInfoPane.addAction(getAction("viewrequest"));
-		certInfoPane.addAction(getAction("revoke"));
-		certInfoPane.addAction(getAction("install"));
-	    } else {
-		// no certificate selected, present signup page
-		certInfoPane.setPage(getClass().getResource("certificate_none_yet.html"));
-		certInfoPane.addAction(getAction("import"));
-		certInfoPane.addAction(getAction("request"));
-	    }
-	} catch (IOException e) {
-	    ErrorMessage.internal(this, e);
+	certInfoPane.removeActions();
+	// update contents and load template
+	CertificatePair c = selection.getCertificatePair();
+	if (c!=null) {
+	    // certificate selected, show info and add buttons according to state
+	    certInfoPane.setData(c);
+	    certInfoPane.setDocument(getClass().getResource("certificate_info.html").toExternalForm());
+	    if (c.getCertificate()==null)
+		certInfoPane.addAction(getAction("viewrequest"));
+	    certInfoPane.addAction(getAction("revoke"));
+	    certInfoPane.addAction(getAction("install"));
+	} else {
+	    // no certificate selected, present signup page
+	    certInfoPane.setDocument(getClass().getResource("certificate_none_yet.html").toExternalForm());
+	    certInfoPane.addAction(getAction("import"));
+	    certInfoPane.addAction(getAction("request"));
 	}
 	// also update selected item in menu
 	if (selection.getIndex() >= 0)
