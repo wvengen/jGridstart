@@ -166,8 +166,7 @@ public class TemplatePanel extends XHTMLPanel {
 	if (template!=null) {
 	    template.setData(p);
 	    // don't do just refresh cause it reparses the document which has already happened
-	    // TODO get namespace handler from document
-	    super.setDocument(template, template.getDocumentURI(), new XhtmlNamespaceHandler());
+	    super.setDocument(template, template.getDocumentURI(), getSharedContext().getNamespaceHandler());
 	}
     }
     
@@ -195,8 +194,7 @@ public class TemplatePanel extends XHTMLPanel {
      */
     public boolean refresh() {
 	template.refresh();
-	// TODO get namespace handler from document
-	super.setDocument(template, getDocument().getDocumentURI(), new XhtmlNamespaceHandler());
+	super.setDocument(template, template.getDocumentURI(), getSharedContext().getNamespaceHandler());
 	return true;
     }
     

@@ -26,6 +26,14 @@ public class DocumentDelegate implements Document {
 	public DocumentDelegate(Document doc) {
 	    setDocument(doc);
 	}
+	/** returns whether this delegate has a valid document, or if it is null.
+	 * <p>
+	 * When this method returns false, one should not call any other method
+	 * before running {@link #setDocument}.
+	 */
+	public boolean isValid() {
+	    return doc != null;
+	}
 	public void setDocument(Document doc) {
 	    this.doc = doc;
 	}

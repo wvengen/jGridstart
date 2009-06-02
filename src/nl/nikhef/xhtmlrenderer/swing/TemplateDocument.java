@@ -80,8 +80,6 @@ public class TemplateDocument extends DocumentDelegate {
     public TemplateDocument(Document template, Properties data) {
 	super();
 	this.template = template;
-	if (template.getDocumentURI()!=null)
-	    setDocumentURI(template.getDocumentURI());
 	setData(data);
     }
     
@@ -104,11 +102,21 @@ public class TemplateDocument extends DocumentDelegate {
 	try {
 	    // clone the template document
 	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	    setDocument(factory.newDocumentBuilder().newDocument());
-	    appendChild(importNode(template.getFirstChild(), true));
+	    Document newDoc = factory.newDocumentBuilder().newDocument();
+	    newDoc.appendChild(newDoc.importNode(template.getFirstChild(), true));
+	    // copy properties from the template document at first, but copy from
+	    // the previously parsed document on subsequent refreshes. This allows
+	    // the user to set attributes without losing them after a refresh.
+	    Document propsSrc = this;
+	    if (!isValid()) propsSrc = template;
+	    if (propsSrc.getDocumentURI()!=null)
+		newDoc.setDocumentURI(propsSrc.getDocumentURI());
+	    newDoc.setStrictErrorChecking(propsSrc.getStrictErrorChecking());
+	    newDoc.setXmlStandalone(propsSrc.getXmlStandalone());
+	    newDoc.setXmlVersion(propsSrc.getXmlVersion());
 	    // and run the template
+	    setDocument(newDoc);
 	    doTemplate(this);
-	    // and copy URI
 	} catch (ParserConfigurationException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
