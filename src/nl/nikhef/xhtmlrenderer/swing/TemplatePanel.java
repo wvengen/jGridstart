@@ -92,11 +92,11 @@ import org.xhtmlrenderer.util.Configuration;
  *   panel.setDocument(document);
  * </code></pre>
  * <p>
- * Additionally, HTML form elements are automatically bound to a properties. This means
+ * Additionally, HTML form elements are automatically bound to properties. This means
  * that each form element is bound to a property (see {@link #setData} and {@link #data})
  * with the name specified by the element's <tt>name</tt> attribute. So the HTML item
  * <pre><code>
- *   &lt;label for="name"&gt;Your name:&lt;label&gt; &lt;input type="text" name="name" id="name"/&gt;
+ *   &lt;label for="name"&gt;Your name:&lt;/label&gt; &lt;input type="text" name="name" id="name"/&gt;
  * </code></pre>
  * would enable the user to enter his/her name. When the name is changed, the corresponding
  * property <tt>name</tt> is updated as well, so <code>panel.data().getProperty("name")</code>

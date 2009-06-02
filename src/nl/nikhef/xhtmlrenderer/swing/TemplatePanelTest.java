@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.logging.LogManager;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
@@ -24,6 +25,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import junit.extensions.abbot.ComponentTestFixture;
+
+import nl.nikhef.jgridstart.gui.Main;
 
 import org.junit.Test;
 import org.xml.sax.SAXException;
@@ -44,8 +47,9 @@ public class TemplatePanelTest extends ComponentTestFixture {
     /** Whether showFrame() is called for the first time, see createPanel() */
     private boolean isFirstTime = true;
     
-    protected void setUp() {
+    protected void setUp() throws IOException {
 	tester = new ComponentTester();
+	LogManager.getLogManager().readConfiguration(Main.class.getResourceAsStream("/logging.properties"));
     }
     protected void tearDown() {
 	// Default JUnit test runner keeps references to Tests for its
