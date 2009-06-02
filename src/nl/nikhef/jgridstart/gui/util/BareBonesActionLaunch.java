@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart.gui.util;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
@@ -15,19 +16,30 @@ public class BareBonesActionLaunch extends BareBonesBrowserLaunch {
     
     /** list of registered actions */
     protected static HashMap<String, Action> actions = new HashMap<String, Action>();
-    
-    public static void openURL(String url, Object src) {
-	if (url.startsWith("action:"))
-	    performAction(url.substring(7), src);
+
+    /** @see BareBonesBrowserLaunch#openURL(URL, Component) */
+    public static void openURL(URL url, Component parent) {
+	if (url.toExternalForm().startsWith("action:"))
+	    performAction(url.toExternalForm().substring(7), parent);
 	else
-	    openURL(url);
+	    BareBonesBrowserLaunch.openURL(url.toExternalForm(), parent);
+    }
+
+    /** @see BareBonesBrowserLaunch#openURL(String, Component) */
+    public static void openURL(String surl, Component parent) {
+	if (surl.startsWith("action:"))
+	    performAction(surl.substring(7), parent);
+	else
+	    BareBonesBrowserLaunch.openURL(surl, parent);
     }
     
-    public static void openURL(URL url, Object src) {
-	if (url.getProtocol() == "action")
-	    performAction(url.getHost(), src);
-	else
-	    openURL(url);
+    /** @see BareBonesBrowserLaunch#openURL(URL) */
+    public static void openURL(URL url) {
+	openURL(url, null);
+    }
+    /** @see BareBonesBrowserLaunch#openURL(String) */
+    public static void openURL(String surl) {
+	openURL(surl, null);
     }
     
     /** Perform a certain action
