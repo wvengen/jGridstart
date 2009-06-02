@@ -195,6 +195,17 @@ public class TemplatePanelTest extends ComponentTestFixture {
 	panel.setData(p);
 	assertTrue(bodyEquals(panel,"<p>bar</p>"));
     }
+    /** Test if reloading a page works with external stylesheet.
+     * 
+     * TODO make sure no exception is thrown down in xhtmlrenderer that is caught internally */
+    @Test
+    public void testReloadStylesheet() throws Exception {
+	panel = new TemplatePanel();
+	panel.setDocument(getClass().getResource("testData5.html").toExternalForm());
+	assertTrue(bodyEquals(panel, "<p/>"));
+	panel.refresh();
+	assertTrue(bodyEquals(panel, "<p/>"));
+    }
     
     /** Text input: test if value="foo" in html sets a textfield's value */
     @Test
