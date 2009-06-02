@@ -1,7 +1,5 @@
 package nl.nikhef.xhtmlrenderer.swing;
 
-import static org.junit.Assert.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -75,7 +73,8 @@ public class TemplateDocumentTest extends TestCase {
 	// compare properties
 	if (n1.getNodeType() != n2.getNodeType()) return false;
 	if (!equals(n1.getNodeName(), n2.getNodeName())) return false;
-	if (!equals(n1.getLocalName(), n2.getLocalName())) return false;
+	// don't compare localname because its availability is DOM implementation dependent
+	//if (!equals(n1.getLocalName(), n2.getLocalName())) return false;
 	if (!equals(n1.getNamespaceURI(), n2.getNamespaceURI())) return false;
 	if (!equals(n1.getPrefix(), n2.getPrefix())) return false;
 	if (!equals(n1.getNodeValue(), n2.getNodeValue())) return false;

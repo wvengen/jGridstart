@@ -32,6 +32,8 @@ import nl.nikhef.jgridstart.gui.Main;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
+
 import abbot.finder.ComponentFinder;
 import abbot.finder.ComponentNotFoundException;
 import abbot.finder.Matcher;
@@ -129,13 +131,27 @@ public class TemplatePanelTest extends ComponentTestFixture {
      * @throws InvocationTargetException 
      * @throws InterruptedException */
     protected Component find(Matcher m) throws MultipleComponentsFoundException, ComponentNotFoundException, InterruptedException, InvocationTargetException {
+	guiSleep();
+	// only then look it up
+	return getFinder().find(m);
+    }
+    /** Helper method: test the panel's contents 
+     * @throws ParserConfigurationException 
+     * @throws IOException 
+     * @throws SAXException */
+    protected boolean bodyEquals(TemplatePanel panel, String body) throws SAXException, IOException, ParserConfigurationException {
+	return TemplateDocumentTest.bodyEquals(panel.getDocument(), body);
+    }
+    /** Helper method: wait for AWT queue to finish 
+     * @throws InvocationTargetException 
+     * @throws InterruptedException */
+    protected void guiSleep() throws InterruptedException, InvocationTargetException {
 	// invoke and wait for an event in the gui thread, so that really
 	// all events are handled
 	java.awt.EventQueue.invokeAndWait(new Runnable() {
 	    public void run() { }
 	});
-	// only then look it up
-	return getFinder().find(m);
+	sleep();
     }
     
     /** Test data binding */
@@ -148,6 +164,7 @@ public class TemplatePanelTest extends ComponentTestFixture {
 	assertEquals("yeah", panel.data().getProperty("foobar"));
     }
     /** Test data binding with supplied Properties */
+    @Test
     public void testData2() throws Exception {
 	Properties p = new Properties();
 	createPanel("", p);
@@ -155,6 +172,28 @@ public class TemplatePanelTest extends ComponentTestFixture {
 	assertNull(panel.data().getProperty("foobar"));
 	p.setProperty("foobar", "yeah");
 	assertEquals("yeah", panel.data().getProperty("foobar"));	
+    }
+    /** Test data binding with setData() */
+    @Test
+    public void testData3() throws Exception {
+	Properties p = new Properties();
+	p.setProperty("foo", "bar");
+	panel = new TemplatePanel();
+	panel.setDocument(TemplateDocumentTest.parseBody("<p c='${foo}'/>"));
+	assertTrue(bodyEquals(panel, "<p/>"));
+	panel.setData(p);
+	assertTrue(bodyEquals(panel, "<p>bar</p>"));
+    }
+    /** Test construction from external page */
+    @Test
+    public void testData4() throws Exception {
+	panel = new TemplatePanel();
+	panel.setDocument(getClass().getResource("testData4.html").toExternalForm());
+	assertTrue(bodyEquals(panel, "<p/>"));
+	Properties p = new Properties();
+	p.setProperty("foo", "bar");
+	panel.setData(p);
+	assertTrue(bodyEquals(panel,"<p>bar</p>"));
     }
     
     /** Text input: test if value="foo" in html sets a textfield's value */
@@ -358,9 +397,10 @@ public class TemplatePanelTest extends ComponentTestFixture {
     @Test
     public void testFocusInput() throws Exception {
 	createPanel("<input type='text' name='txt'/>");
+	guiSleep();
 	assertTrue(find(new ClassMatcher(JTextField.class)).hasFocus());
 	// We don't want to need to click the field before input can be entered.
-	// On Windows and Mac OS X it does seem to work by default, on Linux it
+	// On Windows it does seem to work by default, on Linux it
 	// works only when the focus policy is click-to-focus.
 	//getRobot().click((JTextField)find(new ClassMatcher(JTextField.class)));
 	getRobot().keyString("test input");
@@ -371,8 +411,9 @@ public class TemplatePanelTest extends ComponentTestFixture {
     @Test
     public void testFocusInput2() throws Exception {
 	createPanel("<input type='text' name='txt'/><input type='checkbox' name='chk'/>");
+	guiSleep();
 	// We don't want to need to click the field before input can be entered.
-	// On Windows and Mac OS X it does seem to work by default, on Linux it
+	// On Windows it does seem to work by default, on Linux it
 	// works only when the focus policy is click-to-focus.
 	//getRobot().click((JTextField)find(new ClassMatcher(JTextField.class)));
 	getRobot().keyString("test input");
