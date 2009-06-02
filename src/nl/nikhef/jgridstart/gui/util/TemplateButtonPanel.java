@@ -113,37 +113,48 @@ public class TemplateButtonPanel extends JPanel {
     }
     
     // plain delegates TODO complete
+    /** @see TemplatePanel#getDocumentTitle */
     public String getDocumentTitle() {
 	return contentpane.getDocumentTitle();
     }
+    /** @see TemplatePanel#refresh */
     public void refresh() {
 	contentpane.refresh();
     }
+    /** @see TemplatePanel#setData */
     public void setData(Properties p) {
 	contentpane.setData(p);
     }
+    /** @see TemplatePanel#data */
     public Properties data() {
 	return contentpane.data();
     }
+    /** @see TemplatePanel#setDocument(String) */
     public void setDocument(String url) {
 	contentpane.setDocument(url);
     }
+    /** @see TemplatePanel#setDocument(File) */
     public void setDocument(File file) throws Exception {
 	contentpane.setDocument(file);
     }
+    /** @see TemplatePanel#setDocument(Document, String) */
     public void setDocument(Document doc, String url) {
 	contentpane.setDocument(doc, url);
     }
+    /** @see TemplatePanel#setDocument(Document, String, NamespaceHandler) */
     public void setDocument(Document doc, String url, NamespaceHandler nsh) {
 	contentpane.setDocument(doc, url, nsh);
     }
+    /** @see TemplatePanel#getDocument */
     public Document getDocument() {
 	return contentpane.getDocument();
     }
+    /** Sets the background colour, also of the HTML area */
     public void setBackground(Color c) {
 	super.setBackground(c);
 	if (contentpane!=null) contentpane.setBackground(c);
     }
+    /** @see TemplatePanel#print */
     public boolean print() throws PrinterException {
 	return contentpane.print();
     }
