@@ -113,10 +113,12 @@
 	  -->
 	<target name="dist" depends="compile,keystore">
 		<!-- pack into jar -->
+		<basename property="dep.bouncycastle.basename" file="${dep.bouncycastle}"/>
 		<jar jarfile="${dir.dist}/${target.name}.large.jar">
 			<manifest>
 				<attribute name="Built-By" value="${user.name}"/>
 				<attribute name="Main-Class" value="${target.main}"/>
+				<attribute name="Class-Path" value="${dep.bouncycastle.basename}"/>
 			</manifest>
 			<fileset dir="${dir.build}">
 				<!-- remove non-production files -->
