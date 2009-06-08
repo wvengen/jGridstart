@@ -4,15 +4,25 @@ import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.jdesktop.swingworker.SwingWorker;
+import org.xhtmlrenderer.pdf.ITextRenderer;
+
+import com.lowagie.text.DocumentException;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateRequest;
@@ -83,6 +93,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 
     /** called when page in wizard was changed */
     public void pageChanged(TemplateWizard w, int page) {
+	// left buttons are page-specific
+	btnLeft.removeAll();
 	// stop worker on page change when needed
 	if (worker!=null) {
 	    worker.cancel(true);
@@ -103,22 +115,9 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    nextAction.setEnabled(false);
 	}
 	if (page==3) {
-	    /*
-	    // print form; enable close button after print dialog
-	    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	    cancelAction.setEnabled(Boolean.valueOf(data().getProperty("state.cancontinue")));
-	    SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    try {
-			print();
-			cancelAction.setEnabled(true);
-			setCursor(Cursor.getDefaultCursor());
-		    } catch (PrinterException e) {
-			ErrorMessage.error(getParent(), "Printing failed", e);
-		    }
-		}
-	    });
-	    */
+	    // add print form button
+	    btnLeft.add(new JButton(new PrintAction()));
+	    btnLeft.add(new JButton(new SaveToPDFAction()));
 	}
 	if (page==4) {
 	    // quit wizard
@@ -127,6 +126,9 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	}
 	// say "Close" when a certificate is present because everything is done by then
 	cancelAction.putValue(AbstractAction.NAME, "Close");
+	// redraw buttons
+	btnLeft.revalidate();
+	btnLeft.repaint();
     }
 
     /** worker thread for generation of a certificate */
@@ -235,6 +237,57 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    }
 	    // update content pane
 	    w.refresh();
+	}
+    }
+    
+    /** Action for printing the page displayed */
+    protected class PrintAction extends AbstractAction {
+	public PrintAction() {
+	    putValue(NAME, "Print...");
+	    putValue(MNEMONIC_KEY, new Integer('P'));
+	}
+	public void actionPerformed(ActionEvent e) {
+	    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	    SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		    try {
+			print();
+			setCursor(Cursor.getDefaultCursor());
+		    } catch (PrinterException e) {
+			ErrorMessage.error(getParent(), "Printing failed", e);
+		    }
+		}
+	    });
+	}
+    }
+    /** Action for saving the page displayed to a PDF */
+    protected class SaveToPDFAction extends AbstractAction {
+	public SaveToPDFAction() {
+	    putValue(NAME, "Save as PDF...");
+	    putValue(MNEMONIC_KEY, new Integer('S'));
+	}
+	public void actionPerformed(ActionEvent e) {
+	    JFileChooser chooser = new JFileChooser();
+	    chooser.setDialogTitle("Save form as PDF");
+	    chooser.setApproveButtonText("Save");
+	    chooser.setApproveButtonMnemonic('S');
+	    int result = chooser.showDialog(getParent(), null);
+	    if (result == JFileChooser.APPROVE_OPTION) {
+		doSave(chooser.getSelectedFile());
+	    }
+	}
+	public void doSave(File dest) {
+	    try {
+		ITextRenderer r = new ITextRenderer();
+		r.setDocument(getDocument(), getDocument().getDocumentURI());
+		OutputStream os;
+		os = new FileOutputStream(dest);
+		r.layout();
+		r.createPDF(os);
+		os.close();	    
+	    } catch (Exception e) {
+		ErrorMessage.error(getParent(), "Saving to PDF failed", e);
+	    }
 	}
     }
 }

@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.print.PrinterException;
@@ -10,11 +11,14 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
+
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
@@ -28,7 +32,18 @@ import org.xhtmlrenderer.swing.LinkListener;
 import org.xhtmlrenderer.swing.SelectionHighlighter;
 
 
-/** A template pane in a scrolledwindow with buttons below. */
+/** A {@link TemplatePanel} in a scrolled window with buttons below.
+ * <p>
+ * This is a thin layer over {@linkplain TemplatePanel} that adds optional buttons
+ * below the document view. It may be viewed as a kind of {@linkplain JOptionPane}
+ * with a {@linkplain TemplatePanel} as dialog contents, but the buttons here are
+ * to be supplied explicitely. {@link TemplateWizard} is an example that adds
+ * previous/next buttons.
+ * <p>
+ * Additionally, links are opened in an external web browser using
+ * {@link BareBonesActionLaunch}.
+ * TODO Also selecting and copying the text is possible.
+ */
 public class TemplateButtonPanel extends JPanel {
     
     /** the actual html template pane */
@@ -71,11 +86,12 @@ public class TemplateButtonPanel extends JPanel {
 		copyAction.getValue(Action.NAME));
 	*/
 	
-	// add button pane
+	// add button pane, by default with right aligned components
 	buttonpane = new JPanel();
 	buttonpane.setLayout(new BoxLayout(buttonpane, BoxLayout.X_AXIS));
 	buttonpane.setBorder(BorderFactory.createEmptyBorder(
 		btnBorderWidth, btnBorderWidth, btnBorderWidth, btnBorderWidth));
+	buttonpane.add(Box.createHorizontalGlue());
 	add(buttonpane, null);
     }
     
@@ -83,33 +99,64 @@ public class TemplateButtonPanel extends JPanel {
 	this();
 	setDocument(src);
     }
-    
-    /** remove all buttons currently present */
-    public void removeActions() {
-	buttonpane.removeAll();
+
+    /** returns the bottom {@linkplain JPanel} that can contain the buttons.
+     * <p>
+     * By default, horizontal glue is added as the first element, so that
+     * when you use {@link JPanel#add}, elements are right-aligned. If you
+     * really want to have this differently, call {@link JPanel#removeAll}
+     * on the returned {@linkplain JPanel} after construction of this
+     * {@linkplain TemplateButtonPanel}. */
+    public JPanel getButtonPane() {
+	return buttonpane;
     }
+    
     /** adds an action to the button list
      *
-     * @param action Action to add
+     * @param panel Panel to add the button to; useful when creating sub-panels
+     * @param btn Button to add
      * @param isDefault true whether this is the default action (set on only one)
+     * @param isLast whether this is the final button to add, for refreshing
      */
-    public void addAction(Action action, boolean isDefault) {
-	if (buttonpane.getComponentCount()==0)
-	    buttonpane.add(Box.createHorizontalGlue());
-	
-	buttonpane.add(new JButton(action), null);
-	buttonpane.add(Box.createRigidArea(new Dimension(btnBorderWidth, 0)));
-	buttonpane.revalidate();
-	buttonpane.repaint();
-	if (isDefault)
-	    contentpane.setSubmitAction(action);
+    public void addButton(JPanel panel, JButton btn, boolean isDefault, boolean isLast) {
+	panel.add(btn, null);
+	panel.add(Box.createRigidArea(new Dimension(btnBorderWidth, 0)));
+	if (isDefault && btn.getAction()!=null)
+	    contentpane.setSubmitAction(btn.getAction());
+	if (isLast) {
+	    panel.revalidate();
+	    panel.repaint();
+	}
     }
-    /** adds an non-default action to the button list
-     * 
-     * @param action Action to add
+    /** adds an action to the button list
+    *
+    * @param panel Panel to add the button to; useful when creating sub-panels
+    * @param btn Button to add
+    * @param isDefault true whether this is the default action (set on only one)
+    */
+    public void addButton(JPanel panel, JButton btn, boolean isDefault) {
+	addButton(panel, btn, isDefault, true);
+    }
+    /** adds an action to the button list
+     * <p>
+     * The button needs to have an Action specified at this moment.
+     *
+     * @param btn Button to add
+     * @param isDefault true whether this is the default action (set on only one)
+     * @param isLast whether this is the final button to add, for refreshing
      */
-    public void addAction(Action action) {
-	addAction(action, false);
+    public void addButton(JButton btn, boolean isDefault, boolean isLast) {
+	addButton(buttonpane, btn, isDefault, isLast);
+    }
+    /** adds an action to the button list
+     * <p>
+     * The button needs to have an Action specified at this moment.
+     *
+     * @param btn Button to add
+     * @param isDefault true whether this is the default action (set on only one)
+    */
+    public void addButton(JButton btn, boolean isDefault) {
+	addButton(buttonpane, btn, isDefault);
     }
     
     // plain delegates TODO complete
@@ -128,6 +175,10 @@ public class TemplateButtonPanel extends JPanel {
     /** @see TemplatePanel#data */
     public Properties data() {
 	return contentpane.data();
+    }
+    /** @see TemplatePanel#setSubmitAction */
+    public void setSubmitAction(Action e) {
+	contentpane.setSubmitAction(e);
     }
     /** @see TemplatePanel#setDocument(String) */
     public void setDocument(String url) {

@@ -8,6 +8,7 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -22,11 +23,15 @@ import javax.swing.SwingUtilities;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.util.HashMap;
+
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.basic.BasicSliderUI.ActionScroller;
+
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
@@ -41,6 +46,7 @@ public class JGSFrame extends JFrame {
     private JMenuBar jMenuBar = null;
     private JComponent certList = null; 
     private TemplateButtonPanel certInfoPane = null;
+    private HashMap<String, JButton> certInfoButtons = null;
 
     private CertificateStore store = null;
     private CertificateSelection selection = null; 
@@ -95,7 +101,19 @@ public class JGSFrame extends JFrame {
 	new ActionAbout(this);
 	// now that the actions are available, the menu can be created
 	this.setJMenuBar(getJMenuBar());
-
+	
+	// create buttons for template panel from actions
+	String[] actions = {
+		"import", "request",
+		"viewrequest", "revoke", "install"
+	};
+	certInfoButtons = new HashMap<String, JButton>();
+	for (int i=0; i<actions.length; i++) {
+	    JButton btn = new JButton(getAction(actions[i]));
+	    certInfoButtons.put(actions[i], btn);
+	    certInfoPane.addButton(btn, false, false);
+	}
+	    
 	// load certificates from default location
 	store.load();
 
@@ -205,7 +223,7 @@ public class JGSFrame extends JFrame {
 	if (certInfoPane == null) {
 	    certInfoPane = new TemplateButtonPanel();
 	    certInfoPane.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-
+	    
 	    // use SwingUtilities.invokeLater() to update the gui because
 	    // these may be originating from a different worker thread
 	    selection.addListSelectionListener(new ListSelectionListener() {
@@ -278,23 +296,23 @@ public class JGSFrame extends JFrame {
     /** Effectuate a selection change in the gui. Current selection is
      * managed by the class variable selection. */
     private void updateSelection() {
-	certInfoPane.removeActions();
 	// update contents and load template
 	CertificatePair c = selection.getCertificatePair();
 	if (c!=null) {
 	    // certificate selected, show info and add buttons according to state
 	    certInfoPane.setData(c);
 	    certInfoPane.setDocument(getClass().getResource("certificate_info.html").toExternalForm());
-	    if (c.getCertificate()==null)
-		certInfoPane.addAction(getAction("viewrequest"));
-	    certInfoPane.addAction(getAction("revoke"));
-	    certInfoPane.addAction(getAction("install"));
 	} else {
 	    // no certificate selected, present signup page
 	    certInfoPane.setDocument(getClass().getResource("certificate_none_yet.html").toExternalForm());
-	    certInfoPane.addAction(getAction("import"));
-	    certInfoPane.addAction(getAction("request"));
 	}
+	certInfoButtons.get("viewrequest").setVisible(c!=null && c.getCertificate()==null);
+	certInfoButtons.get("install").setVisible(c!=null && c.getCertificate()!=null);
+	certInfoButtons.get("revoke").setVisible(c!=null);
+	
+	certInfoButtons.get("import").setVisible(c==null);
+	certInfoButtons.get("request").setVisible(c==null);
+	
 	// also update selected item in menu
 	if (selection.getIndex() >= 0)
 	    identityMenu.getItem(identityIndex + selection.getIndex()).setSelected(true);

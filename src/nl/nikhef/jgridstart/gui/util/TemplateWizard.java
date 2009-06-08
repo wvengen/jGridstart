@@ -15,8 +15,11 @@ import java.util.Properties;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import org.w3c.dom.Document;
@@ -35,6 +38,8 @@ public class TemplateWizard extends JDialog {
     protected int step = -1;
     /** actual dialog content with HTML and buttons */
     protected TemplateButtonPanel pane = null;
+    protected JPanel btnRight = null;
+    protected JPanel btnLeft = null;
     /** "Next" action */
     protected Action nextAction = null;
     /** "Previous" action */
@@ -114,7 +119,20 @@ public class TemplateWizard extends JDialog {
 	    }
 	};
 	prevAction.putValue(Action.MNEMONIC_KEY, new Integer('P'));
-	pane.addAction(prevAction);
+	
+	// create two button areas: one for prev/next to the right, one for
+	// extra buttons at the left.
+	btnLeft = new JPanel();
+	btnLeft.setLayout(new BoxLayout(btnLeft, BoxLayout.X_AXIS));
+	btnRight = new JPanel();
+	btnRight.setLayout(new BoxLayout(btnRight, BoxLayout.X_AXIS));
+	JPanel bpanel = pane.getButtonPane();
+	bpanel.removeAll();
+	bpanel.add(btnLeft, null);
+	bpanel.add(Box.createHorizontalGlue());
+	bpanel.add(btnRight, null);
+	
+	pane.addButton(btnRight, new JButton(prevAction), false, false);
 	// "Next" button; name and mnemonic set in setStep()
 	nextAction = new AbstractAction("Next") {
 	    public void actionPerformed(ActionEvent e) {
@@ -122,16 +140,16 @@ public class TemplateWizard extends JDialog {
 	    }
 	};
 	nextAction.putValue(Action.MNEMONIC_KEY, new Integer('N'));
-	pane.addAction(nextAction, true);
+	pane.addButton(btnRight, new JButton(nextAction), true, false);
 	// close window on escape
-	pane.buttonpane.add(Box.createRigidArea(new Dimension(pane.btnBorderWidth*8, 0)));
+	btnRight.add(Box.createRigidArea(new Dimension(pane.btnBorderWidth*8, 0)));
 	cancelAction = new AbstractAction("Cancel") {
 	    public void actionPerformed(ActionEvent e) {
 		TemplateWizard.this.dispose();
 	    }
 	};
 	cancelAction.putValue(Action.MNEMONIC_KEY, new Integer('C'));
-	pane.addAction(cancelAction, false);
+	pane.addButton(btnRight, new JButton(cancelAction), true);
 	getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 		KeyStroke.getKeyStroke("ESCAPE"), "ESCAPE");
 	getRootPane().getActionMap().put("ESCAPE", cancelAction);
