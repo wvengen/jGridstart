@@ -1,9 +1,20 @@
 <html>
 <head>
-	<title>Request a new certificate</title>
+	<title>Certificate request</title>
+	<link rel="stylesheet" type="text/css" href="stylesheet.css"/>
 	<link rel="stylesheet" type="text/css" href="stylesheet-registration_form.css"/>
 </head>
 <body>
+  <div class="ui">
+    <h1>Certificate request - Verification form</h1>
+    <p>Now you need to print this form  containing your personal details and certificate
+    information, and bring it to your registration authority,
+    <a href="mailto:${org.ra.email}" c="${org.ra.name}">**your agent**</a>
+    of <a href="${org.url}" c="${org.name}">**agent organisation**</a>.
+    Don't forget to bring your proof-of-identity, such as a passport or driving license.</p>
+  </div>
+  
+  <div class="form">
 	<h1>DutchGrid Certification Authorities Registration</h1>
 	
 	<table class="reserved">
@@ -115,6 +126,6 @@
 		<td class="signature-box">Signature of registration authority<br/><br/><br/><br/></td>
       </tr>
     </table>
-    
+  </div>
 </body>
 </html>

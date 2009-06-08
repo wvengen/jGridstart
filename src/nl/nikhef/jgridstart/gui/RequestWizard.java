@@ -103,6 +103,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    nextAction.setEnabled(false);
 	}
 	if (page==3) {
+	    /*
 	    // print form; enable close button after print dialog
 	    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	    cancelAction.setEnabled(Boolean.valueOf(data().getProperty("state.cancontinue")));
@@ -117,6 +118,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    }
 		}
 	    });
+	    */
 	}
 	if (page==4) {
 	    // quit wizard
