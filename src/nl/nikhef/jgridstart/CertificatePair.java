@@ -250,11 +250,10 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    for (int i=0; i<orgs.length; i++) {
 		Organisation org = Organisation.get(orgs[i]);
 		try {
-		    orgs[i] = org.getNameHTML();
+		    sorgs += org.getNameHTML() + ", ";
 		} catch (Exception e) { }
 	    }
-	    sorgs = Arrays.toString(orgs);
-	    return sorgs.substring(1, sorgs.length()-1).trim();
+	    return sorgs.substring(0, sorgs.length()-2).trim();
 	}
 	// nothing by default
 	return null;
