@@ -199,6 +199,14 @@ public class TemplateDocumentTest extends TestCase {
 	templateTest("<p c='${vhtml}'/>", "<p>"+p.getProperty("vhtml")+"</p>", p);
     }
     
+    /** Test more complex html substitution */
+    @Test
+    public void testContentsReplace2() throws Exception {
+	Properties p =new Properties();
+	p.setProperty("foohtml", "<a href='http://www.w3.org/'>w3</a>, this <div>yeah</div>");
+	templateTest("<p c='${foohtml}'/>", "<p>"+p.getProperty("foohtml")+"</p>", p);
+    }
+    
     @Test
     public void testLock() throws Exception {
 	templateTest("<input type='text' name='foo' readonly='readonly'/>", "<input type='text' name='foo' readonly='readonly' disabled='disabled'/>");

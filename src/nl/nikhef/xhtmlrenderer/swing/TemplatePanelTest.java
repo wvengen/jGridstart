@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.LogManager;
 
@@ -30,9 +31,11 @@ import junit.extensions.abbot.ComponentTestFixture;
 import nl.nikhef.jgridstart.gui.Main;
 
 import org.junit.Test;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xhtmlrenderer.css.constants.CSSName;
+import org.xhtmlrenderer.css.parser.FSRGBColor;
 import org.xml.sax.SAXException;
-
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 import abbot.finder.ComponentFinder;
 import abbot.finder.ComponentNotFoundException;
@@ -206,6 +209,31 @@ public class TemplatePanelTest extends ComponentTestFixture {
 	panel.refresh();
 	assertTrue(bodyEquals(panel, "<p/>"));
     }
+    /** Test stylesheet loaded correctly */
+    @Test
+    public void testStylesheetApplied() throws Exception {
+	panel = new TemplatePanel();
+	panel.setDocument(getClass().getResource("testData5.html").toExternalForm());
+	assertTrue(bodyEquals(panel, "<p/>"));
+	// check that stylesheet was indeed loaded
+	Element e = (Element)TemplateDocumentTest.getBody(panel.getDocument()).getFirstChild();
+	assertEquals( FSRGBColor.RED, panel.getSharedContext().getStyle(e).getBackgroundColor());	
+    }
+    /** Test if loading a page from a jar works including stylesheet
+     * 
+     * TODO make sure no exception is thrown down in xhtmlrenderer that is caught internally */
+    @Test
+    public void testLoadFromJar() throws Exception {
+	String url = getClass().getResource("testData6.jar").toExternalForm();
+	url = "jar:"+url+"!/some/path/testData.html";
+	panel = new TemplatePanel();
+	panel.setDocument(url);
+	assertTrue(bodyEquals(panel, "<p/>"));
+	// check that stylesheet was loaded
+	Element e = (Element)TemplateDocumentTest.getBody(panel.getDocument()).getFirstChild();
+	assertEquals( FSRGBColor.RED, panel.getSharedContext().getStyle(e).getBackgroundColor());
+    }
+    
     
     /** Text input: test if value="foo" in html sets a textfield's value */
     @Test

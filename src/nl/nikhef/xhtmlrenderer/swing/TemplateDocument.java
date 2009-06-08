@@ -160,9 +160,10 @@ public class TemplateDocument extends DocumentDelegate {
 		    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		    factory.setAttribute("http://apache.org/xml/features/dom/defer-node-expansion", Boolean.FALSE);
 		    Document newDoc = factory.newDocumentBuilder().parse(new ByteArrayInputStream(data));
+		    newDoc.normalize();
 		    NodeList newChildren = newDoc.getFirstChild().getChildNodes();
-		    for (int i=0; i<newChildren.getLength(); i++)
-			node.appendChild(node.getOwnerDocument().adoptNode(newChildren.item(i)));
+		    while(newChildren.getLength()>0)
+			node.appendChild(node.getOwnerDocument().adoptNode(newChildren.item(0)));
 		} catch (SAXException e) {
 		    // TODO Auto-generated catch block
 		    e.printStackTrace();
