@@ -40,10 +40,10 @@ public class FileUtils {
 
     /**
      * Change file permissions
-     * 
+     * <p>
      * Not supported natively until java 1.6. Bad Java.
-     * Note that the ownerOnly argument differs from Java. When ownerOnly is
-     * true for Java's File.setReadable(), File.setWritable() or
+     * Note that the ownerOnly argument differs from Java. When {@code ownerOnly} is
+     * true for Java's {@link File#setReadable}, {@link File#setWritable} or
      * File.setExecutable(), the other/group permissions are left as they are.
      * This method resets them instead. When ownerOnly is false, behaviour is
      * as Java's.
@@ -121,7 +121,7 @@ public class FileUtils {
     }
     
     /** Execute a command and return the exit code 
-     * @throws InterruptedException */
+     * @throws IOException */
     public static int Exec(String[] cmd) throws IOException {
 	// Windows needs to capture input/output or application will hang
 	if (System.getProperty("os.name").startsWith("Windows")) {
@@ -146,14 +146,14 @@ public class FileUtils {
 	return ret;
     }
     
-    /** Execute a command and return the exit code and store stdout and stderr.
+    /** Execute a command, enter input on stdin, and return the exit code while storing stdout and stderr.
      * 
      * @param cmd command to run
      * @param input String to feed to process's stdin
      * @param output String to which stdin and stdout is appended.
+     * @return process exit code
      * 
-     * @throws IOException 
-     * @throws InterruptedException */
+     * @throws IOException */
     public static int Exec(String[] cmd, String input, String output) throws IOException {
 	// log
 	String scmd = "";
@@ -189,6 +189,14 @@ public class FileUtils {
 	return ret;
     }
     
+    /** Execute a command and return the exit code while storing stdout and stderr.
+     * 
+     * @param cmd command to run
+     * @param output String to which stdin and stdout is appended.
+     * @return process exit code
+     * 
+     * @throws IOException
+     */
     public static int Exec(String[] cmd, String output) throws IOException {
 	return Exec(cmd, null, output);
     }

@@ -5,8 +5,8 @@ import java.io.IOException;
 
 /**
  * A more safe temporary file writer class
- * 
- * The standard File.createTempFile() method has a number of problems. This is
+ * <p>
+ * The standard {@link File#createTempFile} method has a number of problems. This is
  * an attempt to counter some of its problems. - file is made accessible by user
  * only on write (when supported) - file can be deleted properly after use (it
  * is always deleted automatically on exit)

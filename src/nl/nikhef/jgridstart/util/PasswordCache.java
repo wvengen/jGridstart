@@ -83,7 +83,7 @@ public class PasswordCache {
     /** Set the timeout after which passwords are forgotten again.
      * Also updates timeout of currently stored passwords.
      * 
-     * @param timeout timeout in number of seconds
+     * @param s timeout in number of seconds
      */
     public void setTimeout(int s) {
 	this.timeout = s;

@@ -11,6 +11,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.logging.Logger;
 
+/** Helper methods for reading (external) URLs */
 public class ConnectionUtils {
     
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
@@ -24,22 +25,22 @@ public class ConnectionUtils {
 	return pageContents(url, (String)null, false);
     }
    
-    /** Return a reader for a URL with pre/post data
+    /** Return a reader for a URL with pre or post data
      * 
      * @param url URL to submit to
-     * @param data Array of "key","value","key2","value2",...
-     * @param post true to post data, false for get
+     * @param data Array of {@code "key","value","key2","value2",...}
+     * @param post {@code true} to post data, {@code false} for get
      * @return reader for reading from the URL
      * @throws IOException 
      */
     public static Reader pageReader(URL url, String[] data, boolean post) throws IOException {
 	return pageReader(url, createQueryString(data, post), post);
     }
-    /** Return the contents of a URL with pre/post data
+    /** Return the contents of a URL with pre or post data
      * 
      * @param url URL to submit to
-     * @param data Array of "key","value","key2","value2",...
-     * @param post true to post data, false for get
+     * @param data Array of {@code "key","value","key2","value2",...}
+     * @param post {@code true} to post data, {@code false} for get
      * @return reader for reading from the URL
      * @throws IOException 
      */
@@ -50,8 +51,8 @@ public class ConnectionUtils {
     /** Return the contents of a URL with pre or post data
      * 
      * @param url URL to submit to
-     * @param data String of "key=value&amp;otherkey=othervalue" post data
-     * @param post true to post data, false for get
+     * @param data String of "{@code key=value&amp;otherkey=othervalue}" post data
+     * @param post {@code true} to post data, {@code false} for get
      * @return data returned by server
      * @throws IOException
      */
@@ -69,8 +70,8 @@ public class ConnectionUtils {
     /** Return a Reader for a URL with pre or post data
      * 
      * @param url URL to submit to
-     * @param data String of "key=value&amp;otherkey=othervalue" post data
-     * @param post true to post data, false for get
+     * @param data String of "{code key=value&amp;otherkey=othervalue}" post data
+     * @param post {@code true} to post data, {@code false} for get
      * @return data returned by server
      * @throws IOException
      */
@@ -101,7 +102,7 @@ public class ConnectionUtils {
     
     /** Return a query string from arguments for pre or post
      * 
-     * @param data Array of "key=value" Strings
+     * @param data Array of {@code "key=value"} Strings
      * @return single String with urlencoded data
      * @throws UnsupportedEncodingException 
      */
