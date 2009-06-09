@@ -49,6 +49,7 @@
 	  -->
 
 	<property name="dep.bouncycastle" location="${dir.thirdparty}/bouncycastle/bcprov-jdk14-142.jar"/>
+	<property name="dep.bouncycastle.smime" location="${dir.thirdparty}/bouncycastle/bcmail-jdk14-142.jar"/>
 	<property name="dep.cli" location="${dir.thirdparty}/commons-cli/commons-cli-1.2.jar"/>
 	<property name="dep.junit" location="${dir.thirdparty}/junit/junit-4.5.jar"/>
 	<property name="dep.abbot" location="${dir.thirdparty}/junit/abbot.jar"/>
@@ -128,17 +129,19 @@
 			<zipfileset src="${dep.cli}" includes="**/*.class"/>
 			<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
 			<zipfileset src="${dep.xhtmlrenderer}" includes="**/*.class" excludes="**/tool/**"/>
+			<zipfileset src="${dep.itext}" includes="**/*.class" excludes="**/tools/**"/>
+			<zipfileset src="${dep.bouncycastle.smime}" includes="org/bouncycastle/cms/**"/>
 		</jar>
 		<!-- minimize jar file; skipnonpubliclibraryclasses needed for java1.6 -->
 		<proguard obfuscate="false" skipnonpubliclibraryclasses="false">
 			<injar file="${dir.dist}/${target.name}.large.jar"/>
 			<outjar file="${dir.dist}/${target.name}.jar"/>
 			<libraryjar file="${java.home}/lib/rt.jar"/>
+			<libraryjar file="${java.home}/lib/jce.jar"/>
 			<libraryjar file="${java.home}/lib/jsse.jar"/>
 			<libraryjar file="${dep.bouncycastle}"/>
 			<libraryjar file="${dep.junit}"/>
 			<libraryjar file="${dep.abbot}"/>
-			<libraryjar file="${dep.itext}"/>
 			<keepclasseswithmembers access="public">
 				<method access="public static" type="void"
 					name="main" parameters="java.lang.String[]"/>
