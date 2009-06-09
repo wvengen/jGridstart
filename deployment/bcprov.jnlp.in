@@ -6,7 +6,7 @@
   <offline-allowed/>
  </information>
  <resources>
-  <jar href="bcprov-jdk14-142.jar"/>
+  <jar href="bcprov-jdk14-143.jar"/>
  </resources>
  <component-desc/>
 </jnlp>

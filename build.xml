@@ -48,8 +48,8 @@
 	  - dependencies
 	  -->
 
-	<property name="dep.bouncycastle" location="${dir.thirdparty}/bouncycastle/bcprov-jdk14-142.jar"/>
-	<property name="dep.bouncycastle.smime" location="${dir.thirdparty}/bouncycastle/bcmail-jdk14-142.jar"/>
+	<property name="dep.bouncycastle" location="${dir.thirdparty}/bouncycastle/bcprov-jdk14-143.jar"/>
+	<property name="dep.bouncycastle.smime" location="${dir.thirdparty}/bouncycastle/bcmail-jdk14-143.jar"/>
 	<property name="dep.cli" location="${dir.thirdparty}/commons-cli/commons-cli-1.2.jar"/>
 	<property name="dep.junit" location="${dir.thirdparty}/junit/junit-4.5.jar"/>
 	<property name="dep.abbot" location="${dir.thirdparty}/junit/abbot.jar"/>
@@ -64,6 +64,7 @@
 		<pathelement location="${dep.abbot}"/>
 		<pathelement location="${dep.swingworker}"/> <!-- for java1.5 and below -->
 		<pathelement location="${dep.xhtmlrenderer}"/>
+		<pathelement location="${dep.itext}"/>
 	</path>
 
 	<!--
@@ -130,6 +131,9 @@
 			<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
 			<zipfileset src="${dep.xhtmlrenderer}" includes="**/*.class" excludes="**/tool/**"/>
 			<zipfileset src="${dep.itext}" includes="**/*.class" excludes="**/tools/**"/>
+			<!-- iText needs some org.bouncycastle.cms classes but some other classes in this
+			     package reference javax.mail which we don't want to include as well (so that
+			     ProGuard can resolve them). Solution: only include part of the smime package -->
 			<zipfileset src="${dep.bouncycastle.smime}" includes="org/bouncycastle/cms/**"/>
 		</jar>
 		<!-- minimize jar file; skipnonpubliclibraryclasses needed for java1.6 -->

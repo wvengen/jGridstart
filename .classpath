@@ -2,11 +2,6 @@
 <classpath>
 	<classpathentry kind="src" output="bin" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="thirdparty/bouncycastle/bcprov-jdk14-142.jar" sourcepath="thirdparty/bouncycastle/bcprov-jdk14-142-src.zip">
-		<attributes>
-			<attribute name="javadoc_location" value="http://bouncycastle.org/docs/docs1.4/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="thirdparty/commons-cli/commons-cli-1.2.jar" sourcepath="thirdparty/commons-cli/commons-cli-1.2-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="http://commons.apache.org/cli/api-release/"/>
@@ -32,7 +27,20 @@
 			<attribute name="javadoc_location" value="http://abbot.sourceforge.net/doc/api/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="thirdparty/flyingsaucer/iText-2.0.8.jar"/>
-	<classpathentry kind="lib" path="thirdparty/bouncycastle/bcmail-jdk14-142.jar"/>
+	<classpathentry kind="lib" path="thirdparty/flyingsaucer/iText-2.0.8.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.1t3xt.info/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="thirdparty/bouncycastle/bcmail-jdk14-143.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://bouncycastle.org/docs/mdocs1.4/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="thirdparty/bouncycastle/bcprov-jdk14-143.jar" sourcepath="thirdparty/bouncycastle/bcprov-jdk14-143-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="http://bouncycastle.org/docs/docs1.4/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
