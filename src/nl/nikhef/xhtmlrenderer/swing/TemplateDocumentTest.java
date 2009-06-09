@@ -207,6 +207,22 @@ public class TemplateDocumentTest extends TestCase {
 	templateTest("<p c='${foohtml}'/>", "<p>"+p.getProperty("foohtml")+"</p>", p);
     }
     
+    /** Test contents substitution with boolean evaluation */
+    @Test
+    public void testContentsReplace3() throws Exception {
+	Properties p = new Properties();
+	p.setProperty("foo", "true");
+	templateTest("<p c='${(true)}'/>", "<p>true</p>");
+	templateTest("<p c='${(false)}'/>", "<p>false</p>");
+	templateTest("<p c='${((true))}'/>", "<p>true</p>");
+	templateTest("<p c='${((false))}'/>", "<p>false</p>");
+	templateTest("<p c='${(!true)}'/>", "<p>false</p>");
+	templateTest("<p c='${(!false)}'/>", "<p>true</p>");
+	templateTest("<p class='${(true)}'/>", "<p class='true'/>");
+	templateTest("<p c='${(${foo})}'/>", "<p>false</p>");
+	templateTest("<p c='${(${foo})}'/>", "<p>true</p>", p);
+    }
+    
     @Test
     public void testLock() throws Exception {
 	templateTest("<input type='text' name='foo' readonly='readonly'/>", "<input type='text' name='foo' readonly='readonly' disabled='disabled'/>");

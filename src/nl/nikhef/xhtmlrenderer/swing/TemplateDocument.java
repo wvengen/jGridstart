@@ -57,6 +57,15 @@ import org.xml.sax.SAXException;
  * Example: {@code <p if="${url} and ${desc}">Visit <a href="${url}" c="${desc}"/></p>}<br>
  * to only show a link with description if both relevant variables are defined.
  * <p>
+ * <strong>Replacement with conditional</strong>
+ * <p>
+ * It is also possible to use a conditional with a replacement by using
+ * {@code ${(<expression>)}} as a variable in an attribute. This can be used, for example,
+ * to change the class of an element based on whether a variable is set or not:
+ * {@code <p class="has-${(${foo})}">yeah</p>}, which can be styled by css class
+ * {@code has-true} when {@code foo} is set, or {@code has-false} when {@code foo}
+ * is unset.
+ * <p>
  * <strong>Other remarks</strong>
  * <p>
  * When the property <tt><i>something</i>.lock</tt> is defined and an element with the
@@ -235,10 +244,21 @@ public class TemplateDocument extends DocumentDelegate {
     /** evaluates an expression by replacing variables */
     // TODO more intelligent expression parsing, e.g. using JUEL
     protected String parseExpression(String expr) {
+	// parse embedded conditionals
+	StringBuffer dstbufCond = new StringBuffer();
+	final Pattern patCond = Pattern.compile("(\\$\\{\\((.*?)\\)\\})", Pattern.MULTILINE|Pattern.DOTALL);
+	Matcher matchCond = patCond.matcher(expr);
+	while (matchCond.find()) {
+	    String key = matchCond.group(2).trim();
+	    String sub = Boolean.toString(parseConditional(parseExpression(key)));
+	    matchCond.appendReplacement(dstbufCond, sub);
+	}
+	matchCond.appendTail(dstbufCond);
+	
 	// substitute variables
 	StringBuffer dstbuf = new StringBuffer();
 	final Pattern pat = Pattern.compile("(\\$\\{(.*?)\\})", Pattern.MULTILINE|Pattern.DOTALL);
-	Matcher match = pat.matcher(expr);
+	Matcher match = pat.matcher(dstbufCond.toString());
 	while (match.find()) {
 	    String key = match.group(2).trim();
 	    String sub = data!=null ? data.getProperty(key) : null;
