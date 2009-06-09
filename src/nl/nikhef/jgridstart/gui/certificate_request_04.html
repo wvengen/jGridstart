@@ -7,11 +7,18 @@
 <body>
   <div class="ui">
     <h1>Certificate request - Verification form</h1>
-    <p>Now you need to print this form  containing your personal details and certificate
-    information, and bring it to your registration authority,
-    <a href="mailto:${org.ra.email}" c="${org.ra.name}">**your agent**</a>
-    of <a href="${org.url}" c="${org.name}">**agent organisation**</a>.
-    Don't forget to bring your proof-of-identity, such as a passport or driving license.</p>
+    <p if="${cert}">
+       You already have a certificate, so this form is shown for reference only.
+    </p>
+    <p if="!${cert}">
+      <span if="${request.submitted}">Now you need to</span>
+      <span if="!${request.submitted}">After you have submitted the request, you will need to</span>
+      print this form  containing your personal details and certificate
+      information, and bring it to your registration authority,
+      <a href="mailto:${org.ra.email}" c="${org.ra.name}">**your agent**</a>
+      of <a href="${org.url}" c="${org.name}">**agent organisation**</a>.
+      Don't forget to bring your proof-of-identity, such as a passport or driving license.
+    </p>
   </div>
   
   <div class="form">
