@@ -19,7 +19,7 @@
 	
 	<table class="reserved">
 	  <tr>
-	    <th>Reserved for CA operations use</th>
+	    <th class="title">Reserved for CA operations use</th>
 	    <td class="fillin" style="text-align: right">........ - ......</td>
 	  </tr>
 	  <tr>
@@ -27,9 +27,9 @@
       </tr>
       <tr>
         <td colspan="2">
-          <span class="check">&#x25a1; ID Document valid</span>
-          <span class="check">&#x25a1; PoP Challenge verified</span>
-          <span class="check">&#x25a1; RA Signature OK</span>
+          <span class="check">ID Document valid</span>
+          <span class="check">PoP Challenge verified</span>
+          <span class="check">RA Signature OK</span>
         </td>
       </tr>
 	</table>
@@ -50,9 +50,9 @@
 	    </td>
 	    <td class="ra">
 	      <h2 style="text-align:center">Send this form by mail or fax to</h2>
-	      <address c="${org.ra.address}">DutchGrid MS CA
-	        NIKHEF c/o Someone
-	        P.O. Box 12345
+	      <address>DutchGrid MS CA
+	        NIKHEF c/o Djuhaeri Harapan
+	        P.O. Box 41882
 	        NL 1009 DB Amsterdam
 	        The Netherlands
 	        
@@ -76,7 +76,7 @@
 	      <td>Streed addres <span class="comment">(physical delivery address)</span> <div class="fillin" c="${street}">Bar avenue 0</div></td>
 	    </tr>
 	    <tr>
-	      <td>Organisation <div class="fillin" c="${org}">Foo inc.</div></td>
+	      <td>Organisation <div class="fillin" c="${org.name}">Foo inc.</div></td>
 	      <td>ZIP code <div class="fillin" c="${zip}">1234AA</div></td>
 	    </tr>
 	    <tr>
@@ -99,14 +99,17 @@
 	      <td class="signature-box" rowspan="2">Signature <div class="fillin"></div></td>
 	      <td class="signature-info">Place and date <div class="fillin"></div></td>
 	    </tr>
-	    <tr><td><br/><br/></td></tr></table>
+	    <tr><td>
+	      Please take this form to <span c="${org.ra.name}"/>
+	      <a href="mailto:${org.ra.email}" c="&amp;lt;${org.ra.email}&amp;gt;">**your agent**</a>
+	    </td></tr></table>
       </div>
 
 	</div>
 
 
 	<table class="reserved">
-	  <tr><th colspan="2">Reserved for RA operations use</th></tr>
+	  <tr class="title"><th colspan="2">Reserved for RA operations use</th></tr>
 
 	  <tr><td colspan="2" class="ra">
         I, <span class="fillin"><sup>RA name</sup></span> have
@@ -118,8 +121,7 @@
 	    <span class="fillin"><sup>meeting place</sup></span> and have confirmed
 	    his affiliation with <span class="fillin"><sup>organisation name</sup></span>
 	    to the extent required in the
-	    <a href="http://ca.dutchgrid.nl/medium/policy/">certificate policy
-	    and practice statement</a>.
+	    <a href="http://ca.dutchgrid.nl/medium/policy/">CP/CPS</a>.
 	  </td></tr>
 	  <tr>
         <td class="notes-box">Notes</td>

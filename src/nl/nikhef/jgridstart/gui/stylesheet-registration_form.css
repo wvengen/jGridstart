@@ -10,6 +10,9 @@
      padding: 0;
    }
 }
+@page {
+  size: A4 portrait;
+}
 
 .form {
 	border: 1px solid black;
@@ -62,6 +65,15 @@
 }
 .form span.check {
 	margin-right: 1.5em;
+}
+.form .check:before {
+	/* black square as checkbox that also works in print mode */
+	content: ' ';
+	font-size: 70%;
+	padding: 0 0.7em 0 0.7em;
+	margin: 3px 6px 3px 3px;
+	vertical-align: middle;
+	border: 1px solid black;
 }
 .form .check {
 	white-space: nowrap;
@@ -141,7 +153,7 @@
 	vertical-align: top;
 	text-align: right;
 	display: inline-block;
-	width: 15em;
+	width: 20em;
 }
 .form .reserved .notes-box, .form .reserved .signature-box {
 	font-style: italic;
