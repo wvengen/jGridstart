@@ -130,7 +130,7 @@
 			<zipfileset src="${dep.cli}" includes="**/*.class"/>
 			<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
 			<zipfileset src="${dep.xhtmlrenderer}" includes="**/*.class" excludes="**/tool/**"/>
-			<zipfileset src="${dep.itext}" includes="**/*.class" excludes="**/tools/**"/>
+			<zipfileset src="${dep.itext}" includes="**/*.class,**/fonts/*" excludes="**/tools/**"/>
 			<!-- iText needs some org.bouncycastle.cms classes but some other classes in this
 			     package reference javax.mail which we don't want to include as well (so that
 			     ProGuard can resolve them). Solution: only include part of the smime package -->
