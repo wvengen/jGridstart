@@ -42,15 +42,27 @@ th {
 /*
  * Semantic markup: activity bullet list
  */
-.activitylist li.pending {
-	list-style-type: circle;
+.activitylist {
+	margin-left: 1em;
+	padding-left: 0;
+}
+.activitylist li {
+	line-height: 1.5;
+	list-style-type: none;
+}
+.activitylist li:before {
+	content: 'o';
+	display: inline-block;
+	width: 0.6em;
+}
+.activitylist li.done-false {
 	color: black;
 }
-.activitylist li.active {
-	list-style-type: circle;
-	font-weight: bold;
+.activitylist li.done-true:before {
+	content: '\2713';
+	display: inline-block;
+	width: 0.6em;
 }
-.activitylist li.finished {
-	list-style-type: disc;
+.activitylist li.done-true {
 	color: green;
 }
