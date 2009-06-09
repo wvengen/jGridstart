@@ -19,6 +19,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
+
 import org.jdesktop.swingworker.SwingWorker;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -29,6 +30,7 @@ import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.Organisation;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
+import nl.nikhef.jgridstart.gui.util.FileFilterSuffix;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 /** Wizard that asks the user for information and generates the certificate */
@@ -266,9 +268,9 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	}
 	public void actionPerformed(ActionEvent e) {
 	    JFileChooser chooser = new JFileChooser();
+	    chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+	    chooser.setFileFilter(new FileFilterSuffix("PDF document", ".pdf"));
 	    chooser.setDialogTitle("Save form as PDF");
-	    chooser.setApproveButtonText("Save");
-	    chooser.setApproveButtonMnemonic('S');
 	    int result = chooser.showDialog(getParent(), null);
 	    if (result == JFileChooser.APPROVE_OPTION) {
 		doSave(chooser.getSelectedFile());
