@@ -1,8 +1,8 @@
 #!/bin/sh
-JAVA=java1.5
+JAVA=java
 BASE=`dirname $0`
 LIB="$BASE/thirdparty"
-CLASSPATH="$LIB/bouncycastle/bcprov-jdk14-142.jar:$LIB/commons-cli/commons-cli-1.2.jar:$LIB/flyingsaucer/core-renderer-minimal.jar:$LIB/swingworker/swing-worker-1.2.jar:$BASE/bin"
+CLASSPATH="$LIB/bouncycastle/bcprov-jdk14-143.jar:$LIB/commons-cli/commons-cli-1.2.jar:$LIB/flyingsaucer/core-renderer-minimal.jar:$LIB/swingworker/swing-worker-1.2.jar:$BASE/bin"
 INVOKED_PROGRAM="$0"
 export BASE CLASSPATH INVOKED_PROGRAM
 
