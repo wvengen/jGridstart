@@ -28,7 +28,7 @@ public class FileUtils {
 		    in.getAbsolutePath(),
 		    out.getAbsolutePath(),
 		    "/O", "/Q", "/Y"};
-	    return Exec(cmd, "F", new String()) == 0;
+	    return Exec(cmd, "F", null) == 0;
 	} else {
 	    // other, assume unix-like
 	    cmd = new String[]{"cp",
@@ -120,6 +120,23 @@ public class FileUtils {
 	}
     }
     
+    /** Create a temporary directory with read-only permissions.
+     * <p>
+     * TODO Current code contains a race-condition. Please see Sun
+     * bug <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4735419">4735419</a>
+     * for a better solution.
+     */
+    public static File createTempDir(String prefix, File directory) throws IOException {
+	File d = File.createTempFile(prefix, null, directory);
+	d.delete();
+	d.mkdirs();
+	chmod(d, true, true, true, true);
+	return d;
+    }
+    public static File createTempDir(String prefix) throws IOException {
+	return createTempDir(prefix, new File(System.getProperty("java.io.tmpdir")));
+    }
+    
     /** Execute a command and return the exit code 
      * @throws IOException */
     public static int Exec(String[] cmd) throws IOException {
@@ -150,11 +167,11 @@ public class FileUtils {
      * 
      * @param cmd command to run
      * @param input String to feed to process's stdin
-     * @param output String to which stdin and stdout is appended.
+     * @param output String to which stdin and stdout is appended, or null
      * @return process exit code
      * 
      * @throws IOException */
-    public static int Exec(String[] cmd, String input, String output) throws IOException {
+    public static int Exec(String[] cmd, String input, StringBuffer output) throws IOException {
 	// log
 	String scmd = "";
 	for (int i=0; i<cmd.length; i++) scmd += " "+cmd[i]; 
@@ -167,14 +184,14 @@ public class FileUtils {
 	}
 	// retrieve output
 	String s = System.getProperty("line.separator");
-	String lineout, lineerr;
+	String lineout = null, lineerr = null;
 	BufferedReader stdout = new BufferedReader(
 		new InputStreamReader(p.getInputStream()));
 	BufferedReader stderr = new BufferedReader(
 		new InputStreamReader(p.getErrorStream()));
-	while ( (lineout=stdout.readLine()) != null && (lineerr=stderr.readLine()) != null) {
-	    if (lineout!=null) output += lineout + s;
-	    if (lineerr!=null) output += lineerr + s;
+	while ( (lineout=stdout.readLine()) != null || (lineerr=stderr.readLine()) != null) {
+	    if (lineout!=null && output!=null) output.append(lineout + s);
+	    if (lineerr!=null && output!=null) output.append(lineerr + s);
 	}
 	stdout.close();	
 	// log and return
@@ -198,6 +215,6 @@ public class FileUtils {
      * @throws IOException
      */
     public static int Exec(String[] cmd, String output) throws IOException {
-	return Exec(cmd, null, output);
+	return Exec(cmd, null, null);
     }
 }
