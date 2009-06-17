@@ -1,0 +1,150 @@
+package nl.nikhef.jgridstart.install;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
+import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
+import nl.nikhef.jgridstart.util.FileUtils;
+
+public class BrowsersMacOSX extends BrowsersCommon {
+    
+    private String defaultBrowser = null;
+    
+    /** Location of lsregister binary */
+    private static String lsregloc = null;
+
+    @Override
+    public void initialize() throws IOException {
+	availableBrowsers = new HashMap<String, Properties>();
+	
+	// run lsregister util to obtain available browsers
+	String output = lsregister(new String[] { "-dump", "-apps" });
+	String[] lines = output.split("\\n");
+	output = null;
+	Properties p = new Properties();
+	Pattern pBundle = Pattern.compile("^\\s*bundle\\s+id:\\s*(\\d+)\\s*$");
+	Pattern pName = Pattern.compile("^\\s*name:\\s*(.*?)\\s*$");
+	Pattern pId = Pattern.compile("^\\s*identifier:\\s*(.*?)\\s*\\(0x[0-9a-fA-F]+\\)\\s*$");
+	Pattern pBindings = Pattern.compile("^\\s*bindings:\\s*(.*?)\\s*$");
+	for (int i=0; i<lines.length; i++) {
+	    // name:
+	    Matcher mName = pName.matcher(lines[i]);
+	    if (mName.matches() && p.getProperty("desc")==null) {
+		p.setProperty("desc", mName.group(1));
+		continue;
+	    }
+	    // canonical id:
+	    Matcher mId = pId.matcher(lines[i]);
+	    if (mId.matches() && p.getProperty("uti")==null) {
+		p.setProperty("uti", mId.group(1));
+		continue;
+	    }
+	    // bindings: ; require http: or https: for the web browser
+	    Matcher mBindings = pBindings.matcher(lines[i]);
+	    if (mBindings.matches()) {
+		String[] bindings = mBindings.group(1).split(",\\s*");
+		for (int j=0; j<bindings.length; j++) {
+		    if (bindings[j].equals("http:") || bindings[j].equals("https:")) {
+			p.setProperty("__ok__", Boolean.toString(true));
+		    }
+		}
+		continue;
+	    }
+	    // bundle id:
+	    Matcher mBundle = pBundle.matcher(lines[i]);
+	    if (mBundle.matches()) {
+		// process old one
+		if (Boolean.valueOf(p.getProperty("__ok__"))) {
+		    p.remove("__ok__");
+		    // copy additional properties from settings, based on uti
+		    for (Iterator<Properties> it = getKnownBrowsers().values().iterator(); it.hasNext(); ) {
+			Properties known = it.next();
+			if (p.getProperty("uti").equals(known.getProperty("uti"))) {
+			    for (Enumeration<?> en = known.keys(); en.hasMoreElements(); ) {
+				String key = (String)en.nextElement();
+				if (!p.containsKey(key)) p.setProperty(key, known.getProperty(key));			    }
+			}
+		    }
+		    availableBrowsers.put(p.getProperty("uti"), p);
+		}
+		// and start a new application entry
+		p = new Properties();
+		continue;
+	    }
+	}
+	
+	// detect default browser using `defaults`; use first match for http/https
+	// TODO more intelligently parse output of defaults
+	StringBuffer dfloutput = new StringBuffer();
+	FileUtils.Exec(new String[] { "defaults", "read", "com.apple.LaunchServices" }, null, dfloutput);
+	Pattern pDefault = Pattern.compile(".*\\x7b(.*?)\\s*LSHandlerURLScheme\\s*=\\s*https?\\s*;\\s*(.*?)\\x7d.*", Pattern.MULTILINE|Pattern.DOTALL);
+	Pattern pRole = Pattern.compile("^\\s*LSHandlerRole(All|Viewer)\\s*=\\s*\"(.*?)\"\\s*;", Pattern.MULTILINE);
+	Matcher mDefault = pDefault.matcher(dfloutput);
+	if (mDefault.matches()) {
+	    String info = mDefault.group(1)+mDefault.group(2);
+	    Matcher mRole = pRole.matcher(info);
+	    if (mRole.matches()) {
+		defaultBrowser = mRole.group(2);
+	    }
+	}
+	// fallback to Safari as default browser
+	if (defaultBrowser==null) defaultBrowser = "com.apple.safari";
+    }
+
+    @Override
+    public String getDefaultBrowser() {
+	return defaultBrowser;
+    }
+
+    @Override
+    public void openUrl(String browserid, String urlString)
+	    throws BrowserNotAvailableException, BrowserExecutionException {
+	try {
+	    FileUtils.Exec(new String[] { "open", "-b", browserid, urlString});
+	} catch (IOException e) {
+	    throw new BrowserExecutionException(browserid, e);
+	}
+    }
+
+    @Override
+    protected void installPKCS12System(String browserid, File pkcs)
+	    throws BrowserExecutionException {
+	// TODO Auto-generated method stub
+
+    }
+    
+    /** Run lsregister and return output. */
+    protected String lsregister(String[] args) throws IOException {
+	String[] cmd = new String[args.length+1];
+	
+	// Find the location of lsregister (only once)
+	final String[] lsregLocs = new String[] {
+		"/System/Library/Frameworks/ApplicationServices.framework/Frameworks/LaunchServices.framework/Support/lsregister",
+		"/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister",
+	};
+	for (int i=0; i<lsregLocs.length && lsregloc == null; i++) {
+	    if (new File(lsregLocs[i]).exists())
+		lsregloc = lsregLocs[i];
+	}
+	
+	if (lsregloc==null)
+	    throw new IOException("lsregister not found");
+	    
+	// run program and return output
+	cmd[0] = lsregloc;
+	System.arraycopy(args, 0, cmd, 1, args.length);
+	
+	StringBuffer output = new StringBuffer();
+	FileUtils.Exec(cmd, null, output);
+	
+	return output.toString();
+    }
+}

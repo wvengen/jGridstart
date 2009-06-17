@@ -1,0 +1,159 @@
+package nl.nikhef.jgridstart.install;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Map.Entry;
+
+import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
+import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
+import nl.nikhef.jgridstart.util.FileUtils;
+import nl.nikhef.jgridstart.util.PrivateFileWriter;
+
+/** Platform-agnostic parts of browser discovery and certificate installation. */
+abstract class BrowsersCommon implements IBrowsers {
+    
+    /** List of known browsers parsed from {@literal browsers.properties} */
+    private HashMap<String, Properties> knownBrowsers = new HashMap<String, Properties>();
+
+    /** List of available browsers.
+     * <p>
+     * This is used by the default implementation to get browser information
+     * from. By default, it is equal to knownBrowsers, so be sure to override
+     * it if you want something else.
+     */
+    protected HashMap<String, Properties> availableBrowsers = knownBrowsers;
+
+    
+    public abstract void initialize() throws IOException;
+
+    public abstract String getDefaultBrowser();
+
+    public abstract void openUrl(String browserid, String urlString)
+    	throws BrowserNotAvailableException, BrowserExecutionException;
+    
+    
+    public Set<String> getBrowserList() {
+	return availableBrowsers.keySet();
+    }
+
+    public String getBrowserName(String browserid) {
+	return knownBrowsers.get(browserid).getProperty("desc");
+    }
+    
+    public void openUrl(String urlString)
+    		throws BrowserNotAvailableException, BrowserExecutionException {
+	openUrl(getDefaultBrowser(), urlString);
+    }
+
+    public void openUrl(List<String> browserids, String urlString)
+    		throws BrowserExecutionException, BrowserNotAvailableException {
+	BrowserNotAvailableException firstException = null;
+	for (Iterator<String> it = browserids.iterator(); it.hasNext(); ) {
+	    try {
+		openUrl(it.next(), urlString);
+		return;
+	    } catch(BrowserNotAvailableException e) {
+		if (firstException==null) firstException = e;
+		continue;
+	    }
+	}
+	throw firstException;
+    }
+
+    
+    /** Return the list of known browsers from {@literal browsers.properties}, load when needed */
+    protected HashMap<String, Properties> getKnownBrowsers() throws IOException {
+	if (knownBrowsers==null || knownBrowsers.size()==0)
+	    readKnownBrowsers();
+	return knownBrowsers;
+    }
+
+    /** Parse the file {@literal browsers.properties} */ 
+    protected HashMap<String, Properties> readKnownBrowsers() throws IOException {
+	knownBrowsers.clear();
+	// load
+	Properties p = new Properties();
+	p.load(getClass().getResourceAsStream("browsers.properties"));
+	// split into browsers
+	for (Iterator<Entry<Object,Object>> it = p.entrySet().iterator(); it.hasNext(); ) {
+	    Entry<Object, Object> o = it.next();
+	    String key = (String)o.getKey();
+	    String value = (String)o.getValue();
+	    int idx = key.indexOf('.');
+	    String browser = key.substring(0, idx);
+	    if (!knownBrowsers.containsKey(browser))
+		knownBrowsers.put(browser, new Properties());
+	    knownBrowsers.get(browser).setProperty(key.substring(idx+1), value);
+	}
+	return knownBrowsers;
+    }
+
+    public void installPKCS12(File pkcs)
+    		throws BrowserNotAvailableException, BrowserExecutionException {
+	installPKCS12(getDefaultBrowser(), pkcs);
+    }
+
+    public void installPKCS12(String browserid, File pkcs)
+	    throws BrowserNotAvailableException, BrowserExecutionException {
+
+	// check if browserid is present
+	if (!availableBrowsers.containsKey(browserid))
+	    throw new BrowserNotAvailableException(browserid);
+
+	// run the installation command
+	String method = availableBrowsers.get(browserid).getProperty("certinst");
+	if ("system".equals(method)) {
+	    installPKCS12System(browserid, pkcs);
+	} else if ("browser".equals(method)) {
+	    openUrl(browserid, pkcs.toURI().toASCIIString());
+	} else if ("mozilla".equals(method)) {
+	    installPKCS12Mozilla(browserid, pkcs);
+	} else {
+	    throw new BrowserExecutionException(browserid, "invalid installation method: "+method);
+	}
+    }
+    
+    /** Install a PKCS#12 file into the system's certificate store */
+    abstract protected void installPKCS12System(String browserid, File pkcs) throws BrowserExecutionException;
+    
+    /** Install a PKCS#12 file into a Mozilla-type certificate store */
+    protected void installPKCS12Mozilla(String browserid, File pkcs)
+    	throws BrowserNotAvailableException, BrowserExecutionException {
+	File tmpdir = null, pkcsNew = null, htmlNew = null;
+	try {
+	    // create a temporary directory to store pkcs and html page
+	    tmpdir = FileUtils.createTempDir("jgridstart_certinst");
+	    pkcsNew = new File(tmpdir, "import.p12");
+	    FileUtils.CopyFile(pkcs, pkcsNew);
+	    htmlNew = new File(tmpdir, "certinstall_moz.html");
+	    OutputStream htmlWriter = new PrivateFileWriter(htmlNew).getOutputStream();
+	    InputStream htmlReader = getClass().getResourceAsStream(htmlNew.getName());
+	    while(htmlReader.available()>0) {
+		byte[] b = new byte[htmlReader.available()];
+		htmlWriter.write(b, 0, htmlReader.read(b));
+	    }
+	    htmlReader.close();
+	    htmlWriter.close();
+	    // delete files on exit; note that Java deletes in reverse order
+	    tmpdir.deleteOnExit();
+	    pkcsNew.deleteOnExit();
+	    htmlNew.deleteOnExit();
+	    // open page to install
+	    openUrl(browserid, htmlNew.toURI().toASCIIString());
+	} catch (IOException e) {
+	    // make sure the files are cleaned up now
+	    if (pkcsNew!=null) pkcsNew.delete();
+	    if (htmlNew!=null) htmlNew.delete();
+	    if (tmpdir!=null) tmpdir.delete();
+	    // and throw exception
+	    throw new BrowserExecutionException(browserid,  e);
+	} 
+    }
+}

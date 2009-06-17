@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<script type="text/javascript"><!--
+/*
+ * Certificate installation page for Mozilla-based browsers
+ *
+ * This HTML page contains Javascript that installs a PKCS#12 file into
+ * the browser's certificate store. This requires the user to
+ * 1) Grant access to this scripting functionality
+ * 2) Enter the password which protects the PKCS#12 file
+ * A password is required on the PKCS#12 file when it contains a
+ * private key.
+ *
+ * Useful links for development:
+ * - https://developer.mozilla.org/En/XPCOM_API_Reference
+ * - http://kb.mozillazine.org/Development_resources#XPCOM_.2F_XPConnect
+ * - https://developer.mozilla.org/En/Code_snippets/Miscellaneous
+ * - http://mb.eschew.org/16
+ * - http://www.mozilla.org/projects/security/components/signed-scripts.html
+ *
+ * @author wvengen
+ */
+
+// which PKCS#12 file to import; path relative to this html file
+var pkcsfile = "import.p12";
+// whether to close the window when the operation is finished, or no
+var closeWhenFinished = true;
+
+function error(msg) {
+	alert("Error while importing certificate:\n"+msg);
+	if (closeWhenFinished) window.close();
+}
+function errorhandler(msg, url, line) {
+	error(msg);
+}
+
+// returns a File for the absolute filename
+function getAbsoluteFile(name) {
+	var file = Components.classes["@mozilla.org/file/local;1"].getService(Components.interfaces.nsILocalFile);
+	file.initWithPath(name);
+	return file;
+}
+
+// returns a File for the relative filename
+function getRelativeFile(name) {
+	var ios = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
+	var fh = ios.getProtocolHandler("file").QueryInterface(Components.interfaces.nsIFileProtocolHandler);
+	var file = fh.getFileFromURLSpec(window.location);
+	file = file.parent;
+	file.append(name);
+	return file;
+}
+
+function importcerts() {
+	// request required privileges
+	netscape.security.PrivilegeManager.enablePrivilege('UniversalFileRead UniversalXPConnect');
+
+	// it can be quite hard to find the operations of certdb nowadays. Pointer:
+	//  http://www.oxymoronical.com/experiments/apidocs/interface/nsIX509CertDB
+	var certdb = Components.classes["@mozilla.org/security/x509certdb;1"].getService(Components.interfaces.nsIX509CertDB);
+
+	// file to import
+	var file = getRelativeFile(pkcsfile);
+
+	// import pkcs12 file, using name from the file
+	certdb.importPKCS12File(null, file);
+
+	/*
+	Some crawling of the mozilla source on mxr.mozilla.org shows that the
+	following functions are called to import a pkcs12 file. This may be
+	useful to know in the future to avoid a password prompt during import.
+
+		importPKCS12File
+			sec_pkcs12_add_key
+				PK11_ImportPrivateKeyInfo (/ PK11_ImportEncryptedPrivateKeyInfo)
+					PK11_ImportPrivateKeyInfoAndReturnKey
+			sec_pkcs12_add_cert
+				PK11_ImportCertForKeyToSlot
+				(or PK11_ImportDERCert for CA cert without key)
+	*/
+
+	if (closeWhenFinished) window.close();
+}
+
+window.onerror = errorhandler;
+window.onload = importcerts;
+
+//-->
+</script>
+</head>
+<body>
+<h3>Certificate installation page</h3>
+<p>This page will close automatically when finished.</p>
+<noscript>
+  <h4>Whoops</h4>
+  <p>you need to enable Javascript to be able to install the certificate.</p>
+</noscript>
+</body>
+</html>

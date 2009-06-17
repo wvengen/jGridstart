@@ -6,6 +6,9 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
+import nl.nikhef.jgridstart.install.BrowserFactory;
+import nl.nikhef.jgridstart.install.exception.BrowserException;
+
 /**
  * Launch a web page in an external browser but modify action: links to run UI
  * Actions instead.
@@ -21,16 +24,24 @@ public class BareBonesActionLaunch extends BareBonesBrowserLaunch {
     public static void openURL(URL url, Component parent) {
 	if (url.toExternalForm().startsWith("action:"))
 	    performAction(url.toExternalForm().substring(7), parent);
-	else
-	    BareBonesBrowserLaunch.openURL(url.toExternalForm(), parent);
+	else try {
+	    BrowserFactory.getInstance().openUrl(url.toExternalForm());
+	    //BareBonesBrowserLaunch.openURL(url.toExternalForm(), parent);
+	} catch (Exception e) {
+	    ErrorMessage.error(parent, "Could not launch URL", e);
+	}
     }
 
     /** @see BareBonesBrowserLaunch#openURL(String, Component) */
     public static void openURL(String surl, Component parent) {
 	if (surl.startsWith("action:"))
 	    performAction(surl.substring(7), parent);
-	else
-	    BareBonesBrowserLaunch.openURL(surl, parent);
+	else try {
+	    BrowserFactory.getInstance().openUrl(surl);
+	    //BareBonesBrowserLaunch.openURL(surl, parent);
+	} catch (Exception e) {
+	    ErrorMessage.error(parent, "Could not launch URL", e);
+	}
     }
     
     /** @see BareBonesBrowserLaunch#openURL(URL) */
