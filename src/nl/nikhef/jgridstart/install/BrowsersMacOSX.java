@@ -32,6 +32,7 @@ public class BrowsersMacOSX extends BrowsersCommon {
 	Properties p = new Properties();
 	Pattern pBundle = Pattern.compile("^\\s*bundle\\s+id:\\s*(\\d+)\\s*$");
 	Pattern pName = Pattern.compile("^\\s*name:\\s*(.*?)\\s*$");
+	Pattern pCanId = Pattern.compile("^\\s*canonical id:\\s*(.*?)\\s*\\(0x[0-9a-fA-F]+\\)\\s*$");
 	Pattern pId = Pattern.compile("^\\s*identifier:\\s*(.*?)\\s*\\(0x[0-9a-fA-F]+\\)\\s*$");
 	Pattern pBindings = Pattern.compile("^\\s*bindings:\\s*(.*?)\\s*$");
 	for (int i=0; i<lines.length; i++) {
@@ -42,6 +43,12 @@ public class BrowsersMacOSX extends BrowsersCommon {
 		continue;
 	    }
 	    // canonical id:
+	    Matcher mCanId = pCanId.matcher(lines[i]);
+	    if (mCanId.matches() && p.getProperty("uti.canonical")==null) {
+		p.setProperty("uti.canonical", mCanId.group(1));
+		continue;
+	    }
+	    // id:
 	    Matcher mId = pId.matcher(lines[i]);
 	    if (mId.matches() && p.getProperty("uti")==null) {
 		p.setProperty("uti", mId.group(1));
@@ -63,7 +70,14 @@ public class BrowsersMacOSX extends BrowsersCommon {
 	    if (mBundle.matches()) {
 		// process old one
 		if (Boolean.valueOf(p.getProperty("__ok__"))) {
+		    // post-process properties
+		    // Sometimes the uti is ambiguous (e.g. case; safari vs. Safari),
+		    // so the optional canonical id is preferred.
 		    p.remove("__ok__");
+		    if (p.getProperty("uti.canonical")!=null) {
+			p.setProperty("uti", p.getProperty("uti.canonical"));
+			p.remove("uti.canonical");
+		    }
 		    // copy additional properties from settings, based on uti
 		    for (Iterator<Properties> it = getKnownBrowsers().values().iterator(); it.hasNext(); ) {
 			Properties known = it.next();
@@ -117,8 +131,11 @@ public class BrowsersMacOSX extends BrowsersCommon {
     @Override
     protected void installPKCS12System(String browserid, File pkcs)
 	    throws BrowserExecutionException {
-	// TODO Auto-generated method stub
-
+	try {
+	    FileUtils.Exec(new String[] { "open", pkcs.toURI().toASCIIString()});
+	} catch (IOException e) {
+	    throw new BrowserExecutionException(browserid, e);
+	}
     }
     
     /** Run lsregister and return output. */

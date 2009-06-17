@@ -74,7 +74,9 @@ public class ActionInstall extends CertificateAction {
 	    PasswordCache.getInstance().setAlwaysAskForEncrypt(oldAsk);
 	    // now install and cleanup
 	    BrowserFactory.getInstance().installPKCS12(new File(pkcs.getPath()));
-	    
+	    pkcs=null; // to avoid deleting it since it still may be needed during install
+	               // it is deleted anyway on program exit
+ 	    
 	} catch (PasswordCancelledException e1) {
 	    // do nothing
 	} catch (Exception e1) {
