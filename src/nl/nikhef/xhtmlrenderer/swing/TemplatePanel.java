@@ -40,7 +40,6 @@ import org.xhtmlrenderer.extend.UserAgentCallback;
 import org.xhtmlrenderer.layout.LayoutContext;
 import org.xhtmlrenderer.render.BlockBox;
 import org.xhtmlrenderer.resource.XMLResource;
-import org.xhtmlrenderer.simple.XHTMLPanel;
 import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
 import org.xhtmlrenderer.swing.BasicPanel;
 import org.xhtmlrenderer.swing.FSMouseListener;
@@ -277,7 +276,7 @@ public class TemplatePanel extends XHTMLPanel {
         if (Configuration.isTrue("xr.use.listeners", true)) {
             resetMouseTracker();
         }
-        setDocument(doc, url, new XhtmlNamespaceHandler());
+        setDocument(doc, url, getSharedContext().getNamespaceHandler());
     }
     @Override
     public void setDocument(InputStream stream, String url) {
