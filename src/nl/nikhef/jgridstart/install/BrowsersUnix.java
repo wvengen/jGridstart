@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.HashMap;
 import java.util.Map.Entry;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
 import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
@@ -15,7 +18,7 @@ class BrowsersUnix extends BrowsersCommon {
     private String defaultBrowser = null;
     
     public void initialize() throws IOException {
-	availableBrowsers = readKnownBrowsers();
+	availableBrowsers = (HashMap<String, Properties>)readKnownBrowsers().clone();
 	// find known browsers, keep only which are in path
 	for (Iterator<Entry<String, Properties>> it = availableBrowsers.entrySet().iterator(); it.hasNext(); ) {
 	    Entry<String, Properties> entry = it.next();
@@ -127,7 +130,18 @@ class BrowsersUnix extends BrowsersCommon {
     @Override
     protected void installPKCS12System(String browserid, File pkcs) throws BrowserExecutionException {
 	throw new BrowserExecutionException(browserid,
-		"There is no default certificate store, please install the certificate " +
-		"manually in your browser.");
+		"There is no default certificate store on Unix/Linux,\n" +
+		"please install the certificate manually in your browser.");
+    }
+    
+    @Override
+    protected HashMap<String, Properties> readKnownBrowsers() throws IOException {
+	knownBrowsers = super.readKnownBrowsers();
+	// filter browsers with exe only
+	for (Iterator<Properties> it = knownBrowsers.values().iterator(); it.hasNext(); ) {
+	    Properties p = it.next();
+	    if (p.getProperty("exe")==null) it.remove();
+	}
+	return knownBrowsers;
     }
 }

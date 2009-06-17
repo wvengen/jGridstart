@@ -191,4 +191,17 @@ public class BrowsersMacOSX extends BrowsersCommon {
 	}	
 	return defaultBrowser;
     }
+    
+    @Override
+    protected HashMap<String, Properties> readKnownBrowsers() throws IOException {
+	HashMap<String, Properties> browsers = super.readKnownBrowsers();
+	knownBrowsers = new HashMap<String, Properties>();
+	// use uti as primary key
+	for (Iterator<Properties> it = browsers.values().iterator(); it.hasNext(); ) {
+	    Properties p = it.next();
+	    if (p.getProperty("uti")==null) continue;
+	    knownBrowsers.put(p.getProperty("uti"), p);
+	}
+	return knownBrowsers;
+    }
 }

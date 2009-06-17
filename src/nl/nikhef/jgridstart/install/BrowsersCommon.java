@@ -16,19 +16,27 @@ import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
 import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PrivateFileWriter;
 
-/** Platform-agnostic parts of browser discovery and certificate installation. */
+/** Platform-agnostic parts of browser discovery and certificate installation.
+ * <p>
+ * Each platform-specific implementation of IBrowsers probably wants to derive
+ * from this class.
+ * <p>
+ * TODO consistently use configfile id for browserid so it becomes platform-
+ * independent. Now each backend wants to use its own naming. 
+ * 
+ */
 abstract class BrowsersCommon implements IBrowsers {
     
     /** List of known browsers parsed from {@literal browsers.properties} */
-    private HashMap<String, Properties> knownBrowsers = new HashMap<String, Properties>();
+    protected HashMap<String, Properties> knownBrowsers = new HashMap<String, Properties>();
 
     /** List of available browsers.
      * <p>
      * This is used by the default implementation to get browser information
-     * from. By default, it is equal to knownBrowsers, so be sure to override
-     * it if you want something else.
+     * from. Do make sure to set this to something sensible in the children's
+     * {@link #initialize} methods.
      */
-    protected HashMap<String, Properties> availableBrowsers = knownBrowsers;
+    protected HashMap<String, Properties> availableBrowsers = null;
 
     
     public abstract void initialize() throws IOException;
@@ -44,7 +52,14 @@ abstract class BrowsersCommon implements IBrowsers {
     }
 
     public String getBrowserName(String browserid) {
-	return knownBrowsers.get(browserid).getProperty("desc");
+	String name = null;
+	Properties p = availableBrowsers.get(browserid);
+	if (p!=null) name = p.getProperty("desc");
+	if (name==null) {
+	    p = knownBrowsers.get(browserid);
+	    if (p!=null) name = p.getProperty("desc");
+	}
+	return name;
     }
     
     public void openUrl(String urlString)
@@ -69,10 +84,19 @@ abstract class BrowsersCommon implements IBrowsers {
 
     
     /** Return the list of known browsers from {@literal browsers.properties}, load when needed */
-    protected HashMap<String, Properties> getKnownBrowsers() throws IOException {
-	if (knownBrowsers==null || knownBrowsers.size()==0)
-	    readKnownBrowsers();
+    protected HashMap<String, Properties> getKnownBrowsers() {
+	if (knownBrowsers==null || knownBrowsers.size()==0) {
+	    try {
+		readKnownBrowsers();
+	    // exception should not occur since it's a class resource
+	    } catch (IOException e) { assert(false); }
+	}
 	return knownBrowsers;
+    }
+    
+    /** Return the list of known browsers from {@literal browsers.properties} */
+    public Set<String> getKnownBrowserList() {
+	return getKnownBrowsers().keySet();
     }
 
     /** Parse the file {@literal browsers.properties} */ 

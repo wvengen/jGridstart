@@ -77,6 +77,13 @@ public interface IBrowsers {
      */
     public Set<String> getBrowserList();
     
+    /** Returns a list of browser id's that are recognised by the program.
+     * <p>
+     * They may not be all present in the system, use {@link #getBrowserList}
+     * for that.
+     */
+    public Set<String> getKnownBrowserList();
+    
     /** Returns the default system browser's id.
      * <p>
      * If no default system browser could be found, returns the first
