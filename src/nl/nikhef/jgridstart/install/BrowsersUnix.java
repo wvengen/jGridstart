@@ -13,10 +13,12 @@ import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
 import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
 import nl.nikhef.jgridstart.util.FileUtils;
 
+/** Unix/Linux/BSD/... implementation of browser discovery and launch */
 class BrowsersUnix extends BrowsersCommon {
     
     private String defaultBrowser = null;
     
+    @Override @SuppressWarnings("unchecked") // for clone() cast
     public void initialize() throws IOException {
 	availableBrowsers = (HashMap<String, Properties>)readKnownBrowsers().clone();
 	// find known browsers, keep only which are in path
@@ -104,10 +106,12 @@ class BrowsersUnix extends BrowsersCommon {
 	return output.toString().trim();
     }
 
+    @Override
     public String getDefaultBrowser() {
 	return defaultBrowser;
     }
 
+    @Override
     public void openUrl(String browserid, String urlString)
 	    throws BrowserNotAvailableException, BrowserExecutionException {
 	

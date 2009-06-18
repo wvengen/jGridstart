@@ -25,7 +25,7 @@ public class BrowserFactory {
 	    return browsers;
 	}
 	if (osName.startsWith("Windows")) {
-	    // TODO Windows
+	    browsers = new BrowsersWindows();
 	    return browsers;
 	}
 	// Unix or similar

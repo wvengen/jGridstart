@@ -56,6 +56,7 @@
 	<property name="dep.swingworker" location="${dir.thirdparty}/swingworker/swing-worker-1.2.jar"/>
 	<property name="dep.xhtmlrenderer" location="${dir.thirdparty}/flyingsaucer/core-renderer-minimal.jar"/>
 	<property name="dep.itext" location="${dir.thirdparty}/flyingsaucer/iText-2.0.8.jar"/>
+	<property name="dep.winregistry" location="${dir.thirdparty}/winregistry/WinRegistry-3.4.jar"/>
 	<path id="path.dependencies">
 		<!-- TODO use jdk13 library versions and test -->
 		<pathelement location="${dep.bouncycastle}"/>
@@ -65,6 +66,7 @@
 		<pathelement location="${dep.swingworker}"/> <!-- for java1.5 and below -->
 		<pathelement location="${dep.xhtmlrenderer}"/>
 		<pathelement location="${dep.itext}"/>
+		<pathelement location="${dep.winregistry}"/>
 	</path>
 
 	<!--
@@ -131,6 +133,7 @@
 			<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
 			<zipfileset src="${dep.xhtmlrenderer}" includes="**/*.class" excludes="**/tool/**"/>
 			<zipfileset src="${dep.itext}" includes="**/*.class,**/fonts/*" excludes="**/tools/**"/>
+			<zipfileset src="${dep.winregistry}" includes="**/*.class"/>
 			<!-- iText needs some org.bouncycastle.cms classes but some other classes in this
 			     package reference javax.mail which we don't want to include as well (so that
 			     ProGuard can resolve them). Solution: only include part of the smime package -->

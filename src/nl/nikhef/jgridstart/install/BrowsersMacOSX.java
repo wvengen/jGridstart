@@ -14,6 +14,7 @@ import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
 import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
 import nl.nikhef.jgridstart.util.FileUtils;
 
+/** Mac OS X implementation of browser discovery and launch */
 public class BrowsersMacOSX extends BrowsersCommon {
     
     private String defaultBrowser = null;
