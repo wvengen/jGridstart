@@ -31,6 +31,10 @@ public class PrivateFileWriter extends FileWriter {
     public String getPath() {
 	return file.getPath();
     }
+    /** Return the associated File object */
+    public File getFile() {
+	return file;
+    }
 
     public void write(char[] cbuf) throws IOException {
 	ensurePermissions();

@@ -68,12 +68,12 @@ public class ActionInstall extends CertificateAction {
 
 	    pkcs = new TempFileWriter("browser", ".p12");
 	    // TODO change PasswordCache.set() to have File argument
-	    PasswordCache.getInstance().set(new File(pkcs.getPath()).getCanonicalPath(), pw);
+	    PasswordCache.getInstance().set(pkcs.getFile().getCanonicalPath(), pw);
 	    boolean oldAsk = PasswordCache.getInstance().setAlwaysAskForEncrypt(false);
-	    cert.exportTo(new File(pkcs.getPath()));
+	    cert.exportTo(pkcs.getFile());
 	    PasswordCache.getInstance().setAlwaysAskForEncrypt(oldAsk);
 	    // now install and cleanup
-	    BrowserFactory.getInstance().installPKCS12(new File(pkcs.getPath()));
+	    BrowserFactory.getInstance().installPKCS12(pkcs.getFile());
 	    pkcs=null; // to avoid deleting it since it still may be needed during install
 	               // it is deleted anyway on program exit
  	    
