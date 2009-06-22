@@ -1,16 +1,36 @@
 package nl.nikhef.jgridstart;
 
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 /** Helper class for requesting a new certificate. */
 public class CertificateRequest {
+
+    /** System properties prefix for prefill defaults */
+    public static final String defaultsPrefix = "jgridstart.defaults.";
+    
     /** Set default properties based on an amount of guessing to aid
      * the user in filling in the form.
+     * <p>
+     * Currently this looks at system properties
+     * {@literal jgridstart.defaults.*} and sets defaults from these
+     * if not yet set.
      * 
      * @param p Properties to set
      */
     static public void preFillData(Properties p) {
-	// TODO implement prefillData()
+	// read defaults from system properties
+	for (Iterator<Entry<Object, Object>> it = System.getProperties().entrySet().iterator(); it.hasNext(); ) {
+	    Entry<Object, Object> entry = it.next();
+	    String name = (String)entry.getKey();
+	    String value = (String)entry.getValue();
+	    if (name.startsWith(defaultsPrefix) ) {
+		String localName = name.substring(defaultsPrefix.length()+1);
+		if (!p.containsKey(localName))
+		    p.setProperty(name.substring(defaultsPrefix.length()), value);
+	    }
+	}
     }
     
     /** Complete data entered before creating a certificate signing
