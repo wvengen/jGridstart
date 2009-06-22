@@ -91,7 +91,9 @@ public class BrowsersWindows extends BrowsersCommon {
 		urlString
 	};
 	try {
-	    FileUtils.Exec(cmd);
+	    StringBuffer output = new StringBuffer();
+	    if ( FileUtils.Exec(cmd, null, output) != 0)
+		throw new BrowserExecutionException(browserid, output.toString());
 	} catch (IOException e) {
 	    throw new BrowserExecutionException(browserid, e);
 	}
@@ -108,7 +110,9 @@ public class BrowsersWindows extends BrowsersCommon {
 		pkcs.getAbsolutePath()
 	};
 	try {
-	    FileUtils.Exec(cmd);
+	    StringBuffer output = new StringBuffer();
+	    if ( FileUtils.Exec(cmd, null, output) != 0)
+		throw new BrowserExecutionException(browserid, output.toString());
 	} catch (IOException e) {
 	    throw new BrowserExecutionException(browserid, e);
 	}

@@ -57,7 +57,10 @@ public class BrowsersMacOSX extends BrowsersCommon {
     public void openUrl(String browserid, String urlString)
 	    throws BrowserNotAvailableException, BrowserExecutionException {
 	try {
-	    FileUtils.Exec(new String[] { "open", "-b", browserid, urlString});
+	    String[] cmd = new String[] { "open", "-b", browserid, urlString};
+	    StringBuffer output = new StringBuffer();
+	    if ( FileUtils.Exec(cmd, null, output) != 0)
+		throw new BrowserExecutionException(browserid, output.toString());
 	} catch (IOException e) {
 	    throw new BrowserExecutionException(browserid, e);
 	}
@@ -67,7 +70,10 @@ public class BrowsersMacOSX extends BrowsersCommon {
     protected void installPKCS12System(String browserid, File pkcs)
 	    throws BrowserExecutionException {
 	try {
-	    FileUtils.Exec(new String[] { "open", pkcs.toURI().toASCIIString()});
+	    String[] cmd = new String[] { "open", pkcs.toURI().toASCIIString()};
+	    StringBuffer output = new StringBuffer();
+	    if ( FileUtils.Exec(cmd, null, output) != 0)
+		throw new BrowserExecutionException(browserid, output.toString());
 	} catch (IOException e) {
 	    throw new BrowserExecutionException(browserid, e);
 	}

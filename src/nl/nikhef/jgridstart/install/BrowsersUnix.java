@@ -7,8 +7,6 @@ import java.util.Properties;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
 import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
 import nl.nikhef.jgridstart.util.FileUtils;
@@ -125,7 +123,9 @@ class BrowsersUnix extends BrowsersCommon {
 		urlString
 	};
 	try {
-	    FileUtils.Exec(cmd);
+	    StringBuffer output = new StringBuffer();
+	    if ( FileUtils.Exec(cmd, null, output) != 0)
+		throw new BrowserExecutionException(browserid, output.toString());
 	} catch (IOException e) {
 	    throw new BrowserExecutionException(browserid, e);
 	}
