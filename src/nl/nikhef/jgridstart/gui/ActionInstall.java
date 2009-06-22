@@ -73,6 +73,7 @@ public class ActionInstall extends CertificateAction {
 	    cert.exportTo(pkcs.getFile());
 	    PasswordCache.getInstance().setAlwaysAskForEncrypt(oldAsk);
 	    // now install and cleanup
+	    pkcs.close(); // required for Windows to avoid "being used by another process" error
 	    BrowserFactory.getInstance().installPKCS12(pkcs.getFile());
 	    pkcs=null; // to avoid deleting it since it still may be needed during install
 	               // it is deleted anyway on program exit
