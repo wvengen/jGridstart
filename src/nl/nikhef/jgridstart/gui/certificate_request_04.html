@@ -26,7 +26,7 @@
 	
 	<table class="reserved">
 	  <tr>
-	    <th class="title">Reserved for CA operations use</th>
+	    <th class="title nowrap">Reserved for CA operations use</th>
 	    <td class="fillin" style="text-align: right">........ - ......</td>
 	  </tr>
 	  <tr>
@@ -43,7 +43,7 @@
 	
 	<div class="userdata">
 	  <table><tr>
-	    <td class="userinfo">
+	    <td class="userinfo" style="width: 60%" rowspan="2">
 	      <table>
 	        <tr><td colspan="2">Surname <div class="fillin" c="${surname}">Doe</div></td></tr>
 	        <tr><td colspan="2">Given names <div class="fillin" c="${givenname}">John</div></td></tr>
@@ -55,9 +55,10 @@
 	        <tr><td colspan="2">SOFI number <span class="comment">(optional)</span><div class="fillin" c="${sofi}"></div></td></tr>
 	      </table>
 	    </td>
-	    <td class="ra">
-	      <h2 style="text-align:center">Send this form by mail or fax to</h2>
-	      <address>DutchGrid MS CA
+	    <td class="ra reserved">
+	      <div class="title nowrap center">Reserved for RA operations use</div>
+	      <div class="nowrap center">send this form by mail or fax to</div>
+	      <address class="clear" style="vertical-align: bottom">DutchGrid MS CA
 	        NIKHEF c/o Djuhaeri Harapan
 	        P.O. Box 41882
 	        NL 1009 DB Amsterdam
@@ -116,7 +117,7 @@
 
 
 	<table class="reserved">
-	  <tr class="title"><th colspan="2">Reserved for RA operations use</th></tr>
+	  <tr class="title nowrap"><th colspan="2">Reserved for RA operations use</th></tr>
 
 	  <tr><td colspan="2" class="ra">
         I, <span class="fillin"><sup>RA name</sup></span> have

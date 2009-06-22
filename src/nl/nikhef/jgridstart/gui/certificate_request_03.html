@@ -5,16 +5,22 @@
 </head>
 <body class="ui">
 	<h1>Certificate request - Submission</h1>
-	
+
+
 	<p if="!${request}">Please wait while your certificate is being generated and sent to the
 	registration authority over the internet.</p>
 	
-	<p if="${request}">Your certificate has already been generated<span if="${request.submitted}">
-	  and was sent to the registration authority over the internet</span>.
-	  <span if="!${request.submitted}">Please wait while your certificate is being sent to the
-	  registration authority over the internet.</span>
-	</p>
+	<p if="${request} and !${cert} and !${request.submitted}">Your certificate has already been generated.
+	Please wait while your certificate is being sent to the registration authority over the internet.</p>
 	
+	<p if="${request} and !${cert} and ${request.submitted} and !${request.processed}">
+	Your certificate has been submitted. After you have verified your identity, you can download
+	your certificate here.</p>
+	
+	<p if="${request} and ${cert}">Your certificate request is completed. You can review
+	your details here.</p> 
+
+
 	<ul class="activitylist">
 	  <li class="done-${(${request} or ${cert})}">
 	      Generate key pair</li>
@@ -44,7 +50,7 @@
     </div>
     
     <div if="${cert}">
-      <p>To again print the verification form, press <em>Next</em>.</p>
+      <p>To review the verification form, press <em>Next</em>.</p>
     </div>
 
 

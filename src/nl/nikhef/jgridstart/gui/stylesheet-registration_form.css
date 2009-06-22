@@ -47,21 +47,37 @@
 .form .fillin {
 	min-height: 1.5em; /* ex seems to have problems :( */
 }
+.form .nowrap {
+	white-space: nowrap;
+	overflow: hidden;
+}
+.form .center {
+	text-align: center;
+}
 
 /*
  * Reserved area
  */
-.form table.reserved {
-	border-top: 1px solid black;
-	border-bottom: 1px solid black;
+.form .reserved {
 	padding: 0 1ex;
 	background: #eeeeee;
+	border: 1px solid black;
+}
+.form > table.reserved {
+	border-left: none;
+	border-right: none;
+}
+.form table.reserved {
 	width: 100%;
 }
-.form .reserved th {
+.form .reserved .title {
 	font-style: italic;
 	font-weight: normal;
-	text-align: left;
+	font-size: 85%;
+}
+.form .reserved .clear {
+	background: white;
+	color: black;
 }
 .form span.check {
 	margin-right: 1.5em;
@@ -85,8 +101,9 @@
 .form .userdata {
 	margin: 1em 0.8em;
 }
-.form .userdata table {
+.form .userdata > table {
 	width: 100%;
+	border-spacing: 0.4em;
 }
 .form .userdata td, .form .userdata th {
 	vertical-align: top;
@@ -106,12 +123,10 @@
 	vertical-align: bottom;
 }
 .form .userdata .ra address {
-	margin: 1em 0 0 1em;
 	padding: 1em;
 	white-space: pre-line;
 	font-size: 11pt; 
 	font-style: normal;
-	border: 1px solid black;
 }
 .form h2 {
 	margin-top: 2ex;
