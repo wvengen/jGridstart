@@ -488,7 +488,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	PasswordCache pwcache = PasswordCache.getInstance();
 	String storename = "PKCS#12 store " + dst.getName();
 	char[] pw = pwcache.getForEncrypt(storename, dst.getCanonicalPath());
-	store.store(new FileOutputStream(dst), pw);
+	FileOutputStream out = new FileOutputStream(dst);
+	store.store(out, pw);
+	out.close();
     }
 
     /** Generate a new private key+CSR pair. Details are taken from
