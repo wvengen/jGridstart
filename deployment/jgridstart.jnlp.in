@@ -13,7 +13,11 @@
   <j2se href="http://java.sun.com/products/autodl/j2se" version="1.3+"/>
   <jar href="jgridstart.jar"/>
   <extension name="BouncyCastle cryptography library" href="bcprov.jnlp"/>
-  <property name="java.security.policy" value="@wwwbase@/bcprov.policy"/>
+  <property name="java.security.policy" value="@wwwbase@bcprov.policy"/>
+  <!-- program defaults, customize these for your site -->
+  <property name="jgridstart.defaults.country" value="NL"/>
+  <property name="jgridstart.defaults.level" value="medium"/>
+  <!-- end of program defaults -->
  </resources>
  <application-desc main-class="@main@"/>
 </jnlp>

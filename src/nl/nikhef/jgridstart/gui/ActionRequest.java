@@ -1,7 +1,9 @@
 package nl.nikhef.jgridstart.gui;
 
 import java.awt.event.ActionEvent;
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
