@@ -1,7 +1,7 @@
 package nl.nikhef.jgridstart.install.exception;
 
 /**
- * Browser exception occuring during the execution of the browser
+ * Browser exception occuring when the requested browser is not present
  */
 public class BrowserNotAvailableException extends BrowserException {
     public BrowserNotAvailableException(String browser) {
