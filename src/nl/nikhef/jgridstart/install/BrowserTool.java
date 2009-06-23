@@ -10,8 +10,8 @@ import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
 
 import org.apache.commons.cli.*;
 
-/** Tool to open a web browser and install a PKCS#12 file into
- * a browser's certificate store.
+/** Command-line tool to open a web browser and install a PKCS#12 file
+ * into a browser's certificate store.
  * 
  * @author wvengen
  */

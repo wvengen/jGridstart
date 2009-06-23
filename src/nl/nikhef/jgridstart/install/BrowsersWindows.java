@@ -20,7 +20,7 @@ import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
 import nl.nikhef.jgridstart.util.FileUtils;
 
 /** Windows implementation of browser discovery and launch */
-public class BrowsersWindows extends BrowsersCommon {
+class BrowsersWindows extends BrowsersCommon {
     
     /** the detected default browser name */
     private String defaultBrowser = null;

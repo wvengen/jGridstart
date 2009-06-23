@@ -2,9 +2,10 @@ package nl.nikhef.jgridstart.install;
 
 import java.io.IOException;
 
+/** Retrieves the {@link IBrowsers} instance for the current platform. */
 public class BrowserFactory {
     
-    protected static IBrowsers browsers = null;
+    private static IBrowsers browsers = null;
     
     /** Return an instance of {@link IBrowsers} for the current platform
      * @throws IOException if initialization failed */ 
