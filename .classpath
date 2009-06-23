@@ -42,5 +42,6 @@
 			<attribute name="javadoc_location" value="http://bouncycastle.org/docs/docs1.4/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="thirdparty/winregistry/WinRegistry-3.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
