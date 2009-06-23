@@ -28,6 +28,10 @@
 	<!-- location of thirdparty libraries -->
 	<property name="dir.thirdparty" location="thirdparty"/>
 
+	<!-- extra tool definitions -->
+	<property name="browsertool.target.name" value="browsertool"/>
+	<property name="browsertool.target.main" value="nl.nikhef.jgridstart.install.BrowserTool"/>
+
 	<!-- reference to property file defining the properties
 	  -     keystore.file      java keystore file
 	  -     keystore.passwd    password for accessing the java keystore
@@ -190,6 +194,30 @@
 		<delete file="${dir.dist}/bcprov.jnlp"/>
 		<basename property="dep.bouncycastle.basename" file="${dep.bouncycastle}"/>
 		<delete file="${dir.dist}/${dep.bouncycastle.basename}"/>
+	</target>
+
+	<!--
+	  - extra targets
+	  -->
+	<target name="browsertool" depends="compile">
+		<jar jarfile="${dir.dist}/${browsertool.target.name}.jar">
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+				<attribute name="Main-Class" value="${browsertool.target.main}"/>
+			</manifest>
+			<fileset dir="${dir.build}">
+				<!-- remove non-production files -->
+				<exclude name="**/test*"/>
+				<exclude name="**/package.html"/>
+				<include name="nl/nikhef/jgridstart/install/**"/>
+				<include name="nl/nikhef/jgridstart/util/**"/>
+			</fileset>
+			<zipfileset src="${dep.cli}" includes="**/*.class"/>
+			<zipfileset src="${dep.winregistry}" includes="**/*.class"/>
+		</jar>
+		<!-- sign it, required for java web start -->
+		<signjar keystore="${keystore.file}" jar="${dir.dist}/${browsertool.name}.jar"
+			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
 	</target>
 
 </project>
