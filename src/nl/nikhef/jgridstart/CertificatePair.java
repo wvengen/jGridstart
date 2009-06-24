@@ -44,6 +44,7 @@ import java.util.logging.Logger;
 
 import nl.nikhef.jgridstart.ca.*;
 import nl.nikhef.jgridstart.util.CryptoUtils;
+import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PrivateFileWriter;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
@@ -333,7 +334,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      */
     static public CertificatePair importFrom(File src, File dst)
 	    throws IOException, NoSuchAlgorithmException, PasswordCancelledException, UnrecoverableKeyException, KeyStoreException, NoSuchProviderException, CertificateException {
-	if (!src.isFile())
+	if (!src.isFile() && !src.isDirectory())
 	    throw new IOException("Need file to import from: " + src);
 	if (!src.canRead())
 	    throw new IOException("Cannot read file to import from: " + src);
@@ -342,15 +343,22 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	SecurityChecks checks = new SecurityChecks(cert);
 	cert.path = dst;
 	checks.checkAccessPath();
-
-	try {
-	    // try to read from PEM first
-	    cert.importFromPEM(src);
-	    cert.notifyChanged();
-	} catch (IOException e) {
-	    // try to read from PKCS#12
-	    cert.importFromPKCS(src);
-	    cert.notifyChanged();
+	
+	if (src.isDirectory()) {
+	    cert.importFromDirectory(src);
+	    cert.notifyChanged();	    
+	    
+	} else {
+	    // import from file
+	    try {
+		// try to read from PEM first
+		cert.importFromPEM(src);
+		cert.notifyChanged();
+	    } catch (IOException e) {
+		// try to read from PKCS#12
+		cert.importFromPKCS(src);
+		cert.notifyChanged();
+	    }
 	}
 	
 	// run checks on imported certificate
@@ -442,11 +450,28 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    }
 	}
     }
+    
+    protected void importFromDirectory(File src) throws IOException {
+	// import from directory: make sure private key exist and copy
+	File key = new File(src, "userkey.pem");
+	if (!key.canRead() || !key.isFile())
+	    throw new IOException("Need directory with readable userkey.pem to import from: " + src);
+	
+	// copy all files
+	List<File> files = Arrays.asList(src.listFiles());
+	for (Iterator<File> i = files.iterator(); i.hasNext();) {
+	    File f = i.next();
+	    if (!f.isFile()) continue;
+	    FileUtils.CopyFile(f, new File(path, f.getName()));
+	}
+	// load from new location
+	load(path);
+    }
 
     /** Export the certificate and private key to a file. Type is
      * detected from the filename.
      * 
-     * @param src destination to export to
+     * @param dst destination to export to
      * @throws CertificateException 
      * @throws NoSuchAlgorithmException 
      * @throws NoSuchProviderException 

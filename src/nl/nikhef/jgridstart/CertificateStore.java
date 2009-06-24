@@ -126,8 +126,9 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * refresh the certificate list from its source and each certificate as well
      * @throws NoSuchAlgorithmException 
      * @throws KeyManagementException 
+     * @throws IOException 
      */
-    public void refresh() throws KeyManagementException, NoSuchAlgorithmException {
+    public void refresh() throws KeyManagementException, NoSuchAlgorithmException, IOException {
 	if (path == null) {
 	    logger.warning("Refresh of empty certificate store");
 	    return;
@@ -296,28 +297,33 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     }
 
     /** Return the default certificate. The default certificate is the one
-     * in ~/.globus (or the platform's equivalent). Normally this is a symlink
-     * to or copy of a certificate in the store.
-     * 
-     * TODO use stat or so to cache the result until file changes
+     * in {@code ~/.globus} (or the platform's equivalent). Normally this is a
+     * symlink to or copy of a certificate in the store
+     * <p>
+     * When the certificate is not found in the certificate store, it is added
+     * as a new one.
      * 
      * @return Default CertificatePair, or null if not present or not matched. 
-     * @throws IOException */
+     */
     public CertificatePair getDefault() {
 	File dflCertFile = new File(path, "usercert.pem"); 
-	X509Certificate dflCert;
+	X509Certificate dflCert = null;
 	try {
 	    dflCert = (X509Certificate)CryptoUtils.readPEM(
 	    	    new FileReader(dflCertFile), null);
-	} catch (IOException e) { return null; }
-	if (dflCert==null) return null;
-	for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {
-	    CertificatePair c = it.next();
-	    if (c.getCertificate()!=null && c.getCertificate().equals(dflCert))
-		return c;
+	} catch (IOException e) { }
+	if (dflCert!=null) {
+	    for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {
+		CertificatePair c = it.next();
+		if (c.getCertificate()!=null && c.getCertificate().equals(dflCert))
+		    return c;
+	    }
 	}
-	// no match
-	// TODO handle case where default certificate is not in certificate store
+	// no match: add to certificate store
+	try {
+	    logger.info("Adding existing default certificate to certificate store");
+	    return importFrom(path);
+	} catch (Exception e) { }
 	return null;
     }
     
@@ -331,6 +337,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	File dflCert = new File(path, "usercert.pem");
 	if (c.getCertificate()==null)
 	    throw new IOException("Cannot set default to pending certificate: "+c);
+	logger.info("Setting default certificate: "+c);
 	// TODO check dflCert and dflKey are already present in certificate store!!!
 	FileUtils.CopyFile(c.getKeyFile(), dflKey);
 	FileUtils.CopyFile(c.getCertFile(), dflCert);
@@ -347,7 +354,9 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     }
     /** Set the default certificate when only one present */
     protected void trySetDefault() {
-	if (size()==1 && getDefault()==null && get(0).getCertificate()!=null)
-	    trySetDefault(get(0));	
+	// not that getDefault() must be first since it can add a
+	// default certificate to the store
+	if (getDefault()==null && size()==1 && get(0).getCertificate()!=null)
+	    trySetDefault(get(0));
     }
 }
