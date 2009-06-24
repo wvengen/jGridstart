@@ -53,22 +53,28 @@ public class XHTMLPanel extends org.xhtmlrenderer.simple.XHTMLPanel {
 	    public StylesheetInfo getDefaultStylesheet(StylesheetFactory factory) {
 		if (_defaultStylesheet == null) {
 		    // get default font properties
-		    Font font = UIManager.getDefaults().getFont("TextPane.font");
-		    float sizePt = font.getSize2D();
+		    Font font = getFont();
 		    // workaround Linux where it seems too large
 		    String osName = System.getProperty("os.name");
 		    if (!osName.startsWith("Mac OS") && !osName.startsWith("Windows"))
-			sizePt *= 0.9;
+			font = font.deriveFont(font.getSize2D()*0.9f);
 		    
 		    // add to UA stylesheet
 		    _defaultStylesheet = super.getDefaultStylesheet(factory);
 		    
 		    Ruleset fontRule = new Ruleset(StylesheetInfo.USER_AGENT);
 		    PropertyValue family = new PropertyValue(PropertyValue.CSS_STRING, font.getName(), font.getName());
-		    PropertyValue size = new PropertyValue(PropertyValue.CSS_PT, sizePt, sizePt+"pt");
+		    PropertyValue size = new PropertyValue(PropertyValue.CSS_PT, font.getSize2D(), font.getSize2D()+"pt");
 		    fontRule.addProperty(new PropertyDeclaration(CSSName.FONT_FAMILY, family, false, StylesheetInfo.USER_AGENT));
 		    fontRule.addProperty(new PropertyDeclaration(CSSName.FONT_SIZE, size, false, StylesheetInfo.USER_AGENT));
-		    // TODO add style
+		    if (font.isBold()) {
+			PropertyValue bold = new PropertyValue(PropertyValue.CSS_STRING, "bold", "bold");
+			fontRule.addProperty(new PropertyDeclaration(CSSName.FONT_WEIGHT, bold, false, StylesheetInfo.USER_AGENT));
+		    }
+		    if (font.isItalic()) {
+			PropertyValue italic = new PropertyValue(PropertyValue.CSS_STRING, "italic", "italic");
+			fontRule.addProperty(new PropertyDeclaration(CSSName.FONT_STYLE, italic, false, StylesheetInfo.USER_AGENT));
+		    }
 		    
 		    Selector bodySelector = new Selector();
 		    bodySelector.setName("body");
