@@ -348,6 +348,7 @@ public class PasswordCache {
 	else
 	    writer = new FileWriter(f);
 	writePEM(src, writer, f, msg);
+	writer.close();
     }
     /** Convenience method for CryptoUtils.writePEM() that uses this PasswordCache 
      * @throws IOException 
@@ -387,7 +388,10 @@ public class PasswordCache {
      * @throws FileNotFoundException 
      * @throws PasswordCancelledException */
     public Object readPEM(File f, String msg) throws FileNotFoundException, IOException, PasswordCancelledException {
-	return readPEM(new FileReader(f), f, msg);
+	FileReader r = new FileReader(f);
+	Object o = readPEM(r, f, msg);
+	r.close();
+	return o;
     }
     
     /** user cancelled password entry */

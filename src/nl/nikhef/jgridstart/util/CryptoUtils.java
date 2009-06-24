@@ -27,7 +27,6 @@ public class CryptoUtils {
     static public void writePEM(Object src, Writer writer) throws IOException {
 	PEMWriter pemwriter = new PEMWriter(writer);
 	pemwriter.writeObject(src);
-	pemwriter.close();
     }
 
     /**
@@ -43,7 +42,6 @@ public class CryptoUtils {
 	PEMWriter pemwriter = new PEMWriter(writer);
 	SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
 	pemwriter.writeObject(src, "DESEDE", pwf.getPassword(), random);
-	pemwriter.close();
     }
     
     /**
@@ -62,7 +60,6 @@ public class CryptoUtils {
 	else
 	    pemreader = new PEMReader(reader);
 	ret = pemreader.readObject();
-	pemreader.close();
 	return ret;
     }
 }
