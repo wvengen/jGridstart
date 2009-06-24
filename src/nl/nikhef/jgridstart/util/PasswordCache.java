@@ -28,7 +28,7 @@ import org.bouncycastle.openssl.PasswordFinder;
 
 /** Class that caches passwords for a limited time so that the user doesn't
  * need to type in the password everytime.
- * 
+ * <p>
  * TODO move swing stuff into gui, implement cli as well, auto-select cli/gui
  *      this can be done by implementing this class with callbacks for asking
  *      the user for passwords. Different UIs can then use their own callbacks,
@@ -58,7 +58,7 @@ public class PasswordCache {
     protected JFrame parent = null;
     /** number of seconds after which passwords are forgotten */
     protected int timeout = 5 * 60;
-    /** see setAlwaysAskForEncrypt() */
+    /** see {@link #setAlwaysAskForEncrypt} */
     protected boolean alwaysAskForEncrypt = true;
     
     protected PasswordCache() {
@@ -81,6 +81,7 @@ public class PasswordCache {
 	this.parent = parent;
     }
     /** Set the timeout after which passwords are forgotten again.
+     * <p>
      * Also updates timeout of currently stored passwords.
      * 
      * @param s timeout in number of seconds
@@ -116,7 +117,7 @@ public class PasswordCache {
     }
     
     /** Return the password for the specified location to decrypt files
-     * 
+     * <p>
      * Each item has a unique reference to a required password consisting of
      * a location string.
      * 
@@ -175,8 +176,10 @@ public class PasswordCache {
 	return null;
     }
     
-    /** Return a new password for the specified location. Also ask for a password
-     * and require to enter twice for verification. This is for encrypting data.
+    /** Return a new password for the specified location.
+     * <p>
+     * Also ask for a password and require to enter twice for verification.
+     * This is for encrypting data.
      * The password is remembered for the case it is read again.
      *
      * @param msg Description presented to the user when asking for a password.
@@ -225,11 +228,12 @@ public class PasswordCache {
 	return pw1;
     }
 
-    /** Set a password for a location. Should not be used normally because the
-     * user is the one to give the password. For testing this is convenient. 
+    /** Set a password for a location.
+     * <p>
+     * Should not be used normally because the user is the one to give the password.
+     * For testing this is convenient. 
      * 
      * @param loc Location string
-     * @param index index in location
      * @param pw password to set
      */
     public void set(String loc, char[] pw) {
@@ -265,30 +269,29 @@ public class PasswordCache {
 	return old;
     }
     
-    /** Return a PasswordFinder that asks the user for a password when encrypting
-     * a file. The password is retrieved using getForEncrypt(). 
+    /** Return a {@link PasswordFinder} that asks the user for a password when
+     * encrypting a file. The password is retrieved using {@link #getForEncrypt}. 
      * 
      * @param msg Description on what this key is about
      * @param loc Location string
-     * @param index index in location
      * @return a new PasswordFinder
      */
     protected CachePasswordFinder getEncryptPasswordFinder(String msg, String loc) {
 	return new CachePasswordFinder(true, msg, loc);
     }
-    /** Return a PasswordFinder that returns the cached password, or else
-     * asks the user to provide ine. The password is retrieved using getForDecrypt(). 
+    /** Return a {@link PasswordFinder} that returns the cached password, or else
+     * asks the user to provide one. The password is retrieved using
+     * @[link #getForDecrypt}. 
      * 
      * @param msg Description on what this key is about
      * @param loc Location string
-     * @param index index in location
      * @return a new PasswordFinder
      */
     protected CachePasswordFinder getDecryptPasswordFinder(String msg, String loc) {
 	return new CachePasswordFinder(false, msg, loc);
     }
     
-    /** A PasswordFinder interface for a password */
+    /** A {@link PasswordFinder} interface for a password */
     private class CachePasswordFinder implements PasswordFinder {
 	private String msg, loc;
 	private boolean write;
@@ -335,7 +338,9 @@ public class PasswordCache {
 	}
     }
     
-    /** Convenience method for CryptoUtils.writePEM() that uses this PasswordCache.
+    /** Convenience method for {@link CryptoUtils#writePEM} that uses
+     * this {@linkplain PasswordCache}.
+     * <p>
      * This one also sets the permissions to user-only for private keys.
      *  
      * @throws IOException 
@@ -350,7 +355,9 @@ public class PasswordCache {
 	writePEM(src, writer, f, msg);
 	writer.close();
     }
-    /** Convenience method for CryptoUtils.writePEM() that uses this PasswordCache 
+    /** Convenience method for {@link CryptoUtils#writePEM} that uses
+     * this {@linkplain PasswordCache}.
+     *  
      * @throws IOException 
      * @throws NoSuchAlgorithmException 
      * @throws PasswordCancelledException */
@@ -362,10 +369,13 @@ public class PasswordCache {
 	    if (pwf.wasCancelled) throw new PasswordCancelledException();
 	}
     }
-    /** Convenience method for CryptoUtils.writePEM() that uses this PasswordCache.
+    /** Convenience method for {@link CryptoUtils#writePEM} that uses
+     * this {@linkplain PasswordCache}.
+     * <p>
      * It invalidates the password when it was wrong, so it is important so use this
-     * method instead of calling CryptoUtils.writePEM() directly when reading a file
-     * with a password using the PasswordCache.
+     * method instead of calling {@link CryptoUtils#writePEM} directly when reading a file
+     * with a password using the {@linkplain PasswordCache}.
+     * 
      * @throws IOException 
      * @throws PasswordCancelledException */
     public Object readPEM(Reader reader, File f, String msg) throws IOException, PasswordCancelledException {
@@ -380,10 +390,13 @@ public class PasswordCache {
 	}
 	return o;
     }
-    /** Convenience method for CryptoUtils.writePEM() that uses this PasswordCache.
+    /** Convenience method for {@link CryptoUtils#writePEM} that uses
+     * this {@linkplain PasswordCache}.
+     * <p>
      * It invalidates the password when it was wrong, so it is important so use this
-     * method instead of calling CryptoUtils.writePEM() directly when reading a file
-     * with a password using the PasswordCache.
+     * method instead of calling {@link CryptoUtils#writePEM} directly when reading a file
+     * with a password using the {@linkplain PasswordCache}.
+     * 
      * @throws IOException 
      * @throws FileNotFoundException 
      * @throws PasswordCancelledException */
