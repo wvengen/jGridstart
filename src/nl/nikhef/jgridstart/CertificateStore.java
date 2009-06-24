@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import nl.nikhef.jgridstart.util.CryptoUtils;
 import nl.nikhef.jgridstart.util.FileUtils;
+import nl.nikhef.jgridstart.util.PEMReader;
 import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 import nl.nikhef.jgridstart.gui.util.ArrayListModel;
@@ -273,6 +273,24 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	} catch(IOException e) {
 	    dst.delete();
 	    throw e;
+	} catch(NoSuchAlgorithmException e) {
+	    dst.delete();
+	    throw e;
+	} catch(PasswordCancelledException e) {
+	    dst.delete();
+	    throw e;
+	} catch (UnrecoverableKeyException e) {
+	    dst.delete();
+	    throw e;
+	} catch (KeyStoreException e) {
+	    dst.delete();
+	    throw e;
+	} catch (NoSuchProviderException e) {
+	    dst.delete();
+	    throw e;
+	} catch (CertificateException e) {
+	    dst.delete();
+	    throw e;
 	}
     }
     
@@ -297,12 +315,14 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	}
     }
 
-    /** Return the default certificate. The default certificate is the one
-     * in {@code ~/.globus} (or the platform's equivalent). Normally this is a
-     * symlink to or copy of a certificate in the store
+    /** Return the default certificate.<p>
+     * The default certificate is the one in {@code ~/.globus}
+     * (or the platform's equivalent). Normally this is a symlink to or copy of
+     * a certificate in the store.
      * <p>
      * When the certificate is not found in the certificate store, it is added
-     * as a new one.
+     * as a new one. Because of this, make sure to invoke this method only after
+     * a store is loaded using {@link #load} (or a constructor doing that).
      * 
      * @return Default CertificatePair, or null if not present or not matched. 
      */
@@ -310,8 +330,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	File dflCertFile = new File(path, "usercert.pem"); 
 	X509Certificate dflCert = null;
 	try {
-	    dflCert = (X509Certificate)CryptoUtils.readPEM(
-	    	    new FileReader(dflCertFile), null);
+	    dflCert = (X509Certificate)PEMReader.readObject(dflCertFile);
 	} catch (IOException e) { }
 	if (dflCert!=null) {
 	    for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {

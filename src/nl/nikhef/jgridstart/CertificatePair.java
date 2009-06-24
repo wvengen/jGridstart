@@ -3,6 +3,8 @@ package nl.nikhef.jgridstart;
 import java.awt.ItemSelectable;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,6 +12,9 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.CharBuffer;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyException;
@@ -43,8 +48,9 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import nl.nikhef.jgridstart.ca.*;
-import nl.nikhef.jgridstart.util.CryptoUtils;
 import nl.nikhef.jgridstart.util.FileUtils;
+import nl.nikhef.jgridstart.util.PEMReader;
+import nl.nikhef.jgridstart.util.PEMWriter;
 import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PrivateFileWriter;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
@@ -278,11 +284,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 
 	// read certificate or else CSR, not fatal if they don't exist. 
 	if (getCertFile().exists()) {
-	    cert = (X509Certificate)CryptoUtils.readPEM(
-		    new FileReader(getCertFile()), null);
+	    cert = (X509Certificate)PEMReader.readObject(getCertFile());
 	} else if (getCSRFile().exists()) {
-	    req = (PKCS10CertificationRequest) CryptoUtils.readPEM(
-		    new FileReader(getCSRFile()), null);
+	    req = (PKCS10CertificationRequest)PEMReader.readObject(getCSRFile());
 	}
 	// read additional properties, not fatal if not present
 	if (getPropertiesFile().exists()) {
@@ -335,6 +339,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      */
     static public CertificatePair importFrom(File src, File dst)
 	    throws IOException, NoSuchAlgorithmException, PasswordCancelledException, UnrecoverableKeyException, KeyStoreException, NoSuchProviderException, CertificateException {
+
 	if (!src.isFile() && !src.isDirectory())
 	    throw new IOException("Need file to import from: " + src);
 	if (!src.canRead())
@@ -344,23 +349,20 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	SecurityChecks checks = new SecurityChecks(cert);
 	cert.path = dst;
 	checks.checkAccessPath();
-	
+
+	String ext = src.getName().toLowerCase();
+	ext = ext.substring(ext.lastIndexOf('.')+1);
+
 	if (src.isDirectory()) {
 	    cert.importFromDirectory(src);
-	    cert.notifyChanged();	    
-	    
+	} else 	if (ext.equals("p12") || ext.equals("pfx")) {
+	    cert.importFromPKCS(src);
+	} else if (ext.equals("pem")) {
+	    cert.importFromPEM(src);
 	} else {
-	    // import from file
-	    try {
-		// try to read from PEM first
-		cert.importFromPEM(src);
-		cert.notifyChanged();
-	    } catch (IOException e) {
-		// try to read from PKCS#12
-		cert.importFromPKCS(src);
-		cert.notifyChanged();
-	    }
+	    throw new IOException("Cannot determine format to import from, unknown file extension: "+ext);
 	}
+	cert.notifyChanged();
 	
 	// run checks on imported certificate
 	checks.checkAll();
@@ -379,31 +381,31 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws PasswordCancelledException 
      */
     protected void importFromPEM(File src) throws IOException, NoSuchAlgorithmException, PasswordCancelledException {
-	Object o;
-	FileReader fr = new FileReader(src);
 	int count = 0;
 	logger.finer("Trying to import certificate from PEM file: "+src);
 	// process all items in the file
-	while ((o = PasswordCache.getInstance().
-		readPEM(fr, src, "PEM certificate "+src.getName())) != null) {
+	PEMReader r = new PEMReader(src, "private key in PEM file "+src.getName());
+	while (r.ready()) {
+	    Object o = r.readObject();
+	    if (o==null) break;
 	    count++;
-	    if (o.getClass().isInstance(KeyPair.class)) {
+	    if (o instanceof KeyPair) {
 		// Extract and write private key
 		if (((KeyPair) o).getPrivate() != null) {
 		    PrivateKey privKey = ((KeyPair) o).getPrivate();
-		    PasswordCache.getInstance().writePEM(privKey, getKeyFile(),
-			    "private key for "+getPath().getName());
+		    PEMWriter.writeObject(getKeyFile(), privKey, "private key for "+getPath().getName());
 		}
-	    } else if (o.getClass().isInstance(X509Certificate.class)) {
+	    } else if (o instanceof X509Certificate) {
 		// Extract and write certificate
-		cert = (X509Certificate) o;
-		CryptoUtils.writePEM(cert, new FileWriter(getCertFile()));
-	    } else if (o.getClass()
-		    .isInstance(PKCS10CertificationRequest.class)) {
+		PEMWriter.writeObject(getCertFile(), o);
+	    } else if (o instanceof PKCS10CertificationRequest) {
 		// Extract and write certificate signing request (CSR)
-		req = (PKCS10CertificationRequest) o;
-		CryptoUtils.writePEM(req, new FileWriter(getCSRFile()));
+		PEMWriter.writeObject(getCSRFile(), o);
+	    } else {
+		logger.fine("Discarding unrecognised object in PEM file "+src.getName()+": "+o);
 	    }
+	    // we only copied files, no load it
+	    load(path);
 	}
 
 	if (count == 0)
@@ -443,14 +445,14 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		 *     careful for hardware devices
 		 */
 		Key key = store.getKey(alias, null);
-		CryptoUtils.writePEM(key, new FileWriter(getKeyFile()));
+		PEMWriter.writeObject(getKeyFile(), key, "imported private key");
 	    }
 	    if ((c = store.getCertificate(alias)) != null) {
 		// TODO warn against multiple certificates
 		// TODO we want only lowest certificate for this key ...
 		// TODO check it really is an instance of X509Certificate
 		cert = (X509Certificate) c;
-		CryptoUtils.writePEM(cert, new FileWriter(getCertFile()));
+		PEMWriter.writeObject(getCertFile(), cert);
 	    }
 	}
     }
@@ -490,7 +492,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	if (ext.equals("p12") || ext.equals("pfx")) {
 	    exportToPKCS(dst);
 	} else if (ext.equals("pem")) {
-	    // TODO
+	    exportToPEM(dst);
 	} else {
 	    throw new IOException("Cannot determine format to export to, unknown file extension: "+ext);
 	}
@@ -506,8 +508,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws NoSuchAlgorithmException 
      * @throws PasswordCancelledException */
     protected void exportToPKCS(File dst) throws IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, PasswordCancelledException {
-	
-	logger.finer("Exporting certificate '"+this+"' to: "+dst);
+	logger.finer("Exporting certificate '"+this+"' to PKCS#12: "+dst);
 
 	// Create certificate chain TODO do proper chain
 	X509Certificate[] certchain = {cert}; // TODO include chain?
@@ -523,6 +524,34 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	char[] pw = pwcache.getForEncrypt(storename, dst.getCanonicalPath());
 	FileOutputStream out = new FileOutputStream(dst);
 	store.store(out, pw);
+	out.close();
+    }
+    
+    /** Export the certificate and private key to a PEM file.
+     * <p>
+     * This is quite simple, since it just concatenates the existing
+     * files from its .globus directory; no password is needed.
+     * 
+     * @throws IOException 
+     */
+    protected void exportToPEM(File dst) throws IOException {
+	logger.finer("Exporting certificate '"+this+"' to PEM: "+dst);
+	
+	BufferedWriter out = new BufferedWriter(new PrivateFileWriter(dst));
+	String s = System.getProperty("line.separator");
+	File[] files = new File[] {
+		getKeyFile(),
+		getCSRFile(),
+		getCertFile()
+	};
+	for (int i=0; i<files.length; i++) {
+	    if (files[i]==null) continue;
+	    BufferedReader in = new BufferedReader(new FileReader(files[i]));
+	    while (in.ready()) {
+		out.write(in.readLine() + s);
+	    }
+	    in.close();
+	}
 	out.close();
     }
 
@@ -574,11 +603,14 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		sigAlgName, name, pubKey, derSet, privKey);
 
 	// Save certificate request
-	CryptoUtils.writePEM(cert.req, new FileWriter(cert.getCSRFile()));
+	PEMWriter w = new PEMWriter(cert.getCSRFile());
+	w.writeObject(cert.req);
+	w.close();
 
 	// Save private key; permissions are ok by default
-	PasswordCache.getInstance().writePEM(privKey, cert.getKeyFile(), 
-		"new certificate's private key");
+	PEMWriter wk = new PEMWriter(cert.getKeyFile());
+	wk.writeObject(privKey, "new certificate's private key");
+	wk.close();
 	
 	// check
 	checks.checkAll();
@@ -637,7 +669,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	cert = getCA().downloadCertificate(req, getProperty("request.serial"));
 	if (cert!=null) {
 	    setProperty("request.processed", Boolean.toString(true));
-	    CryptoUtils.writePEM(cert, new FileWriter(getCertFile()));
+	    PEMWriter w = new PEMWriter(getCertFile());
+	    w.writeObject(cert);
+	    w.close();
 	    notifyChanged();
 	}
 	// TODO what when cert is null, throw Exception; can downloadCertificate() return null anyway?
@@ -712,10 +746,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws IOException 
      * @throws PasswordCancelledException */
     protected PrivateKey getPrivateKey() throws IOException, PasswordCancelledException {
-	FileReader reader = new FileReader(getKeyFile());
-	PasswordCache pwcache = PasswordCache.getInstance();
-	PrivateKey privKey = ((KeyPair)pwcache.readPEM(reader, getKeyFile(), "private key")).getPrivate();
-	return privKey;
+	return ((KeyPair)PEMReader.readObject(getKeyFile(), "private key")).getPrivate();
     }
     
     /** return the certificate, or null if not present. */
@@ -728,8 +759,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	if (req==null) {
 	    if (!getCSRFile().isFile() || !getCSRFile().canRead())
 		return null;
-	    req = (PKCS10CertificationRequest)
-	    	CryptoUtils.readPEM(new FileReader(getCSRFile()), null);
+	    req = (PKCS10CertificationRequest)PEMReader.readObject(getCSRFile());
 	}
 	return req;
     }
@@ -904,9 +934,11 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		throw new IOException("Private key cannot be read: " + f);
 	    // TODO check that others cannot read this key!
 	    try {
-		if (CryptoUtils.readPEM(new FileReader(f), null) == null)
-		    throw new IOException(
-			    "Private key file contains no private key: " + f);
+		PEMReader r = new PEMReader(f);
+		Object o = r.readObject();
+		r.close();
+		if (r==null)
+		    throw new IOException("Private key file contains no private key: " + f);
 	    } catch (IOException e) {
 		// Since readPEM "throws IOException" the specific information
 		// that it might have been a PasswordException is lost :(
@@ -932,10 +964,31 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		throw new IOException("Certificate cannot be read: " + f);
 	    // check if certificate can be loaded
 	    // TODO cache certificate loading in cert?
-	    if (CryptoUtils.readPEM(new FileReader(f), null) == null)
-		throw new IOException(
-			"Certificate file contains no certificate: " + f);
+	    if (PEMReader.readObject(f) == null)
+		throw new IOException("Certificate file contains no certificate: " + f);
 	}
+    }
+    
+    /** Test equality.
+     * <p>
+     * A {@linkplain CertificatePair} object only equals another object if
+     * it is a {@linkplain CertificatePair} as well, and if the certificates
+     * are equal. If no certificate is present, the CSR is compared instead.
+     * If no CSR is present either, the path is compared.
+     * <p>
+     * Ideally the private key would be checked as well, but that requires a password.
+     */
+    @Override
+    public boolean equals(Object other) {
+	if (!(other instanceof CertificatePair))
+	    return false;
+	if (getCertificate()!=null)
+	    return cert.equals(((CertificatePair)other).getCertificate());
+	try {
+	    if (getCSR()!=null)
+	        return getCSR().equals(((CertificatePair)other).getCSR());
+	} catch (IOException e) { }
+	return getPath().equals(((CertificatePair)other).getPath());
     }
 
     /*

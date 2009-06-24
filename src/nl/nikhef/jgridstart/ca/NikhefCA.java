@@ -16,10 +16,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
 import nl.nikhef.jgridstart.util.ConnectionUtils;
-import nl.nikhef.jgridstart.util.CryptoUtils;
 
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PEMWriter;
 
 /**
  * This class is used to download a certificate from a Nikhef CA
@@ -71,7 +72,9 @@ public class NikhefCA implements CA {
 	String name = req.getCertificationRequestInfo().getSubject().getValues(X509Principal.CN).get(0).toString();
 	
 	StringWriter reqWriter = new StringWriter();
-	CryptoUtils.writePEM(req, reqWriter);
+	PEMWriter w = new PEMWriter(reqWriter);
+	w.writeObject(req);
+	w.close();
 	
 	String[] postdata = {
 		"action", "submit",
@@ -135,7 +138,9 @@ public class NikhefCA implements CA {
 	};
 	String scert = ConnectionUtils.pageContents(url, pre, false);
 	StringReader reader = new StringReader(scert);
-	X509Certificate cert = (X509Certificate)CryptoUtils.readPEM(reader, null);
+	PEMReader r = new PEMReader(reader);
+	X509Certificate cert = (X509Certificate)r.readObject();
+	r.close();
 	if (cert==null)
 	    throw new IOException("Certificate could not be retrieved: "+scert);
 	return cert;
