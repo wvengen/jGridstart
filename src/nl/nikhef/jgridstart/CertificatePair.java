@@ -298,6 +298,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws IOException 
      * @throws FileNotFoundException */
     public void store() throws FileNotFoundException, IOException {
+	logger.finest("Storing certificate properties: "+getPropertiesFile());
 	Properties p = (Properties)CertificatePair.super.clone();
 	// remove volatile properties
 	ArrayList<String> propsToRemove = new ArrayList<String>();
@@ -381,6 +382,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	Object o;
 	FileReader fr = new FileReader(src);
 	int count = 0;
+	logger.finer("Trying to import certificate from PEM file: "+src);
 	// process all items in the file
 	while ((o = PasswordCache.getInstance().
 		readPEM(fr, src, "PEM certificate "+src.getName())) != null) {
@@ -422,6 +424,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	if (store.size() == 0)
 	    throw new IOException("Not a PKCS#12 file: " + src);
 
+	logger.finer("Importing certificate from PKCS#12 file: "+src);
+
 	Certificate c = null;
 	int i = 1;
 	for (Enumeration<String> it = store.aliases(); it.hasMoreElements(); i++) {
@@ -457,6 +461,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	if (!key.canRead() || !key.isFile())
 	    throw new IOException("Need directory with readable userkey.pem to import from: " + src);
 	
+	logger.finer("Importing certificate from directory: "+src);
+
 	// copy all files
 	List<File> files = Arrays.asList(src.listFiles());
 	for (Iterator<File> i = files.iterator(); i.hasNext();) {
@@ -500,6 +506,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws NoSuchAlgorithmException 
      * @throws PasswordCancelledException */
     protected void exportToPKCS(File dst) throws IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, PasswordCancelledException {
+	
+	logger.finer("Exporting certificate '"+this+"' to: "+dst);
 
 	// Create certificate chain TODO do proper chain
 	X509Certificate[] certchain = {cert}; // TODO include chain?
@@ -540,6 +548,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    NoSuchProviderException, SignatureException, PasswordCancelledException {
 	// functionally based on
 	// org.globus.tools.GridCertRequest.genCertificateRequest()
+	
+	logger.finer("Generating certificate request to "+dst);
 
 	CertificatePair cert = new CertificatePair();
 	SecurityChecks checks = new SecurityChecks(cert);
@@ -585,12 +595,14 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws CertificateException 
      * @throws IOException */
     public void uploadRequest() throws CertificateException, KeyException, NoSuchAlgorithmException, IllegalStateException, NoSuchProviderException, SignatureException, IOException {
+	logger.finer("Uploading certificate request for: "+this);
 	if (cert!=null) {
 	    logger.warning("Ignoring request to upload CSR since certificate is present: "+this);
 	    return;
 	}
 	setProperty("request.serial", getCA().uploadCertificationRequest(req, this));
 	setProperty("request.submitted", "true");
+	logger.finer("Got certificate request serial "+getProperty("request.serial")+" for: "+this);
 	notifyChanged();
 	store();
     }
@@ -619,6 +631,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    logger.warning("Ignoring request to download certificate when already present: "+this);
 	    return;
 	}
+	
+	logger.finer("Downloading certificate: "+this);
 	
 	cert = getCA().downloadCertificate(req, getProperty("request.serial"));
 	if (cert!=null) {

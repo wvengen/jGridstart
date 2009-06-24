@@ -233,6 +233,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * @throws IOException 
      */
     public CertificatePair delete(int index) throws IOException {
+	logger.info("Deleting certificate #"+index+": "+get(index));
 	// remove from list
 	CertificatePair cert = super.remove(index);
 	// and from disk; subdirs are not deleted
