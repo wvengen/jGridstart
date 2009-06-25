@@ -328,7 +328,8 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * @return Default CertificatePair, or null if not present or not matched. 
      */
     public CertificatePair getDefault() {
-	File dflCertFile = new File(path, "usercert.pem"); 
+	File dflCertFile = new File(path, "usercert.pem");
+	if (!dflCertFile.canRead()) return null;
 	X509Certificate dflCert = null;
 	try {
 	    dflCert = (X509Certificate)PEMReader.readObject(dflCertFile, X509Certificate.class);
