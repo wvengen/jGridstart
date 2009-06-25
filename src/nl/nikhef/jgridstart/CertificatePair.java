@@ -64,6 +64,8 @@ import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import sun.security.pkcs.PKCS10;
+
 /**
  * Class containing everything related to a grid certificate. Each instance is
  * directly bound to a ~/.globus/xxx directory containing the relevant files (or
@@ -284,9 +286,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 
 	// read certificate or else CSR, not fatal if they don't exist. 
 	if (getCertFile().exists()) {
-	    cert = (X509Certificate)PEMReader.readObject(getCertFile());
+	    cert = (X509Certificate)PEMReader.readObject(getCertFile(), X509Certificate.class);
 	} else if (getCSRFile().exists()) {
-	    req = (PKCS10CertificationRequest)PEMReader.readObject(getCSRFile());
+	    req = (PKCS10CertificationRequest)PEMReader.readObject(getCSRFile(), PKCS10CertificationRequest.class);
 	}
 	// read additional properties, not fatal if not present
 	if (getPropertiesFile().exists()) {
@@ -746,7 +748,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws IOException 
      * @throws PasswordCancelledException */
     protected PrivateKey getPrivateKey() throws IOException, PasswordCancelledException {
-	return ((KeyPair)PEMReader.readObject(getKeyFile(), "private key")).getPrivate();
+	return ((KeyPair)PEMReader.readObject(getKeyFile(), KeyPair.class, "private key")).getPrivate();
     }
     
     /** return the certificate, or null if not present. */
@@ -759,7 +761,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	if (req==null) {
 	    if (!getCSRFile().isFile() || !getCSRFile().canRead())
 		return null;
-	    req = (PKCS10CertificationRequest)PEMReader.readObject(getCSRFile());
+	    req = (PKCS10CertificationRequest)PEMReader.readObject(getCSRFile(), PKCS10CertificationRequest.class);
 	}
 	return req;
     }
@@ -934,10 +936,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		throw new IOException("Private key cannot be read: " + f);
 	    // TODO check that others cannot read this key!
 	    try {
-		PEMReader r = new PEMReader(f);
-		Object o = r.readObject();
-		r.close();
-		if (r==null)
+		Object o = PEMReader.readObject(f, KeyPair.class);
+		if (o==null)
 		    throw new IOException("Private key file contains no private key: " + f);
 	    } catch (IOException e) {
 		// Since readPEM "throws IOException" the specific information
@@ -964,7 +964,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		throw new IOException("Certificate cannot be read: " + f);
 	    // check if certificate can be loaded
 	    // TODO cache certificate loading in cert?
-	    if (PEMReader.readObject(f) == null)
+	    if (PEMReader.readObject(f, X509Certificate.class) == null)
 		throw new IOException("Certificate file contains no certificate: " + f);
 	}
     }

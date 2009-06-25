@@ -330,7 +330,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	File dflCertFile = new File(path, "usercert.pem"); 
 	X509Certificate dflCert = null;
 	try {
-	    dflCert = (X509Certificate)PEMReader.readObject(dflCertFile);
+	    dflCert = (X509Certificate)PEMReader.readObject(dflCertFile, X509Certificate.class);
 	} catch (IOException e) { }
 	if (dflCert!=null) {
 	    for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {

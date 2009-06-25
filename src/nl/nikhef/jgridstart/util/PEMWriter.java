@@ -3,7 +3,6 @@ package nl.nikhef.jgridstart.util;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -24,6 +23,22 @@ public class PEMWriter extends org.bouncycastle.openssl.PEMWriter {
     public PEMWriter(File out, String provider) throws IOException {
 	super(new FileWriter(out), provider);
 	f = out;
+    }
+    
+    /** Write object encrypted to PEM encrypted.
+     * <p>
+     * This sets the file permissions to user-accessible only when
+     * the supplied object contains a private key. For the rest it
+     * just calls its parent,
+     * {@link org.bouncycastle.openssl.PEMWriter#writeObject}.
+     * <p>
+     * 
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeObject(Object obj, String algorithm, char[] password, SecureRandom random) throws IOException {
+	FileUtils.chmod(f, true, true, false, true);
+	super.writeObject(obj, algorithm, password, random);
     }
 
     /** Write object to PEM encrypted */
