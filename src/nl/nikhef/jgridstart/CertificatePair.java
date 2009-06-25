@@ -276,7 +276,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	path = f;
 
 	// make sure it's ok
-	new CertificateCheck(this).check();
+	check(false);
 
 	// read additional properties, not fatal if not present
 	if (getPropertiesFile().exists()) {
@@ -337,9 +337,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    throw new IOException("Cannot read file to import from: " + src);
 
 	CertificatePair cert = new CertificatePair();
-	CertificateCheck checks = new CertificateCheck(cert);
 	cert.path = dst;
-	checks.checkAccessPath();
 
 	String ext = src.getName().toLowerCase();
 	ext = ext.substring(ext.lastIndexOf('.')+1);
@@ -356,8 +354,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	cert.notifyChanged();
 	
 	// run checks on imported certificate
-	checks.check();
-	checks.checkPrivate();
+	cert.check(true);
 
 	return cert;
     }
@@ -578,9 +575,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	logger.finer("Generating certificate request to "+dst);
 
 	CertificatePair cert = new CertificatePair();
-	CertificateCheck checks = new CertificateCheck(cert);
 	cert.path = dst;
-	checks.checkAccessPath();
 
 	String sigAlgName = "SHA1WithRSA";
 	String keyAlgName = "RSA";
@@ -605,8 +600,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	PEMWriter.writeObject(cert.getKeyFile(), privKey, "new certificate's private key");
 	
 	// check
-	checks.check();
-	checks.checkPrivate();
+	cert.check(true);
 	
 	return cert;
     }
@@ -668,7 +662,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    notifyChanged();
 	}
 	// TODO what when cert is null, throw Exception; can downloadCertificate() return null anyway?
-	new CertificateCheck(this).check();
+	check(false);
     }
     
     /** Return the correct CA for this CertificatePair. Currently this is
@@ -787,6 +781,20 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    return false;
 	}	
 	return true;
+    }
+    
+    /**
+     * Run certificate checks.
+     * 
+     * @param checkPriv True to check private key as well, requires private key password.
+     *                  You can safely test this if the private key password is still
+     *                  known to be in the {@link PasswordCache}
+     * @throws IOException 
+     */
+    protected void check(boolean checkPriv) throws IOException {
+	CertificateCheck c = new CertificateCheck(this);
+	c.check();
+	if (checkPriv) c.checkPrivate();
     }
 
     /**
