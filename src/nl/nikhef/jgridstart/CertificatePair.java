@@ -668,7 +668,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    notifyChanged();
 	}
 	// TODO what when cert is null, throw Exception; can downloadCertificate() return null anyway?
-	// TODO security check
+	new CertificateCheck(this).check();
     }
     
     /** Return the correct CA for this CertificatePair. Currently this is
