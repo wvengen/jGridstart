@@ -1,6 +1,7 @@
 package nl.nikhef.jgridstart.gui;
 
 import java.awt.event.ActionEvent;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
@@ -28,7 +29,11 @@ public class ActionMakeDefault extends CertificateAction {
     @Override
     public boolean wantsEnabled() {
 	CertificatePair cert = selection.getCertificatePair();
-	return cert!=null && cert.getCertificate()!=null && !cert.equals(store.getDefault());
+	try {
+	    return cert!=null && cert.getCertificate()!=null && !cert.equals(store.getDefault());
+	} catch (IOException e) {
+	    return false;
+	}
     }
 
     public void actionPerformed(ActionEvent e) {

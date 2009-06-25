@@ -3,6 +3,7 @@ package nl.nikhef.jgridstart;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -331,14 +332,14 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	X509Certificate dflCert = null;
 	try {
 	    dflCert = (X509Certificate)PEMReader.readObject(dflCertFile, X509Certificate.class);
-	} catch (IOException e) { }
-	if (dflCert!=null) {
-	    for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {
-		CertificatePair c = it.next();
-		if (c.getCertificate()!=null && c.getCertificate().equals(dflCert))
-		    return c;
+	    if (dflCert!=null) {
+		for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {
+		    CertificatePair c = it.next();
+		    if (c.getCertificate()!=null && c.getCertificate().equals(dflCert))
+			return c;
+		}
 	    }
-	}
+	} catch (IOException e) { }
 	// no match: add to certificate store
 	try {
 	    logger.info("Adding existing default certificate to certificate store");
@@ -376,7 +377,9 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     protected void trySetDefault() {
 	// not that getDefault() must be first since it can add a
 	// default certificate to the store
-	if (getDefault()==null && size()==1 && get(0).getCertificate()!=null)
-	    trySetDefault(get(0));
+	try {
+	    if (getDefault()==null && size()==1 && get(0).getCertificate()!=null)
+	        trySetDefault(get(0));
+	} catch (IOException e) { }
     }
 }

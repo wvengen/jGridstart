@@ -23,6 +23,7 @@ import javax.swing.SwingUtilities;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -325,8 +326,12 @@ public class JGSFrame extends JFrame {
 	    // no certificate selected, present signup page
 	    certInfoPane.setDocument(getClass().getResource("certificate_none_yet.html").toExternalForm());
 	}
-	certInfoButtons.get("viewrequest").setVisible(c!=null && c.getCertificate()==null);
-	certInfoButtons.get("install").setVisible(c!=null && c.getCertificate()!=null);
+	boolean certPresent = false;
+	try {
+	    certPresent = c!=null && c.getCertificate()==null;
+	} catch (IOException e) { }
+	certInfoButtons.get("viewrequest").setVisible(certPresent);
+	certInfoButtons.get("install").setVisible(certPresent);
 	certInfoButtons.get("revoke").setVisible(c!=null);
 	
 	certInfoButtons.get("import").setVisible(c==null);

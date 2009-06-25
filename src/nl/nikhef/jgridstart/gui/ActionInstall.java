@@ -5,6 +5,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.SecureRandom;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -30,7 +32,11 @@ public class ActionInstall extends CertificateAction {
     
     @Override
     public boolean wantsEnabled() {
-	return getCertificatePair()!=null && getCertificatePair().getCertificate()!=null;
+	try {
+	    return getCertificatePair()!=null && getCertificatePair().getCertificate()!=null;
+	} catch (IOException e) {
+	    return false;
+	}
     }
 
     public void actionPerformed(ActionEvent e) {

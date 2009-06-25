@@ -10,11 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.CharBuffer;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyException;
@@ -63,8 +59,6 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import sun.security.pkcs.PKCS10;
 
 /**
  * Class containing everything related to a grid certificate. Each instance is
@@ -172,57 +166,57 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    String r = getPropertyHtml(key.substring(0, key.length()-5));
 	    if (r!=null) return r;
 	}
-	// return generated property
-	if (key.equals("cert"))
-	    if (cert==null) return null;
-	    else return "true";
-	if (key.equals("request"))
-	    if (!getCSRFile().exists()) return null;
-	    else return "true";
-	if (key.equals("subject"))
-	    if (cert==null && req==null) return null;
-	    else return getSubjectPrincipalValue("x-full");;
-	if (key.startsWith("subject."))
-	    return getSubjectPrincipalValue(key.substring(8));
-	if (key.equals("issuer"))
-	    if (cert==null) return null;
-	    else return "true";
-	if (key.startsWith("issuer."))
-	    return getIssuerPrincipalValue(key.substring(7));
-	if (key.equals("org")) {
-	    if (containsKey(key)) return super.getProperty(key);
-	    if (getProperty("subject")==null) return null;
-	    // return last defined organisation
-	    // TODO doesn't work when organisation unit is involved; need to move to Organisation
-	    String[] orgs = getProperty("subject.o").split(",\\s*");
-	    return orgs[orgs.length-1];
-	}
 	try {
+	    // return generated property
+	    if (key.equals("cert"))
+		if (getCertificate()==null) return null;
+		else return "true";
+	    if (key.equals("request"))
+		if (!getCSRFile().exists()) return null;
+		else return "true";
+	    if (key.equals("subject"))
+		if (getCertificate()==null && getCSR()==null) return null;
+		else return getSubjectPrincipalValue("x-full");
+	    if (key.startsWith("subject."))
+		return getSubjectPrincipalValue(key.substring(8));
+	    if (key.equals("issuer"))
+		if (getCertificate()==null) return null;
+		else return "true";
+	    if (key.startsWith("issuer."))
+		return getIssuerPrincipalValue(key.substring(7));
+	    if (key.equals("org")) {
+		if (containsKey(key)) return super.getProperty(key);
+		if (getProperty("subject")==null) return null;
+		// return last defined organisation
+		// TODO doesn't work when organisation unit is involved; need to move to Organisation
+		String[] orgs = getProperty("subject.o").split(",\\s*");
+		return orgs[orgs.length-1];
+	    }
 	    if (key.equals("modulus"))
-		if (cert!=null) return ((RSAPublicKey)cert.getPublicKey()).getModulus().toString();
-		else if (req!=null) return ((RSAPublicKey)req.getPublicKey()).getModulus().toString();
+		if (getCertificate()!=null) return ((RSAPublicKey)getCertificate().getPublicKey()).getModulus().toString();
+		else if (getCSR()!=null) return ((RSAPublicKey)getCSR().getPublicKey()).getModulus().toString();
 	    if (key.equals("modulus.first20"))
-		if (cert!=null) return ((RSAPublicKey)cert.getPublicKey()).getModulus().toString().substring(0,20);
-		else if (req!=null) return ((RSAPublicKey)req.getPublicKey()).getModulus().toString().substring(0,20);
+		if (getCertificate()!=null) return ((RSAPublicKey)getCertificate().getPublicKey()).getModulus().toString().substring(0,20);
+		else if (getCSR()!=null) return ((RSAPublicKey)getCSR().getPublicKey()).getModulus().toString().substring(0,20);
 	    else return null;
 	    if (key.equals("valid")) {
-		if (cert==null) return null;
-		try { cert.checkValidity(); }
+		if (getCertificate()==null) return null;
+		try { getCertificate().checkValidity(); }
 		catch(CertificateExpiredException e) { return null; }
 		catch(CertificateNotYetValidException e) { return null; }
 		return "true";
 	    }
 	    if (key.equals("valid.notbefore")) {
-		if (cert==null) return null;
-		return DateFormat.getDateInstance().format(cert.getNotBefore());
+		if (getCertificate()==null) return null;
+		return DateFormat.getDateInstance().format(getCertificate().getNotBefore());
 	    }
 	    if (key.equals("valid.notafter")) {
-		if (cert==null) return null;
-		return DateFormat.getDateInstance().format(cert.getNotAfter());
+		if (getCertificate()==null) return null;
+		return DateFormat.getDateInstance().format(getCertificate().getNotAfter());
 	    }
 	    if (key.startsWith("usage")) {
-		if (cert==null) return null;
-		List<String> usage = cert.getExtendedKeyUsage();
+		if (getCertificate()==null) return null;
+		List<String> usage = getCertificate().getExtendedKeyUsage();
 		if (usage==null) return null;
 		if ( key.equals("usage") ||
 		     (key.equals("usage.any")
@@ -282,18 +276,13 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	path = f;
 
 	// make sure it's ok
-	new SecurityChecks(this).checkAll();
+	new CertificateCheck(this).check();
 
-	// read certificate or else CSR, not fatal if they don't exist. 
-	if (getCertFile().exists()) {
-	    cert = (X509Certificate)PEMReader.readObject(getCertFile(), X509Certificate.class);
-	} else if (getCSRFile().exists()) {
-	    req = (PKCS10CertificationRequest)PEMReader.readObject(getCSRFile(), PKCS10CertificationRequest.class);
-	}
 	// read additional properties, not fatal if not present
 	if (getPropertiesFile().exists()) {
 	    super.load(new FileInputStream(getPropertiesFile()));
 	}
+
 	notifyChanged();
     }
     
@@ -348,7 +337,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    throw new IOException("Cannot read file to import from: " + src);
 
 	CertificatePair cert = new CertificatePair();
-	SecurityChecks checks = new SecurityChecks(cert);
+	CertificateCheck checks = new CertificateCheck(cert);
 	cert.path = dst;
 	checks.checkAccessPath();
 
@@ -367,7 +356,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	cert.notifyChanged();
 	
 	// run checks on imported certificate
-	checks.checkAll();
+	checks.check();
+	checks.checkPrivate();
 
 	return cert;
     }
@@ -513,7 +503,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	logger.finer("Exporting certificate '"+this+"' to PKCS#12: "+dst);
 
 	// Create certificate chain TODO do proper chain
-	X509Certificate[] certchain = {cert}; // TODO include chain?
+	X509Certificate[] certchain = {getCertificate()}; // TODO include chain?
 	
 	// Create PKCS12 keystore with password
 	KeyStore store = KeyStore.getInstance("PKCS12", "BC");
@@ -540,21 +530,26 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	logger.finer("Exporting certificate '"+this+"' to PEM: "+dst);
 	
 	BufferedWriter out = new BufferedWriter(new PrivateFileWriter(dst));
-	String s = System.getProperty("line.separator");
-	File[] files = new File[] {
-		getKeyFile(),
-		getCSRFile(),
-		getCertFile()
-	};
-	for (int i=0; i<files.length; i++) {
-	    if (files[i]==null) continue;
-	    BufferedReader in = new BufferedReader(new FileReader(files[i]));
-	    while (in.ready()) {
-		out.write(in.readLine() + s);
+	try {
+	    String s = System.getProperty("line.separator");
+	    File[] files = new File[] {
+		    getKeyFile(),
+		    getCSRFile(),
+		    getCertFile()
+	    };
+	    for (int i=0; i<files.length; i++) {
+		if (files[i]==null) continue;
+		BufferedReader in = new BufferedReader(new FileReader(files[i]));
+		while (in.ready()) {
+		    out.write(in.readLine() + s);
+		}
+		in.close();
 	    }
-	    in.close();
+	} catch(IOException e) {
+	    throw e;
+	} finally {
+	    out.close();
 	}
-	out.close();
     }
 
     /** Generate a new private key+CSR pair. Details are taken from
@@ -583,7 +578,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	logger.finer("Generating certificate request to "+dst);
 
 	CertificatePair cert = new CertificatePair();
-	SecurityChecks checks = new SecurityChecks(cert);
+	CertificateCheck checks = new CertificateCheck(cert);
 	cert.path = dst;
 	checks.checkAccessPath();
 
@@ -605,17 +600,13 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		sigAlgName, name, pubKey, derSet, privKey);
 
 	// Save certificate request
-	PEMWriter w = new PEMWriter(cert.getCSRFile());
-	w.writeObject(cert.req);
-	w.close();
-
+	PEMWriter.writeObject(cert.getCSRFile(), cert.req);
 	// Save private key; permissions are ok by default
-	PEMWriter wk = new PEMWriter(cert.getKeyFile());
-	wk.writeObject(privKey, "new certificate's private key");
-	wk.close();
+	PEMWriter.writeObject(cert.getKeyFile(), privKey, "new certificate's private key");
 	
 	// check
-	checks.checkAll();
+	checks.check();
+	checks.checkPrivate();
 	
 	return cert;
     }
@@ -630,11 +621,13 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws IOException */
     public void uploadRequest() throws CertificateException, KeyException, NoSuchAlgorithmException, IllegalStateException, NoSuchProviderException, SignatureException, IOException {
 	logger.finer("Uploading certificate request for: "+this);
-	if (cert!=null) {
+	try {
+	    if (getCertificate()==null) throw new IOException();
+	} catch (IOException e) {
 	    logger.warning("Ignoring request to upload CSR since certificate is present: "+this);
 	    return;
 	}
-	setProperty("request.serial", getCA().uploadCertificationRequest(req, this));
+	setProperty("request.serial", getCA().uploadCertificationRequest(getCSR(), this));
 	setProperty("request.submitted", "true");
 	logger.finer("Got certificate request serial "+getProperty("request.serial")+" for: "+this);
 	notifyChanged();
@@ -649,7 +642,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
     public boolean isCertificationRequestProcessed() throws KeyManagementException, NoSuchAlgorithmException {
 	boolean isProcessed;
 	try {
-	    isProcessed = getCA().isCertificationRequestProcessed(req, getProperty("request.serial"));
+	    isProcessed = getCA().isCertificationRequestProcessed(getCSR(), getProperty("request.serial"));
 	    boolean oldProcessed = Boolean.valueOf(getProperty("request.processed"));
 	    setProperty("request.processed", Boolean.toString(isProcessed));
 	    if (oldProcessed != isProcessed) notifyChanged();
@@ -661,19 +654,17 @@ public class CertificatePair extends Properties implements ItemSelectable {
     
     /** Download the certificate from the certificate authority */
     public void downloadCertificate() throws IOException, KeyManagementException, NoSuchAlgorithmException {
-	if (cert!=null) {
+	if (getCertificate()!=null) {
 	    logger.warning("Ignoring request to download certificate when already present: "+this);
 	    return;
 	}
 	
 	logger.finer("Downloading certificate: "+this);
 	
-	cert = getCA().downloadCertificate(req, getProperty("request.serial"));
+	cert = getCA().downloadCertificate(getCSR(), getProperty("request.serial"));
 	if (cert!=null) {
 	    setProperty("request.processed", Boolean.toString(true));
-	    PEMWriter w = new PEMWriter(getCertFile());
-	    w.writeObject(cert);
-	    w.close();
+	    PEMWriter.writeObject(getCertFile(), cert);
 	    notifyChanged();
 	}
 	// TODO what when cert is null, throw Exception; can downloadCertificate() return null anyway?
@@ -751,17 +742,26 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return ((KeyPair)PEMReader.readObject(getKeyFile(), KeyPair.class, "private key")).getPrivate();
     }
     
-    /** return the certificate, or null if not present. */
-    public X509Certificate getCertificate() {
+    /** Return the certificate, or null if not present. */
+    public X509Certificate getCertificate() throws IOException {
+	if (cert==null) {
+	    try {
+		cert = (X509Certificate)PEMReader.readObject(getCertFile(), X509Certificate.class);
+	    } catch (FileNotFoundException e) {
+		cert = null;
+	    }
+	}
 	return cert;
     }
     
     /** return the certificate signing request, or null if not present */
     public PKCS10CertificationRequest getCSR() throws IOException {
 	if (req==null) {
-	    if (!getCSRFile().isFile() || !getCSRFile().canRead())
-		return null;
-	    req = (PKCS10CertificationRequest)PEMReader.readObject(getCSRFile(), PKCS10CertificationRequest.class);
+	    try {
+		req = (PKCS10CertificationRequest)PEMReader.readObject(getCSRFile(), PKCS10CertificationRequest.class);
+	    } catch (FileNotFoundException e) {
+		req = null;
+	    }
 	}
 	return req;
     }
@@ -807,13 +807,13 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	try {
 	    // determine source: certificate, else CSR, else return null.
 	    X509Name subject = null;
-	    if (cert != null) {
-		if (where) subject = PrincipalUtil.getSubjectX509Principal(cert);
-		else       subject = PrincipalUtil.getIssuerX509Principal(cert);
+	    if (getCertificate() != null) {
+		if (where) subject = PrincipalUtil.getSubjectX509Principal(getCertificate());
+		else       subject = PrincipalUtil.getIssuerX509Principal(getCertificate());
 	    } else {
-		if (req == null) return null;
+		if (getCSR() == null) return null;
 		if (!where) return null; // no issuer yet for CSR 
-		subject = req.getCertificationRequestInfo().getSubject();
+		subject = getCSR().getCertificationRequestInfo().getSubject();
 	    }
 	    // get info from it
 	    if (id!=null) {
@@ -835,7 +835,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		}
 		return ret;
 	    }
-	} catch (CertificateEncodingException e) { }
+	} catch (CertificateEncodingException e) { 
+	} catch (IOException e) {
+	}
 	return null;
     }
     public String getSubjectPrincipalValue(DERObjectIdentifier id) {
@@ -881,8 +883,12 @@ public class CertificatePair extends Properties implements ItemSelectable {
 
 
     public String toString() {
-	if (cert == null && req == null)
+	try {
+	    if (getCertificate() == null && getCSR() == null)
+	        throw new IOException();
+	} catch (IOException e) {
 	    return "<empty " + this.getClass().getSimpleName() + ">";
+	}
 	String name = getSubjectPrincipalValue(X509Principal.CN);
 	String org = getSubjectPrincipalValue(X509Principal.O);
 	if (name == null && org == null)
@@ -890,85 +896,6 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return name + " (" + org + ")";
     }
 
-    /**
-     * Security checks for the certificate directory. All checks have a void
-     * return type and throw an (TODO x) Exception on failure.
-     */
-    static protected class SecurityChecks {
-	protected CertificatePair cert = null;
-
-	public SecurityChecks(CertificatePair c) {
-	    cert = c;
-	}
-
-	/** Run all checks. */
-	public void checkAll() throws IOException {
-	    checkAccessPath();
-	    checkPrivateKey();
-	    checkCertificate();
-	}
-
-	/** Check access to certificate directory. Must exist. */
-	public void checkAccessPath() throws IOException {
-	    File f = cert.getPath();
-	    if (!f.exists())
-		throw new IOException("Certificate directory not found: " + f);
-	    if (!f.isDirectory())
-		throw new IOException(
-			"Certificate directory is not a directory: " + f);
-	    if (!f.canRead())
-		throw new IOException("Certificate directory cannot be read: "
-			+ f);
-	}
-
-	/**
-	 * Check that the private key is valid. It only checks that a private
-	 * key file is present and has a valid format, not if it can be
-	 * decrypted since we don't want to use the password.
-	 */
-	public void checkPrivateKey() throws IOException {
-	    File f = cert.getKeyFile();
-	    if (!f.exists())
-		throw new IOException("Private key not found: " + f);
-	    if (!f.isFile())
-		throw new IOException("Private key is not a file: " + f);
-	    if (!f.canRead())
-		throw new IOException("Private key cannot be read: " + f);
-	    // TODO check that others cannot read this key!
-	    try {
-		Object o = PEMReader.readObject(f, KeyPair.class);
-		if (o==null)
-		    throw new IOException("Private key file contains no private key: " + f);
-	    } catch (IOException e) {
-		// Since readPEM "throws IOException" the specific information
-		// that it might have been a PasswordException is lost :(
-		// So now I have to parse the message string ...
-		if (!e.getMessage().contains("org.bouncycastle.openssl.PasswordException")&&
-		    !e.getMessage().contains("wrong password"))
-		    throw e;
-	    }
-	}
-
-	/**
-	 * Check the certificate. This is only checked if the certificate really
-	 * exists, because it is optional (e.g. when the certificate signing
-	 * request was made but the certificate not received from the CA).
-	 */
-	public void checkCertificate() throws IOException {
-	    File f = cert.getCertFile();
-	    if (!f.exists())
-		return;
-	    if (!f.isFile())
-		throw new IOException("Certificate is not a file: " + f);
-	    if (!f.canRead())
-		throw new IOException("Certificate cannot be read: " + f);
-	    // check if certificate can be loaded
-	    // TODO cache certificate loading in cert?
-	    if (PEMReader.readObject(f, X509Certificate.class) == null)
-		throw new IOException("Certificate file contains no certificate: " + f);
-	}
-    }
-    
     /** Test equality.
      * <p>
      * A {@linkplain CertificatePair} object only equals another object if
@@ -982,8 +909,12 @@ public class CertificatePair extends Properties implements ItemSelectable {
     public boolean equals(Object other) {
 	if (!(other instanceof CertificatePair))
 	    return false;
-	if (getCertificate()!=null)
-	    return cert.equals(((CertificatePair)other).getCertificate());
+	try {
+	    if (getCertificate()!=null)
+	        return getCertificate().equals(((CertificatePair)other).getCertificate());
+	} catch (IOException e1) {
+	    return false;
+	}
 	try {
 	    if (getCSR()!=null)
 	        return getCSR().equals(((CertificatePair)other).getCSR());
