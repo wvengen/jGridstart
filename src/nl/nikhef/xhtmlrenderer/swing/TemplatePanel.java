@@ -114,7 +114,7 @@ import org.xhtmlrenderer.util.Configuration;
  * 
  * @author wvengen
  */
-public class TemplatePanel extends XHTMLPanel {
+public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
     
     protected Properties data = new Properties();
     protected TemplateDocument template = null;
@@ -132,26 +132,6 @@ public class TemplatePanel extends XHTMLPanel {
     public TemplatePanel(String src) throws IOException {
 	this();
 	setDocument(src);
-    }
-    
-    /** Replace the listener that is activated when a link is clicked.
-     * <p>
-     * This is a convenience method that first removes all LinkListeners, and
-     * then adds the supplied one.
-     * 
-     * @param llnew New LinkListener to use for this TemplatePanel
-     */
-    @SuppressWarnings("unchecked") // getMouseTrackingListeners() returns unchecked List
-    public void replaceLinkListener(LinkListener llnew) {
-	// remove all existing LinkListeners
-	List<FSMouseListener> ls = (List<FSMouseListener>)getMouseTrackingListeners();
-	for (Iterator<FSMouseListener> it = ls.iterator(); it.hasNext(); ) {
-	    FSMouseListener l = it.next();
-	    if (l instanceof LinkListener)
-		removeMouseTrackingListener(l);
-	}
-	// and add new one
-	addMouseTrackingListener(llnew);
     }
     
     /** Set the properties to use for the template and form elements.
@@ -204,20 +184,6 @@ public class TemplatePanel extends XHTMLPanel {
      * {@link #submit} is called. */
     public void setSubmitAction(Action e) {
 	submitAction = e;
-    }
-    
-    /** print the contents of this pane with the smallest possible printer margins;
-     * a print dialog is shown first.
-     * 
-     * @throws PrinterException
-     */
-    public boolean print() throws PrinterException {
-	final PrinterJob printJob = PrinterJob.getPrinterJob();
-        printJob.setPrintable(new TemplatePrintable(this));
-        if (printJob.printDialog()) {
-            printJob.print();
-        }
-	return true;
     }
     
     /** Event handler for form submission.

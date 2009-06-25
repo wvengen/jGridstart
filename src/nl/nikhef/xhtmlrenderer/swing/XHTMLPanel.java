@@ -1,6 +1,10 @@
 package nl.nikhef.xhtmlrenderer.swing;
 
 import java.awt.Font;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.UIManager;
 
@@ -24,15 +28,19 @@ import org.xhtmlrenderer.extend.UserAgentCallback;
 import org.xhtmlrenderer.layout.SharedContext;
 import org.xhtmlrenderer.render.FSFont;
 import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
+import org.xhtmlrenderer.swing.FSMouseListener;
+import org.xhtmlrenderer.swing.LinkListener;
 
 /** An {@link org.xhtmlrenderer.simple.XHTMLPanel} with minor tweaks.
  * <p>
  * This class sets the font from the system's default dialog font so
  * it blends nicely into the user-interface.
+ * <p>
+ * The method {@link #replaceLinkListener} is added for convenience.
  * 
  * @author wvengen
  */
-public class XHTMLPanel extends org.xhtmlrenderer.simple.XHTMLPanel {
+public class XHTMLPanel extends org.xhtmlrenderer.simple.XHTMLPanel implements IXHTMLPanel {
 
     public XHTMLPanel() {
 	super();
@@ -42,6 +50,40 @@ public class XHTMLPanel extends org.xhtmlrenderer.simple.XHTMLPanel {
     public XHTMLPanel(UserAgentCallback uac) {
 	super(uac);
 	initialize_tweaks();
+    }
+
+    /** Replace the listener that is activated when a link is clicked.
+     * <p>
+     * This is a convenience method that first removes all LinkListeners, and
+     * then adds the supplied one.
+     * 
+     * @param llnew New LinkListener to use for this panel
+     */
+    @SuppressWarnings("unchecked") // getMouseTrackingListeners() returns unchecked List
+    public void replaceLinkListener(LinkListener llnew) {
+	// remove all existing LinkListeners
+	List<FSMouseListener> ls = (List<FSMouseListener>)getMouseTrackingListeners();
+	for (Iterator<FSMouseListener> it = ls.iterator(); it.hasNext(); ) {
+	    FSMouseListener l = it.next();
+	    if (l instanceof LinkListener)
+		removeMouseTrackingListener(l);
+	}
+	// and add new one
+	addMouseTrackingListener(llnew);
+    }    
+    
+    /** print the contents of this pane with the smallest possible printer margins;
+     * a print dialog is shown first.
+     * 
+     * @throws PrinterException
+     */
+    public boolean print() throws PrinterException {
+	final PrinterJob printJob = PrinterJob.getPrinterJob();
+        printJob.setPrintable(new TemplatePrintable(this));
+        if (printJob.printDialog()) {
+            printJob.print();
+        }
+	return true;
     }
     
     /** Setup the XHTMPanel tweaks */
