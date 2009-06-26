@@ -27,6 +27,8 @@
 	<property name="dir.dist" location="deployment"/>
 	<!-- location of thirdparty libraries -->
 	<property name="dir.thirdparty" location="thirdparty"/>
+	<!-- location of javadoc output -->
+	<property name="dir.javadoc" location="doc"/>
 
 	<!-- extra tool definitions -->
 	<property name="browsertool.target.name" value="browsertool"/>
@@ -61,6 +63,7 @@
 	<property name="dep.xhtmlrenderer" location="${dir.thirdparty}/flyingsaucer/core-renderer-minimal.jar"/>
 	<property name="dep.itext" location="${dir.thirdparty}/flyingsaucer/iText-2.0.8.jar"/>
 	<property name="dep.winregistry" location="${dir.thirdparty}/winregistry/WinRegistry-3.4.jar"/>
+	<property name="dep.apiviz" location="${dir.thirdparty}/javadoc/apiviz-1.3.0.GA.jar"/>
 	<path id="path.dependencies">
 		<!-- TODO use jdk13 library versions and test -->
 		<pathelement location="${dep.bouncycastle}"/>
@@ -194,6 +197,7 @@
 		<delete file="${dir.dist}/bcprov.jnlp"/>
 		<basename property="dep.bouncycastle.basename" file="${dep.bouncycastle}"/>
 		<delete file="${dir.dist}/${dep.bouncycastle.basename}"/>
+		<delete file="http://java.sun.com/j2se/1.5.0/docs/api"/>
 	</target>
 
 	<!--
@@ -218,6 +222,33 @@
 		<!-- sign it, required for java web start -->
 		<signjar keystore="${keystore.file}" jar="${dir.dist}/${browsertool.name}.jar"
 			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
+	</target>
+
+	<!-- javadoc with APIviz, needs graphviz >= 2.20 -->
+	<target name="javadoc" depends="compile">
+		<javadoc
+				destdir="${dir.javadoc}"
+				classpathref="path.dependencies"
+				access="protected" source="${target.jvmversion}"
+				doclet="org.jboss.apiviz.APIviz" docletpath="${dep.apiviz}" additionalparam="-sourceclasspath ${dir.build}">
+			<sourcefiles>
+				<fileset dir="${dir.src}">
+					<include name="**/*.java"/>
+					<exclude name="**Test.java"/>
+					<exclude name="**/AllTests.java"/>
+				</fileset>
+			</sourcefiles>
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+			<link href="http://bouncycastle.org/docs/docs1.4/"/>
+			<link href="http://bouncycastle.org/docs/mdocs1.4/"/>
+			<link href="http://commons.apache.org/cli/api-1.2/"/>
+			<link href="http://junit.org/junit/javadoc/4.5/"/>
+			<link href="http://abbot.sourceforge.net/doc/api/"/>
+			<link href="https://swingworker.dev.java.net/nonav/javadoc/"/>
+			<link href="http://pigeonholdings.com/projects/flyingsaucer/R8/javadoc/user/"/>
+			<link href="http://www.1t3xt.info/api/"/>
+			<!-- no online javadoc foudn for WinRegistry -->
+		</javadoc>
 	</target>
 
 </project>
