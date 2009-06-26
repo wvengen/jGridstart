@@ -599,8 +599,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	// Save private key; permissions are ok by default
 	PEMWriter.writeObject(cert.getKeyFile(), privKey, "new certificate's private key");
 	
-	// check
-	cert.check(true);
+	// TODO check
+	//cert.check(true);
 	
 	return cert;
     }
@@ -616,7 +616,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
     public void uploadRequest() throws CertificateException, KeyException, NoSuchAlgorithmException, IllegalStateException, NoSuchProviderException, SignatureException, IOException {
 	logger.finer("Uploading certificate request for: "+this);
 	try {
-	    if (getCertificate()==null) throw new IOException();
+	    if (getCertificate()!=null) throw new IOException();
 	} catch (IOException e) {
 	    logger.warning("Ignoring request to upload CSR since certificate is present: "+this);
 	    return;
