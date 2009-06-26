@@ -8,6 +8,7 @@ import java.awt.print.PrinterException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -15,12 +16,16 @@ import java.util.Properties;
 import java.util.logging.LogManager;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.text.JTextComponent;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -151,16 +156,37 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
     protected boolean bodyEquals(ITemplatePanel panel, String body) throws SAXException, IOException, ParserConfigurationException {
 	return TemplateDocumentTest.bodyEquals(panel.getDocument(), body);
     }
-    /** Helper method: wait for AWT queue to finish 
-     * @throws InvocationTargetException 
-     * @throws InterruptedException */
+    /** Helper method: wait for AWT queue to finish.
+     * <p>
+     * This is done a couple of times to really make it work ... :/ */
     protected void guiSleep() throws InterruptedException, InvocationTargetException {
+	guiSleep(3);
+    }
+    protected void guiSleep(int times) throws InterruptedException, InvocationTargetException {
 	// invoke and wait for an event in the gui thread, so that really
 	// all events are handled
-	java.awt.EventQueue.invokeAndWait(new Runnable() {
-	    public void run() { }
-	});
-	sleep();
+	for (int i=0; i<times; i++) {
+	    java.awt.EventQueue.invokeAndWait(new Runnable() {
+		public void run() { }
+	    });
+	    sleep();
+	}
+    }
+    /** Get resource from class. Look in Class's space first for overriding
+     * by child classes, fallback to the package this class is in. */
+    protected String getResourceURI(String name) {
+	URL url = getClass().getResource(name);
+	if (url!=null) return url.toExternalForm();
+	url = ITemplatePanelTest.class.getResource(name);
+	if (url!=null) return url.toExternalForm();
+	return null;
+    }
+    /** Returns whether this {@link Component} is a form element or no. */
+    protected boolean isFormComponent(Component c) {
+	return	c instanceof AbstractButton &&
+		c instanceof JComboBox &&
+		c instanceof JList &&
+		c instanceof JTextComponent;
     }
     
     /** Test data binding */
@@ -187,7 +213,7 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
     public void testData3() throws Exception {
 	Properties p = new Properties();
 	p.setProperty("foo", "bar");
-	panel = new TemplatePanel();
+	panel = createPanel();
 	panel.setDocument(TemplateDocumentTest.parseBody("<p c='${foo}'/>"));
 	assertTrue(bodyEquals(panel, "<p/>"));
 	panel.setData(p);
@@ -196,8 +222,8 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
     /** Test construction from external page */
     @Test
     public void testData4() throws Exception {
-	panel = new TemplatePanel();
-	panel.setDocument(getClass().getResource("testData4.html").toExternalForm());
+	panel = createPanel();
+	panel.setDocument(getResourceURI("testData4.html"));
 	assertTrue(bodyEquals(panel, "<p/>"));
 	Properties p = new Properties();
 	p.setProperty("foo", "bar");
@@ -209,8 +235,8 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
      * TODO make sure no exception is thrown down in xhtmlrenderer that is caught internally */
     @Test
     public void testReloadStylesheet() throws Exception {
-	panel = new TemplatePanel();
-	panel.setDocument(getClass().getResource("testData5.html").toExternalForm());
+	panel = createPanel();
+	panel.setDocument(getResourceURI("testData5.html"));
 	assertTrue(bodyEquals(panel, "<p/>"));
 	panel.refresh();
 	assertTrue(bodyEquals(panel, "<p/>"));
@@ -218,8 +244,8 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
     /** Test stylesheet loaded correctly */
     @Test
     public void testStylesheetApplied() throws Exception {
-	panel = new TemplatePanel();
-	panel.setDocument(getClass().getResource("testData5.html").toExternalForm());
+	panel = createPanel();
+	panel.setDocument(getResourceURI("testData5.html"));
 	assertTrue(bodyEquals(panel, "<p/>"));
 	// check that stylesheet was indeed loaded
 	Element e = (Element)TemplateDocumentTest.getBody(panel.getDocument()).getFirstChild();
@@ -230,9 +256,9 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
      * TODO make sure no exception is thrown down in xhtmlrenderer that is caught internally */
     @Test
     public void testLoadFromJar() throws Exception {
-	String url = getClass().getResource("testData6.jar").toExternalForm();
+	String url = getResourceURI("testData6.jar");
 	url = "jar:"+url+"!/some/path/testData.html";
-	panel = new TemplatePanel();
+	panel = createPanel();
 	panel.setDocument(url);
 	assertTrue(bodyEquals(panel, "<p/>"));
 	// check that stylesheet was loaded
@@ -381,7 +407,7 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	            "<input type='button' name='rd' readonly='readonly'/>");
 	Component[] comps = findMany(new ClassMatcher(Component.class));
 	for (int i=0; i<comps.length; i++)
-	    assertFalse(comps[i].isEnabled());
+	    assertFalse(isFormComponent(comps[i]) && comps[i].isEnabled());
     }
     /** Test the readonly attribute is unset by default */
     @Test
@@ -392,7 +418,7 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	            "<input type='button' name='d'/>");
 	Component[] comps = findMany(new ClassMatcher(Component.class));
 	for (int i=0; i<comps.length; i++)
-	    assertTrue(comps[i].isEnabled());
+	    assertTrue(!isFormComponent(comps[i]) || comps[i].isEnabled());
     }
     /** Test the readonly attribute set by <tt>.lock</tt> property */
     @Test
@@ -408,7 +434,7 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	            "<input type='button' name='d'/>", p);
 	Component[] comps = findMany(new ClassMatcher(Component.class));
 	for (int i=0; i<comps.length; i++)
-	    assertFalse(comps[i].isEnabled());
+	    assertFalse(isFormComponent(comps[i]) && comps[i].isEnabled());
     }
     
     /** Test that dating the properties refreshes the document */
@@ -471,8 +497,8 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 
     
     /** An interactive test to play with */
-    public static void main(String[] args) throws Exception {
-	final TemplatePanel pane = new TemplatePanel();
+    public static void main(ITemplatePanel spane, String[] args) throws Exception {
+	final ITemplatePanel pane = spane; // for inner class reference
 	final String testPage = 
 	    "<html>"+
 	    "<head><title>Test page</title></head>"+
@@ -542,10 +568,10 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	// don't set "bar"
 	DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 	pane.setDocument(builder.parse(new ByteArrayInputStream(testPage.getBytes())));
-	pane.setPreferredSize(new Dimension(500, 600));
+	((Component)pane).setPreferredSize(new Dimension(500, 600));
 	final JFrame frame = new JFrame();
-	frame.getContentPane().add(new JScrollPane(pane));
-	frame.setSize(pane.getPreferredSize());
+	frame.getContentPane().add(new JScrollPane((Component)pane));
+	frame.setSize(((Component)pane).getPreferredSize());
 	frame.setTitle("TemplatePane Test");
 	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	frame.pack();

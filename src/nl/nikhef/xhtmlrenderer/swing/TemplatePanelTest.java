@@ -5,4 +5,8 @@ public class TemplatePanelTest extends ITemplatePanelTest {
     protected ITemplatePanel createPanel() {
 	return new TemplatePanel();
     }
+    
+    public static void main(String[] args) throws Exception {
+	ITemplatePanelTest.main(new TemplatePanel(), args);
+    }
 }

@@ -5,11 +5,14 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
 import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.AbstractAction;
@@ -22,15 +25,23 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+
+import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
+
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xhtmlrenderer.extend.NamespaceHandler;
+import org.xhtmlrenderer.layout.SharedContext;
+import org.xhtmlrenderer.simple.extend.FormSubmissionListener;
+import org.xhtmlrenderer.swing.FSMouseListener;
+import org.xhtmlrenderer.swing.LinkListener;
 
 /**
  * HTML-based wizard dialog. One supplies it with a list of html templates and a
  * property list.
  * 
  */
-public class TemplateWizard extends JDialog {
+public class TemplateWizard extends JDialog implements ITemplatePanel {
 
     /** wizard page templates for each step */
     public ArrayList<URL> pages = new ArrayList<URL>();
@@ -172,39 +183,147 @@ public class TemplateWizard extends JDialog {
 	void pageChanged(TemplateWizard w, int page);
     }
     
-    // delegates to TemplatePanel
-    public String getDocumentTitle() {
-	return pane.getDocumentTitle();
-    }
-    public void refresh() {
-	pane.refresh();
-    }
-    public void setData(Properties p) {
-	pane.setData(p);
-    }
-    public Properties data() {
-	return pane.data();
-    }
-    public void setDocument(String url) {
-	pane.setDocument(url);
-    }
-    public void setDocument(File file) throws Exception {
-	pane.setDocument(file);
-    }
-    public void setDocument(Document doc, String url) {
-	pane.setDocument(doc, url);
-    }
-    public void setDocument(Document doc, String url, NamespaceHandler nsh) {
-	pane.setDocument(doc, url, nsh);
-    }
-    public Document getDocument() {
-	return pane.getDocument();
-    }
+
     public void setBackground(Color c) {
 	super.setBackground(c);
 	if (pane!=null) pane.setBackground(c);
     }
+    /*
+     * 
+     * Delegates
+     * 
+     */
+    public void addMouseTrackingListener(FSMouseListener l) {
+	pane.addMouseTrackingListener(l);
+    }
+
+    public void componentHidden(ComponentEvent e) {
+	pane.componentHidden(e);
+    }
+
+    public void componentMoved(ComponentEvent e) {
+	pane.componentMoved(e);
+    }
+
+    public void componentResized(ComponentEvent e) {
+	pane.componentResized(e);
+    }
+
+    public void componentShown(ComponentEvent e) {
+	pane.componentShown(e);
+    }
+
+    public Properties data() {
+	return pane.data();
+    }
+
+    public Document getDocument() {
+	return pane.getDocument();
+    }
+
+    public String getDocumentTitle() {
+	return pane.getDocumentTitle();
+    }
+
+    public List<?> getMouseTrackingListeners() {
+	return pane.getMouseTrackingListeners();
+    }
+
+    public SharedContext getSharedContext() {
+	return pane.getSharedContext();
+    }
+
+    public URL getURL() {
+	return pane.getURL();
+    }
+
+    public boolean isActive(Element e) {
+	return pane.isActive(e);
+    }
+
+    public boolean isFocus(Element e) {
+	return pane.isFocus(e);
+    }
+
+    public boolean isHover(Element e) {
+	return pane.isHover(e);
+    }
+
     public boolean print() throws PrinterException {
 	return pane.print();
     }
+
+    public boolean refresh() {
+	return pane.refresh();
+    }
+
+    public void reloadDocument(Document doc) {
+	pane.reloadDocument(doc);
+    }
+
+    public void reloadDocument(String URI) {
+	pane.reloadDocument(URI);
+    }
+
+    public void removeMouseTrackingListener(FSMouseListener l) {
+	pane.removeMouseTrackingListener(l);
+    }
+
+    public void replaceLinkListener(LinkListener llnew) {
+	pane.replaceLinkListener(llnew);
+    }
+
+    public void setData(Properties p) {
+	pane.setData(p);
+    }
+
+    public void setDocument(Document doc, String url) {
+	pane.setDocument(doc, url);
+    }
+
+    public void setDocument(Document doc) {
+	pane.setDocument(doc);
+    }
+
+    public void setDocument(File file) throws Exception {
+	pane.setDocument(file);
+    }
+
+    public void setDocument(InputStream stream, String url, NamespaceHandler nsh) {
+	pane.setDocument(stream, url, nsh);
+    }
+
+    public void setDocument(InputStream stream, String url) throws Exception {
+	pane.setDocument(stream, url);
+    }
+
+    public void setDocument(String url, NamespaceHandler nsh) {
+	pane.setDocument(url, nsh);
+    }
+
+    public void setDocument(String uri) {
+	pane.setDocument(uri);
+    }
+
+    public void setDocumentFromString(String content, String url,
+	    NamespaceHandler nsh) {
+	pane.setDocumentFromString(content, url, nsh);
+    }
+
+    public void setFormSubmissionListener(FormSubmissionListener fsl) {
+	pane.setFormSubmissionListener(fsl);
+    }
+
+    public void setSharedContext(SharedContext ctx) {
+	pane.setSharedContext(ctx);
+    }
+
+    public void setSubmitAction(Action e) {
+	pane.setSubmitAction(e);
+    }
+
+    public void submit(String query) {
+	pane.submit(query);
+    }
+
 }

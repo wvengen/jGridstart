@@ -1,20 +1,16 @@
 package nl.nikhef.jgridstart.gui.util;
 
-import javax.swing.JButton;
-
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanelTest;
 
-public class TemplateButtonPanelTest extends ITemplatePanelTest {
+public class TemplateWizardTest extends ITemplatePanelTest {
     @Override
     protected ITemplatePanel createPanel() {
-	return new TemplateButtonPanel();
+	return new TemplateWizard();
     }
     
     public static void main(String[] args) throws Exception {
-	TemplateButtonPanel panel = new TemplateButtonPanel();
-	panel.addButton(new JButton("dummy"), false);
-	panel.addButton(new JButton("dfldummy"), true);
+	TemplateWizard panel = new TemplateWizard();
 	ITemplatePanelTest.main(panel, args);
     }
 }

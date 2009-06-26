@@ -1,10 +1,13 @@
 package nl.nikhef.jgridstart.gui.util;
 
-import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ComponentEvent;
 import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.Action;
@@ -15,11 +18,17 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
 import nl.nikhef.xhtmlrenderer.swing.TemplatePanel;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xhtmlrenderer.extend.NamespaceHandler;
+import org.xhtmlrenderer.layout.SharedContext;
+import org.xhtmlrenderer.simple.extend.FormSubmissionListener;
 import org.xhtmlrenderer.swing.BasicPanel;
+import org.xhtmlrenderer.swing.FSMouseListener;
 import org.xhtmlrenderer.swing.LinkListener;
 
 
@@ -34,7 +43,7 @@ import org.xhtmlrenderer.swing.LinkListener;
  * Additionally, links are opened in an external web browser using
  * {@link BareBonesActionLaunch}.
  */
-public class TemplateButtonPanel extends JPanel /*implements ITemplateContainer*/ {
+public class TemplateButtonPanel extends JPanel implements ITemplatePanel {
     
     /** the actual html template pane */
     protected TemplatePanel contentpane = null;
@@ -134,55 +143,142 @@ public class TemplateButtonPanel extends JPanel /*implements ITemplateContainer*
     public void addButton(JButton btn, boolean isDefault) {
 	addButton(buttonpane, btn, isDefault);
     }
-    
-    // plain delegates TODO complete
-    /** @see TemplatePanel#getDocumentTitle */
-    public String getDocumentTitle() {
-	return contentpane.getDocumentTitle();
+
+    /*
+     * 
+     * Delegates
+     * 
+     */
+    public void addMouseTrackingListener(FSMouseListener l) {
+	contentpane.addMouseTrackingListener(l);
     }
-    /** @see TemplatePanel#refresh */
-    public boolean refresh() {
-	return contentpane.refresh();
+
+    public void componentHidden(ComponentEvent e) {
+	contentpane.componentHidden(e);
     }
-    /** @see TemplatePanel#setData */
-    public void setData(Properties p) {
-	contentpane.setData(p);
+
+    public void componentMoved(ComponentEvent e) {
+	contentpane.componentMoved(e);
     }
-    /** @see TemplatePanel#data */
+
+    public void componentResized(ComponentEvent e) {
+	contentpane.componentResized(e);
+    }
+
+    public void componentShown(ComponentEvent e) {
+	contentpane.componentShown(e);
+    }
+
     public Properties data() {
 	return contentpane.data();
     }
-    /** @see TemplatePanel#setSubmitAction */
-    public void setSubmitAction(Action e) {
-	contentpane.setSubmitAction(e);
-    }
-    /** @see TemplatePanel#setDocument(String) */
-    public void setDocument(String url) {
-	contentpane.setDocument(url);
-    }
-    /** @see TemplatePanel#setDocument(File) */
-    public void setDocument(File file) throws Exception {
-	contentpane.setDocument(file);
-    }
-    /** @see TemplatePanel#setDocument(Document, String) */
-    public void setDocument(Document doc, String url) {
-	contentpane.setDocument(doc, url);
-    }
-    /** @see TemplatePanel#setDocument(Document, String, NamespaceHandler) */
-    public void setDocument(Document doc, String url, NamespaceHandler nsh) {
-	contentpane.setDocument(doc, url, nsh);
-    }
-    /** @see TemplatePanel#getDocument */
+
     public Document getDocument() {
 	return contentpane.getDocument();
     }
-    /** Sets the background colour, also of the HTML area */
-    public void setBackground(Color c) {
-	super.setBackground(c);
-	if (contentpane!=null) contentpane.setBackground(c);
+
+    public String getDocumentTitle() {
+	return contentpane.getDocumentTitle();
     }
-    /** @see TemplatePanel#print */
+
+    public List<?> getMouseTrackingListeners() {
+	return contentpane.getMouseTrackingListeners();
+    }
+
+    public SharedContext getSharedContext() {
+	return contentpane.getSharedContext();
+    }
+
+    public URL getURL() {
+	return contentpane.getURL();
+    }
+
+    public boolean isActive(Element e) {
+	return contentpane.isActive(e);
+    }
+
+    public boolean isFocus(Element e) {
+	return contentpane.isFocus(e);
+    }
+
+    public boolean isHover(Element e) {
+	return contentpane.isHover(e);
+    }
+
     public boolean print() throws PrinterException {
 	return contentpane.print();
     }
+
+    public boolean refresh() {
+	return contentpane.refresh();
+    }
+
+    public void reloadDocument(Document doc) {
+	contentpane.reloadDocument(doc);
+    }
+
+    public void reloadDocument(String URI) {
+	contentpane.reloadDocument(URI);
+    }
+
+    public void removeMouseTrackingListener(FSMouseListener l) {
+	contentpane.removeMouseTrackingListener(l);
+    }
+
+    public void replaceLinkListener(LinkListener llnew) {
+	contentpane.replaceLinkListener(llnew);
+    }
+
+    public void setData(Properties p) {
+	contentpane.setData(p);
+    }
+
+    public void setDocument(Document doc, String url) {
+	contentpane.setDocument(doc, url);
+    }
+
+    public void setDocument(Document doc) {
+	contentpane.setDocument(doc);
+    }
+
+    public void setDocument(File file) throws Exception {
+	contentpane.setDocument(file);
+    }
+
+    public void setDocument(InputStream stream, String url, NamespaceHandler nsh) {
+	contentpane.setDocument(stream, url, nsh);
+    }
+
+    public void setDocument(InputStream stream, String url) throws Exception {
+	contentpane.setDocument(stream, url);
+    }
+
+    public void setDocument(String url, NamespaceHandler nsh) {
+	contentpane.setDocument(url, nsh);
+    }
+
+    public void setDocument(String uri) {
+	contentpane.setDocument(uri);
+    }
+
+    public void setDocumentFromString(String content, String url,
+	    NamespaceHandler nsh) {
+	contentpane.setDocumentFromString(content, url, nsh);
+    }
+
+    public void setFormSubmissionListener(FormSubmissionListener fsl) {
+	contentpane.setFormSubmissionListener(fsl);
+    }
+
+    public void setSharedContext(SharedContext ctx) {
+	contentpane.setSharedContext(ctx);
+    }
+
+    public void setSubmitAction(Action e) {
+	contentpane.setSubmitAction(e);
+    }
+
+    public void submit(String query) {
+	contentpane.submit(query);
+    }   
 }
