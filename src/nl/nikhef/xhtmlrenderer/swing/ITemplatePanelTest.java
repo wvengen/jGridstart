@@ -45,10 +45,10 @@ import abbot.tester.ComponentTester;
  * <p>
  * This is an abstract class, each derived class must implement the method
  * {@linkplain #createPanel} which creates a new {@linkplain ITemplatePanel}
- * instance. Note that {@code T} must be derived from {@link JComponent} as
- * well, since it must be shown on screen.
+ * instance. Note that the returned class must be derived from {@link Component}
+ * as well, since it must be shown on screen.
  */
-public abstract class ITemplatePanelTest<T extends ITemplatePanel> extends ComponentTestFixture {
+public abstract class ITemplatePanelTest extends ComponentTestFixture {
     
     /** Abbot tester */
     private ComponentTester tester = null;
