@@ -1,5 +1,6 @@
 package nl.nikhef.jgridstart;
 
+import nl.nikhef.jgridstart.install.BrowsersMacOSXTest;
 import nl.nikhef.jgridstart.util.PasswordCacheTest;
 import nl.nikhef.xhtmlrenderer.swing.TemplateDocumentTest;
 import nl.nikhef.xhtmlrenderer.swing.TemplatePanelTest;
@@ -13,6 +14,7 @@ public class AllTests {
 	TestSuite suite = new TestSuite("Test for nl.nikhef.jgridstart");
 	//$JUnit-BEGIN$
 	suite.addTestSuite(PasswordCacheTest.class);
+	suite.addTestSuite(BrowsersMacOSXTest.class);
 	suite.addTestSuite(TemplateDocumentTest.class);
 	suite.addTestSuite(TemplatePanelTest.class);
 	//$JUnit-END$
