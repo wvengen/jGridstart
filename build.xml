@@ -234,8 +234,8 @@
 			<sourcefiles>
 				<fileset dir="${dir.src}">
 					<include name="**/*.java"/>
-					<exclude name="**Test.java"/>
-					<exclude name="**/AllTests.java"/>
+					<exclude name="**/*Test.*"/>
+					<exclude name="**/AllTests.*"/>
 				</fileset>
 			</sourcefiles>
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
