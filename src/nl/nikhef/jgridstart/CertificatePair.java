@@ -60,31 +60,30 @@ import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-/**
- * Class containing everything related to a grid certificate. Each instance is
- * directly bound to a ~/.globus/xxx directory containing the relevant files (or
- * another base directory, which is the CertificateStore). This is at least a
- * private key, and usually a certificate. A log can be expected as well (this
- * class logs all actions to it) and a certificate signing request can be
- * present too.
- * 
+/** Class containing everything related to a grid certificate.
+ * <p>
+ * Each instance is directly bound to a {@literal ~/.globus/xxx} directory
+ * containing the relevant files (or another base directory, which is the
+ * {@link CertificateStore}). This is at least a private key, and usually a
+ * certificate. A log can be expected as well (this class logs all actions to
+ * it) and a certificate signing request can be present too.
+ * <p>
  * This class provides actions like request, revoke, import, export, etc.
- * 
+ * <p>
  * This class is also a child of Properties. One can set and get any property
  * desired, but some are specifically reserved and queried directly from the
- * certificate and/or certificate signing request. Please see getProperty().
- * When the object is loaded, properties found in the file indicated  by
- * getPropertiesFile() are set. On destruction, the properties are written
- * back as to provide transparent presistency. When a property shouldn't be
- * written, one can set the property name with ".volatile" appended to "true"
+ * certificate and/or certificate signing request. Please see {@link #getProperty}.
+ * When the object is loaded, properties found in the file indicated by
+ * {@link #getPropertiesFile} are set. On destruction, the properties are written back
+ * as to provide transparent presistency. When a property shouldn't be written,
+ * one can set the property name with {@code .volatile} appended to {@code true}
  * to make the property not persistent, e.g. with
- * <code>
+ * <pre><code>
  *   foo.html=&gt;b&lt;hi there&gt;/b&lt;
  *   foo.html.volatile=true
- * </code>
- * the variable "foo.html" is not saved back to the properties file.
- * 
- * 
+ * </code></pre>
+ * the variable {@code foo.html} is not saved back to the properties file.
+ * <p>
  * After some more thinking this could actually involve a Java KeyStore as a
  * custom backend for ~/.globus containing just a private key and a certificate.
  * Then custom extensions can retrieve the CSR and other info. This would allow
@@ -132,34 +131,38 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	load(f);
     }
     
-    /** Return the value of a property. Usually this just returns the
-     * value set by setProperty, but there are some cases where the
+    /** Return the value of a property.
+     * <p>
+     * Usually this just returns the
+     * value set by {@link #setProperty}, but there are some cases where the
      * value is taken directly from the certificate or certificate
-     * signing request. Please see getSubjectPrincipalValue() for more info.
+     * signing request. Please see {@link #getSubjectPrincipalValue} for more info.
+     * <dl>
+     * <dt>valid</dt>
+     *     <dd>is {@code true} if the certificate is valid, {@code null} otherwise</dd>
+     * <dt>valid.notafter, valid.notbefore</dt>
+     *     <dd>localised validity interval</dd>
+     * <dt>cert, request</dt>
+     *     <dd>is {@code true} when certificate respectively CSR are present</dd>
+     * <dt>subject, issuer, usage</dt>
+     *     <dd>is {@code true} when child keys can be present</dd>
+     * <dt>usage.any, usage.serverauth, usage.clientauth, usage.codesigning,
+     *   <dd>usage.emailprotection, usage.timestamping, usage.ocspsigning</dt>
+     *     are {@code true} when they are defined in the extended key usage</dd>
+     * <dt>modulus, modulus.first20</dt>
+     *     <dd>the public key's modulus, and its first 20 characters</dd>
+     * <dt>org</dt>
+     *     <dd>is returned when set, or guessed from subject if unset</dd>
+     * </dl>
      * 
-     * - valid
-     *     is "true" if the certificate is valid, null otherwise
-     * - valid.notafter, valid.notbefore
-     *     localised validity interval
-     * - cert, request
-     *     is "true" when certificate respectively CSR are present
-     * - subject, issuer, usage
-     *     is "true" when child keys can be present
-     * - usage.any, usage.serverauth, usage.clientauth, usage.codesigning,
-     *   usage.emailprotection, usage.timestamping, usage.ocspsigning
-     *     are "true" when they are defined in the extended key usage
-     * - modulus, modulus.first20
-     *     the public key's modulus, and its first 20 characters
-     * - org
-     *     is returned when set, or guessed from subject if unset
-     *     
-     * You can postfix each property with ".html" to get an html representation.
+     * You can postfix each property with {@code .html} to get an html representation.
      * If no html representation is present, it just returns the same as the
-     * property without ".html".
+     * property without {@code .html}.
      * 
      * @param key property to get the value of
      * @return value of the property, or null if not found.
      */
+    @Override
     public String getProperty(String key) {
 	// parse html
 	if (key.endsWith(".html")) {
@@ -261,8 +264,21 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	// nothing by default
 	return null;
     }
+    /** {@inheritDoc}
+     * <p>
+     * On setting a property, all {@link ItemListener}s are notified using
+     * {@linkplain #notifyChanged} if the value is different from the old one.
+     */
+    @Override
+    public Object setProperty(String name, String value) {
+	String old = getProperty(name);
+	Object o = super.setProperty(name, value);
+	if (!value.equals(old))
+	    notifyChanged();
+	return o;
+    }
 
-    /** reset the contents to this object to the empty state */
+    /** Reset the contents to this object to the empty state */
     public void clear() {
 	path = null;
 	cert = null;
@@ -286,7 +302,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	notifyChanged();
     }
     
-    /** Store the properties in the file indicated by getPropertiesFile().
+    /** Store the properties in the file indicated by {@link #getPropertiesFile}.
+     * <p>
      * This file is written with permissions so that only the user can read
      * it, because it may contain personal information. 
      * 
@@ -312,8 +329,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		"jGridstart certificate properties");
     }
 
-    /**
-     * Import a CertificatePair from a keystore into a (new) directory.
+    /** Import a {@linkplaiun CertificatePair} from a keystore into a (new) directory.
      * 
      * @param src File to import from
      * @param dst Directory to import into. On success, this directory could be
@@ -359,12 +375,12 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return cert;
     }
 
-    /**
-     * Import key and certificate from a PEM file, possibly overwriting the
-     * current data.
+    /** Import key and certificate from a PEM file.
+     * <p>
+     * This may possibly overwrite the current data.
      * 
-     * @param src
-     *            PEM file to import from
+     * @param src PEM file to import from
+     * 
      * @throws IOException
      * @throws NoSuchAlgorithmException 
      * @throws PasswordCancelledException 
@@ -465,8 +481,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	load(path);
     }
 
-    /** Export the certificate and private key to a file. Type is
-     * detected from the filename.
+    /** Export the certificate and private key to a file.
+     * <p>
+     * Type is detected from the filename.
      * 
      * @param dst destination to export to
      * @throws CertificateException 
@@ -489,7 +506,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
     
     /** Export the certificate and private key to a PKCS#12 file.
      * <p>
-     * TODO use PrivateFileWriter for more secure permissions
+     * TODO use {@link PrivateFileWriter} for more secure permissions
      * 
      * @throws NoSuchProviderException 
      * @throws KeyStoreException 
@@ -519,7 +536,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
     /** Export the certificate and private key to a PEM file.
      * <p>
      * This is quite simple, since it just concatenates the existing
-     * files from its .globus directory; no password is needed.
+     * files from its {@code .globus} directory; no password is needed.
      * 
      * @throws IOException 
      */
@@ -549,12 +566,16 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	}
     }
 
-    /** Generate a new private key+CSR pair. Details are taken from
-     * properties as follows, based on "Grid Certificate Profile"
-     * revision 0.26 ( http://www.ogf.org/documents/GFD.125.pdf ).
-     * 
-     *   subject
-     *     certificate subject to use (DN) 
+    /** Generate a new private key+CSR pair.
+     * <p>
+     * Details are taken from properties as follows, based on
+     * "<em>Grid Certificate Profile</em>"
+     * revision 0.26,
+     * <a href="http://www.ogf.org/documents/GFD.125.pdf">http://www.ogf.org/documents/GFD.125.pdf</a>.
+     * <p>
+     * Details of the certificate are specified by the supplied
+     * {@linkplain Properties}. Currently only the property {@code subject}
+     * is used, which dictates the subject (DN) to use.
      * 
      * @param dst Destination directory (subdir of a store)
      * @param p Properties according to which to generate request
@@ -605,7 +626,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return cert;
     }
     
-    /** Upload the certificate signing request to its certificate authority 
+    /** Upload the certificate signing request to its certificate authority .
+     * 
      * @throws SignatureException 
      * @throws NoSuchProviderException 
      * @throws IllegalStateException 
@@ -628,8 +650,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	store();
     }
     
-    /** See if the certificate can be downloaded from the certificate authority. Also sets
-     * the property "request.processed" accordingly.
+    /** See if the certificate can be downloaded from the certificate authority.
+     * <p>
+     * Also sets the property {@code request.processed} accordingly.
      *  
      * @throws NoSuchAlgorithmException 
      * @throws KeyManagementException */
@@ -637,9 +660,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	boolean isProcessed;
 	try {
 	    isProcessed = getCA().isCertificationRequestProcessed(getCSR(), getProperty("request.serial"));
-	    boolean oldProcessed = Boolean.valueOf(getProperty("request.processed"));
 	    setProperty("request.processed", Boolean.toString(isProcessed));
-	    if (oldProcessed != isProcessed) notifyChanged();
 	} catch (IOException e) {
 	    return false;
 	}
@@ -717,10 +738,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return new File(getPath(), "usercert.pem");
     }
     
-    /**
-     * 
-     * return the File containing the additional properties, or null if no certificate
-     * is loaded. The file need not exist.
+    /** Return the {@linkplain File} containing the additional properties.
+     * <p>
+     * If no certificate is loaded, {@code null} is returned. The file need not exist yet.
      */
     protected File getPropertiesFile() {
 	if (path == null)
@@ -728,15 +748,21 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return new File(getPath(), "userinfo.properties");
     }
     
-    /** return the private key; decrypt password is requested from the user
-     * when required. 
+    /** Return the decrypted private key.
+     * <p>
+     * The decryption password is requested from the user when required
+     * using {@link PasswordCache}. 
+     * 
      * @throws IOException 
      * @throws PasswordCancelledException */
     protected PrivateKey getPrivateKey() throws IOException, PasswordCancelledException {
 	return ((KeyPair)PEMReader.readObject(getKeyFile(), KeyPair.class, "private key")).getPrivate();
     }
     
-    /** Return the certificate, or null if not present. */
+    /** Return the certificate.
+     * <p>
+     * Returns or {@code null} if not present.
+     */
     public X509Certificate getCertificate() throws IOException {
 	if (cert==null) {
 	    try {
@@ -748,7 +774,10 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return cert;
     }
     
-    /** return the certificate signing request, or null if not present */
+    /** Return the certificate signing request (CSR).
+     * <p>
+     * Returns {@code null} if not present
+     */
     public PKCS10CertificationRequest getCSR() throws IOException {
 	if (req==null) {
 	    try {
@@ -760,8 +789,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return req;
     }
 
-    /**
-     * refresh an item from disk and update its status from online sources.
+    /** Refresh an item from disk and update its status from online sources.
      * 
      * @return whether the refresh was successful or no
      * @throws NoSuchAlgorithmException 
@@ -783,8 +811,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return true;
     }
     
-    /**
-     * Run certificate checks.
+    /** Run certificate checks.
      * 
      * @param checkPriv True to check private key as well, requires private key password.
      *                  You can safely test this if the private key password is still
@@ -797,12 +824,12 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	if (checkPriv) c.checkPrivate();
     }
 
-    /**
-     * return a value of a principal of the certificate issuer/subject. This is
-     * taken from the certificate when present. If that fails, the CSR is
-     * attempted. If that fails as well, null is returned. The value returned is
+    /** Return a value of a principal of the certificate issuer/subject.
+     * <p>
+     * This is taken from the certificate when present. If that fails, the CSR is
+     * attempted. If that fails as well, {@code null} is returned. The value returned is
      * meant for display purposes.
-     * 
+     * <p>
      * TODO document behaviour when id==null
      * 
      * @param id one of X509Certificate.* (O, CN, ...)
@@ -856,18 +883,20 @@ public class CertificatePair extends Properties implements ItemSelectable {
     }
 
     /** Get a principal value from the certificate issuer/subject by string.
-     * The string is matched with X509Name.DefaultLookup, see
-     * getSubjectPrincipalValue() for details. Apart from this some special
-     * string ids are provided:
-     * 
-     *   x-email
-     *       email address, one of the several fields
-     *   x-full
-     *       string of the whole subject or issuer, parts separated by '/'
+     * <p>
+     * The string is matched with {@link X509Name#DefaultLookUp}, see
+     * {@link #getSubjectPrincipalValue} for details.
+     * <p>
+     * Apart from this some special string ids are provided:
+     * <dl>
+     *   <dt>{@code x-email}</dt>
+     *       <dd>email address, one of the several fields</dd>
+     *   <dt>x-full</dt>
+     *       <dd>string of the whole subject or issuer, parts separated by {@code '/'}</dd>
+     * </dl>
      * 
      * @param id name as present in X509Name.DefaultLookup
      * @param where true for subject, false for issuer
-     * @return
      */
     protected String getPrincipalValue(String id, boolean where) {
 	String s;
