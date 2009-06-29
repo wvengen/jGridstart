@@ -13,11 +13,12 @@ import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 
 /** This class provides the default implementation for Actions that operate
- * on a Certificate. It provides a default logger and keeps track of the
- * currently selected certificate which can be retrieved by getCertificate().
- * 
- * The action has to be bound to a CertificateSelection by the caller of the
- * CertificateAction if you want the certificate to be updated when the
+ * on a Certificate.<p>
+ * It provides a default logger and keeps track of the currently selected
+ * certificate which can be retrieved by {#linkplain #getCertificate}.
+ * <p>
+ * The action has to be bound to a {@link CertificateSelection} by the caller of the
+ * {@linkplain CertificateAction} if you want the certificate to be updated when the
  * selection changes.
  * 
  * @author wvengen
@@ -43,11 +44,12 @@ public abstract class CertificateAction extends AbstractAction implements ListSe
 	certificatePair = cert;
     }
     
-    /** Returns whether this action should be enabled or not. This is
-     * called when the selection changes and updates the enabled-state.
-     * It is not possible to just override the isEnabled() method
+    /** Returns whether this action should be enabled or not.
+     * <p>
+     * This is called when the selection changes and updates the enabled-state.
+     * It is not possible to just override the {@linkplain #isEnabled} method
      * Swing gets confused about the enabled-ness of connected components
-     * when isEnabled() is modified.
+     * when {@linkplain #isEnabled} is modified.
      * 
      * By default it just returns isEnabled(), so the behaviour is
      * unchanged from an ordinary Action. */
@@ -55,11 +57,13 @@ public abstract class CertificateAction extends AbstractAction implements ListSe
 	return isWantEnabled;
     }
     
-    /** Sets the enabled state of this CertificateAction. Note that when
-     * no CertificatePair is currently selected, the action is always
-     * disabled. TODO explain better
+    /** Sets the enabled state of this {@linkplain CertificateAction}.
+     * <p>
+     * Note that when no {@linkplain CertificatePair} is currently selected,
+     * the action is always disabled.
+     * TODO explain better
      * 
-     * @see AbstractAction.setEnabled() */
+     * @see AbstractAction#setEnabled */
     @Override
     public void setEnabled(boolean e) {
 	isWantEnabled = e;
@@ -68,6 +72,7 @@ public abstract class CertificateAction extends AbstractAction implements ListSe
 
     /** Catch it when the certificate selection is changed */
     public void valueChanged(ListSelectionEvent e) {
+	// only operate at the end of a stream of selection events to avoid flickering
 	if (e.getValueIsAdjusting()) return;
 	// remove itemlistener for previous pair
 	if (certificatePair!=null) certificatePair.removeItemListener(this);
@@ -75,8 +80,8 @@ public abstract class CertificateAction extends AbstractAction implements ListSe
 	certificatePair.addItemListener(this);
 	super.setEnabled(certificatePair!=null && wantsEnabled());
     }
-    /** Catch it when the certificate itself is changed, needed for wantsEnabled()
-     * depending on the certificate state. */
+    /** Catch it when the certificate itself is changed, needed for
+     * {@linkplain #wantsEnabled} depending on the certificate state. */
     public void itemStateChanged(ItemEvent e) {
 	super.setEnabled(certificatePair!=null && wantsEnabled());
     }
