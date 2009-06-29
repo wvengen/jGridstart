@@ -72,10 +72,11 @@ public class JGSFrame extends JFrame {
      * This method initializes this
      */
     private void initialize() {
+	
 	store = new CertificateStore();
 	selection = new CertificateSelection(store);
 	PasswordCache.getInstance().setParent(this);
-
+	
 	// setup gui
 	this.setSize(550, 350);
 	this.setMinimumSize(new Dimension(400, 150));
@@ -303,15 +304,19 @@ public class JGSFrame extends JFrame {
 	return certInfoPane;
     }
     
-    /** Set the actionViewCertificateList and its gui views. Yes, this is terrible
-     * to put it in a method like this, but I don't know at this moment how to do it
-     * properly. TODO fix this
+    /** Set the visibility of the {@link CertificateList}.
+     * <p>
+     * In Java 1.6 one could use the built-in functionality of
+     * {@link Action}s, but as we want to support older versions as 
+     * well, this is done by manually calling the menu item to
+     * preserve the action-gui binding.
+     * <p>
+     * This requires selecting each view of the action when it
+     * has a checkbox :( but I see no easy other way right now.
      */
     private void setViewCertificateList(boolean wantVisible) {
-	    getAction("viewlist").putValue("SwingSelectedKey", new Boolean(wantVisible));
-	    viewCertificateList.setSelected(wantVisible);
-	    ActionEvent ev2 = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "");
-	    getAction("viewlist").actionPerformed(ev2);
+	if (viewCertificateList.isSelected()!=wantVisible)
+	    viewCertificateList.doClick();
     }
     
     /** Effectuate a selection change in the gui. Current selection is
