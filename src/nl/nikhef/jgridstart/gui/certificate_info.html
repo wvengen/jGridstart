@@ -48,14 +48,6 @@
 				<span if="!${valid}" class="invalid" title="certificate is expired or revoked">&#x2715;</span>
 			</td>
 		</tr>
-		<tr if="${usage}">
-			<th class="usage">Usage</th>
-			<td class="usage">
-				<span if="${usage.any}" title="usable for anything">any,</span> 
-				<span if="${usage.clientauth}" title="usable for client authentication like in a web browser">Client authentication,</span> 
-				<span if="${usage.emailprotection}" title="usable for signing and encrypting emails">Email protection,</span>
-			</td>
-		</tr>
 		<!--
 		<tr>
 			<th class="vo">VOs</th>
@@ -67,7 +59,27 @@
 			</td>
 		</tr>
 		-->
-
+	</table>
+	<p class="showdetails">
+		<a href="action:showdetails" class="shown-${(${view.showdetails})}">Details</a>
+	</p>
+	<table summary="certificate details" cellpadding="3" class="details" if="${view.showdetails}">	
+		<tr>
+			<th class="modulus">Modulus</th>
+			<td class="modulus"><span c="${modulus.first20}"/>...</td>
+		</tr>
+		<tr if="${usage}">
+			<th class="usage">Usage</th>
+			<td class="usage">
+				<span if="${usage.any}" title="usable for anything">any,</span> 
+				<span if="${usage.clientauth}" title="usable for client authentication like in a web browser">Client authentication,</span> 
+				<span if="${usage.emailprotection}" title="usable for signing and encrypting emails">Email protection,</span>
+			</td>
+		</tr>
+		<tr>
+			<th class="location">Location</th>
+			<td class="location" c="${path}"/>
+		</tr>
 	</table>
 
 </body>

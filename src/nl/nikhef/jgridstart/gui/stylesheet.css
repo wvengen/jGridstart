@@ -9,7 +9,6 @@ h1 {
 th {
 	font-weight: normal;
 	text-align: left;
-	font-style: italic;
 	white-space: nowrap;
 }
 
@@ -65,4 +64,25 @@ th {
 }
 .activitylist li.done-true {
 	color: green;
+}
+
+/*
+ * certificate_info
+ */
+
+td.location {
+	font-family: monospace;
+	font-size: 80%;
+}
+ 
+.showdetails a {
+	color: black;
+	text-decoration: none;
+	border-bottom: 1px dotted gray;
+}
+.showdetails a.shown-true:before {
+	content: "v ";
+}
+.showdetails a.shown-false:before {
+	content: "> ";
 }

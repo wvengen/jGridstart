@@ -171,6 +171,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	}
 	try {
 	    // return generated property
+	    if (key.equals("path"))
+		if (getPath()==null) return null;
+		else return getPath().toString();
 	    if (key.equals("cert"))
 		if (getCertificate()==null) return null;
 		else return "true";

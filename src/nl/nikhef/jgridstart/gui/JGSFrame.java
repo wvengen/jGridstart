@@ -91,6 +91,7 @@ public class JGSFrame extends JFrame {
 	new ActionRevoke(this, selection);
 	new ActionExport(this, selection);
 	new ActionMakeDefault(this, store, selection);
+	new ActionShowDetails(this, selection);
 	new ActionViewLog(this);
 	new ActionViewCertificateList(this, certList, false);
 	new ActionRefresh(this, store) {
