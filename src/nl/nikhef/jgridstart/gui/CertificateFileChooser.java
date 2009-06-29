@@ -18,5 +18,8 @@ public class CertificateFileChooser extends JFileChooser {
 		    new FileFilterSuffix("Certificate Bundle", ".p12,.pfx,.pem"));
 	
 	setAcceptAllFileFilterUsed(false);
+	
+	setFileSelectionMode(FILES_ONLY);
+	setDialogType(open ? OPEN_DIALOG : SAVE_DIALOG);
     }
 }
