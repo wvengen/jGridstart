@@ -89,6 +89,7 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	if (p!=null)
 	    panel.setData(p);
 	frame = showFrame((Component)panel);
+	frame.setMinimumSize(new Dimension(200, 100));
 	waitForWindow(frame, true);
 	// On Mac OS X I have seen the first test fail because the window wasn't
 	// realised fully even when showFrame returned (It couldn't find any
