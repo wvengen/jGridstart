@@ -193,7 +193,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     protected File newItem() throws IOException {
 	File dst = null;
 	for (int i = 0; i < Integer.MAX_VALUE; i++) {
-	    dst = new File(path, String.format("grid-cert-%04d", i));
+	    dst = new File(path, String.format("user-cert-%04d", i));
 	    if (!dst.exists()) break;
 	}
 	if (dst.exists())
