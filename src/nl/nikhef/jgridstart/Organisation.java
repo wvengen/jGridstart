@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,10 +17,21 @@ public class Organisation extends Properties {
     /** global list of all organisations */
     protected static HashMap<String, Organisation> organisations = null;
     
-    /** Get an organisation by identifier */
+    /** Get an organisation by identifier.
+     * <p>
+     * This returns the organisation as read from the configuration file.
+     * If the organisation is not found, however, a new {@linkplain Organisation}
+     * object is returned which has id and name set to the argument {@code org}.
+     */
     public static Organisation get(String org) {
 	if (organisations==null) readAll();
-	return organisations.get(org);
+	Organisation o = organisations.get(org);
+	if (o==null) {
+	    o = new Organisation(org);
+	    o.setProperty("name", org);
+	    o.setProperty("desc", org+" (unrecognised organisation)");
+	}
+	return o;
     }
     /** Return the list of organisations */
     public static Organisation[] getAll() {
@@ -56,14 +68,26 @@ public class Organisation extends Properties {
 	// from direct property if set
 	if (cert.getProperty("org")!=null)
 	    return get(cert.getProperty("org"));
-	// else parse subject: find first id in certificate list
-	String[] orgs = cert.getProperty("subject.o").split(",\\s*");
-	for (int i=0; i<orgs.length; i++) {
-	    if (organisations.keySet().contains(orgs[i]))
-		return get(orgs[i]);
+	// else parse subject: find in certificate
+	// a weight is given for finding the most meaningful organisation
+	String[] sorgs = cert.getProperty("subject.o").split(",\\s*");
+	Organisation org = null;
+	int weight = -100;
+	for (int i=0; i<sorgs.length; i++) {
+	    if (organisations.keySet().contains(sorgs[i])) {
+		Organisation curorg = organisations.get(sorgs[i]);
+		int curweight = 0;
+		// calculate weight
+		if (!Boolean.valueOf(org.getProperty("signup")))
+		    curweight -= 10;
+		// test if this organisation is a better match
+		if (curweight > weight) {
+		    weight = curweight;
+		    org = curorg;
+		}
+	    }
 	}
-	// nothing found ...
-	return null;
+	return org;
     }
     
     /** Returns a list of &gt;option&lt; elements to put in an html select. The CertificatePair
@@ -72,7 +96,7 @@ public class Organisation extends Properties {
      * support organisations that are not present in the configuration file.
      *
      * @param cert CertificatePair to include organisation from
-     * @param signup whether to restrict options to organisations for which one can signup
+     * @param signupOnly whether to restrict options to organisations for which one can signup
      */
     public static String getAllOptionsHTML(CertificatePair cert, boolean signupOnly) {
 	// setup variables to detect if certificate organisation is present already
@@ -90,10 +114,7 @@ public class Organisation extends Properties {
 	}
 	// create option for non-existent organisation
 	if (cert!=null && !hasOrg) {
-	    String id = cert.getProperty("org");
-	    Organisation org = new Organisation(id);
-	    org.setProperty("name", id);
-	    org.setProperty("desc", id+" (unrecognised organisation)");
+	    Organisation org = get(cert.getProperty("org"));
 	    r = org.getOptionHTML()+"\n" + r;
 	}
 	return r;
@@ -115,10 +136,13 @@ public class Organisation extends Properties {
     /** Create a new origanisation */
     protected Organisation(String id) {
 	setProperty("id", id);
+	// signup is true by default
+	if (getProperty("signup")==null) setProperty("signup", "true");
     }
     
-    /** Returns an organisation property. If the key is not found in this organisation,
-     * the organisation pointed by "ref" is tried, when available.
+    /** Returns an organisation property.
+     * <p>
+     * If the key is not found in this organisation, the organisation pointed by {@code ref} is tried, when available.
      * 
      * This is done instead of using a parent property to allow referencing organisations
      * that are defined later in the configuration file. */
@@ -167,8 +191,10 @@ public class Organisation extends Properties {
 		"</option>";
     }
     
-    /** Copy all properties to a Properties instance. These are volatile
-     * attributes since they are bound to an organisation, not a Certificate. */
+    /** Copy all properties to a {@linkplain Properties} instance.
+     * <p>
+     * These are volatile attributes since they are bound to an organisation,
+     * not a Certificate. */
     public void copyTo(Properties p, String prefix) {
 	// copy from parent first
 	if (containsKey("ref"))

@@ -153,6 +153,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
      *     <dd>the public key's modulus, and its first 20 characters</dd>
      * <dt>org</dt>
      *     <dd>is returned when set, or guessed from subject if unset</dd>
+     * <dt>state.icon</dt>
+     *     <dd>Icon for certificate state, one of {@code valid}, {@code warning},
+     *     {@code renew} or {@code error}.</dd>
      * </dl>
      * 
      * You can postfix each property with {@code .html} to get an html representation.
@@ -201,10 +204,11 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    if (key.equals("modulus"))
 		if (getCertificate()!=null) return ((RSAPublicKey)getCertificate().getPublicKey()).getModulus().toString();
 		else if (getCSR()!=null) return ((RSAPublicKey)getCSR().getPublicKey()).getModulus().toString();
-	    if (key.equals("modulus.first20"))
+	    if (key.equals("modulus.first20")) {
 		if (getCertificate()!=null) return ((RSAPublicKey)getCertificate().getPublicKey()).getModulus().toString().substring(0,20);
 		else if (getCSR()!=null) return ((RSAPublicKey)getCSR().getPublicKey()).getModulus().toString().substring(0,20);
-	    else return null;
+		else return null;
+	    }
 	    if (key.equals("valid")) {
 		if (getCertificate()==null) return null;
 		try { getCertificate().checkValidity(); }
@@ -219,6 +223,12 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    if (key.equals("valid.notafter")) {
 		if (getCertificate()==null) return null;
 		return DateFormat.getDateInstance().format(getCertificate().getNotAfter());
+	    }
+	    if (key.equals("state.icon")) {
+		if (Boolean.valueOf(getProperty("valid"))) return "valid";
+		if (Boolean.valueOf(getProperty("cert"))) return "warning";
+		// TODO if (Boolean.valueOf(getProperty(""))) return "renew";
+		return "error";
 	    }
 	    if (key.startsWith("usage")) {
 		if (getCertificate()==null) return null;
@@ -263,6 +273,15 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		} catch (Exception e) { }
 	    }
 	    return sorgs.substring(0, sorgs.length()-2).trim();
+	}
+	if (key.equals("state.icon")) {
+	    String state = getProperty(key);
+	    if (state == "valid")
+		return "<b color='green'>&#x2713;</b>";
+	    else if (state == "warning")
+		return "<b color='yellow'>!</b>";
+	    else
+		return "<b color='red'>&#x2715;</b>";
 	}
 	// nothing by default
 	return null;

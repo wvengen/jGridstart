@@ -11,6 +11,7 @@ import org.bouncycastle.asn1.x509.X509Name;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.Organisation;
 
 /**
  * Java Swing component that contains a list of certificates. It is a view for
@@ -49,23 +50,29 @@ public class ComponentCertificateList extends JList {
 	    if (value==null) return this;
 	    // we want a more rich markup from the object
 	    CertificatePair cert = (CertificatePair)value;
-	    String s = "";
-	    // TODO icon showing certificate state
+	    String line1 = "", line2 = "";
+	    String dfl = "";
 	    // name of person
-	    s += cert.getSubjectPrincipalValue(X509Name.CN);
-	    CertificatePair dflCert = ((CertificateStore)getModel()).getDefault();
+	    line2 += cert.getSubjectPrincipalValue(X509Name.CN);
 	    // add star to default certificate
-	    if ( cert.equals(dflCert) ) {
-		// TODO get default certificate from store (not yet implemented)
-		s += "<b color='#ffcc00'>&#x2730</b>";
-	    }	
-	    // organisations
-	    if (cert.getSubjectPrincipalValue(X509Name.CN)!=null) {
-		s += "<br>\n&nbsp;<i style='font-size:80%;'>"+
-			cert.getSubjectPrincipalValue(X509Name.O)+"</i>";
-	    }
+	    CertificatePair dflCert = ((CertificateStore)getModel()).getDefault();
+	    if ( cert.equals(dflCert) )
+		dfl += "&nbsp;<b color='#ffcc00'>&#x2730</b>";
+	    // organisation
+	    line1 += Organisation.getFromCertificate(cert).getProperty("name");
 	    // set html contents
-	    setText("<html><body width='100%' style='margin: 2pt;'>"+s+"</html></body>");
+	    String s =
+		"<html><body width='100%'>" +
+	    	"<table border='0' cellpadding='2' cellspacing='0'>" +
+	    	"  <tr>" +
+	    	"    <td width='19' rowspan='2' align='center'>" + cert.getProperty("state.icon.html") + "</td>" +
+	    	"    <td>" +
+	    	       line1 + dfl + "<br>" +
+	    	"      <small>" + line2 + "</small>" +
+	    	"    </td>" +
+	    	"  </tr>" +
+	    	"</html></body>";
+	    setText(s);
 	    return this;
 	}
     }

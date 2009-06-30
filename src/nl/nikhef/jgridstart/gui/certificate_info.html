@@ -44,8 +44,8 @@
 				<span if="${valid.notafter}">
 				  until <c c="${valid.notafter}"></c>
 				</span>
-				<span if="${valid}" class="valid" title="certificate is valid and can be used">&#x2713;</span>
-				<span if="!${valid}" class="invalid" title="certificate is expired or revoked">&#x2715;</span>
+				<span if="${valid}" class="valid" title="certificate is valid and can be used" c="${state.icon.html}"/>
+				<span if="!${valid}" class="invalid" title="certificate is expired or revoked" c="${state.icon.html}"/>
 			</td>
 		</tr>
 		<!--
