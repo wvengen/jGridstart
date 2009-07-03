@@ -2,7 +2,7 @@ package nl.nikhef.xhtmlrenderer.swing;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
 import java.io.ByteArrayInputStream;
@@ -60,7 +60,7 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
     /** Current component under test, created by createPanel */
     private ITemplatePanel panel = null;
     /** Current frame that contains the panel, also created by createPanel */
-    private Frame frame = null;
+    private Window frame = null;
     /** Whether showFrame() is called for the first time, see createPanel() */
     private boolean isFirstTime = true;
     
@@ -75,7 +75,24 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	tester = null;
     }
     
+    /** Helper method: return a new ITemplatePanel instance.
+     * <p>
+     * This is to be overridden by the implementation because it needs
+     * to create the class specific to that implementation.
+     */
     protected abstract ITemplatePanel createPanel();
+    /** Helper method: show window frame.
+     * <p>
+     * This show the frame, creating one when needed. 
+     */
+    protected Window showFrame(ITemplatePanel panel) {
+	if (panel instanceof Window) {
+	    showWindow((Window)panel);
+	    return ((Window)panel);
+	} else {
+	    return showFrame((Component)panel);
+	}
+    }
     
     /** Helper method: create template panel from a html body
      * 
@@ -88,7 +105,7 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	panel.setDocument(TemplateDocumentTest.parseBody(body));
 	if (p!=null)
 	    panel.setData(p);
-	frame = showFrame((Component)panel);
+	frame = showFrame(panel);
 	frame.setMinimumSize(new Dimension(200, 100));
 	waitForWindow(frame, true);
 	// On Mac OS X I have seen the first test fail because the window wasn't
