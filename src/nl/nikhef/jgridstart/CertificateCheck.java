@@ -2,16 +2,25 @@ package nl.nikhef.jgridstart;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAParams;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.logging.Logger;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 import nl.nikhef.jgridstart.util.PEMReader;
 import nl.nikhef.jgridstart.util.PasswordCache;
@@ -39,7 +48,7 @@ public class CertificateCheck {
      * Exceptions work such that only one exception is shown at once.
      * So the order in which the checks appear <em>is</em> important.
      */
-    public void check() throws IOException {
+    public void check() throws CertificateCheckException {
 	checkAccessPath();
 	checkPrivateKey();
 	checkCertificate();
@@ -52,12 +61,13 @@ public class CertificateCheck {
      * user is expecting a password dialog, or the password is already
      * present in the {@link PasswordCache}. 
      */
-    public void checkPrivate() throws IOException {
-	checkPrivateKeyMatchesCertificate();
+    public void checkPrivate() throws CertificateCheckException {
+	checkPrivateKeyDecryptValid();
+	if (cert.getCertFile().exists()) checkPrivateKeyMatchesCertificate();
     }
     
     /** Check access to certificate directory. Must exist. */
-    protected void checkAccessPath() throws IOException {
+    protected void checkAccessPath() throws CertificateCheckException {
 	File f = cert.getPath();
 	if (!f.exists())
 	    fail("Certificate directory not found", f);
@@ -73,7 +83,7 @@ public class CertificateCheck {
      * valid format, not if it can be decrypted since we don't want
      * to use the password.
      */
-    protected void checkPrivateKey() throws IOException {
+    protected void checkPrivateKey() throws CertificateCheckException {
 	File f = cert.getKeyFile();
 	if (!f.exists())
 	    fail("Private key not found", f);
@@ -92,7 +102,7 @@ public class CertificateCheck {
 	    // So now I have to parse the message string ...
 	    if (!e.getMessage().contains("org.bouncycastle.openssl.PasswordException") &&
 		    !e.getMessage().contains("wrong password"))
-		throw e;
+		throw new CertificateCheckException(e);
 	}
     }
 
@@ -102,7 +112,7 @@ public class CertificateCheck {
      * exists, because it is optional (e.g. when the certificate signing
      * request was made but the certificate not received from the CA).
      */
-    protected void checkCertificate() throws IOException {
+    protected void checkCertificate() throws CertificateCheckException {
 	File f = cert.getCertFile();
 	if (!f.exists())
 	    return;
@@ -111,8 +121,25 @@ public class CertificateCheck {
 	if (!f.canRead())
 	    fail("Certificate cannot be read", f);
 	// check if certificate was loaded or can be loaded
-	if (cert.getCertificate() == null) {
-	    fail("Certificate file contains no certificate", f);
+	try {
+	    if (cert.getCertificate() == null)
+	        fail("Certificate file contains no certificate", f);
+	} catch (IOException e) {
+	    throw new CertificateCheckException(e);
+	}
+    }
+    
+    /** Check if the decrypted private key is valid.
+     * <p>
+     * This requires the private key to be decrypted so a password
+     * may be asked.
+     */
+    protected void checkPrivateKeyDecryptValid() throws CertificateCheckException {
+	try {
+	    cert.getPrivateKey();
+	} catch (PasswordCancelledException e) {
+	} catch (IOException e) {
+	    throw new CertificateCheckException(e);
 	}
     }
     
@@ -123,10 +150,11 @@ public class CertificateCheck {
      * <p>
      * TODO don't use IOException
      */
-    protected void checkPrivateKeyMatchesCertificate() throws IOException {
+    protected void checkPrivateKeyMatchesCertificate() throws CertificateCheckException {
 	try {
 	    PublicKey pub = cert.getCertificate().getPublicKey();
 	    PrivateKey priv = cert.getPrivateKey();
+	    
 	    if (!pub.getAlgorithm().equals(priv.getAlgorithm()))
 		    fail("Private key doesn't belong to certificate (algorithm)");
 	    
@@ -135,9 +163,12 @@ public class CertificateCheck {
 		DSAPrivateKey dpriv = (DSAPrivateKey)priv;
 		DSAParams dpubp = dpub.getParams();
 		DSAParams dprivp = dpriv.getParams();
+		// private key has no getY() interface :(
+		BigInteger dprivY = dprivp.getG().modPow(dpriv.getX(), dprivp.getP());
 		if ( !dpubp.getG().equals(dprivp.getG()) ||
 		     !dpubp.getP().equals(dprivp.getP()) ||
-		     !dpubp.getQ().equals(dprivp.getQ()) )
+		     !dpubp.getQ().equals(dprivp.getQ()) ||
+		     !dpub.getY().equals(dprivY))
 		    fail("Private key doesn't belong to certificate (DSA params)");
 		    
 	    } else if (pub.getAlgorithm().equals("RSA")) {
@@ -148,20 +179,90 @@ public class CertificateCheck {
 		
 	    } else 
 		fail("Unsupported key format");
-	} catch (PasswordCancelledException e) { }
+	} catch (PasswordCancelledException e) {
+	} catch (IOException e) {
+	    throw new CertificateCheckException(e);
+	}
     }
     
     /** Called when a check fails, throws an Exception. */
-    protected void fail(String msg) throws IOException {
+    protected void fail(String msg) throws CertificateCheckException {
 	_fail(msg+": "+cert);
     }
     /** Called when a check fails, throws an Exception. */
-    protected void fail(String msg, File f) throws IOException {
+    protected void fail(String msg, File f) throws CertificateCheckException {
 	_fail(msg+": "+f);
     }
     /** Called when a check fails, throws an Exception (low level, don't use) */
-    private void _fail(String msg) throws IOException {
+    private void _fail(String msg) throws CertificateCheckException {
 	logger.warning("Check failed: "+msg);
-	throw new IOException(msg);
+	throw new CertificateCheckException(msg);
     }
+    
+    /** Exception thrown when a test fails */
+    public class CertificateCheckException extends Exception {
+	protected CertificateCheckException(String reason) {
+	    super(reason);
+	}
+	protected CertificateCheckException(Exception e) {
+	    super(e);
+	}
+    }
+    
+    //
+    // Command-line test tool; called from jgridstart.sh
+    //
+    
+    /** Test program */
+    public static void main(String[] args) throws Exception {
+	boolean checkPrivate = false;
+	String dir = null;
+	try {
+	    final Options opts = new Options();
+
+	    opts.addOption(new Option("h", "help", false, "show help message"));
+	    opts.addOption(new Option("p", "private", false, "decrypt private key (password required)"));
+
+	    CommandLineParser parser = new GnuParser();
+	    CommandLine line = parser.parse(opts, args);
+
+	    if (line.getArgs().length==0 || line.hasOption("help")) {
+		actionHelp(line, opts);
+		System.exit(0);
+	    }
+	    dir = line.getArgs()[0];
+	    if (line.hasOption("private"))
+		checkPrivate = true;
+	} catch (ParseException e) {
+	    System.err.println(e.getLocalizedMessage());
+	}
+	// now check the supplied path; CertificatePair checks for itself, btw
+	try {
+	    CertificatePair cert = new CertificatePair(new File(dir));
+	    if (checkPrivate)
+		new CertificateCheck(cert).checkPrivate();
+	    
+	    System.out.println("ok");
+	} catch (IOException e) {
+	    System.err.println(e.getLocalizedMessage());
+	    System.exit(1);
+	}
+	
+	System.exit(0);
+    }
+
+    /** Show help message */
+    protected static void actionHelp(CommandLine line, Options opts) {
+	// figure out executable name; shellscript sets variable to aid in this
+	String prog = System.getenv("INVOKED_PROGRAM");
+	if (prog==null) prog = "java "+CertificateCheck.class.getName();
+	// print help
+	HelpFormatter fmt = new HelpFormatter();
+	if (System.getenv("COLUMNS")!=null)
+	    fmt.setWidth(Integer.valueOf(System.getenv("COLUMNS")));
+	PrintWriter out = new PrintWriter(System.out, true);
+	out.println("usage: "+prog+" [-p] <globus certificate dir>");
+	fmt.printOptions(out, fmt.getWidth(), opts, fmt.getLeftPadding(), fmt.getDescPadding());
+	System.exit(0);
+    }	
 }

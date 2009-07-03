@@ -27,6 +27,7 @@ import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PEMReader;
 import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
+import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.gui.util.ArrayListModel;
 
 public class CertificateStore extends ArrayListModel<CertificatePair> implements ItemListener {
@@ -178,8 +179,10 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	try {
 	    add(new CertificatePair(f));
 	} catch (IOException e) {
-	    logger.warning("Failed to load certificate from " + f + ": "
-		    + e.getMessage());
+	    logger.warning("Failed to load certificate from " + f + ": " + e.getMessage());
+	    return false;
+	} catch (CertificateCheckException e) {
+	    logger.warning("Certificate invalid " + f + ": " + e.getMessage());
 	    return false;
 	}
 	return true;
@@ -263,8 +266,9 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * @throws NoSuchProviderException 
      * @throws KeyStoreException 
      * @throws UnrecoverableKeyException 
+     * @throws CertificateCheckException 
      */
-    public CertificatePair importFrom(File src) throws IOException, NoSuchAlgorithmException, PasswordCancelledException, UnrecoverableKeyException, KeyStoreException, NoSuchProviderException, CertificateException {
+    public CertificatePair importFrom(File src) throws IOException, NoSuchAlgorithmException, PasswordCancelledException, UnrecoverableKeyException, KeyStoreException, NoSuchProviderException, CertificateException, CertificateCheckException {
 	File dst = newItem();
 	// import
 	try {

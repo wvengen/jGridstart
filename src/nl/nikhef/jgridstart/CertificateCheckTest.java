@@ -1,0 +1,126 @@
+package nl.nikhef.jgridstart;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.security.SecureRandom;
+import org.junit.Test;
+
+import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
+import nl.nikhef.jgridstart.util.FileUtils;
+import nl.nikhef.jgridstart.util.PasswordCache;
+
+public class CertificateCheckTest  {
+    
+    /** Helper method: get {@linkplain File} for test number */
+    protected File getResourceFile(String name) throws IOException {
+	try {
+	    return new File(getClass().getResource("CertificateCheck-tests/"+name).toURI());
+	} catch (URISyntaxException e) { throw new IOException(e); }
+    }
+    /** Helper method: get {@link CertificatePair}; not load()ed !!! */
+    protected CertificatePair getCert(File f) throws IOException {
+	// create CertificatePair
+	// use protected methods to workaround built-in CertificateCheck invocation
+	CertificatePair cert = new CertificatePair();
+	cert.path = f;
+	return cert;
+    }
+    protected CertificatePair getCert(String name) throws IOException {
+	return getCert(getResourceFile(name));
+    }
+    /** Helper method: test a dir that is loaded, optional private decryption (via {@link PasswordCache}).*/
+    protected void test(File f, String passw) throws IOException, CertificateCheckException {
+	CertificatePair cert = getCert(f);
+	CertificateCheck check = new CertificateCheck(cert);
+	check.check();
+	// private key check if asked for
+	if (passw!=null) {
+	    PasswordCache.getInstance().set(cert.getKeyFile().getCanonicalPath(), passw.toCharArray());
+	    check.checkPrivate();
+	}
+	// private key check with random password should fail
+	SecureRandom random;
+	try {
+	    random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+	} catch (Exception e) { throw new IOException(e); }
+	char[] wrongpw = new char[12];
+	for (int i=0; i<wrongpw.length; i++) wrongpw[i] = (char)(random.nextInt(128-32)+32);
+	PasswordCache.getInstance().set(cert.getKeyFile().getCanonicalPath(), wrongpw);
+	try {
+	    check.checkPrivate();
+	    throw new IOException("Private key check succeeds with random password");
+	} catch(CertificateCheckException e) { /* ok */ }
+    }
+    /** Helper method: test and decrypt private key */
+    protected void test(String name, String passw) throws IOException, CertificateCheckException {
+	test(getResourceFile(name), passw);
+    }
+    /** Helper method: test without decrypting private key */
+    protected void test(String name) throws IOException, CertificateCheckException {
+	test(getResourceFile(name), null);
+    }
+
+    /** Ordinary, correct cert+key+request */
+    @Test public void testO_01() throws Exception { test("testO-01", ""); }
+    /** Ordinary, correct cert+key */
+    @Test public void testO_02() throws Exception { test("testO-02",""); }
+    /** Ordinary, correct key+request */
+    @Test public void testO_03() throws Exception { test("testO-03",""); }
+    /** Only key. TODO warning? */
+    @Test public void testO_04() throws Exception { test("testO-04",""); }
+    /** Test ordinary cert+key with different password */
+    @Test public void testO_05() throws Exception { test("testO-05","jjzlkxOIoi234jioOIj"); }
+    /** Test ordinary cert+key with DSA algorithm */
+    @Test public void testO_06() throws Exception { test("testO-06","abcd"); }
+
+    /** Empty directory */
+    @Test(expected=CertificateCheckException.class)
+    public void testE_01() throws Exception { test("testE-01"); }
+    /** Empty private key */
+    @Test(expected=CertificateCheckException.class)
+    public void testE_02() throws Exception { test("testE-02"); }
+    /** Unreadable private key */
+    @Test(expected=CertificateCheckException.class)
+    public void testE_03() throws Exception {
+	CertificatePair cert = getCert("testE-03");
+	FileUtils.chmod(cert.getKeyFile(), false, false, false, false);
+	try {
+	    test("testE-03");
+	} finally {
+	    FileUtils.chmod(cert.getKeyFile(), true, false, false, false);
+	}
+    }
+    /** Malformed private key; random chars replaced */
+    @Test(expected=CertificateCheckException.class)
+    public void testE_04() throws Exception { test("testE-04", ""); }
+    /** Empty certificate */
+    @Test(expected=CertificateCheckException.class)
+    public void testE_05() throws Exception { test("testE-05"); }
+    /** Unreadable certificate */
+    @Test(expected=CertificateCheckException.class)
+    public void testE_06() throws Exception {
+	CertificatePair cert = getCert("testE-06");
+	FileUtils.chmod(cert.getCertFile(), false, false, false, false);
+	try {
+	    test("testE-06");
+	} finally {
+	    FileUtils.chmod(cert.getCertFile(), true, false, false, false);
+	}
+    }
+    /** Malformed certificate; random chars replaced */
+    @Test(expected=CertificateCheckException.class)
+    public void testE_07() throws Exception { test("testE-07", ""); }
+    /** Key/certificate mismatch, both RSA */
+    @Test(expected=CertificateCheckException.class)
+    public void testE_08() throws Exception { test("testE-08", ""); }
+    /** Key/certificate mismatch, key DSA, cert RSA */
+    @Test(expected=CertificateCheckException.class)
+    public void testE_09() throws Exception { test("testE-09", "abcd"); }
+    /** Key/certificate mismatch, key RSA, cert DSA */
+    @Test(expected=CertificateCheckException.class)
+    public void testE_10() throws Exception { test("testE-10", "jjzlkxOIoi234jioOIj"); }
+    /** Key/certificate mismatch, both DSA */
+    @Test(expected=CertificateCheckException.class)
+    public void testE_11() throws Exception { test("testE-11", "qqq123"); }
+}

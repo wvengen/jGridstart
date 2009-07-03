@@ -25,6 +25,7 @@ import org.apache.commons.cli.ParseException;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 public class Main {
@@ -190,8 +191,9 @@ public class Main {
     /** get a certificate from its online source after signing 
      * @throws IOException 
      * @throws NoSuchAlgorithmException 
-     * @throws KeyManagementException */
-    protected static void actionGet(CommandLine line) throws ParseException, KeyManagementException, NoSuchAlgorithmException, IOException {
+     * @throws KeyManagementException 
+     * @throws CertificateCheckException */
+    protected static void actionGet(CommandLine line) throws ParseException, KeyManagementException, NoSuchAlgorithmException, IOException, CertificateCheckException {
 	CertificatePair cert = getCertificate(line);
 	cert.downloadCertificate();
     }

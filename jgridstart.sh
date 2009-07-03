@@ -24,6 +24,11 @@ elif [ "$1" = "cli" ]; then
 elif [ "$1" = "gui" ]; then
 	shift
 	$JAVA nl.nikhef.jgridstart.gui.Main $@
+elif [ "$1" = "check" ]; then
+	INVOKED_PROGRAM="$INVOKED_PROGRAM $1"
+	export INVOKED_PROGRAM
+	shift
+	$JAVA nl.nikhef.jgridstart.CertificateCheck $@
 elif [ "$DISPLAY" ]; then
 	$JAVA nl.nikhef.jgridstart.gui.Main $@
 else

@@ -43,6 +43,7 @@ import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.ca.*;
 import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PEMReader;
@@ -112,7 +113,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
     }
 
     /** Create new empty certificate pair */
-    private CertificatePair() {
+    protected CertificatePair() {
 	super();
 	Runtime.getRuntime().addShutdownHook(new Thread() {
 	   public void run() {
@@ -126,7 +127,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
     }
 
     /** New certificate pair of a directory */
-    public CertificatePair(File f) throws IOException {
+    public CertificatePair(File f) throws IOException, CertificateCheckException {
 	this();
 	load(f);
     }
@@ -309,7 +310,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
     }
 
     /** Load a certificate from a directory */
-    protected void load(File f) throws IOException {
+    protected void load(File f) throws IOException, CertificateCheckException {
 	clear();
 	path = f;
 
@@ -367,7 +368,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws UnrecoverableKeyException 
      */
     static public CertificatePair importFrom(File src, File dst)
-	    throws IOException, NoSuchAlgorithmException, PasswordCancelledException, UnrecoverableKeyException, KeyStoreException, NoSuchProviderException, CertificateException {
+	    throws IOException, CertificateCheckException, NoSuchAlgorithmException, PasswordCancelledException, UnrecoverableKeyException, KeyStoreException, NoSuchProviderException, CertificateException {
 
 	if (!src.isFile() && !src.isDirectory())
 	    throw new IOException("Need file to import from: " + src);
@@ -407,7 +408,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws NoSuchAlgorithmException 
      * @throws PasswordCancelledException 
      */
-    protected void importFromPEM(File src) throws IOException, NoSuchAlgorithmException, PasswordCancelledException {
+    protected void importFromPEM(File src) throws IOException, CertificateCheckException, NoSuchAlgorithmException, PasswordCancelledException {
 	int count = 0;
 	logger.finer("Trying to import certificate from PEM file: "+src);
 	// process all items in the file
@@ -484,7 +485,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	}
     }
     
-    protected void importFromDirectory(File src) throws IOException {
+    protected void importFromDirectory(File src) throws IOException, CertificateCheckException {
 	// import from directory: make sure private key exist and copy
 	File key = new File(src, "userkey.pem");
 	if (!key.canRead() || !key.isFile())
@@ -690,7 +691,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
     }
     
     /** Download the certificate from the certificate authority */
-    public void downloadCertificate() throws IOException, KeyManagementException, NoSuchAlgorithmException {
+    public void downloadCertificate() throws IOException, CertificateCheckException, KeyManagementException, NoSuchAlgorithmException {
 	if (getCertificate()!=null) {
 	    logger.warning("Ignoring request to download certificate when already present: "+this);
 	    return;
@@ -826,8 +827,10 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    // see if certificate can be downloaded
 	    if (!Boolean.valueOf(getProperty("request.processed")))
 		isCertificationRequestProcessed();
+	// TODO proper error reporting or don't catch
 	} catch (IOException e) {
-	    // TODO proper error reporting or don't catch
+	    return false;
+	} catch (CertificateCheckException e) {
 	    return false;
 	}	
 	return true;
@@ -838,9 +841,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @param checkPriv True to check private key as well, requires private key password.
      *                  You can safely test this if the private key password is still
      *                  known to be in the {@link PasswordCache}
-     * @throws IOException 
+     * @throws CertificateCheckException 
      */
-    protected void check(boolean checkPriv) throws IOException {
+    protected void check(boolean checkPriv) throws CertificateCheckException {
 	CertificateCheck c = new CertificateCheck(this);
 	c.check();
 	if (checkPriv) c.checkPrivate();
