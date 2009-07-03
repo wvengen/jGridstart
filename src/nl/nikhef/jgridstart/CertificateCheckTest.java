@@ -18,7 +18,7 @@ public class CertificateCheckTest extends TestCase {
     protected File getResourceFile(String name) throws IOException {
 	try {
 	    return new File(getClass().getResource("CertificateCheck-tests/"+name).toURI());
-	} catch (URISyntaxException e) { throw new IOException(e); }
+	} catch (URISyntaxException e) { throw new IOException(e.getLocalizedMessage()); }
     }
     /** Helper method: get {@link CertificatePair}; not load()ed !!! */
     protected CertificatePair getCert(File f) throws IOException {
@@ -45,7 +45,7 @@ public class CertificateCheckTest extends TestCase {
 	SecureRandom random;
 	try {
 	    random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-	} catch (Exception e) { throw new IOException(e); }
+	} catch (Exception e) { throw new IOException(e.getLocalizedMessage()); }
 	char[] wrongpw = new char[12];
 	for (int i=0; i<wrongpw.length; i++) wrongpw[i] = (char)(random.nextInt(128-32)+32);
 	PasswordCache.getInstance().set(cert.getKeyFile().getCanonicalPath(), wrongpw);

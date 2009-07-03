@@ -134,6 +134,8 @@
 			<fileset dir="${dir.build}">
 				<!-- remove non-production files -->
 				<exclude name="**/test*"/>
+				<exclude name="**/*test/**"/>
+				<exclude name="**/*tests/**"/>
 				<exclude name="**/package.html"/>
 			</fileset>
 			<zipfileset src="${dep.cli}" includes="**/*.class"/>
@@ -212,6 +214,8 @@
 			<fileset dir="${dir.build}">
 				<!-- remove non-production files -->
 				<exclude name="**/test*"/>
+				<exclude name="**/*test/**"/>
+				<exclude name="**/*tests/**"/>
 				<exclude name="**/package.html"/>
 				<include name="nl/nikhef/jgridstart/install/**"/>
 				<include name="nl/nikhef/jgridstart/util/**"/>
