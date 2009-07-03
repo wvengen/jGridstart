@@ -15,6 +15,7 @@ public class AllTests {
 	TestSuite suite = new TestSuite("Test for nl.nikhef.jgridstart");
 	//$JUnit-BEGIN$
 	suite.addTestSuite(PasswordCacheTest.class);
+	suite.addTestSuite(CertificateCheckTest.class);
 	suite.addTestSuite(BrowsersMacOSXTest.class);
 	suite.addTestSuite(TemplateDocumentTest.class);
 	suite.addTestSuite(TemplatePanelTest.class);

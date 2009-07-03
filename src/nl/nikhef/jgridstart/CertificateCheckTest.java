@@ -4,13 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.SecureRandom;
+
 import org.junit.Test;
+import junit.framework.TestCase;
 
 import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
-public class CertificateCheckTest  {
+public class CertificateCheckTest extends TestCase {
     
     /** Helper method: get {@linkplain File} for test number */
     protected File getResourceFile(String name) throws IOException {
@@ -60,6 +62,19 @@ public class CertificateCheckTest  {
     protected void test(String name) throws IOException, CertificateCheckException {
 	test(getResourceFile(name), null);
     }
+    /** Helper method: test and assume that an CertificateCheckException occurs.*/
+    protected void testE(String name, String passw) throws IOException {
+	try {
+	    test(name, passw);
+	} catch(CertificateCheckException e) {
+	    return;
+	}
+	throw new IOException("Expected a CertificateCheckException");
+    }
+    /** Helper method: test and assume that an CertificateCheckException occurs (no decrypt). */
+    protected void testE(String name) throws IOException {
+	testE(name, null);
+    }
 
     /** Ordinary, correct cert+key+request */
     @Test public void testO_01() throws Exception { test("testO-01", ""); }
@@ -75,52 +90,41 @@ public class CertificateCheckTest  {
     @Test public void testO_06() throws Exception { test("testO-06","abcd"); }
 
     /** Empty directory */
-    @Test(expected=CertificateCheckException.class)
-    public void testE_01() throws Exception { test("testE-01"); }
+    @Test public void testE_01() throws Exception { testE("testE-01"); }
     /** Empty private key */
-    @Test(expected=CertificateCheckException.class)
-    public void testE_02() throws Exception { test("testE-02"); }
+    @Test public void testE_02() throws Exception { testE("testE-02"); }
     /** Unreadable private key */
-    @Test(expected=CertificateCheckException.class)
-    public void testE_03() throws Exception {
+    @Test public void testE_03() throws Exception {
 	CertificatePair cert = getCert("testE-03");
-	FileUtils.chmod(cert.getKeyFile(), false, false, false, false);
 	try {
-	    test("testE-03");
+	    FileUtils.chmod(cert.getKeyFile(), false, false, false, false);
+	    testE("testE-03");
 	} finally {
 	    FileUtils.chmod(cert.getKeyFile(), true, false, false, false);
 	}
     }
     /** Malformed private key; random chars replaced */
-    @Test(expected=CertificateCheckException.class)
-    public void testE_04() throws Exception { test("testE-04", ""); }
+    @Test public void testE_04() throws Exception { testE("testE-04", ""); }
     /** Empty certificate */
-    @Test(expected=CertificateCheckException.class)
-    public void testE_05() throws Exception { test("testE-05"); }
+    @Test public void testE_05() throws Exception { testE("testE-05"); }
     /** Unreadable certificate */
-    @Test(expected=CertificateCheckException.class)
-    public void testE_06() throws Exception {
+    @Test public void testE_06() throws Exception {
 	CertificatePair cert = getCert("testE-06");
-	FileUtils.chmod(cert.getCertFile(), false, false, false, false);
 	try {
-	    test("testE-06");
+	    FileUtils.chmod(cert.getCertFile(), false, false, false, false);
+	    testE("testE-06");
 	} finally {
 	    FileUtils.chmod(cert.getCertFile(), true, false, false, false);
 	}
     }
     /** Malformed certificate; random chars replaced */
-    @Test(expected=CertificateCheckException.class)
-    public void testE_07() throws Exception { test("testE-07", ""); }
+    @Test public void testE_07() throws Exception { testE("testE-07", ""); }
     /** Key/certificate mismatch, both RSA */
-    @Test(expected=CertificateCheckException.class)
-    public void testE_08() throws Exception { test("testE-08", ""); }
+    @Test public void testE_08() throws Exception { testE("testE-08", ""); }
     /** Key/certificate mismatch, key DSA, cert RSA */
-    @Test(expected=CertificateCheckException.class)
-    public void testE_09() throws Exception { test("testE-09", "abcd"); }
+    @Test public void testE_09() throws Exception { testE("testE-09", "abcd"); }
     /** Key/certificate mismatch, key RSA, cert DSA */
-    @Test(expected=CertificateCheckException.class)
-    public void testE_10() throws Exception { test("testE-10", "jjzlkxOIoi234jioOIj"); }
+    @Test public void testE_10() throws Exception { testE("testE-10", "jjzlkxOIoi234jioOIj"); }
     /** Key/certificate mismatch, both DSA */
-    @Test(expected=CertificateCheckException.class)
-    public void testE_11() throws Exception { test("testE-11", "qqq123"); }
+    @Test public void testE_11() throws Exception { testE("testE-11", "qqq123"); }
 }
