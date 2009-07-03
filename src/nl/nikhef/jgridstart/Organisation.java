@@ -70,7 +70,9 @@ public class Organisation extends Properties {
 	    return get(cert.getProperty("org"));
 	// else parse subject: find in certificate
 	// a weight is given for finding the most meaningful organisation
-	String[] sorgs = cert.getProperty("subject.o").split(",\\s*");
+	String sorg = cert.getProperty("subject.o");
+	String[] sorgs = new String[] {};
+	if (sorg!=null) sorgs = sorg.split(",\\s*");
 	Organisation org = null;
 	int weight = -100;
 	for (int i=0; i<sorgs.length; i++) {

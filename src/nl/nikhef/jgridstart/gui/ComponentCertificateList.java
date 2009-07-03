@@ -59,7 +59,8 @@ public class ComponentCertificateList extends JList {
 	    if ( cert.equals(dflCert) )
 		dfl += "&nbsp;<b color='#ffcc00'>&#x2730</b>";
 	    // organisation
-	    line1 += Organisation.getFromCertificate(cert).getProperty("name");
+	    Organisation org = Organisation.getFromCertificate(cert);
+	    if (org!=null) line1 += org.getProperty("name");
 	    // set html contents
 	    String s =
 		"<html><body width='100%'>" +
