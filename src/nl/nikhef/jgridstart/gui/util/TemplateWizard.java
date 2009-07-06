@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.print.PrinterException;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -36,10 +35,15 @@ import org.xhtmlrenderer.simple.extend.FormSubmissionListener;
 import org.xhtmlrenderer.swing.FSMouseListener;
 import org.xhtmlrenderer.swing.LinkListener;
 
-/**
- * HTML-based wizard dialog. One supplies it with a list of html templates and a
- * property list.
- * 
+/** HTML-based wizard dialog.
+ * <p>
+ * This is an {@link ITemplatePanel} with next/previous buttons by which
+ * the user can walk through a list of pages. The pages that make up the
+ * wizard are defined in the member {@link #pages}.
+ * <p>
+ * When you want to do something on a page change, use {@link #setHandler} with
+ * a {@link PageListener} interface as argument. One can use {@link #setStep} and
+ * {@link #setStepRelative} to change the current page.
  */
 public class TemplateWizard extends JDialog implements ITemplatePanel {
 
@@ -104,10 +108,14 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	setStep(step + delta);
     }
 
-    /** shows or hides the dialog */
+    /** Shows or hides the dialog.
+     * <p>
+     * This also sets the current step to the first one if none is selected
+     * as of yet (only when there are pages defined).
+     */
     public void setVisible(boolean visible) {
 	// need to setup some stuff if no step selected
-	if (visible && step < 0)
+	if (visible && step < 0 && pages.size() > 0)
 	    setStep(0);
 	super.setVisible(visible);
     }
@@ -123,14 +131,7 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	pane = new TemplateButtonPanel();
 	getContentPane().add(pane);
 	pane.setBackground(UIManager.getColor("control"));
-	// "Previous" button
-	prevAction = new AbstractAction("Previous") {
-	    public void actionPerformed(ActionEvent e) {
-		setStepRelative(-1);
-	    }
-	};
-	prevAction.putValue(Action.MNEMONIC_KEY, new Integer('P'));
-	
+
 	// create two button areas: one for prev/next to the right, one for
 	// extra buttons at the left.
 	btnLeft = new JPanel();
@@ -141,9 +142,19 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	bpanel.removeAll();
 	bpanel.add(btnLeft, null);
 	bpanel.add(Box.createHorizontalGlue());
-	bpanel.add(btnRight, null);
+	bpanel.add(btnRight, null);	
 	
-	pane.addButton(btnRight, new JButton(prevAction), false, false);
+	// "Previous" button
+	prevAction = new AbstractAction("Previous") {
+	    public void actionPerformed(ActionEvent e) {
+		setStepRelative(-1);
+	    }
+	};
+	prevAction.putValue(Action.MNEMONIC_KEY, new Integer('P'));
+	
+	JButton prevButton = new JButton(prevAction);
+	prevButton.setName("wizard_previous");
+	pane.addButton(btnRight, prevButton, false, false);
 	// "Next" button; name and mnemonic set in setStep()
 	nextAction = new AbstractAction("Next") {
 	    public void actionPerformed(ActionEvent e) {
@@ -151,7 +162,9 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	    }
 	};
 	nextAction.putValue(Action.MNEMONIC_KEY, new Integer('N'));
-	pane.addButton(btnRight, new JButton(nextAction), true, false);
+	JButton nextButton = new JButton(nextAction);
+	nextButton.setName("wizard_next");
+	pane.addButton(btnRight, nextButton, true, false);
 	// close window on escape
 	btnRight.add(Box.createRigidArea(new Dimension(pane.btnBorderWidth*8, 0)));
 	cancelAction = new AbstractAction("Cancel") {
@@ -160,7 +173,9 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	    }
 	};
 	cancelAction.putValue(Action.MNEMONIC_KEY, new Integer('C'));
-	pane.addButton(btnRight, new JButton(cancelAction), true);
+	JButton cancelButton = new JButton(cancelAction);
+	cancelButton.setName("wizard_close");
+	pane.addButton(btnRight, cancelButton, true);
 	getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 		KeyStroke.getKeyStroke("ESCAPE"), "ESCAPE");
 	getRootPane().getActionMap().put("ESCAPE", cancelAction);
