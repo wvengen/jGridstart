@@ -94,13 +94,15 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
     
     /** return the TemplateDocument by index.
      * <p>
-     * The document is loaded on demand.
+     * The document is loaded on demand. Always use this method to access
+     * the document, or else it may not be loaded.
      *
      * @return loaded document on success, {@code null} on failure
      */
     protected TemplateDocument getDocument(int i)  {
 	// load when needed
-	if (docs.size() < i || !docs.get(i).getDocumentURI().equals(pages.get(i).toExternalForm()) ) {
+	while (docs.size() <= i) docs.add(null);
+	if (docs.get(i)==null || !docs.get(i).getDocumentURI().equals(pages.get(i).toExternalForm()) ) {
 	    try {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		Document src = factory.newDocumentBuilder().parse(pages.get(i).toExternalForm());
