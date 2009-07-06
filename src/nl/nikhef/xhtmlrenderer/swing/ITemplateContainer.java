@@ -22,6 +22,13 @@ public interface ITemplateContainer extends IDocumentContainer {
      */
     public Properties data();
     
+    /** Renders an ITemplateDocument instance.
+     * 
+     * @param doc template to show, this will be processed with the data
+     *            supplied by this container.
+     */
+    public void setDocument(TemplateDocument doc);
+    
     /** Refresh the contents so that all parsing is redone.
      * <p>
      * Note that the template may or may not be retrieved again from its source.

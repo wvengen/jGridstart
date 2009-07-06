@@ -1,12 +1,20 @@
 package nl.nikhef.jgridstart.gui.util;
 
+import java.net.URL;
+import java.io.ByteArrayInputStream;
+import java.awt.Dimension;
 import javax.swing.JButton;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+
 import org.junit.Test;
 import abbot.finder.matchers.NameMatcher;
 
 import nl.nikhef.jgridstart.gui.util.TemplateWizard.PageListener;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanelTest;
+import nl.nikhef.xhtmlrenderer.swing.TemplateDocument;
 
 public class TemplateWizardTest extends ITemplatePanelTest {
     @Override
@@ -100,7 +108,45 @@ public class TemplateWizardTest extends ITemplatePanelTest {
     
     
     public static void main(String[] args) throws Exception {
-	TemplateWizard panel = new TemplateWizard();
-	ITemplatePanelTest.main(panel, args);
+	final String testStyle = "<style type='text/css'><!--\n" +
+	    "body { padding-left: 7em; }\n" +
+	    ".wizard-contents { position: fixed; left: 0; top: 0; background: #eee; width: 4.5em; }\n" +
+	    ".wizard-contents .wizard-current { color: green; }\n" +
+	    "//--></style>";
+	final String[] testPages = {
+		"<html><head>"+testStyle+"<title>Page 1</title></head><body>" +
+			"<div c='${wizard.contents.html}'/>" +
+			testBody +
+			"</body></html>",
+		"<html><head>"+testStyle+"<title>Page 2</title></head><body>" +
+			"<div c='${wizard.contents.html}'/>" +
+			"<h1>Page two</h1><p>Hi there</p>" +
+			"</body></html>",
+		"<html><head>"+testStyle+"<title>Page 3</title></head><body>" +
+			"<div c='${wizard.contents.html}'/>" +
+			"<h1>Page three</h1><p>Hi there</p>" +
+			"</body></html>",
+	};
+	
+	TemplateWizard wiz = new TemplateWizard() {
+	    // use embedded document as source instead of external pages
+	    @Override
+	    public TemplateDocument getDocument(int step) {
+		try {
+		    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		    DocumentBuilder builder = factory.newDocumentBuilder();
+		    Document src = builder.parse(new ByteArrayInputStream(testPages[step].getBytes()));
+		    return new TemplateDocument(src, data());
+		} catch(Exception e) {
+		    return null;
+		}
+	    }
+	};
+	// create dummy list so it knows the right number of pages
+	for (int i=0; i<testPages.length; i++) wiz.pages.add(new URL("http://localhost/"));
+	// and go!
+	setTestPane(null, wiz);
+	wiz.setPreferredSize(new Dimension(500,400));
+	wiz.setVisible(true);
     }
 }

@@ -513,14 +513,8 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	assertTrue(Boolean.valueOf(panel.data().getProperty("chk")));
     }
 
-    
-    /** An interactive test to play with */
-    public static void main(ITemplatePanel spane, String[] args) throws Exception {
-	final ITemplatePanel pane = spane; // for inner class reference
-	final String testPage = 
-	    "<html>"+
-	    "<head><title>Test page</title></head>"+
-	    "<body>"+
+    /** test page for use by test main */
+    protected static final String testBody = 
 	    "<h1>Test page</h1>"+
 	    // check substitution in ordinary attribute
 	    "<p>Check that this points to <a href='${theurl}'>www.w3.org</a>.</p>"+
@@ -573,9 +567,16 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	    "<span if='${_nothing_} or ${_nothingelse_}'>H</span> " +
 	    "<span if='something and false'>I</span> " +
 	    "<span if='!something'>J</span> " +
-	    "</span></p>" +
+	    "</span></p>";
+    protected static final String testPage =
+	    "<html>"+
+	    "<head><title>Test page</title></head>"+
+	    "<body>"+
+	    testBody +
 	    "</body>"+
-	    "</html>";		    
+	    "</html>";	    
+    /** set test pane for use with {@linkplain #testPage} */
+    protected static void setTestPane(Window wnd, ITemplatePanel pane) {
 	pane.data().setProperty("foo", "the contents of this foo variable");
 	pane.data().setProperty("theurl", "http://www.w3.org/");
 	pane.data().setProperty("chk", "true");
@@ -584,19 +585,12 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	pane.data().setProperty("sel", "selected");
 	pane.data().setProperty("somehtml", "you should see <em>this</em> text");
 	// don't set "bar"
-	DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-	pane.setDocument(builder.parse(new ByteArrayInputStream(testPage.getBytes())));
-	((Component)pane).setPreferredSize(new Dimension(500, 600));
-	final JFrame frame = new JFrame();
-	frame.getContentPane().add(new JScrollPane((Component)pane));
-	frame.setSize(((Component)pane).getPreferredSize());
-	frame.setTitle("TemplatePane Test");
-	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	frame.pack();
+
 	pane.setSubmitAction(new AbstractAction() {
 	    public void actionPerformed(ActionEvent e) {
+		ITemplatePanel pane = (ITemplatePanel)e.getSource();
 		if (e.getActionCommand().equals("show"))
-		    JOptionPane.showMessageDialog(frame,
+		    JOptionPane.showMessageDialog(null,
 			    "Checkbox: "+pane.data().getProperty("chk")+"\n"+
 			    "Selection: "+pane.data().getProperty("sel")+"\n"+
 			    "Radio: "+pane.data().getProperty("rad")+"\n"+
@@ -611,6 +605,27 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 		    }
 	    }
 	});
-	frame.setVisible(true);
+    }
+    
+    /** An interactive test to play with */
+    public static void main(ITemplatePanel spane, String[] args) throws Exception {
+	final ITemplatePanel pane = spane; // for inner class reference
+	DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	pane.setDocument(builder.parse(new ByteArrayInputStream(testPage.getBytes())));
+	((Component)pane).setPreferredSize(new Dimension(500, 600));
+	Window wnd;
+	if (pane instanceof Window) {
+	    wnd = (Window)pane;
+	} else {
+	    JFrame frame = new JFrame();
+	    frame.getContentPane().add(new JScrollPane((Component)pane));
+	    frame.setTitle("TemplatePane Test");
+	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    wnd = frame;
+	}
+	setTestPane(wnd, spane);
+	wnd.setSize(((Component)pane).getPreferredSize());
+	wnd.pack();
+	wnd.setVisible(true);
     }
 }

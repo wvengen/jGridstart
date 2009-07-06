@@ -219,6 +219,15 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 	    submitAction.actionPerformed(e);
 	}
     }
+    
+    public void setDocument(TemplateDocument doc) {
+	template = doc;
+	super.setDocument(doc, doc.getDocumentURI());
+    }
+    public void setDocument(TemplateDocument doc, NamespaceHandler nsh) {
+	template = doc;
+	super.setDocument(doc, doc.getDocumentURI(), nsh);
+    }
 
     /** Override of {@link XHTMLPanel#setDocument setDocument} to process the template. */
     /* <p>

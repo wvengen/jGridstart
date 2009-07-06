@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
+import nl.nikhef.xhtmlrenderer.swing.TemplateDocument;
 import nl.nikhef.xhtmlrenderer.swing.TemplatePanel;
 
 import org.w3c.dom.Document;
@@ -231,6 +232,14 @@ public class TemplateButtonPanel extends JPanel implements ITemplatePanel {
 
     public void setData(Properties p) {
 	contentpane.setData(p);
+    }
+    
+    public void setDocument(TemplateDocument doc) {
+	contentpane.setDocument(doc);
+    }
+    
+    public void setDocument(TemplateDocument doc, NamespaceHandler nsh) {
+	contentpane.setDocument(doc, nsh);
     }
 
     public void setDocument(Document doc, String url) {
