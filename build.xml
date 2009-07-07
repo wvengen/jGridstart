@@ -29,6 +29,8 @@
 	<property name="dir.thirdparty" location="thirdparty"/>
 	<!-- location of javadoc output -->
 	<property name="dir.javadoc" location="doc"/>
+	<!-- location of junit test output -->
+	<property name="dir.testreports" location="testreports"/>
 
 	<!-- extra tool definitions -->
 	<property name="browsertool.target.name" value="browsertool"/>
@@ -251,8 +253,17 @@
 			<link href="https://swingworker.dev.java.net/nonav/javadoc/"/>
 			<link href="http://pigeonholdings.com/projects/flyingsaucer/R8/javadoc/user/"/>
 			<link href="http://www.1t3xt.info/api/"/>
-			<!-- no online javadoc foudn for WinRegistry -->
+			<!-- no online javadoc found for WinRegistry -->
 		</javadoc>
 	</target>
-
+	
+	<!-- test report -->
+	<target name="testreport" depends="compile">
+		<junit fork="yes" haltonfailure="no">
+			<test fork="yes" todir="${dir.testreports}" name="nl.nikhef.jgridstart.AllTests"/>
+			<formatter type="xml"/>
+			<classpath refid="path.dependencies"/>
+			<classpath path="${dir.build}"/>
+		</junit>
+	</target>
 </project>
