@@ -9,18 +9,23 @@ import java.util.List;
 import javax.swing.UIManager;
 
 import org.w3c.dom.css.CSSPrimitiveValue;
+import org.w3c.dom.css.RGBColor;
 import org.xhtmlrenderer.context.AWTFontResolver;
 import org.xhtmlrenderer.css.constants.CSSName;
 import org.xhtmlrenderer.css.extend.StylesheetFactory;
 import org.xhtmlrenderer.css.newmatch.Selector;
 import org.xhtmlrenderer.css.parser.CSSErrorHandler;
 import org.xhtmlrenderer.css.parser.CSSParser;
+import org.xhtmlrenderer.css.parser.FSColor;
+import org.xhtmlrenderer.css.parser.FSRGBColor;
 import org.xhtmlrenderer.css.parser.PropertyValue;
+import org.xhtmlrenderer.css.parser.property.PrimitivePropertyBuilders.Color;
 import org.xhtmlrenderer.css.sheet.PropertyDeclaration;
 import org.xhtmlrenderer.css.sheet.Ruleset;
 import org.xhtmlrenderer.css.sheet.StylesheetInfo;
 import org.xhtmlrenderer.css.style.CalculatedStyle;
 import org.xhtmlrenderer.css.style.CssContext;
+import org.xhtmlrenderer.css.style.derived.ColorValue;
 import org.xhtmlrenderer.css.style.derived.LengthValue;
 import org.xhtmlrenderer.css.value.FontSpecification;
 import org.xhtmlrenderer.extend.FontResolver;
@@ -117,6 +122,14 @@ public class XHTMLPanel extends org.xhtmlrenderer.simple.XHTMLPanel implements I
 			PropertyValue italic = new PropertyValue(PropertyValue.CSS_STRING, "italic", "italic");
 			fontRule.addProperty(new PropertyDeclaration(CSSName.FONT_STYLE, italic, false, StylesheetInfo.USER_AGENT));
 		    }
+		    
+		    // get colours from UIManager; can still override in user stylesheet
+		    java.awt.Color fg = UIManager.getColor("Panel.foreground");
+		    PropertyValue fgCol = new PropertyValue(new FSRGBColor(fg.getRed(), fg.getGreen(), fg.getBlue()));
+		    fontRule.addProperty(new PropertyDeclaration(CSSName.COLOR, fgCol, false, StylesheetInfo.USER_AGENT));
+		    java.awt.Color bg = UIManager.getColor("Panel.background");
+		    PropertyValue bgCol = new PropertyValue(new FSRGBColor(bg.getRed(), bg.getGreen(), bg.getBlue()));
+		    fontRule.addProperty(new PropertyDeclaration(CSSName.BACKGROUND_COLOR, bgCol, false, StylesheetInfo.USER_AGENT));
 		    
 		    Selector bodySelector = new Selector();
 		    bodySelector.setName("body");
