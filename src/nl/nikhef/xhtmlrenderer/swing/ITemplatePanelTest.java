@@ -585,6 +585,7 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	pane.data().setProperty("sel", "selected");
 	pane.data().setProperty("somehtml", "you should see <em>this</em> text");
 	// don't set "bar"
+	pane.refresh(); // after updating the properties
 
 	pane.setSubmitAction(new AbstractAction() {
 	    public void actionPerformed(ActionEvent e) {
@@ -608,8 +609,7 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
     }
     
     /** An interactive test to play with */
-    public static void main(ITemplatePanel spane, String[] args) throws Exception {
-	final ITemplatePanel pane = spane; // for inner class reference
+    public static void main(ITemplatePanel pane, String[] args) throws Exception {
 	DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 	pane.setDocument(builder.parse(new ByteArrayInputStream(testPage.getBytes())));
 	((Component)pane).setPreferredSize(new Dimension(500, 600));
@@ -623,7 +623,7 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    wnd = frame;
 	}
-	setTestPane(wnd, spane);
+	setTestPane(wnd, pane);
 	wnd.setSize(((Component)pane).getPreferredSize());
 	wnd.pack();
 	wnd.setVisible(true);
