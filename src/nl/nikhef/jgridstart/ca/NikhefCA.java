@@ -36,6 +36,7 @@ public class NikhefCA implements CA {
     protected String base = "http://www.nikhef.nl/~wvengen/testca/";
 
     /** Create new OpenCA plugin; initializes SSL configuration 
+     * 
      * @throws NoSuchAlgorithmException 
      * @throws KeyManagementException */
     public NikhefCA() throws NoSuchAlgorithmException, KeyManagementException {
@@ -57,14 +58,11 @@ public class NikhefCA implements CA {
 	HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
     }
 
-    /**
-     * Uploads a user certificate signing request onto a Nikhef CA
+    /** Uploads a user certificate signing request onto a Nikhef CA
      * 
-     * @param req certification signing request
-     * @param info extra information that may be sent with the request
-     *        for OpenCA, only ra, department, phone and email are used.
-     * @return certificate signing request serial number
-     * @throws IOException 
+     * @param req {@inheritDoc}
+     * @param info {@inheritDoc}; only "email" is used here.
+     * @return {@inheritDoc}
      */
     public String uploadCertificationRequest(
 	    PKCS10CertificationRequest req, Properties info) throws IOException {
@@ -115,14 +113,11 @@ public class NikhefCA implements CA {
 	return downloadCertificate(req, reqserial) != null;
     }
 
-    /**
-     * Download a certificate from the Nikhef CA
+    /** Download a certificate from the Nikhef CA
      * 
-     * @param req the certificate signing request that was sent (not used by NikhefCA)
-     * @param serial the serial number of the certificate signing request that was returned
-     *               by submission of the certificate signing request 
-     * @return The X509Certificate signed by the certificate authority
-     * @throws IOException
+     * @param req {@inheritDoc} (not used by NikhefCA)
+     * @param reqserial {@inheritDoc} 
+     * @return {@inheritDoc}
      */
     public X509Certificate downloadCertificate(
 	    PKCS10CertificationRequest req, String reqserial) throws IOException {

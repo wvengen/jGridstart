@@ -54,6 +54,7 @@ public class LocalCA implements CA {
     /**
      * Creates a new LocalCA and generates a self-signed certificate to
      * sign with. It is valid for an hour only.
+     * 
      * @throws NoSuchAlgorithmException 
      * @throws SignatureException 
      * @throws NoSuchProviderException 
@@ -87,13 +88,9 @@ public class LocalCA implements CA {
 	cacert = certGen.generate(cakey, "BC");
     }
     
-    /**
-     * Uploads a user certificate signing request. This is a dummy method for LocalCA.
-     * 
-     * @param req certification signing request
-     * @param info extra information that may be sent with the request
-     * @return certificate signing request serial number
-     * @throws IOException 
+    /** {@inheritDoc}
+     * <p>
+     * This is a dummy method for LocalCA.
      */
     public String uploadCertificationRequest(
 	    PKCS10CertificationRequest req, Properties info) throws IOException {
@@ -101,24 +98,18 @@ public class LocalCA implements CA {
 	return Integer.toString(serial);
     }
 
-    /** Return whether the certificate signing request was processed. This local CA
-     * always processes a certificate on the fly, so it returns always true. */
+    /** {@inheritDoc}
+     * <p>
+     * This local CA always processes a certificate on the fly, so it returns always true.
+     */
     public boolean isCertificationRequestProcessed(
 	    PKCS10CertificationRequest req, String reqserial) throws IOException {
 	return true;
     }
 
-    /**
-     * Return a Certificate. This creates a new Certificate based on the certificate
-     * signing request supplied.
-     * 
+    /** {@inheritDoc}
+     * <p>
      * Note that in the current implementation most attributes aren't copied.
-     * 
-     * @param req the certificate signing request that was sent
-     * @param serial the serial number of the certificate signing request that was returned
-     *               by submission of the certificate signing request (not used) 
-     * @return The signed X509Certificate
-     * @throws IOException
      */
     public X509Certificate downloadCertificate(
 	    PKCS10CertificationRequest req, String reqserial) throws IOException {

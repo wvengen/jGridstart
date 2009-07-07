@@ -352,7 +352,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		"jGridstart certificate properties");
     }
 
-    /** Import a {@linkplaiun CertificatePair} from a keystore into a (new) directory.
+    /** Import a {@linkplain CertificatePair} from a keystore into a (new) directory.
      * 
      * @param src File to import from
      * @param dst Directory to import into. On success, this directory could be

@@ -42,8 +42,8 @@ public interface CA {
      * fetched certificate.
      * 
      * @param req the certificate signing request that was sent
-     * @param serial the serial number of the certificate signing request that was returned
-     *               by submission of the certificate signing request 
+     * @param reqserial the serial number of the certificate signing request that was
+     *               returned by submission of the certificate signing request 
      * @return The X509Certificate signed by the certificate authority
      * @throws IOException
      */
@@ -54,8 +54,8 @@ public interface CA {
      * Download a certificate from the CA.
      * 
      * @param req the certificate signing request that was sent
-     * @param serial the serial number of the certificate signing request that was returned
-     *               by submission of the certificate signing request 
+     * @param reqserial the serial number of the certificate signing request that was
+     *               returned by submission of the certificate signing request 
      * @return The X509Certificate signed by the certificate authority
      * @throws IOException
      */

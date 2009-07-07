@@ -114,8 +114,7 @@ public class LogWindowHandler extends Handler {
      * there is a problem, it reports the problem with the ErrorManager, only
      * once and silently ignores the others.
      * 
-     * @record the LogRecord object
-     * 
+     * @param record the LogRecord object
      */
     public synchronized void publish(LogRecord record) {
 	String message = null;

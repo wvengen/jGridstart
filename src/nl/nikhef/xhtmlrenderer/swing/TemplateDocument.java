@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
  * <p>
  * The constructor receives a template Document, and this object contains the resulting 
  * Document. Each call to {@link #refresh} or {@link #setData} re-parses the
- * template Document. When you call {@link #data}.{@link Properties#setProperty setProperty}
+ * template Document. When you call {@link #data()}.{@link Properties#setProperty setProperty}
  * directly, you need to call {@linkplain #refresh} yourself.
  * <p>
  * <strong>Template language</strong>

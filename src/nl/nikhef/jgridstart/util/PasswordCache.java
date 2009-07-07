@@ -281,7 +281,7 @@ public class PasswordCache {
     }
     /** Return a {@link PasswordFinder} that returns the cached password, or else
      * asks the user to provide one. The password is retrieved using
-     * @[link #getForDecrypt}. 
+     * @{link #getForDecrypt}. 
      * 
      * @param msg Description on what this key is about
      * @param loc Location string
