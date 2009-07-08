@@ -69,6 +69,10 @@ th {
 /*
  * certificate_info
  */
+.infopane {
+	background: white;
+	color: black;
+}
 
 td.location {
 	font-family: monospace;

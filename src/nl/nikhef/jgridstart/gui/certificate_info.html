@@ -3,7 +3,7 @@
 	<title>Certificate of <c c="${subject.cn}"></c></title>
 	<link rel="stylesheet" type="text/css" href="stylesheet.css"/>
 </head>
-<body>
+<body class="infopane">
 	<h1>Certificate of <c c="${subject.cn}"></c></h1>
 	<div if="!${cert}">
 	  <p class="topinfo-bad" if="!${request}">This certificate is incomplete, please consider removing it.</p>
