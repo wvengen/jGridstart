@@ -172,6 +172,7 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
      *         as argument but no base uri was specified).
      */
     public boolean refresh() {
+	if (template==null) return false;
 	template.refresh();
 	super.setDocument(template, template.getDocumentURI(), getSharedContext().getNamespaceHandler());
 	return true;
