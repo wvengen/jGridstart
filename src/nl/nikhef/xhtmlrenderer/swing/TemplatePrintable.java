@@ -35,6 +35,10 @@ class TemplatePrintable extends XHTMLPrintable {
 	super(panel);
     }
 
+    /** {@inheritDoc}
+     * <p>
+     * This method fixes the margins just before layouting.
+     */
     @Override
     public int print(Graphics g, PageFormat pf, int page) {
 	if (g2r==null) {
@@ -53,6 +57,10 @@ class TemplatePrintable extends XHTMLPrintable {
 	return super.print(g, pf, page);
     }
     
+    /** Fix margins.
+     * <p>
+     * Set CSS margins from printer pageformat.
+     */
     @SuppressWarnings("unchecked")
     protected void fixPageInfo(StyleReference style, PageFormat pf, float dpi) {
 	try {
