@@ -1,42 +1,18 @@
 package nl.nikhef.jgridstart.gui;
 
-import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.Panel;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.print.PrinterException;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingworker.SwingWorker;
-import org.xhtmlrenderer.pdf.ITextRenderer;
 import org.xhtmlrenderer.swing.BasicPanel;
 import org.xhtmlrenderer.swing.LinkListener;
 
@@ -45,13 +21,10 @@ import nl.nikhef.jgridstart.CertificateRequest;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.Organisation;
-import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
-import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
-import nl.nikhef.jgridstart.gui.util.FileFilterSuffix;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
-import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
 
 /** Wizard that asks the user for information and generates the certificate */
 public class RequestWizard extends TemplateWizard implements TemplateWizard.PageListener {
@@ -120,7 +93,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		// on the correct certificate.
 		if (uri.startsWith("action:"))
 		    selection.setSelection(cert);
-		BareBonesActionLaunch.openURL(uri, panel);
+		URLLauncher.openURL(uri, panel);
 	    }	    
 	});
     }

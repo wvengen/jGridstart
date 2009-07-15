@@ -9,7 +9,7 @@ import javax.swing.KeyStroke;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
-import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 
 
@@ -23,7 +23,7 @@ public class ActionMakeDefault extends CertificateAction {
 	putValue(NAME, "Make default");
 	putValue(MNEMONIC_KEY, new Integer('D'));
 	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control D"));
-	BareBonesActionLaunch.addAction("makedefault", this);
+	URLLauncher.addAction("makedefault", this);
     }
     
     @Override

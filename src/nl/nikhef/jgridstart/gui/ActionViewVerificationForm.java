@@ -24,7 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.FileFilterSuffix;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
@@ -45,7 +45,7 @@ public class ActionViewVerificationForm extends CertificateAction {
 	super(parent, s);
 	putValue(NAME, "Verification form");
 	putValue(MNEMONIC_KEY, new Integer('V'));
-	BareBonesActionLaunch.addAction("verificationform", this);
+	URLLauncher.addAction("verificationform", this);
     }
     
     @Override

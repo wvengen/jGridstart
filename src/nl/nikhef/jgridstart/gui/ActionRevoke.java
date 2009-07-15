@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+import nl.nikhef.jgridstart.gui.util.URLLauncher;
 
 public class ActionRevoke extends CertificateAction {
     
@@ -14,7 +14,7 @@ public class ActionRevoke extends CertificateAction {
 	this.parent = parent;
 	putValue(NAME, "Revoke...");
 	putValue(MNEMONIC_KEY, new Integer('R'));
-	BareBonesActionLaunch.addAction("revoke", this);
+	URLLauncher.addAction("revoke", this);
     }
     
     public void actionPerformed(ActionEvent e) {

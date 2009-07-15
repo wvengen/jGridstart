@@ -8,7 +8,7 @@ import javax.swing.KeyStroke;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
@@ -20,7 +20,7 @@ public class ActionExport extends CertificateAction {
 	putValue(NAME, "Export...");
 	putValue(MNEMONIC_KEY, new Integer('E'));
 	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control E"));
-	BareBonesActionLaunch.addAction("export", this);
+	URLLauncher.addAction("export", this);
     }
     
     public void actionPerformed(ActionEvent e) {

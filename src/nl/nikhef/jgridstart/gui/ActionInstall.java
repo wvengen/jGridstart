@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.install.BrowserFactory;
 import nl.nikhef.jgridstart.util.PasswordCache;
@@ -25,7 +25,7 @@ public class ActionInstall extends CertificateAction {
 	super(parent, s);
 	putValue(NAME, "Install...");
 	putValue(MNEMONIC_KEY, new Integer('I'));
-	BareBonesActionLaunch.addAction("install", this);
+	URLLauncher.addAction("install", this);
     }
     
     @Override

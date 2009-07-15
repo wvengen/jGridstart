@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+import nl.nikhef.jgridstart.gui.util.URLLauncher;
 
 public class ActionShowDetails extends CertificateAction {
 
@@ -14,7 +14,7 @@ public class ActionShowDetails extends CertificateAction {
 	super(parent, s);
 	putValue(NAME, "Details");
 	putValue(MNEMONIC_KEY, new Integer('D'));
-	BareBonesActionLaunch.addAction("showdetails", this);
+	URLLauncher.addAction("showdetails", this);
     }
 
     public void actionPerformed(ActionEvent e) {

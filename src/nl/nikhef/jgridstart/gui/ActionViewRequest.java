@@ -3,7 +3,7 @@ package nl.nikhef.jgridstart.gui;
 import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 
 /** Show the request wizard for an existing certificate.
@@ -24,7 +24,7 @@ public class ActionViewRequest extends CertificateAction {
 	super(parent, s);
 	putValue(NAME, "Request...");
 	putValue(MNEMONIC_KEY, new Integer('R'));
-	BareBonesActionLaunch.addAction("viewrequest", this);
+	URLLauncher.addAction("viewrequest", this);
     }
     public ActionViewRequest(JFrame parent, CertificateSelection s, int defaultPage) {
 	this(parent, s);

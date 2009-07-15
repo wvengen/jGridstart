@@ -46,7 +46,7 @@ import org.xhtmlrenderer.swing.LinkListener;
  * previous/next buttons.
  * <p>
  * Additionally, links are opened in an external web browser using
- * {@link BareBonesActionLaunch}.
+ * {@link URLLauncher}.
  */
 public class TemplateButtonPanel extends JPanel implements ITemplatePanel {
     
@@ -72,7 +72,7 @@ public class TemplateButtonPanel extends JPanel implements ITemplatePanel {
 	contentpane.replaceLinkListener(new LinkListener() {
 	    @Override
             public void linkClicked(BasicPanel panel, String uri) {
-		BareBonesActionLaunch.openURL(uri, panel);
+		URLLauncher.openURL(uri, panel);
 	    }
 	});
 	

@@ -37,7 +37,7 @@ import javax.swing.plaf.basic.BasicSliderUI.ActionScroller;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
-import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
+import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
 import nl.nikhef.jgridstart.util.PasswordCache;
@@ -139,7 +139,7 @@ public class JGSFrame extends JFrame {
      * Relevant Actions in this application should register themselves
      * with BareBonesActionLaunch. */
     protected Action getAction(String id) {
-	Action action = BareBonesActionLaunch.getAction(id);
+	Action action = URLLauncher.getAction(id);
 	assert(action!=null);
 	return action;
     }
