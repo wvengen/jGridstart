@@ -28,10 +28,21 @@ public class ErrorMessage {
      * @param e Exception to get information from
      */
     public static void internal(Component parent, Exception e) {
+	internal(parent, e.getLocalizedMessage());
+    }
+
+    /** show an error to the user. This method is for errors that should
+     * not occur; the dialog indicates that the user can contact
+     * the developers.
+     * 
+     * @param parent Parent window
+     * @param msg Message to describe to error
+     */
+    public static void internal(Component parent, String msg) {
 	String s = "I'm sorry to report that an unexpected internal error occured.\n"
 	          +"Please contact technical support for help.\n";
 	// TODO include contact details for technical support
-	JOptionPane.showMessageDialog(parent, s+e.getLocalizedMessage(),
+	JOptionPane.showMessageDialog(parent, s+msg,
 		"Internal problem", JOptionPane.ERROR_MESSAGE);
     }
 }

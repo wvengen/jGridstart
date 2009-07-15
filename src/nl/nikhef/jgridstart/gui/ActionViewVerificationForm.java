@@ -1,7 +1,9 @@
 package nl.nikhef.jgridstart.gui;
 
 import java.awt.Cursor;
+import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
@@ -49,7 +51,13 @@ public class ActionViewVerificationForm extends CertificateAction {
     @Override
     public void actionPerformed(ActionEvent e) {
 	if (dlg==null) {
-	    dlg = new VerificationDialog(findWindow(e.getSource()), getCertificatePair());
+	    Window w = findWindow(e.getSource());
+	    if (w instanceof Frame)
+		dlg = new VerificationDialog((Frame)w, getCertificatePair());
+	    else if (w instanceof Dialog)
+		dlg = new VerificationDialog((Dialog)w, getCertificatePair());
+	    else
+		ErrorMessage.internal(w, "Expected Frame or Dialog as owner");
 	    dlg.pack();
 	} else {
 	    dlg.setData(getCertificatePair());
@@ -60,8 +68,16 @@ public class ActionViewVerificationForm extends CertificateAction {
     /** Dialog that shows the verification form */
     protected static class VerificationDialog extends JDialog {
 	private TemplateButtonPanel form = null;
-	public VerificationDialog(Window parent, Properties data) {
+	public VerificationDialog(Frame parent, Properties data) {
 	    super(parent);
+	    initialize(data);
+	}
+	public VerificationDialog(Dialog parent, Properties data) {
+	    super(parent);
+	    initialize(data);
+	}
+	
+	private void initialize(Properties data) {
 	    try {
 		form = new TemplateButtonPanel(getClass().getResource("verification_form.html").toExternalForm());
 		form.setData(data);
@@ -75,7 +91,7 @@ public class ActionViewVerificationForm extends CertificateAction {
 		form.addSeparator();
 		form.addButton(new JButton(new CloseAction(this)), true);
 	    } catch (IOException e) {
-		ErrorMessage.internal(parent, e);
+		ErrorMessage.internal(getParent(), e);
 	    }
 	}
 	/** update the window's contents */
