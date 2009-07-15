@@ -71,6 +71,9 @@ import org.xml.sax.SAXException;
  * When the property <tt><i>something</i>.lock</tt> is defined and an element with the
  * attribute <code>name="<i>something</i>"</code> is present, its readonly attribute
  * will be set automatically. Its use is explained in {@link TemplatePanel}.
+ * <p>
+ * When a propery cannot be found, it is looked with {@link System#getProperty}. If
+ * that fails, {@code null} is assumed as its value.
  * 
  * @author wvengen
  */
@@ -261,7 +264,9 @@ public class TemplateDocument extends DocumentDelegate {
 	Matcher match = pat.matcher(dstbufCond.toString());
 	while (match.find()) {
 	    String key = match.group(2).trim();
-	    String sub = data!=null ? data.getProperty(key) : null;
+	    String sub = null;
+	    if (data!=null) sub = data.getProperty(key);
+	    if (sub==null) sub = System.getProperty(key);
 	    if (sub==null) sub="";
 	    match.appendReplacement(dstbuf, sub);
 	}

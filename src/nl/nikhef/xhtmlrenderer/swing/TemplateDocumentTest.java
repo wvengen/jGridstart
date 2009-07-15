@@ -241,4 +241,11 @@ public class TemplateDocumentTest extends TestCase {
 	template.refresh();
 	assertTrue(bodyEquals(template, "<p>yeah</p>"));
     }
+    
+    @Test
+    public void testSystemData() throws Exception {
+	String body = "<p c='${os.name}'/>";
+	TemplateDocument template = new TemplateDocument(parseBody(body));
+	assertTrue(bodyEquals(template, "<p>"+System.getProperty("os.name")+"</p>"));
+    }
 }
