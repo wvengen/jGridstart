@@ -14,7 +14,7 @@ import nl.nikhef.jgridstart.install.BrowserFactory;
  * opened with an external web browser via {@link BrowserFactory}, but
  * {@code action:} URLs are handled specially.
  * <p>
- * An {@code action:} URL activates an {@link Action}s {@linkplain Action#actionPerformed}
+ * An {@code action:} URL activates an {@link Action}s {@linkplain Action#actionPerformed actionPerformed}
  * method, so it is equivalent to selecting a menu item or pressing a button.
  * Before an action can be called as URL, it must be made known, for example:
  * <code><pre>
@@ -28,7 +28,7 @@ import nl.nikhef.jgridstart.install.BrowserFactory;
  *       System.out.println("Cool down "+e.getActionCommand());
  *     }
  *   }
- * <pre></code>
+ * </pre></code>
  * It is then possible to launch the action by invoking
  * {@code URLLauncher.openURL("action:cool")}.
  * <p>
@@ -36,7 +36,7 @@ import nl.nikhef.jgridstart.install.BrowserFactory;
  * {@link ActionEvent}'s {@link ActionEvent#getActionCommand command}. So when
  * {@code URLLauncher.openURL("action:cool(please)")} would be invoked, 
  * {@code CoolAction}'s {@code actionPerformed} method would print
- * <tt>Cool down please</tt>.
+ * &quot;<i>Cool down please</i>&quot;.
  * <p>
  * The API is compatible with
  * <a href="http://www.nikhef.nl/pub/projects/grid/gridwiki/index.php/User:WvEngen/BareBonesBrowserLaunch">BareBonesBrowserLaunch</a>
@@ -105,17 +105,33 @@ public class URLLauncher {
     
     /** Perform an action.
      * <p>
-     * This method is called for each {@code action:} URL.
+     * This method is called for each {@code action:} URL, it calls
+     * {@link Action#actionPerformed} of the specified action.
+     * <p>
+     * If the action is not found in the list of known actions, an error
+     * dialog is shown.
      * 
      * @param action name of action to perform
-     * @param src source object for event
+     * @param parent parent 
      */
-    public static void performAction(String action, Object src) {
-	ActionEvent e = new ActionEvent(src, 0, "");
-	actions.get(action).actionPerformed(e);
+    public static void performAction(String action, Component parent) {
+	String arg = "";
+	// extract optional argument
+	int bracketidx = action.indexOf('(');
+	if (bracketidx>=0) {
+	    arg = action.substring(bracketidx+1, action.lastIndexOf(')'));
+	    action = action.substring(0, bracketidx);
+	}
+	// invoke action
+	ActionEvent e = new ActionEvent(parent, 0, arg);
+	if (actions.containsKey(action))
+	    actions.get(action).actionPerformed(e);
+	else
+	    ErrorMessage.internal(parent, "Unrecognised action: "+action);
     }
     
-    /** add an Action class to the list of recognised actions.
+    /** Add an {@linkplain Action} to the list of recognised actions.
+     * <p>
      * It is suggested to run this in an Action's constructor like this:
      * 
      * <code>
