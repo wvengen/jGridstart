@@ -245,7 +245,6 @@ public class TemplateDocument extends DocumentDelegate {
 	final Pattern comp = Pattern.compile("^(.*?)(==|!=)(.*)$");
 	matcher = comp.matcher(expr);
 	if (matcher.find()) {
-	    System.out.println("Compare: <"+matcher.group(1).trim()+"> "+matcher.group(2)+" <"+matcher.group(3).trim()+">");
 	    boolean val = (matcher.group(1).trim().equals(matcher.group(3).trim()));
 	    if (matcher.group(2).equals("!="))
 		val = !val;
