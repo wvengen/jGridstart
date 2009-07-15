@@ -12,7 +12,7 @@ import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
-
+/** Export selected certificate to PKCS#12/PEM file */
 public class ActionExport extends CertificateAction {
     
     public ActionExport(JFrame parent, CertificateSelection s) {

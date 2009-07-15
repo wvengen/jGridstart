@@ -9,6 +9,7 @@ import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+/** Quit the application */
 public class ActionQuit extends AbstractAction {
 
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");

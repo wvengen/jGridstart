@@ -16,7 +16,7 @@ import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
-
+/** Import a new certificate from a PKCS#12/PEM file */
 public class ActionImport extends AbstractAction {
     
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");

@@ -6,10 +6,13 @@ import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 
-/** Shows the "request new" wizard from ActionRequest, but this action
- * just views the form of the currently selected certificate and doesn't
- * create a new one.
+/** Show the request wizard for an existing certificate.
+ * <p>
+ * Shows the "request new" wizard from {@link ActionRequest}, but this
+ * action just views the form of the currently selected certificate and
+ * doesn't create a new one.
  * 
+ * @see ActionRequest
  * @author wvengen
  */
 public class ActionViewRequest extends CertificateAction {
@@ -30,7 +33,7 @@ public class ActionViewRequest extends CertificateAction {
     
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
-	TemplateWizard dlg = new RequestWizard(parent, getCertificatePair());
+	TemplateWizard dlg = new RequestWizard(parent, getCertificatePair(), selection);
 	dlg.setStep(defaultPage);
 	dlg.setVisible(true);
     }

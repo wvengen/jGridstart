@@ -4,8 +4,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.SecureRandom;
 import javax.swing.JFrame;
@@ -56,7 +54,7 @@ public class ActionInstall extends CertificateAction {
 		"if you have set any. The additional password for importing this\n" +
 		"certificate, will be copied to the clipboard.";
 	    Object [] options = { "Install", "Cancel" };
-	    int ret = JOptionPane.showOptionDialog(parent,
+	    int ret = JOptionPane.showOptionDialog(findWindow(e.getSource()),
 		    message,
 		    "Install certificate into browser",
 		    JOptionPane.OK_CANCEL_OPTION,

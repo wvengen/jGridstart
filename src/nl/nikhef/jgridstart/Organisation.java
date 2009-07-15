@@ -22,8 +22,11 @@ public class Organisation extends Properties {
      * This returns the organisation as read from the configuration file.
      * If the organisation is not found, however, a new {@linkplain Organisation}
      * object is returned which has id and name set to the argument {@code org}.
+     * 
+     * @return Organisation, or {@code null} if {@code org} was {@code null} itself.
      */
     public static Organisation get(String org) {
+	if (org==null) return null;
 	if (organisations==null) readAll();
 	Organisation o = organisations.get(org);
 	if (o==null) {

@@ -1,26 +1,28 @@
 package nl.nikhef.xhtmlrenderer.swing;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -40,11 +42,8 @@ import org.xhtmlrenderer.extend.UserAgentCallback;
 import org.xhtmlrenderer.layout.LayoutContext;
 import org.xhtmlrenderer.render.BlockBox;
 import org.xhtmlrenderer.resource.XMLResource;
-import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
-import org.xhtmlrenderer.swing.BasicPanel;
 import org.xhtmlrenderer.swing.FSMouseListener;
 import org.xhtmlrenderer.swing.LinkListener;
-import org.xhtmlrenderer.swing.SelectionHighlighter;
 import org.xhtmlrenderer.swing.SwingReplacedElement;
 import org.xhtmlrenderer.swing.SwingReplacedElementFactory;
 import org.xhtmlrenderer.util.Configuration;
@@ -107,6 +106,10 @@ import org.xhtmlrenderer.util.Configuration;
  * <p>
  * To handle form submission from the HTML form, use {@link #setSubmitAction}.
  * <p>
+ * The input button element has a special attribute {@code href} that opens the page
+ * it points to using the installed linklistener(s). When one hooks that, it is possible
+ * to generate actions by button presses.
+ * <p>
  * It may be desirable to keep the user from editing certain variables under specific
  * circumstances. This is done by setting the property <tt><i>propertyname</i>.lock</tt>
  * to <tt>true</tt>, which enables the <tt>readonly</tt> attribute on the form element
@@ -119,6 +122,8 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
     protected Properties data = new Properties();
     protected TemplateDocument template = null;
     protected Action submitAction = null;
+    
+    protected HashMap<String, Component> formelements = new HashMap<String, Component>();
 
     /** Construct a new, empty TemplatePanel with empty properties. */
     public TemplatePanel() {
@@ -220,6 +225,13 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 	    submitAction.actionPerformed(e);
 	}
     }
+
+    public Component getFormComponent(String name) {
+	return formelements.get(name);
+    }
+    public Map<String, Component> getFormComponents() {
+	return Collections.unmodifiableMap(formelements);
+    }
     
     public void setDocument(TemplateDocument doc) {
 	template = doc;
@@ -274,6 +286,11 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 		bindProperty(box.getElement(), ((SwingReplacedElement)el).getJComponent());
 	    return el;
 	}
+	
+	@Override
+	public void reset() {
+	    formelements = new HashMap<String, Component>();
+	};
 
 	/** Add a listener that updates the properties bound to the
 	 * enclosing TemplatePane when the supplied component is changed. This
@@ -296,6 +313,11 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 	    String value = data.getProperty(name);
 	    // we care about content controls, not scrollpanes
 	    if (c instanceof JScrollPane) c = (JComponent)((JScrollPane)c).getViewport().getView();
+	    // store Component reference by name; radio button especially
+	    if (c instanceof JRadioButton)
+		formelements.put(name+"."+ivalue, c);
+	    else
+		formelements.put(name, c);
 	    // how to get&set contents depends on type of control.
 	    if (c instanceof JTextComponent) {
 		// text and password
@@ -330,6 +352,12 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 		if (value!=null)
 		    ((JRadioButton)c).setSelected(ivalue.equals(value));
 		((AbstractButton)c).addChangeListener(new FormComponentListener(e, c));
+	    } else if (c instanceof JButton) {
+		// ordinary button
+		// remove actionlisteners that pops up useless dialog, add new one
+		for (int i=0; i<((JButton)c).getActionListeners().length; i++)
+		    ((JButton)c).removeActionListener(((JButton)c).getActionListeners()[i]);
+		((JButton)c).addActionListener(new FormComponentListener(e, c));
 	    } else if (c instanceof AbstractButton) {
 		// checkbox
 		if (value!=null)
@@ -342,7 +370,7 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 
 	/** Class that implements listeners for the form elements which update
 	 * the corresponding TemplatePanel property. */
-	protected class FormComponentListener implements DocumentListener, ChangeListener, ListSelectionListener, ItemListener {
+	protected class FormComponentListener implements DocumentListener, ChangeListener, ListSelectionListener, ItemListener, ActionListener {
 
 	    protected Element el = null;
 
@@ -420,6 +448,22 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 	    public void valueChanged(ListSelectionEvent e) {
 		if (!e.getValueIsAdjusting())
 		    doUpdate(e.getSource());
+	    }
+
+	    // button was pressed
+	    public void actionPerformed(ActionEvent e) {
+		if (e.getSource() instanceof JButton) {
+		    String href = el.getAttribute("href");
+		    if (href!=null) {
+			// activate all link listeners
+			List<FSMouseListener> ls = (List<FSMouseListener>)getMouseTrackingListeners();
+			for (Iterator<FSMouseListener> it = ls.iterator(); it.hasNext(); ) {
+			    FSMouseListener l = it.next();
+			    if (l instanceof LinkListener)
+				((LinkListener)l).linkClicked(TemplatePanel.this, href);
+			}
+		    }
+		}
 	    }
 	}
     }

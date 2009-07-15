@@ -87,6 +87,7 @@ public class JGSFrame extends JFrame {
 	// create actions; they register themselves
 	new ActionRequest(this, store, selection);
 	new ActionViewRequest(this, selection, 2);
+	new ActionViewVerificationForm(this, selection);
 	new ActionImport(this, store, selection);
 	new ActionInstall(this, selection);
 	new ActionRevoke(this, selection);

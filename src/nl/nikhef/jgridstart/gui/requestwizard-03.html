@@ -1,0 +1,64 @@
+<html>
+<head>
+	<title>Verification form</title>
+	<link rel="stylesheet" type="text/css" href="style.css"/>
+</head>
+<body>
+
+<div class="wizard-title" c="${wizard.title.html}"/>
+<div class="wizard-contents" c="${wizard.contents.html}"/>
+
+<div class="wizard-page">
+
+	<p>Besides submitting your request for a certificate, you need
+	to send a signed registration form to the Certification Authority
+	by following these steps:</p>
+	
+	<form>
+	<ol>
+		<li>Fill in the paper form <input type="button" value="display form" href="action:verificationform" />
+			<a class="helpbutton" href="action:toggle(wizard.show.help1)">(help)</a>
+			<div class="help" if="${wizard.show.help1}">
+				Press the <i>display form</i> button, enter your personal details,
+				and print it. Note that you can also leave one or more fields
+				empty and write them on the printed form.
+				The form will be used later to verify your identity.
+			</div></li>
+		<li>Obtain a signature from your Registration Authority
+			<a class="helpbutton" href="action:toggle(wizard.show.help2)">(help)</a>
+			<div class="help" if="${wizard.show.help2}">
+				You need to visit a Registration Authority, who will confirm
+				that you are who you claim to be, and will sign the form that
+				you printed in the previous step. Your Registration Authority is
+				<a href="mailto:${org.ra.email}" c="${org.ra.name}">Someone</a> from
+				<a href="${org.url}" c="${org.name}">Organisation</a><span if="${org.ra.address}">, 
+				<span c="${org.ra.address}"/></span>.
+				(though you can visit
+				<a href="https://ca.dutchgrid.nl/request/showra?o=${org}">another</a>
+				as well).<br/>
+				Do make sure to bring your proof-of-identity, like passport or driving license.
+			</div></li>
+		<li>Send the signed form to the Certification Authority
+			<a class="helpbutton" href="action:toggle(wizard.show.help3)">(help)</a>
+			<div class="help" if="${wizard.show.help3}">
+				After your have obtained a signature from the Registration Authority,
+				please submit it to the Certification Authority by snail mail or fax
+				(the address is displayed on the form).
+			</div></li>
+		<li>Wait until the request is processed
+			<a class="helpbutton" href="action:toggle(wizard.show.help4)">(help)</a>
+			<div class="help" if="${wizard.show.help4}">
+				When the Certification Authority receives the verification form, it
+				takes up to three working days to process. When your request has
+				been approved, this program will show you what to do next.<br/>
+				If the approval takes longer than three working days, you may
+				contact the <a href="mailto:ca@dutchgrid.nl">DutchGrid CA</a>.
+			</div></li>
+	</ol>
+	</form>
+
+</div>
+
+</body>
+</html>
+

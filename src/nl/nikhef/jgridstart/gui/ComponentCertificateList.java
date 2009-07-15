@@ -13,10 +13,11 @@ import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.Organisation;
 
-/**
+/** List of certificates.
+ * <p>
  * Java Swing component that contains a list of certificates. It is a view for
- * the CertificateStore class and optionally interfaces with a
- * CertificateSelection.
+ * {@link CertificateStore} and optionally interfaces with a
+ * {@link CertificateSelection}.
  * 
  * @author wvengen
  */

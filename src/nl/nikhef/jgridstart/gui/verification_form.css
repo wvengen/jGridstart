@@ -31,15 +31,13 @@
 	margin-top: 0.9em;
 	margin-bottom: 0.7em;
 }
-.form table {
-	table-layout: fixed; /* equal-width columns */
-}
 .form .comment {
 	font-style: italic;
 	font-size: 6pt;
 	color: #888888;
 }
 .form .fillin, .form .fillin-fixed {
+	width: 100%;
 	font-family: monospace;
 	font-size: 11pt;
 	font-weight: bold;
@@ -71,6 +69,7 @@
 	width: 100%;
 }
 .form .reserved .title {
+	text-align: left;
 	font-style: italic;
 	font-weight: normal;
 	font-size: 85%;
@@ -135,11 +134,17 @@
 	font-weight: normal;
 }
 .form .pop .fillin {
+	width: auto;
 	font-size: 11pt;
 	letter-spacing: 0.3em; /* unsupported by flying saucer :( */
 	border: 2px solid black;
 	padding: 0.6em 0.6em 0.2em 0.6em;
 	margin: 0 0.5em 0 0.5em;
+}
+
+table.userinfo, table.signature {
+	width: 100%;
+	table-layout: fixed; /* equal-width columns */
 }
 
 /*

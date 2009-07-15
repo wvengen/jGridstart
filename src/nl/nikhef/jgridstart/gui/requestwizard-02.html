@@ -1,0 +1,32 @@
+<html>
+<head>
+	<title>Submit request</title>
+	<link rel="stylesheet" type="text/css" href="style.css"/>
+</head>
+<body>
+
+<div class="wizard-title" c="${wizard.title.html}"/>
+<div class="wizard-contents" c="${wizard.contents.html}"/>
+
+<div class="wizard-page">
+
+<div if="!${cert}">
+
+  <div if="!${request.submitted}">
+    <p>Your request needs to be submitted to the Certificate Authority, which will
+    provide your certificate after verification.</p>
+  
+    <p>Please wait while your request is being submitted...</p>
+  </div>
+
+  <p if="${request.submitted}">Your request has been submitted successfully to the
+  Certificate Authority, please proceed by pressing <em>Next</em>.</p>
+</div>
+
+<p if="${cert}">Your certificate is present already, it is not necessary to submit
+a request.</p>
+
+</div>
+
+</body>
+</html>

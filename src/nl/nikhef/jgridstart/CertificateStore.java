@@ -319,6 +319,26 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	    throw e;
 	}
     }
+    /** Create a new certificate request in the CertificateStore with preset password
+     *
+     * @param p Properties to use for generation. See CertificatePair.generateRequest()
+     * @throws SignatureException 
+     * @throws NoSuchProviderException 
+     * @throws NoSuchAlgorithmException 
+     * @throws InvalidKeyException 
+     * @throws PasswordCancelledException 
+     */
+    public CertificatePair generateRequest(Properties p, char[] pw) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, PasswordCancelledException {
+	File dst = newItem();
+	try {
+	    CertificatePair cert = CertificatePair.generateRequest(dst, p, pw);
+	    add(cert);
+	    return cert;
+	} catch(IOException e) {
+	    dst.delete();
+	    throw e;
+	}
+    }
 
     /** Return the default certificate.<p>
      * The default certificate is the one in {@code ~/.globus}

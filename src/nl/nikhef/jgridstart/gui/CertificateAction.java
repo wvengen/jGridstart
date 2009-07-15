@@ -1,10 +1,13 @@
 package nl.nikhef.jgridstart.gui;
 
+import java.awt.Component;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -12,8 +15,8 @@ import javax.swing.event.ListSelectionListener;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 
-/** This class provides the default implementation for Actions that operate
- * on a Certificate.<p>
+/** Default implementation for {@link Action}s that operate on a {@link CertificatePair}.
+ * <p>
  * It provides a default logger and keeps track of the currently selected
  * certificate which can be retrieved by {#linkplain #getCertificate}.
  * <p>
@@ -91,4 +94,27 @@ public abstract class CertificateAction extends AbstractAction implements ListSe
     
     /** The actual handler when the action is performed */
     abstract public void actionPerformed(ActionEvent e);
+    
+    /** Find a {@linkplain Window} given a contained {@linkplain Component}.
+     * 
+     * @return the window, or null if not found
+     */
+    public static Window findWindow(Component c) {
+	for (; c!=null; c = c.getParent()) {
+	    if (c instanceof Window) return (Window)c;
+	}
+	return null;
+    }
+    /** Find a {@linkplain Window} given a contained {@linkplain Component}.
+     * <p>
+     * This accepts an {@linkplain Object} as argument, and if that is no
+     * {@linkplain Component}, {@code null} is returned.
+     * 
+     * @return the window, or null if not found
+     */
+    public static Window findWindow(Object c) {
+	if (c instanceof Component)
+	    return findWindow((Component)c);
+	return null;
+    }
 }

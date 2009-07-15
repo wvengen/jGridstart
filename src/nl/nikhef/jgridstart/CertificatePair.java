@@ -60,6 +60,7 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PasswordFinder;
 
 /** Class containing everything related to a grid certificate.
  * <p>
@@ -226,8 +227,10 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		return DateFormat.getDateInstance().format(getCertificate().getNotAfter());
 	    }
 	    if (key.equals("state.icon")) {
-		if (Boolean.valueOf(getProperty("valid"))) return "valid";
-		if (Boolean.valueOf(getProperty("cert"))) return "warning";
+		if (!Boolean.valueOf(getProperty("cert")) && Boolean.valueOf(getProperty("request")))
+			return "warning";
+		if (Boolean.valueOf(getProperty("valid")))
+		    return "valid";
 		// TODO if (Boolean.valueOf(getProperty(""))) return "renew";
 		return "error";
 	    }
@@ -280,7 +283,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    if (state == "valid")
 		return "<b color='green'>&#x2713;</b>";
 	    else if (state == "warning")
-		return "<b color='yellow'>!</b>";
+		return "<font size='+1'><b color='#cc9900'>!</b></font>";
 	    else
 		return "<b color='red'>&#x2715;</b>";
 	}
@@ -589,7 +592,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	}
     }
 
-    /** Generate a new private key+CSR pair.
+    /** Generate a new private key+CSR pair with specified password.
      * <p>
      * Details are taken from properties as follows, based on
      * "<em>Grid Certificate Profile</em>"
@@ -602,6 +605,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * 
      * @param dst Destination directory (subdir of a store)
      * @param p Properties according to which to generate request
+     * @param pw Password to use, or {@code null} to ask from user via {@link PasswordCache}
      * @return newly created CertificatePair
      * @throws IOException
      * @throws NoSuchAlgorithmException
@@ -610,7 +614,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws SignatureException
      * @throws PasswordCancelledException 
      */
-    static public CertificatePair generateRequest(File dst, Properties p)
+    static public CertificatePair generateRequest(File dst, Properties p, final char[] pw)
 	    throws IOException, NoSuchAlgorithmException, InvalidKeyException,
 	    NoSuchProviderException, SignatureException, PasswordCancelledException {
 	// functionally based on
@@ -641,12 +645,26 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	// Save certificate request
 	PEMWriter.writeObject(cert.getCSRFile(), cert.req);
 	// Save private key; permissions are ok by default
-	PEMWriter.writeObject(cert.getKeyFile(), privKey, "new certificate's private key");
+	if (pw==null)
+	    PEMWriter.writeObject(cert.getKeyFile(), privKey, "new certificate's private key");
+	else
+	    PEMWriter.writeObject(cert.getKeyFile(), privKey, pw);
 	
 	// TODO check
 	//cert.check(true);
 	
 	return cert;
+    }
+    /** Generate a new private key+CSR pair, request password.
+     * @throws PasswordCancelledException 
+     * @throws IOException 
+     * @throws SignatureException 
+     * @throws NoSuchProviderException 
+     * @throws NoSuchAlgorithmException 
+     * @throws InvalidKeyException 
+     * @see #generateRequest(File, Properties) */
+    static public CertificatePair generateRequest(File dst, Properties p) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException, PasswordCancelledException {
+	return generateRequest(dst, p, null);
     }
     
     /** Upload the certificate signing request to its certificate authority .

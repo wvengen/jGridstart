@@ -4,6 +4,7 @@ import javax.swing.JFileChooser;
 
 import nl.nikhef.jgridstart.gui.util.FileFilterSuffix;
 
+/** Filechooser for PEM and PKCS#12 files */
 public class CertificateFileChooser extends JFileChooser {
 
     public CertificateFileChooser(boolean open) {

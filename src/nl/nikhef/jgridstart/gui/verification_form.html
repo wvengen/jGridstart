@@ -1,26 +1,9 @@
 <html>
 <head>
-	<title>Certificate request</title>
-	<link rel="stylesheet" type="text/css" href="stylesheet.css"/>
-	<link rel="stylesheet" type="text/css" href="stylesheet-registration_form.css"/>
+	<title>Verification form</title>
+	<link rel="stylesheet" type="text/css" href="verification_form.css"/>
 </head>
 <body>
-  <div class="ui">
-    <h1>Certificate request - Verification form</h1>
-    <p if="${cert}">
-       You already have a certificate, so this form is shown for reference only.
-    </p>
-    <p if="!${cert}">
-      <span if="${request.submitted}">Now you need to</span>
-      <span if="!${request.submitted}">After you have submitted the request, you will need to</span>
-      print this form  containing your personal details and certificate
-      information, and bring it to your registration authority,
-      <a href="mailto:${org.ra.email}" c="${org.ra.name}">**your agent**</a>
-      of <a href="${org.url}" c="${org.name}">**agent organisation**</a>.
-      Don't forget to bring your proof-of-identity, such as a passport or driving license.
-    </p>
-  </div>
-  
   <div class="form">
 	<h1>DutchGrid Certification Authorities Registration</h1>
 	
@@ -30,7 +13,7 @@
 	    <td class="fillin" style="text-align: right">........ - ......</td>
 	  </tr>
 	  <tr>
-	    <td colspan="2" class="fillin-fixed"><span c="${subject}">/O=dutchgrid/O=users/O=somewhere/CN=John Doe</span></td>
+	    <td colspan="2" class="fillin-fixed"><span c="${subject}">/O=dutchgrid/O=users/O=fooinc/CN=John Doe</span></td>
       </tr>
       <tr>
         <td colspan="2">
@@ -45,20 +28,19 @@
 	  <table><tr>
 	    <td class="userinfo" style="width: 60%" rowspan="2">
 	      <table>
-	        <tr><td colspan="2">Surname <div class="fillin" c="${surname}">Doe</div></td></tr>
-	        <tr><td colspan="2">Given names <div class="fillin" c="${givenname}">John</div></td></tr>
+	        <tr><td colspan="2">Surname <br/><div class="fillin" c="${surname}">Doe</div></td></tr>
+	        <tr><td colspan="2">Given names <br/><div class="fillin" c="${givenname}">John</div></td></tr>
 	        <tr>
-	          <td>Place of Birth <div class="fillin" c="${birthplace}">Someplace</div></td>
-	          <td style="text-align:right">Date of birth <div class="fillin" c="${birthdate}">01 Jan 1900</div></td>
+	          <td>Place of Birth <br/><input type="text" class="fillin" name="birthplace" size="20"/></td>
+	          <td style="text-align:right">Date of birth <br/><input type="text" class="fillin" name="birthdate" size="8"/></td>
 	        </tr>
-	        <tr><td colspan="2">Identity paper type, number, country <div class="fillin"><span if="${identity}" c="${identity}, ${country}">Passport NL12345678, NL</span></div></td></tr>
+	        <tr><td colspan="2">Identity paper type, number, country <br/><input type="text" class="fillin" size="30"/></td></tr>
 	        <tr><td colspan="2">SOFI number <span class="comment">(optional)</span><div class="fillin" c="${sofi}"></div></td></tr>
 	      </table>
 	    </td>
-	    <td class="ra reserved">
-	      <div class="title nowrap center">Reserved for RA operations use</div>
+	    <td class="ra">
 	      <div class="nowrap center">send this form by mail or fax to</div>
-	      <address class="clear" style="vertical-align: bottom">DutchGrid MS CA
+	      <address class="clear" style="vertical-align: bottom; border: 2px solid black;">DutchGrid MS CA
 	        NIKHEF c/o Djuhaeri Harapan
 	        P.O. Box 41882
 	        NL 1009 DB Amsterdam
@@ -80,19 +62,19 @@
 	  
 	  <table class="userinfo">
 	    <tr>
-	      <td>Name <div class="fillin" c="${givenname} ${surname}">John Doe</div></td>
-	      <td>Streed addres <span class="comment">(physical delivery address)</span> <div class="fillin" c="${street}">Bar avenue 0</div></td>
+	      <td>Name <br/><div class="fillin" c="${givenname} ${surname}">John Doe</div></td>
+	      <td>Street addres <span class="comment">(physical delivery address)</span> <br/><input type="text" class="fillin" name="street"/></td>
 	    </tr>
 	    <tr>
-	      <td>Organisation <div class="fillin" c="${org.name}">Foo inc.</div></td>
-	      <td>ZIP code <div class="fillin" c="${zip}">1234AA</div></td>
+	      <td>Organisation <br/><div class="fillin" c="${org.name}">Foo inc.</div></td>
+	      <td>ZIP code <br/><input type="text" class="fillin" name="zip"/></td>
 	    </tr>
 	    <tr>
-	      <td>Phone number <div class="fillin" c="${phone}">+31 (0)123 456789</div></td>
-	      <td>Place <span class="comment">(and province where applicable)</span> <div class="fillin" c="${place}">Heaven</div></td>
+	      <td>Phone number <br/><input type="text" class="fillin" name="phone"/></td>
+	      <td>Place <span class="comment">(and province where applicable)</span> <br/><input type="text" class="fillin" name="place"/></td>
 	    </tr>
 	    <tr>
-	      <td>Email address <div class="fillin" c="${email}">john@heaven.mil</div></td>
+	      <td>Email address <br/><input type="text" class="fillin" name="email"/></td>
 	    </tr>
 	  </table>
 	  
@@ -103,7 +85,7 @@
 	    abide by the <a href="http://ca.dutchgrid.nl/medium/policy/">certificate policy
 	    and practice statement</a> of the DutchGrid Certification Authority.
 	    
-	    <table><tr>
+	    <table class="signature"><tr>
 	      <td class="signature-box" rowspan="2">Signature <div class="fillin"></div></td>
 	      <td class="signature-info">Place and date <div class="fillin"></div></td>
 	    </tr>
@@ -116,8 +98,8 @@
 	</div>
 
 
-	<table class="reserved">
-	  <tr class="title nowrap"><th colspan="2">Reserved for RA operations use</th></tr>
+	<table class="reserved signature">
+	  <tr><th colspan="2" class="title nowrap">Reserved for RA operations use</th></tr>
 
 	  <tr><td colspan="2" class="ra">
         I, <span class="fillin"><sup>RA name</sup></span> have

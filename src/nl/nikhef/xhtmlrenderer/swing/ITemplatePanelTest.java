@@ -58,7 +58,7 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
     /** Abbot tester */
     private ComponentTester tester = null;
     /** Current component under test, created by createPanel */
-    private ITemplatePanel panel = null;
+    protected ITemplatePanel panel = null;
     /** Current frame that contains the panel, also created by createPanel */
     private Window frame = null;
     /** Whether showFrame() is called for the first time, see createPanel() */

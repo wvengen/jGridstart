@@ -16,7 +16,7 @@ import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanelTest;
 import nl.nikhef.xhtmlrenderer.swing.TemplateDocument;
 
-public class TemplateWizardTest extends ITemplatePanelTest {
+public class TemplateWizardTest extends TemplateButtonPanelTest {
     @Override
     protected ITemplatePanel createPanel() {
 	return new TemplateWizard();
@@ -82,9 +82,10 @@ public class TemplateWizardTest extends ITemplatePanelTest {
 	wiz.pages.add(getClass().getResource("testWizard2.html"));
 	handlerPage = -1;
 	wiz.setHandler(new PageListener() {
-	    public void pageChanged(TemplateWizard w, int page) {
-		handlerPage = page;
+	    public void pageEnter(TemplateWizard w, int o, int n) {
+		handlerPage = n;
 	    }
+	    public boolean pageLeave(TemplateWizard w, int o, int n) { return true; }
 	});
 	showWindow(wiz);
 	wiz.setStep(0);
@@ -109,22 +110,30 @@ public class TemplateWizardTest extends ITemplatePanelTest {
     
     public static void main(String[] args) throws Exception {
 	final String testStyle = "<style type='text/css'><!--\n" +
-	    "body { padding-left: 7em; }\n" +
-	    ".wizard-contents { position: fixed; left: 0; top: 0; background: #eee; width: 4.5em; }\n" +
-	    ".wizard-contents .wizard-current { color: green; }\n" +
+	    "body { margin: 0; padding: 0; background: #eee; color: #000; }\n" +
+	    ".wizard-title { position:fixed; top: 0; left: 0; height: 25pt; background: inherit; width: 100%; margin: 0; padding: 10pt; }\n" +
+	    ".wizard-title > * { margin-top: 0; padding-top: 0; }\n" +
+	    ".wizard-title h1 { font-weight: bold; font-size: 150%; }\n" +
+	    ".wizard-contents { position: fixed; left: 0; top: 45pt; background: inherit; width: 5em; margin: 0; padding: 1ex 0 1ex 2.5em; height: 100%; }\n" +
+	    ".wizard-contents > ul { margin: 0; padding: 0; }\n" +
+	    ".wizard-contents .wizard-current { font-weight: bold; }\n" +
+	    ".wizard-page { background: white; margin-left: 8em; margin-top: 45pt; padding: 1ex; }\n" +
 	    "//--></style>";
 	final String[] testPages = {
 		"<html><head>"+testStyle+"<title>Page 1</title></head><body>" +
-			"<div c='${wizard.contents.html}'/>" +
-			testBody +
+			"<div class='wizard-title'><h1>TemplateWizard test</h1></div>" +
+			"<div class='wizard-contents' c='${wizard.contents.html}'/>" +
+			"<div class='wizard-page'>"+ testBody + "</div>" +
 			"</body></html>",
 		"<html><head>"+testStyle+"<title>Page 2</title></head><body>" +
-			"<div c='${wizard.contents.html}'/>" +
-			"<h1>Page two</h1><p>Hi there</p>" +
+		"<div class='wizard-title'><h1>TemplateWizard test</h1></div>" +
+			"<div class='wizard-contents' c='${wizard.contents.html}'/>" +
+			"<div class='wizard-page'>Hi there</div>" +
 			"</body></html>",
 		"<html><head>"+testStyle+"<title>Page 3</title></head><body>" +
-			"<div c='${wizard.contents.html}'/>" +
-			"<h1>Page three</h1><p>Hi there</p>" +
+		"<div class='wizard-title'><h1>TemplateWizard test</h1></div>" +
+			"<div class='wizard-contents' c='${wizard.contents.html}'/>" +
+			"<div class='wizard-page'>Hello there then</div>" +
 			"</body></html>",
 	};
 	

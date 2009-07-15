@@ -9,14 +9,13 @@ import nl.nikhef.jgridstart.gui.util.BareBonesActionLaunch;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+/** Show "About" dialog */
 public class ActionAbout extends AbstractAction {
 
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");
-    private JFrame parent = null;
 
     public ActionAbout(JFrame parent) {
 	super();
-	this.parent = parent;
 	putValue(NAME, "About...");
 	putValue(MNEMONIC_KEY, new Integer('A'));
 	BareBonesActionLaunch.addAction("about", this);
@@ -24,7 +23,7 @@ public class ActionAbout extends AbstractAction {
 
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
-	JOptionPane.showMessageDialog(parent,
+	JOptionPane.showMessageDialog(CertificateAction.findWindow(e.getSource()),
 		"jGridstart gives you a hassle-free start with the grid.\n" +
 		"At least I hope so!\n" +
 		"\n" +

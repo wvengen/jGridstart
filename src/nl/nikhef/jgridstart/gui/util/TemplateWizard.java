@@ -1,20 +1,20 @@
 package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.print.PrinterException;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.AbstractAction;
@@ -56,10 +56,10 @@ import org.xml.sax.SAXException;
  * a variable {@code wizard.contents.html} which can be inserted in each step
  * using the default {@link TemplateDocument template} substitutions. It can be
  * fixed to the viewport with css like <code>position: fixed</code>.
- * {@link #setStepContents} generates this variable, which can be customized
- * by derived classes.
+ * {@link #updateWizardProperties} generates this variable, which can be customized
+ * by derived classes by overriding either that method, or {@link #getWizardContentsLine}.
  * <p>
- * The default implementation of {@linkplain #setStepContents} retrieves the
+ * The default implementation of {@linkplain #getWizardContentsLine} retrieves the
  * HTML document title for each page to construct the overview of the available
  * steps.
  */
@@ -118,23 +118,33 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	}
 	return docs.get(i);
     }
-
+    /** Returns the title of a step */
+    protected String getDocumentTitle(int step) {
+	return getSharedContext().getNamespaceHandler().getDocumentTitle(getDocument(step));	
+    }
+    
     /** set the currently displayed page */
     // TODO describe behaviour, especially what happens in last step
     //      (based on handler being present or not)
     public void setStep(int s) {
+	int oldStep = step;
+	// call pre-hook first
+	if (handler!=null && !handler.pageLeave(this, oldStep, s))
+	    return;
+	
 	// handle final "Close" step which just quits the dialog
 	if (s == pages.size()) {
 	    if (handler!=null)
-		handler.pageChanged(this, s);
+		handler.pageEnter(this, oldStep, s);
 	    else
 		dispose();
 	    return;
 	}
 	step = s;
 	// Update the navigation bar
-	setStepContents(step);
+	updateWizardProperties(step);
 	// set new contents and get title from that as well
+	getDocument(s).refresh();
 	pane.setDocument(getDocument(s));
 	setTitle(pane.getDocumentTitle());
 	// no "Previous" at start; no "Next" beyond the final "Close"
@@ -142,7 +152,6 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	    cancelAction.putValue(Action.NAME, "Close");
 	nextAction.setEnabled(step < (pages.size()-1) );
 	prevAction.setEnabled(step > 0);
-	if (handler!=null) handler.pageChanged(this, s);
 	
 	// pack here to give child classes a chance to setPreferredSize()
 	// in their constructors or in setStep(). This is only called if
@@ -150,6 +159,8 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	// dialog size to its preferred size, which is unwanted when the
 	// user resized the window.
 	if (!isVisible()) pack();
+
+	if (handler!=null) handler.pageEnter(this, oldStep, s);
     }
     /** go to another page by relative distance */
     public void setStepRelative(int delta) {
@@ -158,35 +169,50 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	setStep(step + delta);
     }
     
-    /** Update the contents list for a step.
+    /** Update the wizard properties for a step.
      * <p>
-     * This generates the property {@code wizard.contents.html} which can be
-     * referenced in the template to include a table of contents. Derived
-     * classes may override this for a customized view.
+     * This generaties the properties {@code wizard.*} which can be
+     * referenced in the template. The following variables are defined
+     * by default:
+     * <ul>
+     *   <li>{@code wizard.contents.html} - list of pages (html)</li>
+     * </ul>
      * <p>
-     * Note that property {@code wizard.contents.html.volatile} is set
-     * to {@code true} to avoid it being saved to disk for persistent
+     * Note that property {@code wizard.contents.html.volatile} are
+     * set to {@code true} to avoid it being saved to disk for persistent
      * property stores (like jGridstart's CertificatePair).
+     * <p>
+     * Derived classes may add and/or override wizard properties. Please
+     * make sure to set the {@code wizard.foo.html.volatile} property
+     * as well to avoid property clutter.
      * 
      * @param step step for which the contents is displayed; the default
      *             implementation marks the currently displayed step. 
      */
-    public void setStepContents(int step) {
-	String v = "<ul class='wizard-contents'>\n";
-
-	for (int i=0; i<pages.size(); i++) {
-	    String li;
-	    if (step == i) {
-		li = "<li class='wizard-current'>";
-	    } else {
-		li = "<li>";
-	    }
-	    v += li+getSharedContext().getNamespaceHandler().getDocumentTitle(getDocument(i))+"</li>\n";
-	}
+    public void updateWizardProperties(int step) {
+	String v = "<ul>\n";
+	
+	for (int i=0; i<pages.size(); i++)
+	    v += getWizardContentsLine(i, step);
 	
 	v += "</ul>\n";
 	data().setProperty("wizard.contents.html", v);
 	data().setProperty("wizard.contents.html.volatile", "true");
+    }
+    /** Returns the contents line for a page.
+     * <p>
+     * Default implementation returns a li item with an optional class
+     * {@code wizard-current} if it is the current page, or
+     * {@code wizard-future} if it is a step later than the current one.
+     * 
+     * @param step step to return contents for; index in {@link #pages}
+     * @param current the currently active step
+     */
+    protected String getWizardContentsLine(int step, int current) {
+	String classes = "";
+	if (step==current) classes += " wizard-current";
+	if (step>current)  classes += " wizard-future";
+	return (classes=="" ? "<li>" : "<li class='"+classes+"'>") + getDocumentTitle(step) + "</li>\n";
     }
 
     /** Shows or hides the dialog.
@@ -207,11 +233,10 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
      * specified by UIManager. It is still possible to override it in CSS/HTML.
      */
     protected void initialize() {
-	setModal(true);
+	//setModal(true);
 	getContentPane().removeAll();
 	pane = new TemplateButtonPanel();
 	getContentPane().add(pane);
-	pane.setBackground(UIManager.getColor("control"));
 
 	// create two button areas: one for prev/next to the right, one for
 	// extra buttons at the left.
@@ -270,13 +295,25 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
     }
     
     public interface PageListener {
-	/** called when page was changed. This is called after the page has
-	 * been shown and can be used to modify the dialog contents.
+	/** Called before a page is to be changed
 	 * 
 	 * @param w Current TemplateWizard
-	 * @param page Page number currently shown (index in pages)
+	 * @param curPage Page number almost leaving (index in pages)
+	 * @param newPage Page number going to (index in pages)
+	 * @return {@code true} to continue, {@code false} to stay on current page
 	 */
-	void pageChanged(TemplateWizard w, int page);
+	boolean pageLeave(TemplateWizard w, int curPage, int newPage);
+
+	/** Called after page was changed.
+	 * <p>
+	 * This is called after the page has been shown and can be used to
+	 * modify the dialog contents.
+	 * 
+	 * @param w Current TemplateWizard
+	 * @param prevPage Page number previously shown (index in pages)
+	 * @param curPage Page number just shown (index in pages)
+	 */
+	void pageEnter(TemplateWizard w, int prevPage, int curPage);
     }
     
 
@@ -429,5 +466,12 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
     public void submit(String query) {
 	pane.submit(query);
     }
+    
+    public Component getFormComponent(String name) {
+	return pane.getFormComponent(name);
+    }
 
+    public Map<String, Component> getFormComponents() {
+	return pane.getFormComponents();
+    }
 }

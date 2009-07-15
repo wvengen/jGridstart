@@ -1,6 +1,8 @@
 package nl.nikhef.jgridstart.gui.util;
 
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.print.PrinterException;
 import java.io.File;
@@ -8,8 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -143,6 +147,14 @@ public class TemplateButtonPanel extends JPanel implements ITemplatePanel {
     */
     public void addButton(JButton btn, boolean isDefault) {
 	addButton(buttonpane, btn, isDefault);
+    }
+    
+    /** adds a seperator to the button list
+     * <p>
+     * This is implemented as some whitespace to visually separate buttons
+     */
+    public void addSeparator() {
+	buttonpane.add(Box.createRigidArea(new Dimension(btnBorderWidth*8, 0)));
     }
 
     /*
@@ -289,5 +301,13 @@ public class TemplateButtonPanel extends JPanel implements ITemplatePanel {
 
     public void submit(String query) {
 	contentpane.submit(query);
-    }   
+    }
+    
+    public Component getFormComponent(String name) {
+	return contentpane.getFormComponent(name);
+    }
+
+    public Map<String, Component> getFormComponents() {
+	return contentpane.getFormComponents();
+    }
 }

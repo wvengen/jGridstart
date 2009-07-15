@@ -84,6 +84,20 @@ public class PEMWriter extends org.bouncycastle.openssl.PEMWriter {
 	w.writeObject(obj, msg);
 	w.close();
     }
+    
+    /** Wrote single object to PEM encrypted with specified password.
+     * <p>
+     * Stores password in {@link PasswordCache} as well.
+     * @throws IOException 
+     * @throws NoSuchAlgorithmException 
+     */
+    public static void writeObject(File f, Object obj, final char[] pw) throws NoSuchAlgorithmException, IOException {
+	PEMWriter w = new PEMWriter(f);
+	w.writeObject(obj, new PasswordFinder() {
+	    public char[] getPassword() { return pw; }
+	});
+	w.close();
+    }
 
     // TODO finish variants
 }

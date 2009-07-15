@@ -1,0 +1,140 @@
+
+/*
+ * Wizard
+ */
+body {
+	margin: 0;
+	padding: 0;
+}
+
+.wizard-title {
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 25pt;
+	width: 100%;
+	margin: 0;
+	padding: 5pt 1em 5pt 1em;
+	background: inherit;
+	font-weight: bold;
+	font-size: 150%;
+}
+
+.wizard-contents {
+	position: fixed;
+	top: 35pt;
+	left: 0;
+	width: 11em;
+	height: 100%;
+	margin: 0;
+	padding: 5pt 0 5pt 1.5em;
+	background: inherit;
+}
+.wizard-contents > ul {
+	/* allow contents to be of class wizard-contents, or inside div of that class */
+	margin: 0;
+	padding: 0;
+}
+.wizard-contents li {
+	margin-bottom: 5pt;
+	color: black;
+}
+.wizard-contents li.wizard-current {
+	font-weight: bold;
+}
+.wizard-contents li.wizard-future {
+	color: #888;
+}
+.wizard-contents li.wizard-done {
+	list-style-type: none;
+	color: black;
+}
+.wizard-contents li.wizard-done:before {
+	content: '\2713';
+	margin-left: -1em;
+	margin-right: 0.2em;
+}
+
+.wizard-page {
+	margin-left: 13em; /* = .wizard-contents' horizontal paddings + width */
+	margin-top: 35pt;   /* = .wizard-title's vertical paddings + height */
+	padding: 5pt 1em 5pt 1em;
+	background: white;
+}
+
+/*
+ * Form
+ */
+form table {
+	border: none;
+	border-collapse: collapse;
+}
+
+form table td, form table th {
+	border-bottom: 1px solid #ddd;
+	border-top: 1px solid #ddd;
+	padding: 3pt 0 3pt 0;
+}
+
+form table th {
+	vertical-align: top;
+	text-align: left;
+	font-weight: normal;
+	padding-right: 0.5em;
+	padding-left: 0.8em;
+}
+form table th label:after {
+	content: ":";
+}
+form table input {
+	width: 100%;
+}
+form table td.legend {
+	padding-top: 15pt;
+	border-bottom: none;
+	border-top: none;
+}
+form table td.legend:first-child {
+	/* not so much space padding for first item :) */
+	padding-top: 5pt;
+}
+
+.resulting-dn {
+	padding-top: 15pt;
+}
+.resulting-dn label {
+	display: block;
+	color: #888;
+}
+.resulting-dn input {
+	width: 100%;
+	font-family: monospace;
+	background: inherit;
+	border: none;
+	color: #888;
+}
+
+/*
+ * Info
+ */
+.wizard-page ul li, .wizard-page ol li {
+	margin-bottom: 0.8em;
+}
+.wizard-page ul li li, .wizard-page ol li li {
+	margin-bottom: auto;
+}
+
+.wizard-page .help {
+	cursor: help;
+	background: #eee;
+	color: #080808;
+	font-size: 90%;
+	padding: 3pt .6em 3pt .6em;
+	margin: 0 .5em 5pt .5em;
+}
+.wizard-page .helpbutton {
+	font-size: 80%;
+	/*cursor: hand;*/
+	background: #eee;
+	color: black;
+}
