@@ -96,6 +96,7 @@ public class JGSFrame extends JFrame {
 	new ActionShowDetails(this, selection);
 	new ActionViewLog(this);
 	new ActionViewCertificateList(this, certList, false);
+	new ActionChangeBrowser(this, selection);
 	new ActionRefresh(this, store) {
 	    public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
