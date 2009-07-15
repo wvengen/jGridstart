@@ -143,6 +143,8 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	step = s;
 	// Update the navigation bar
 	updateWizardProperties(step);
+	// enter handler so it can update properties
+	if (handler!=null) handler.pageEnter(this, oldStep, s);
 	// set new contents and get title from that as well
 	getDocument(s).refresh();
 	pane.setDocument(getDocument(s));
@@ -159,8 +161,6 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	// dialog size to its preferred size, which is unwanted when the
 	// user resized the window.
 	if (!isVisible()) pack();
-
-	if (handler!=null) handler.pageEnter(this, oldStep, s);
     }
     /** go to another page by relative distance */
     public void setStepRelative(int delta) {
@@ -386,7 +386,13 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	return pane.print();
     }
 
+    /** {@inheritDoc}
+     * <p>
+     * Also calls the {@link PageListener#pageEnter} handler so data
+     * updated there is refreshed as well.
+     */
     public boolean refresh() {
+	if (handler!=null) handler.pageEnter(this, step, step);
 	return pane.refresh();
     }
 

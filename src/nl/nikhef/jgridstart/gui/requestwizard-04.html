@@ -12,31 +12,31 @@
 
 <p>Congratulations, your certificate has been approved and was retrieved from the
 Certification Authority. As a final step, you will want to install it into your
-webbrowser, <em>Mozilla Firefox</em>
+webbrowser, <em c="${install.browser.desc}">your webbrowser</em>
 (<a href='action:changebrowser'>change browser</a>).</p>
 
 <p>Please follow these steps:</p>
 <form>
 
-<ol if="!${install.method.manual}">
+<ol if="${install.browser.certinst} and !${install.browser.certinst}!=manual">
 	<li>Press the <em>install</em> button to begin
-		<input type='button' href='action:install' value='install'/>
+		<input type='button' href='action:install(silent,password=${install.passwd})' value='install'/>
 		<ul>
 			<li>You may need to enter your private key password again</li>
-			<li><span c="${install.browser}">Your webbrowser</span> will open a new window</li>
+			<li><span c="${install.browser.desc}">Your webbrowser</span> will open a new window</li>
 		</ul></li>
 		
 	<!--
 	  -  Mozilla browsers
 	  -->
 	
-	  <li if="${install.method.mozilla}">
+	  <li if="${install.browser.certinst}==mozilla">
 	    When an <em>Internet Security</em> dialog appears, choose <em>Allow</em>.</li>
 	
-	  <li if="${install.method.mozilla}">
+	  <li if="${install.browser.certinst}==mozilla">
 	    If you have set a master password, enter it in the dialog that pops up.</li>
 	
-	  <li if="${install.method.mozilla}">
+	  <li if="${install.browser.certinst}==mozilla">
 	    In the password dialog for the <em>certificate backup</em>, enter the
 		password <tt id='passwd' c="${install.passwd}">tobaronetwothree</tt>
 		Note that this a temporary password, and that it has been copied to
@@ -47,10 +47,10 @@ webbrowser, <em>Mozilla Firefox</em>
 	  -  Internet Explorer and other browsers using Windows keystore
 	  -->
 	
-	  <li if="${install.method.system} and ${os.windows}">
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Win">
 	    The <em>Certificate Import Wizard</em> will appear, press <em>Next</em> twice.</li>
 
-	  <li if="${install.method.system} and ${os.windows}">
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Win">
 	    In the password field, enter the password
 	    <tt id='passwd' c="${install.passwd}">tobaronetwothree</tt>
 		Note that this a temporary password, and that it has been copied to
@@ -59,10 +59,10 @@ webbrowser, <em>Mozilla Firefox</em>
 		      for increased security.</li>
 		</ul></li>
 	
-	  <li if="${install.method.system} and ${os.windows}">
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Win">
 	    Press <em>Next</em> a couple of times, and <em>Finish</em>.</li>
 	
-	  <li if="${install.method.system} and ${os.windows}">
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Win">
 	    If you enabled strong private key protection, confirm the keystore access
 	    by pressing <em>Ok</em>.</li>
 
@@ -71,10 +71,10 @@ webbrowser, <em>Mozilla Firefox</em>
 	  -  Safari and other Mac OS keystore-aware browsers
 	   -->
 	   	 
-	  <li if="${install.method.system} and ${os.macos}">
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Mac">
 	    TODO</li>
 	    
-	  <li if="${install.method.browser}">
+	  <li if="${install.browser.certinst}==browser and ${os.name[0:3]}==Mac">
 	    If the password of the PKCS#12 file to import is asked,
 	    enter <tt id='passwd' c="${install.passwd}">tobaronetwothree</tt>
 		Note that this a temporary password, and that it has been copied to
@@ -84,10 +84,7 @@ webbrowser, <em>Mozilla Firefox</em>
 	  -  Browsers that import by opening the PKCS#12 file directly
 	  -->
 
-	  <li if="${install.method.browser}">
-	    Your webbrowser will open the certificate and key.</li>
-	    
-	  <li if="${install.method.browser}">
+	  <li if="${install.browser.certinst}==browser">
 	    If the password of the PKCS#12 file to import is asked,
 	    enter <tt id='passwd' c="${install.passwd}">tobaronetwothree</tt>
 		Note that this a temporary password, and that it has been copied to
@@ -105,7 +102,7 @@ webbrowser, <em>Mozilla Firefox</em>
   -  Browser unsupported, manual installation
   -->
  
-<p if="${install.method.manual}">
+<p if="!${install.browser.certinst} or ${install.browser.certinst}==manual">
   Automatic installation of your certificate is not supported for this webbrowser.
   You can do it manually by <a href="action:export">exporting</a> it to a PKCS#12
   file, and importing the resulting file into your webbrowser.

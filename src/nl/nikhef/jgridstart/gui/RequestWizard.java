@@ -4,6 +4,7 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,8 @@ import nl.nikhef.jgridstart.Organisation;
 import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
+import nl.nikhef.jgridstart.install.BrowserFactory;
+import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 /** Wizard that asks the user for information and generates the certificate */
@@ -94,6 +97,9 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		if (uri.startsWith("action:"))
 		    selection.setSelection(cert);
 		URLLauncher.openURL(uri, panel);
+		// refresh document after action because properties may be updated
+		if (uri.startsWith("action:"))
+		    refresh();
 	    }	    
 	});
     }
@@ -175,7 +181,35 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    worker = new GenerateWorker(w, curPage);
 	    worker.execute();
 	    // go next only when all actions are finished
-	    nextAction.setEnabled(false);
+	    //nextAction.setEnabled(false);
+	}
+	
+	// generate installation password, update default browser
+	if (curPage==3) {
+	    // set browser properties
+	    try {
+		System.setProperty("install.browser", BrowserFactory.getInstance().getDefaultBrowser());
+		String browserid = data().getProperty("install.browser");
+		if (browserid==null) browserid = System.getProperty("install.browser");
+		// remove the old browser Properties
+		for (Enumeration<Object> en = data().keys(); en.hasMoreElements(); ) {
+		    String key = (String)en.nextElement();
+		    if (!key.startsWith("install.browser.")) continue;
+		    data().remove(key);
+		}
+		// copy the browser's Properties
+		Properties p = BrowserFactory.getInstance().getBrowserProperties(browserid);
+		for (Enumeration<Object> en = p.keys(); en.hasMoreElements(); ) {
+		    String key = (String)en.nextElement();
+		    data().setProperty("install.browser."+key, p.getProperty(key));
+		    data().setProperty("install.browser."+key+".volatile", "true");
+		}
+	    } catch (IOException e) {
+		// no browser info, handled in html by !${install.browser*}
+	    } catch (BrowserNotAvailableException e) {
+		// should not happen as we query default browser
+		ErrorMessage.internal(this, e);
+	    }
 	}
 
 	// redraw buttons

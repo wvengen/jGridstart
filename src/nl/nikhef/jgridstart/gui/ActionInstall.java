@@ -5,6 +5,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -18,7 +20,13 @@ import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.TempFileWriter;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
-
+/** Install certificate into web browser.
+ * <p>
+ *  
+ * 
+ * @author wvengen
+ *
+ */
 public class ActionInstall extends CertificateAction {
     
     public ActionInstall(JFrame parent, CertificateSelection s) {
@@ -36,35 +44,57 @@ public class ActionInstall extends CertificateAction {
 	    return false;
 	}
     }
+    
+    /** Generate a random password suitable for export 
+     * @throws NoSuchProviderException 
+     * @throws NoSuchAlgorithmException */
+    public char[] generatePassword() throws NoSuchAlgorithmException, NoSuchProviderException {
+	// generate temporary password used to import in browser and write pkcs file
+	SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+	char[] pw = new char[7]; // TODO Illegal key size exception if larger password :(
+	for (int i=0; i<pw.length; i++) pw[i] = (char)(random.nextInt(128-32)+32);
+	return pw;
+    }
 
     public void actionPerformed(ActionEvent e) {
 	TempFileWriter pkcs = null;
 	CertificatePair cert = null;
+	
 	try {
-	    // generate temporary password used to import in browser and write pkcs file
-	    SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-	    char[] pw = new char[7]; // TODO Illegal key size exception if larger password :(
-	    for (int i=0; i<pw.length; i++) pw[i] = (char)(random.nextInt(128-32)+32);
+	    // parse arguments
+	    boolean silent = false;	// whether to silently install or inform user
+	    char[] pw = null;		// password to use
+	    String[] args = e.getActionCommand().split(",\\s*");
+	    for (int i=0; i<args.length; i++) {
+		if (args[i].startsWith("password="))
+		    pw = args[i].substring(9).toCharArray();
+		else if (args[i].equals("silent"))
+		    silent = true;
+	    }
+	    if (pw==null) pw = generatePassword();
 
-	    // explain what'll happen in password dialog or option pane
-	    String message = 
-		"You are about to install the selected certificate into your\n" +
-		"web browser, so that you can access protected websites.\n\n" +
-		"The installation procedure will ask you for your master password\n" +
-		"if you have set any. The additional password for importing this\n" +
-		"certificate, will be copied to the clipboard.";
-	    Object [] options = { "Install", "Cancel" };
-	    int ret = JOptionPane.showOptionDialog(findWindow(e.getSource()),
-		    message,
-		    "Install certificate into browser",
-		    JOptionPane.OK_CANCEL_OPTION,
-		    JOptionPane.INFORMATION_MESSAGE,
-		    null, // no icon
-		    options, options[0]);
-	    if (ret!=JOptionPane.OK_OPTION) return;
+	    if (!silent) {
+		// explain what'll happen in password dialog or option pane
+		String message = 
+		    "You are about to install the selected certificate into your\n" +
+		    "web browser, so that you can access protected websites.\n\n" +
+		    "The installation procedure will ask you for your master password\n" +
+		    "if you have set any. The additional password for importing this\n" +
+		    "certificate is "+String.valueOf(pw)+" and will be copied to the clipboard.";
+		Object [] options = { "Install", "Cancel" };
+		int ret = JOptionPane.showOptionDialog(findWindow(e.getSource()),
+			message,
+			"Install certificate into browser",
+			JOptionPane.OK_CANCEL_OPTION,
+			JOptionPane.INFORMATION_MESSAGE,
+			null, // no icon
+			options, options[0]);
+		if (ret!=JOptionPane.OK_OPTION) return;
 
-	    cert = selection.getCertificatePair();
-	    logger.finer("Action: "+getValue(NAME));
+		cert = selection.getCertificatePair();
+		logger.finer("Action: "+getValue(NAME));
+
+	    }
 	    
 	    // copy password to clipboard
 	    Transferable transPassw = new StringSelection(new String(pw));

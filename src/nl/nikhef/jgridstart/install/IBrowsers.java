@@ -3,6 +3,7 @@ package nl.nikhef.jgridstart.install;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
@@ -102,7 +103,7 @@ public interface IBrowsers {
      * This probably requires user interaction such as entering the keystore's
      * master password, and the PCKS#12 file's passphrase.
      * 
-     * @param browserid browser identifier to i nstall certificate for
+     * @param browserid browser identifier to install certificate for
      * @param pkcs file containing PKCS#12 certificate
      */
     public void installPKCS12(String browserid, File pkcs)
@@ -112,4 +113,20 @@ public interface IBrowsers {
      * @see #installPKCS12(String, File) */
     public void installPKCS12(File pkcs)
 	throws BrowserNotAvailableException, BrowserExecutionException;
+    
+    /** Return a list of {@linkplain Properties} for a browser.
+     * <p>
+     * This exposes the browser's {@link Properties} that are used internally.
+     * Please do think twice before using this, because relying on internal
+     * details generally is not wise. It might be useful, however, in certain
+     * cases.
+     * <p>
+     * Please realise that this method may vanish in later versions, so be warned.
+     * 
+     * @param browserid browser identifier to obtain {@linkplain Properties} of
+     * @return the browser's {@linkplain Properties} 
+     * @throws BrowserNotAvailableException 
+     */
+    public Properties getBrowserProperties(String browserid)
+    	throws BrowserNotAvailableException;
 }

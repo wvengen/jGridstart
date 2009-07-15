@@ -62,6 +62,17 @@ abstract class BrowsersCommon implements IBrowsers {
 	return name;
     }
     
+    public Properties getBrowserProperties(String browserid)
+    		throws BrowserNotAvailableException {
+
+	// check if browserid is present
+	if (!availableBrowsers.containsKey(browserid))
+	    throw new BrowserNotAvailableException(browserid);
+	
+	// return properties
+	return availableBrowsers.get(browserid);
+    }
+    
     public void openUrl(String urlString)
     		throws BrowserNotAvailableException, BrowserExecutionException {
 	openUrl(getDefaultBrowser(), urlString);
