@@ -16,7 +16,8 @@ import nl.nikhef.jgridstart.install.BrowserFactory;
  * <p>
  * An {@code action:} URL activates an {@link Action}s {@linkplain Action#actionPerformed actionPerformed}
  * method, so it is equivalent to selecting a menu item or pressing a button.
- * Before an action can be called as URL, it must be made known, for example:
+ * Before an action can be called as URL, it must be made known using {@link #addAction},
+ * for example:
  * <code><pre>
  *   class CoolAction extends AbstractAction {
  *     public CoolAction() {
@@ -134,7 +135,7 @@ public class URLLauncher {
      * <p>
      * It is suggested to run this in an Action's constructor like this:
      * 
-     * <code>
+     * <code><pre>
      *   class MyAction extends AbstractAction {
      *     
      *     public MyAction() {
@@ -146,7 +147,8 @@ public class URLLauncher {
      *       // ...
      *     }
      *   }
-     * </code>
+     * </pre></code>
+     * See also this class's description.
      *  
      * @param name name in url, e.g. "myaction" to respond to url "action:myaction"
      * @param a Action to perform when url is opened
