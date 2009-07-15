@@ -52,6 +52,8 @@ import org.xml.sax.SAXException;
  *   <li><code><i>expression</i> and <i>expression</i></code> for the boolean and operation
  *   <li><code><i>expression</i> or <i>expression</i></code> for the boolean or operation
  *   <li><code>(<i>subexpression</i>)</code> to evaluate subexpressions, as usual
+ *   <li><code><i>string1</i> == <i>string2</i></code> to check if two strings are equal (whitespace is trimmed)</li>
+ *   <li><code><i>string1</i> != <i>string2</i></code> to check if two strings are unequal (whitespace is trimmed)</li>
  * </ul>
  * <br>
  * Example: {@code <p if="${url} and ${desc}">Visit <a href="${url}" c="${desc}"/></p>}<br>
@@ -213,7 +215,8 @@ public class TemplateDocument extends DocumentDelegate {
 	// add parentheses to boolean operators
 	//expr = expr.replaceAll("^(.*\\b)(and|or)(\\b.*)$", "($1)$2($3)");
 	// parse subexpressions within parentheses
-	Matcher matcher = Pattern.compile("(\\(.*\\))").matcher(expr);
+	final Pattern paren = Pattern.compile("(\\(.*\\))");
+	Matcher matcher = paren.matcher(expr);
 	StringBuffer newExpr = new StringBuffer();
 	while (matcher.find()) {
 	    String subExpr = matcher.group();
@@ -227,7 +230,7 @@ public class TemplateDocument extends DocumentDelegate {
 	matcher.appendTail(newExpr);
 	expr = newExpr.toString().trim();
 	// parse boolean operations
-	Pattern ops = Pattern.compile("^(.*?)\\b(and|or)\\b(.*)$");
+	final Pattern ops = Pattern.compile("^(.*?)\\b(and|or)\\b(.*)$");
 	while ( (matcher=ops.matcher(expr)).find() ) {
 	    boolean pre = parseConditional(matcher.group(1));
 	    String op = matcher.group(2);
@@ -236,6 +239,15 @@ public class TemplateDocument extends DocumentDelegate {
 		expr = Boolean.toString(pre && post);
 	    else if (op.equals("or"))
 		expr = Boolean.toString(pre || post);
+	}
+	// parse string comparison
+	final Pattern comp = Pattern.compile("^(.*?)\\b(==|!=)\\b(.*)$");
+	matcher = comp.matcher(expr);
+	if (matcher.find()) {
+	    boolean val = (matcher.group(1).trim().equals(matcher.group(3).trim()));
+	    if (matcher.group(2).equals("!="))
+		val = !val;
+	    expr = Boolean.toString(val);
 	}
 	// handle negations
 	if (expr.startsWith("!"))

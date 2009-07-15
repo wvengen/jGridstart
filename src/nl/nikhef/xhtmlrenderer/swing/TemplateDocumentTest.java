@@ -175,6 +175,17 @@ public class TemplateDocumentTest extends TestCase {
 	templateTest("<p if='!(!(!true))'>1</p>", "");
 	templateTest("<p if='true and ((true or (true and false)) and true)'>1</p>", "<p>1</p>");
 	templateTest("<p if='true and ((true or (true and false)) and !true)'>1</p>", "");
+	// comparison
+	templateTest("<p if='a==a'>1</p>", "<p>1</p>");
+	templateTest("<p if='a!=a'>1</p>", "");
+	templateTest("<p if=' \"SDOjioSDFIOJSD\" != \"SDOjioSDFIOJSD\"   '>1</p>", "<p>1</p>");
+	templateTest("<p if=' \"SDOjioSDFIOJSD\" !=    '>1</p>", "<p>1</p>");
+	templateTest("<p if='=='>1</p>", "<p>1</p>");
+	templateTest("<p if='!='>1</p>", "");
+	templateTest("<p if=' =='>1</p>", "<p>1</p>");
+	templateTest("<p if=' !='>1</p>", "");
+	templateTest("<p if='== '>1</p>", "<p>1</p>");
+	templateTest("<p if='!= '>1</p>", "");
     }
     
     @Test
