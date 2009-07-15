@@ -189,7 +189,7 @@ public class TemplateDocumentTest extends TestCase {
     }
     
     @Test
-    public void testContentsreplaces() throws Exception {
+    public void testContentsreplaceSimple() throws Exception {
 	// static replacements
 	templateTest("<p c='test'/>", "<p>test</p>");
 	templateTest("<p c=''/>", "<p/>");
@@ -212,15 +212,15 @@ public class TemplateDocumentTest extends TestCase {
     
     /** Test more complex html substitution */
     @Test
-    public void testContentsReplace2() throws Exception {
-	Properties p =new Properties();
+    public void testContentsReplaceHtml() throws Exception {
+	Properties p = new Properties();
 	p.setProperty("foohtml", "<a href='http://www.w3.org/'>w3</a>, this <div>yeah</div>");
 	templateTest("<p c='${foohtml}'/>", "<p>"+p.getProperty("foohtml")+"</p>", p);
     }
     
     /** Test contents substitution with boolean evaluation */
     @Test
-    public void testContentsReplace3() throws Exception {
+    public void testContentsReplaceBoolEval() throws Exception {
 	Properties p = new Properties();
 	p.setProperty("foo", "true");
 	templateTest("<p c='${(true)}'/>", "<p>true</p>");
@@ -232,6 +232,19 @@ public class TemplateDocumentTest extends TestCase {
 	templateTest("<p class='${(true)}'/>", "<p class='true'/>");
 	templateTest("<p c='${(${foo})}'/>", "<p>false</p>");
 	templateTest("<p c='${(${foo})}'/>", "<p>true</p>", p);
+    }
+    
+    /** Test substring */
+    @Test
+    public void testContentsReplaceSubstring() throws Exception {
+	Properties p = new Properties();
+	p.setProperty("foo", "abcdefghijlk");
+	templateTest("<p c='${foo[:]}'/>", "<p>"+p.getProperty("foo")+"</p>", p);
+	templateTest("<p c='${foo[0:]}'/>", "<p>"+p.getProperty("foo")+"</p>", p);
+	templateTest("<p c='${foo[0:0]}'/>", "<p/>");
+	templateTest("<p c='${foo[:1]}'/>", "<p>a</p>", p);
+	templateTest("<p c='${foo[:5]}'/>", "<p>abcde</p>", p);
+	templateTest("<p c='${foo[0:5]}'/>", "<p>abcde</p>", p);
     }
     
     @Test

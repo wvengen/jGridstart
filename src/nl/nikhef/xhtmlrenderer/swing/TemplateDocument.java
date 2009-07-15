@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.internal.matchers.SubstringMatcher;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -272,7 +273,7 @@ public class TemplateDocument extends DocumentDelegate {
 	
 	// substitute variables
 	StringBuffer dstbuf = new StringBuffer();
-	final Pattern pat = Pattern.compile("(\\$\\{(.*?)\\})", Pattern.MULTILINE|Pattern.DOTALL);
+	final Pattern pat = Pattern.compile("(\\$\\{(.*?)(\\[([0-9]*):([0-9]*)\\])?\\})", Pattern.MULTILINE|Pattern.DOTALL);
 	Matcher match = pat.matcher(dstbufCond.toString());
 	while (match.find()) {
 	    String key = match.group(2).trim();
@@ -280,6 +281,14 @@ public class TemplateDocument extends DocumentDelegate {
 	    if (data!=null) sub = data.getProperty(key);
 	    if (sub==null) sub = System.getProperty(key);
 	    if (sub==null) sub="";
+	    // handle substring
+	    if (match.group(3)!=null) {
+		int from = 0;
+		int to = sub.length();
+		try { from = Integer.parseInt(match.group(4)); } catch(Exception e) { }
+		try { to = Integer.parseInt(match.group(5)); } catch(Exception e) { }
+		sub = sub.substring(from, to);
+	    }
 	    match.appendReplacement(dstbuf, sub);
 	}
 	match.appendTail(dstbuf);
