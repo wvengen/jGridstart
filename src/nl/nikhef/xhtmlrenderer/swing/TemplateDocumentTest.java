@@ -178,7 +178,7 @@ public class TemplateDocumentTest extends TestCase {
 	// comparison
 	templateTest("<p if='a==a'>1</p>", "<p>1</p>");
 	templateTest("<p if='a!=a'>1</p>", "");
-	templateTest("<p if=' \"SDOjioSDFIOJSD\" != \"SDOjioSDFIOJSD\"   '>1</p>", "<p>1</p>");
+	templateTest("<p if=' \"SDOjioSDFIOJSD\" == \"SDOjioSDFIOJSD\"   '>1</p>", "<p>1</p>");
 	templateTest("<p if=' \"SDOjioSDFIOJSD\" !=    '>1</p>", "<p>1</p>");
 	templateTest("<p if='=='>1</p>", "<p>1</p>");
 	templateTest("<p if='!='>1</p>", "");
@@ -186,6 +186,8 @@ public class TemplateDocumentTest extends TestCase {
 	templateTest("<p if=' !='>1</p>", "");
 	templateTest("<p if='== '>1</p>", "<p>1</p>");
 	templateTest("<p if='!= '>1</p>", "");
+	templateTest("<p if='aowiejfaoiwejf=='>1</p>", "");
+	templateTest("<p if='==aowiejfaoiwejf'>1</p>", "");
     }
     
     @Test
@@ -208,6 +210,7 @@ public class TemplateDocumentTest extends TestCase {
 	templateTest("<p c='${vtrue} yeah'/>", "<p>true yeah</p>", p);
 	templateTest("<p c='${vempty}'/> blup", "<p/> blup");
 	templateTest("<p c='${vhtml}'/>", "<p>"+p.getProperty("vhtml")+"</p>", p);
+	templateTest("<p c='${vnonexistant}'/>", "<p/>");
     }
     
     /** Test more complex html substitution */
