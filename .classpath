@@ -7,11 +7,6 @@
 			<attribute name="javadoc_location" value="http://commons.apache.org/cli/api-release/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="thirdparty/junit/junit-4.5.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="http://junit.org/junit/javadoc/4.5/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="thirdparty/swingworker/swing-worker-1.2.jar" sourcepath="thirdparty/swingworker/swing-worker-src-1.2.zip">
 		<attributes>
 			<attribute name="javadoc_location" value="https://swingworker.dev.java.net/nonav/javadoc/"/>
@@ -43,5 +38,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="thirdparty/winregistry/WinRegistry-3.4.jar"/>
+	<classpathentry kind="lib" path="thirdparty/junit/junit-4.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
