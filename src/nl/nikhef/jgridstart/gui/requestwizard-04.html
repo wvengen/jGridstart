@@ -20,11 +20,8 @@ webbrowser, <em c="${install.browser.desc}">your webbrowser</em>
 
 <ol if="${install.browser.certinst} and !${install.browser.certinst}!=manual">
 	<li>Press the <em>install</em> button to begin
-		<input type='button' href='action:install(silent,password=${install.passwd})' value='install'/>
-		<ul>
-			<li>You may need to enter your private key password again</li>
-			<li><span c="${install.browser.desc}">Your webbrowser</span> will open a new window</li>
-		</ul></li>
+		<input type='button' href='action:install(silent,password=${install.passwd})' value='install'/><br/>
+		You may need to enter your private key password again</li>
 		
 	<!--
 	  -  Mozilla browsers
@@ -72,23 +69,33 @@ webbrowser, <em c="${install.browser.desc}">your webbrowser</em>
 	   -->
 	   	 
 	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Mac">
-	    TODO</li>
-	    
-	  <li if="${install.browser.certinst}==browser and ${os.name[0:3]}==Mac">
-	    If the password of the PKCS#12 file to import is asked,
+	    The <em>Add Certificates</em> dialog will appear, confirm that
+		you want to import the certificate.</li>
+		
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Mac">
+	    When the password of the PKCS#12 file to import is asked,
 	    enter <tt id='passwd' c="${install.passwd}">tobaronetwothree</tt>
-		Note that this a temporary password, and that it has been copied to
-		your clipboard as well (use Command-V to paste).</li>
-	
+		Note that this a temporary password.</li>
+
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Mac">
+	  	If you have set a password for your keychain, enter it in the next
+		dialog.</li>
+	    
 	<!-- 
 	  -  Browsers that import by opening the PKCS#12 file directly
 	  -->
+	  
+	  <li if="${install.browser.certinst}==browser">
+	  	<em c="${install.browser.desc}">your webbrowser</em> will open a new window or tab.</li>
 
 	  <li if="${install.browser.certinst}==browser">
-	    If the password of the PKCS#12 file to import is asked,
+	    When the password of the PKCS#12 file to import is asked,
 	    enter <tt id='passwd' c="${install.passwd}">tobaronetwothree</tt>
 		Note that this a temporary password, and that it has been copied to
-		your clipboard as well (use Ctrl-V to paste).</li>
+		your clipboard as well (use 
+		  <span if="${os.name[0:3]}!=Mac">Ctrl-V</span>
+		  <span if="${os.name[0:3]}==Mac">Command-V</span>
+		to paste).</li>
 	    
 	 
 	<!-- For all OSes -->
