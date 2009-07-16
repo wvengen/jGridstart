@@ -10,12 +10,22 @@
 
 <div class="wizard-page">
 
-<p>Congratulations, your certificate has been approved and was retrieved from the
-Certification Authority. As a final step, you will want to install it into your
-webbrowser, <em c="${install.browser.desc}">your webbrowser</em>
-(<a href='action:changebrowser'>change browser</a>).</p>
+<div if="!${install.done}">
+  <p>Congratulations, your certificate has been approved and
+  was retrieved from the Certification Authority. As a final step, you will want to
+  install it into your webbrowser, <em c="${install.browser.desc}">your webbrowser</em>
+  (<a href='action:changebrowser'>change browser</a>).</p>
+  <p>Please follow these steps:</p>
+</div>
 
-<p>Please follow these steps:</p>
+<div if="${install.done}">
+  <p>Your certificate has been installed in a webbrowser in the past. If you want to
+  reinstall the certificate into your webbrowser,
+  <em c="${install.browser.desc}">your webbrowser</em>
+  (<a href='action:changebrowser'>change browser</a>), follow these steps:</p>
+</div>
+
+
 <form>
 
 <ol if="${install.browser.certinst} and !${install.browser.certinst}!=manual">

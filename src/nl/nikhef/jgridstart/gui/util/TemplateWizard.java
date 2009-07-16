@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -414,6 +415,10 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
     }
 
     public void setData(Properties p) {
+	// need to setData on all cached instances!
+	for (Iterator<TemplateDocument> it = docs.iterator(); it.hasNext(); )
+	    it.next().setData(p);
+	// and pane itself
 	pane.setData(p);
     }
 
