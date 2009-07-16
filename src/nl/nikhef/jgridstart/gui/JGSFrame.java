@@ -86,10 +86,17 @@ public class JGSFrame extends JFrame {
 	new ActionViewVerificationForm(this, selection);
 	new ActionImport(this, store, selection);
 	new ActionInstall(this, selection);
-	new ActionRevoke(this, selection);
+	//new ActionRevoke(this, selection);
 	new ActionExport(this, selection);
 	new ActionMakeDefault(this, store, selection);
-	new ActionShowDetails(this, selection);
+	new ActionShowDetails(this, selection) {
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		super.actionPerformed(e);
+		// update info pane as well
+		certInfoPane.refresh();
+	    }
+	};
 	new ActionViewLog(this);
 	new ActionViewCertificateList(this, certList, false);
 	new ActionChangeBrowser(this, selection);
@@ -109,7 +116,7 @@ public class JGSFrame extends JFrame {
 	// create buttons for template panel from actions
 	String[] actions = {
 		"import", "request",
-		"viewrequest", "revoke", "install"
+		"viewrequest", /*"revoke",*/ "install"
 	};
 	certInfoButtons = new HashMap<String, JButton>();
 	for (int i=0; i<actions.length; i++) {
@@ -194,7 +201,7 @@ public class JGSFrame extends JFrame {
 	    menu.add(new JMenuItem(getAction("viewrequest")));
 	    menu.add(new JMenuItem(getAction("install")));
 	    menu.add(new JMenuItem("Renew certificate...", 'N')).setEnabled(false);
-	    menu.add(new JMenuItem(getAction("revoke")));
+	    //menu.add(new JMenuItem(getAction("revoke")));
 	    menu.addSeparator();
 	    menu.add(new JMenuItem(getAction("export")));
 	    menu.add(new JMenuItem(getAction("makedefault")));
@@ -338,7 +345,7 @@ public class JGSFrame extends JFrame {
 	} catch (IOException e) { }
 	certInfoButtons.get("viewrequest").setVisible(certPresent);
 	certInfoButtons.get("install").setVisible(certPresent);
-	certInfoButtons.get("revoke").setVisible(c!=null);
+	//certInfoButtons.get("revoke").setVisible(c!=null);
 	
 	certInfoButtons.get("import").setVisible(c==null);
 	certInfoButtons.get("request").setVisible(c==null);

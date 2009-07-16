@@ -4,12 +4,11 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JFrame;
 
-import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.URLLauncher;
 
 public class ActionShowDetails extends CertificateAction {
-
+    
     public ActionShowDetails(JFrame parent, CertificateSelection s) {
 	super(parent, s);
 	putValue(NAME, "Details");
@@ -19,8 +18,10 @@ public class ActionShowDetails extends CertificateAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-	CertificatePair cert = getCertificatePair();
-	boolean curVal = Boolean.valueOf(cert.getProperty("view.showdetails"));
-	cert.setProperty("view.showdetails", Boolean.toString(!curVal));
+	boolean curVal = false;
+	try { curVal = Boolean.valueOf(System.getProperty("view.showdetails")); }
+	catch(Exception e1) { }
+	System.setProperty("view.showdetails", Boolean.toString(!curVal));
+	System.out.println("New showdetails="+curVal);
     }
 }
