@@ -22,6 +22,5 @@ public class ActionShowDetails extends CertificateAction {
 	try { curVal = Boolean.valueOf(System.getProperty("view.showdetails")); }
 	catch(Exception e1) { }
 	System.setProperty("view.showdetails", Boolean.toString(!curVal));
-	System.out.println("New showdetails="+curVal);
     }
 }
