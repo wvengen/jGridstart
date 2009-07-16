@@ -1,8 +1,13 @@
 package nl.nikhef.jgridstart.gui;
 
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
 import nl.nikhef.jgridstart.CertificateSelection;
+import nl.nikhef.jgridstart.gui.ActionViewVerificationForm.VerificationDialog;
+import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 
@@ -37,11 +42,21 @@ public class ActionViewRequest extends CertificateAction {
     
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
-	TemplateWizard dlg = new RequestWizard(parent, getCertificatePair(), selection);
-	if (e.getActionCommand().trim()!="")
-	    dlg.setStep(Integer.valueOf(e.getActionCommand()));
+	TemplateWizard dlg = null;
+	
+	Window w = findWindow(e.getSource());
+	if (w instanceof Frame)
+	    dlg = new RequestWizard((Frame)w, getCertificatePair(), selection);
+	else if (w instanceof Dialog)
+	    dlg = new RequestWizard((Dialog)w, getCertificatePair(), selection);
 	else
+	    ErrorMessage.internal(w, "Expected Frame or Dialog as owner");
+
+	try {
+	    dlg.setStep(Integer.valueOf(e.getActionCommand()));
+	} catch (NumberFormatException e1) {
 	    dlg.setStep(defaultPage);
+	}
 	dlg.setVisible(true);
     }
 }

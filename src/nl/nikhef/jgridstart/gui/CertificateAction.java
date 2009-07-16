@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
+import javax.swing.JPopupMenu;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -100,8 +101,12 @@ public abstract class CertificateAction extends AbstractAction implements ListSe
      * @return the window, or null if not found
      */
     public static Window findWindow(Component c) {
-	for (; c!=null; c = c.getParent()) {
+	while (c!=null) {
 	    if (c instanceof Window) return (Window)c;
+	    if (c instanceof JPopupMenu)
+		c = ((JPopupMenu)c).getInvoker();
+	    else
+		c = c.getParent();
 	}
 	return null;
     }

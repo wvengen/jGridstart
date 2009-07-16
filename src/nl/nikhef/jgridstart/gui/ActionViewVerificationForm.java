@@ -39,8 +39,6 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
  */
 public class ActionViewVerificationForm extends CertificateAction {
     
-    protected VerificationDialog dlg = null;
-
     public ActionViewVerificationForm(JFrame parent, CertificateSelection s) {
 	super(parent, s);
 	putValue(NAME, "Verification form");
@@ -50,18 +48,17 @@ public class ActionViewVerificationForm extends CertificateAction {
     
     @Override
     public void actionPerformed(ActionEvent e) {
-	if (dlg==null) {
-	    Window w = findWindow(e.getSource());
-	    if (w instanceof Frame)
-		dlg = new VerificationDialog((Frame)w, getCertificatePair());
-	    else if (w instanceof Dialog)
-		dlg = new VerificationDialog((Dialog)w, getCertificatePair());
-	    else
-		ErrorMessage.internal(w, "Expected Frame or Dialog as owner");
-	    dlg.pack();
-	} else {
-	    dlg.setData(getCertificatePair());
+	VerificationDialog dlg = null;
+	Window w = findWindow(e.getSource());
+	if (w instanceof Frame)
+	    dlg = new VerificationDialog((Frame)w, getCertificatePair());
+	else if (w instanceof Dialog)
+	    dlg = new VerificationDialog((Dialog)w, getCertificatePair());
+	else {
+	    ErrorMessage.internal(w, "Expected Frame or Dialog as owner");
+	    return;
 	}
+	dlg.pack();
 	dlg.setVisible(true);
     }
     

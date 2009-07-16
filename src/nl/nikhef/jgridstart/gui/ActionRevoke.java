@@ -26,7 +26,7 @@ public class ActionRevoke extends CertificateAction {
 	    "<p></p><p><em>Revocation is not yet implemented</em></p>" +
 	    "</html></body>";
 	Object [] options = { "Revoke", "Cancel" };
-	int ret = JOptionPane.showOptionDialog(parent,
+	int ret = JOptionPane.showOptionDialog(findWindow(e.getSource()),
 		message,
 		"Revoke certificate",
 		JOptionPane.YES_NO_OPTION,

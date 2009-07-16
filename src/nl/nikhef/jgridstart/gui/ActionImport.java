@@ -41,9 +41,9 @@ public class ActionImport extends AbstractAction {
 	chooser.setDialogTitle("Import a new certificate");
 	chooser.setApproveButtonText("Import");
 	chooser.setApproveButtonMnemonic('I');
-	int result = chooser.showDialog(parent, null);
+	int result = chooser.showDialog(CertificateAction.findWindow(e.getSource()), null);
 	if (result == JFileChooser.APPROVE_OPTION) {
-	    doImport(chooser.getSelectedFile());
+	    doImport(e, chooser.getSelectedFile());
 	}
     }
     
@@ -51,17 +51,17 @@ public class ActionImport extends AbstractAction {
      * 
      * @param f File to import
      */
-    public void doImport(File f) {
+    public void doImport(ActionEvent e, File f) {
 	logger.info("Importing certificate: "+f);
 	
 	try {
 	    CertificatePair cert = store.importFrom(f);
 	    selection.setSelection(store.indexOf(cert));
-	} catch (PasswordCancelledException e) {
+	} catch (PasswordCancelledException e1) {
 	    // do nothing
-	} catch(Exception e) {
-	    logger.severe("Error importing certificate "+f+": "+e);
-	    ErrorMessage.error(parent, "Import failed", e);
+	} catch(Exception e1) {
+	    logger.severe("Error importing certificate "+f+": "+e1);
+	    ErrorMessage.error(CertificateAction.findWindow(e.getSource()), "Import failed", e1);
 	}
     }
     

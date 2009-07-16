@@ -41,7 +41,7 @@ public class ActionMakeDefault extends CertificateAction {
 	try {
 	    store.setDefault(cert);
 	} catch (IOException e1) {
-	    ErrorMessage.error(parent, "Could not set default certificate", e1);
+	    ErrorMessage.error(findWindow(e.getSource()), "Could not set default certificate", e1);
 	}
     }
 }

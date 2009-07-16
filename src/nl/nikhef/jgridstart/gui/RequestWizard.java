@@ -178,8 +178,12 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		cancelAction.putValue(AbstractAction.NAME, "Close");
 	} catch (IOException e) { }
 	
-	if (curPage==1 || curPage==2) {
+	if ((curPage==1 || curPage==2) && curPage!=oldPage) {
 	    // on page two we need to execute the things
+	    //  curPage!=oldPage is really needed, since worker.execute()
+	    //  refreshes the page several times to update the status, and
+	    //  that triggers this again. We don't want to get stuck in
+	    //  an update loop, do we.
 	    worker = new GenerateWorker(w, curPage);
 	    worker.execute();
 	    // go next only when all actions are finished
@@ -220,10 +224,6 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		ErrorMessage.error(this, "Certificate installation failed", e);
 	    }
 	}
-
-	// redraw buttons
-	btnLeft.revalidate();
-	btnLeft.repaint();
     }
 
     /** {@inheritDoc}

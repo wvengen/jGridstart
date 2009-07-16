@@ -29,9 +29,9 @@ public class ActionExport extends CertificateAction {
 	chooser.setDialogTitle("Export the currently selected certificate");
 	chooser.setApproveButtonText("Export");
 	chooser.setApproveButtonMnemonic('E');
-	int result = chooser.showDialog(parent, null);
+	int result = chooser.showDialog(findWindow(e.getSource()), null);
 	if (result == JFileChooser.APPROVE_OPTION) {
-	    doExport(chooser.getSelectedFile());
+	    doExport(e, chooser.getSelectedFile());
 	}
     }
     
@@ -39,16 +39,16 @@ public class ActionExport extends CertificateAction {
      * 
      * @param f File to export to
      */
-    public void doExport(File f) {
+    public void doExport(ActionEvent e, File f) {
 	CertificatePair cert = getCertificatePair();
 	logger.info("Exporting certificate "+cert+" to: "+f);
 	try {
 	    cert.exportTo(f);
-	} catch (PasswordCancelledException e) {
+	} catch (PasswordCancelledException e1) {
 	    // do nothing
-	} catch (Exception e) {
-	    logger.severe("Error exporting certificate "+f+": "+e);
-	    ErrorMessage.error(parent, "Export failed", e);
+	} catch (Exception e1) {
+	    logger.severe("Error exporting certificate "+f+": "+e1);
+	    ErrorMessage.error(findWindow(e.getSource()), "Export failed", e1);
 	}
     }
 }

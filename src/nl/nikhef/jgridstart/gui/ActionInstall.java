@@ -76,7 +76,7 @@ public class ActionInstall extends CertificateAction {
 	    if (!silent) {
 		// explain what'll happen in password dialog or option pane
 		// this redirects to the RequestWizard's install page for jGridStart
-		URLLauncher.performAction("viewrequest(3)", parent);
+		URLLauncher.performAction("viewrequest(3)", findWindow(e.getSource()));
 		return;
 		
 		// An alternative implementation would be, though the explanation is
@@ -126,7 +126,7 @@ public class ActionInstall extends CertificateAction {
 	    // do nothing
 	} catch (Exception e1) {
 	    logger.severe("Error installing certificate "+cert+": "+e1);
-	    ErrorMessage.error(parent, "Install failed", e1);
+	    ErrorMessage.error(findWindow(e.getSource()), "Install failed", e1);
 	} finally {
 	    if (pkcs!=null) pkcs.delete();
 	}

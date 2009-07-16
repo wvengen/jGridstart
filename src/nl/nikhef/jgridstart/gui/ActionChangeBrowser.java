@@ -57,7 +57,9 @@ public class ActionChangeBrowser extends CertificateAction {
 	    browserList.setSelectedIndex(bcuridx);
 	    JScrollPane browserListPane = new JScrollPane(browserList);
 	    browserListPane.setPreferredSize(new Dimension(250, 80));
-	    int res = JOptionPane.showConfirmDialog(parent, new Object[] {
+	    int res = JOptionPane.showConfirmDialog(
+		    findWindow(e.getSource()),
+		    new Object[] {
 		    "Select the webbrowser to use this certificate with",
 		    browserListPane
 	    }, "Select preferred webbrowser", JOptionPane.OK_CANCEL_OPTION);
@@ -70,7 +72,7 @@ public class ActionChangeBrowser extends CertificateAction {
 		    getCertificatePair().remove("install.browser");
 	    }
 	} catch (IOException e1) {
-	    ErrorMessage.internal(parent, e1);
+	    ErrorMessage.internal(findWindow(e.getSource()), e1);
 	}
     }
 }
