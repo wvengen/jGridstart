@@ -69,9 +69,10 @@
 	<property name="dep.apiviz" location="${dir.thirdparty}/javadoc/apiviz-1.3.0.GA.jar"/>
 	<!-- activation framework is present in Java 1.6 and we don't use
 	     it apart for resolving; so we can omit it when compiling there
-	     to avoid ProGuard Warnings (which are fatal) -->
-	<property name="dep.activation.real" location="${dir.thirdparty}/bouncycastle/activation.jar"/>
-	<condition property="dep.activation" value="${dep.activation.real}">
+	     to avoid ProGuard Warnings (which are fatal); so we need it for
+	     lower versions. This is a little trick with ProGuard's jarfilter -->
+	<property name="dep.activation" location="${dir.thirdparty}/bouncycastle/activation.jar"/>
+	<condition property="dep.activation.proguardfilter" value="(!**)">
 		<not><available classname="javax.activation.DataHandler"/></not>
   	</condition>
 	<path id="path.dependencies">
@@ -130,12 +131,11 @@
 			</fileset>
 		</copy>
 	</target>
-
+	
 	<!--
-	  - Distribution creation target
+	  -  Full JAR creation target
 	  -->
-	<target name="dist" depends="compile,keystore">
-		<!-- pack into jar -->
+	<target name="jar.large" depends="compile">
 		<basename property="dep.bouncycastle.basename" file="${dep.bouncycastle}"/>
 		<jar jarfile="${dir.dist}/${target.name}.large.jar">
 			<manifest>
@@ -167,6 +167,12 @@
 			</zipfileset>
 			<zipfileset src="${dep.javamail}" includes="**/*.class"/>
 		</jar>
+	</target>
+
+	<!--
+	  - Distribution creation target
+	  -->
+	<target name="jar" depends="keystore,jar.large">
 		<!-- minimize jar file; skipnonpubliclibraryclasses needed for java1.6 -->
 		<proguard obfuscate="false" skipnonpubliclibraryclasses="false">
 			<injar file="${dir.dist}/${target.name}.large.jar"/>
@@ -177,7 +183,7 @@
 			<libraryjar file="${dep.bouncycastle}"/>
 			<libraryjar file="${dep.junit}"/>
 			<libraryjar file="${dep.abbot}"/>
-			<libraryjar file="${dep.activation}"/>
+			<libraryjar file="${dep.activation}" jarfilter="${dep.activation.proguardfilter}" />
 			<keepclasseswithmembers access="public">
 				<method access="public static" type="void"
 					name="main" parameters="java.lang.String[]"/>
@@ -207,7 +213,7 @@
 		<!-- copy bouncycastle jar to deployment area -->
 		<copy file="${dep.bouncycastle}" todir="${dir.dist}"/>
 	</target>
-	<target name="jar" depends="dist"/>
+	<target name="dist" depends="jar"/>
 
 	<!--
 	  - Cleaning target
