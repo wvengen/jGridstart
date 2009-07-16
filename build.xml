@@ -58,6 +58,8 @@
 
 	<property name="dep.bouncycastle" location="${dir.thirdparty}/bouncycastle/bcprov-jdk14-143.jar"/>
 	<property name="dep.bouncycastle.smime" location="${dir.thirdparty}/bouncycastle/bcmail-jdk14-143.jar"/>
+	<property name="dep.javamail" location="${dir.thirdparty}/bouncycastle/mail-1.4.1.jar"/>
+	<property name="dep.activation" location="${dir.thirdparty}/bouncycastle/activation.jar"/>
 	<property name="dep.cli" location="${dir.thirdparty}/commons-cli/commons-cli-1.2.jar"/>
 	<property name="dep.junit" location="${dir.thirdparty}/junit/junit-4.5.jar"/>
 	<property name="dep.abbot" location="${dir.thirdparty}/junit/abbot.jar"/>
@@ -69,12 +71,15 @@
 	<path id="path.dependencies">
 		<!-- TODO use jdk13 library versions and test -->
 		<pathelement location="${dep.bouncycastle}"/>
+		<pathelement location="${dep.bouncycastle.smime}"/>
+			<pathelement location="${dep.javamail}"/>
+			<pathelement location="${dep.activation}"/>
 		<pathelement location="${dep.cli}"/>
 		<pathelement location="${dep.junit}"/>
 		<pathelement location="${dep.abbot}"/>
 		<pathelement location="${dep.swingworker}"/> <!-- for java1.5 and below -->
 		<pathelement location="${dep.xhtmlrenderer}"/>
-		<pathelement location="${dep.itext}"/>
+			<pathelement location="${dep.itext}"/>
 		<pathelement location="${dep.winregistry}"/>
 	</path>
 
@@ -147,8 +152,17 @@
 			<zipfileset src="${dep.winregistry}" includes="**/*.class"/>
 			<!-- iText needs some org.bouncycastle.cms classes but some other classes in this
 			     package reference javax.mail which we don't want to include as well (so that
-			     ProGuard can resolve them). Solution: only include part of the smime package -->
-			<zipfileset src="${dep.bouncycastle.smime}" includes="org/bouncycastle/cms/**"/>
+			     ProGuard can resolve them). Solution: only include part of the smime package.
+			     In addition to this, certificate renewal also requires S/MIME mail stuff.
+			     The activation framework doesn't appear to be needed during run, but ProGuard
+			     needs it to resolve its references, so we include it anyway (it's small). -->
+			<zipfileset src="${dep.bouncycastle.smime}">
+				<include name="org/bouncycastle/cms/**"/>
+				<include name="org/bouncycastle/mail/smime/*.class/"/>
+				<include name="org/bouncycastle/mail/smime/util/*.class/"/>
+			</zipfileset>
+			<zipfileset src="${dep.javamail}" includes="**/*.class"/>
+			<zipfileset src="${dep.activation}" includes="**/*.class"/>
 		</jar>
 		<!-- minimize jar file; skipnonpubliclibraryclasses needed for java1.6 -->
 		<proguard obfuscate="false" skipnonpubliclibraryclasses="false">
@@ -201,7 +215,6 @@
 		<delete file="${dir.dist}/bcprov.jnlp"/>
 		<basename property="dep.bouncycastle.basename" file="${dep.bouncycastle}"/>
 		<delete file="${dir.dist}/${dep.bouncycastle.basename}"/>
-		<delete file="http://java.sun.com/j2se/1.5.0/docs/api"/>
 	</target>
 
 	<!--
@@ -253,6 +266,7 @@
 			<link href="https://swingworker.dev.java.net/nonav/javadoc/"/>
 			<link href="http://pigeonholdings.com/projects/flyingsaucer/R8/javadoc/user/"/>
 			<link href="http://www.1t3xt.info/api/"/>
+			<link href="http://java.sun.com/products/javamail/javadocs/"/>
 			<!-- no online javadoc found for WinRegistry -->
 		</javadoc>
 	</target>
