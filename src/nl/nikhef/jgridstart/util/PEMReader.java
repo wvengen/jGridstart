@@ -8,14 +8,19 @@ import java.io.IOException;
 /** PEM file reader that works directory on files, integrated with {@link PasswordCache}. */
 public class PEMReader extends org.bouncycastle.openssl.PEMReader {
     
+    /** File, if any (for {@linkplain PasswordCache} invalidation on error) */
+    private File in = null;
+    
     /** Create PEMReader for a File */
     public PEMReader(File in) throws FileNotFoundException {
 	super(new FileReader(in));
+	this.in = in;
     }
     
     /** Create PEMReader for an encrypted File */
     public PEMReader(File in, String msg) throws FileNotFoundException, IOException {
 	super(new FileReader(in), PasswordCache.getInstance().getDecryptPasswordFinder(msg, in.getCanonicalPath()));
+	this.in = in;
     }
     
     /** Return single object from PEM file.
@@ -27,6 +32,21 @@ public class PEMReader extends org.bouncycastle.openssl.PEMReader {
 	Object o = r.readObject();
 	r.close();
 	return o;
+    }
+    
+    /** {@inheritDoc}
+     * <p>
+     * This method also invalidates the password when an {@linkplain IOException} occurs.
+     */
+    @Override
+    public Object readObject() throws IOException {
+	try {
+	    return super.readObject();
+	} catch(IOException e) {
+	    if (in!=null)
+		PasswordCache.getInstance().invalidate(in.getCanonicalPath());
+	    throw e;
+	}
     }
 
     /** Return single object from PEM file.
