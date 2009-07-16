@@ -70,7 +70,8 @@
 	<!-- activation framework is present in Java 1.6 and we don't use
 	     it apart for resolving; so we can omit it when compiling there
 	     to avoid ProGuard Warnings (which are fatal) -->
-	<condition property="dep.activation" value="${dir.thirdparty}/bouncycastle/activation.jar">
+	<property name="dep.activation.real" location="${dir.thirdparty}/bouncycastle/activation.jar"/>
+	<condition property="dep.activation" value="${dep.activation.real}">
 		<not><available classname="javax.activation.DataHandler"/></not>
   	</condition>
 	<path id="path.dependencies">
