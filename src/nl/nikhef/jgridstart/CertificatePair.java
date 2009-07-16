@@ -531,8 +531,6 @@ public class CertificatePair extends Properties implements ItemSelectable {
     }
     
     /** Export the certificate and private key to a PKCS#12 file.
-     * <p>
-     * TODO use {@link PrivateFileWriter} for more secure permissions
      * 
      * @throws NoSuchProviderException 
      * @throws KeyStoreException 

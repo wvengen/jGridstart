@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
+
 /** PEM file reader that works directory on files, integrated with {@link PasswordCache}. */
 public class PEMReader extends org.bouncycastle.openssl.PEMReader {
     
@@ -36,7 +38,9 @@ public class PEMReader extends org.bouncycastle.openssl.PEMReader {
     
     /** {@inheritDoc}
      * <p>
-     * This method also invalidates the password when an {@linkplain IOException} occurs.
+     * This method also invalidates the password when an {@linkplain IOException} occurs
+     * and throws a {@link PasswordCancelledException} when the user cancelled the
+     * password entry.
      */
     @Override
     public Object readObject() throws IOException {
@@ -45,6 +49,12 @@ public class PEMReader extends org.bouncycastle.openssl.PEMReader {
 	} catch(IOException e) {
 	    if (in!=null)
 		PasswordCache.getInstance().invalidate(in.getCanonicalPath());
+	    // Convert back to PasswordCancelledException if none was supplied.
+	    //   When the empty string was supplied as password, the exception
+	    //   message is different, so this can be used to detect if the
+	    //   password was cancelled.
+	    if (in!=null && e.toString().contains("Password is null"))
+		throw new PasswordCancelledException();
 	    throw e;
 	}
     }

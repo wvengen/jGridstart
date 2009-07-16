@@ -11,6 +11,10 @@ import nl.nikhef.jgridstart.gui.util.TemplateWizard;
  * Shows the "request new" wizard from {@link ActionRequest}, but this
  * action just views the form of the currently selected certificate and
  * doesn't create a new one.
+ * <p>
+ * The currently shown step can be supplied with the constructor.
+ * Alternatively, the action can be invoked with a number (as string)
+ * in the actioncommand to display a specified step.
  * 
  * @see ActionRequest
  * @author wvengen
@@ -34,7 +38,10 @@ public class ActionViewRequest extends CertificateAction {
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
 	TemplateWizard dlg = new RequestWizard(parent, getCertificatePair(), selection);
-	dlg.setStep(defaultPage);
+	if (e.getActionCommand().trim()!="")
+	    dlg.setStep(Integer.valueOf(e.getActionCommand()));
+	else
+	    dlg.setStep(defaultPage);
 	dlg.setVisible(true);
     }
 }

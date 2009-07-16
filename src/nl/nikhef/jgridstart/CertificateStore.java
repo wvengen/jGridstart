@@ -281,9 +281,6 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	} catch(NoSuchAlgorithmException e) {
 	    dst.delete();
 	    throw e;
-	} catch(PasswordCancelledException e) {
-	    dst.delete();
-	    throw e;
 	} catch (UnrecoverableKeyException e) {
 	    dst.delete();
 	    throw e;

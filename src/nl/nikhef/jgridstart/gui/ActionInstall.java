@@ -75,6 +75,13 @@ public class ActionInstall extends CertificateAction {
 
 	    if (!silent) {
 		// explain what'll happen in password dialog or option pane
+		// this redirects to the RequestWizard's install page for jGridStart
+		URLLauncher.performAction("viewrequest(3)", parent);
+		return;
+		
+		// An alternative implementation would be, though the explanation is
+		// a little brief.
+		/*
 		String message = 
 		    "You are about to install the selected certificate into your\n" +
 		    "web browser, so that you can access protected websites.\n\n" +
@@ -90,9 +97,10 @@ public class ActionInstall extends CertificateAction {
 			null, // no icon
 			options, options[0]);
 		if (ret!=JOptionPane.OK_OPTION) return;
+		*/
 
-		logger.finer("Action: "+getValue(NAME));
 	    }
+	    logger.finer("Action: "+getValue(NAME));
 	    
 	    // copy password to clipboard
 	    Transferable transPassw = new StringSelection(new String(pw));
