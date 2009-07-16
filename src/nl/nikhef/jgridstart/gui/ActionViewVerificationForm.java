@@ -14,13 +14,10 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import javax.swing.AbstractAction;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import nl.nikhef.jgridstart.CertificateSelection;

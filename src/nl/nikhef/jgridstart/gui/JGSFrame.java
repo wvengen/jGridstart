@@ -23,7 +23,6 @@ import javax.swing.SwingUtilities;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -32,13 +31,10 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.plaf.basic.BasicSliderUI.ActionScroller;
-
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.gui.util.URLLauncher;
-import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
@@ -98,6 +94,7 @@ public class JGSFrame extends JFrame {
 	new ActionViewCertificateList(this, certList, false);
 	new ActionChangeBrowser(this, selection);
 	new ActionRefresh(this, store) {
+	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
 		// update info pane as well; TODO move into ActionRefresh itself
@@ -169,6 +166,7 @@ public class JGSFrame extends JFrame {
      * 	
      * @return javax.swing.JMenuBar	
      */
+    @Override
     public JMenuBar getJMenuBar() {
 	if (jMenuBar == null) {
 	    JMenu menu;

@@ -7,7 +7,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -451,6 +450,7 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 	    }
 
 	    // button was pressed
+	    @SuppressWarnings("unchecked") // for mousetracklisteners
 	    public void actionPerformed(ActionEvent e) {
 		if (e.getSource() instanceof JButton) {
 		    String href = el.getAttribute("href");

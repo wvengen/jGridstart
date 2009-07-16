@@ -29,6 +29,7 @@ public class ActionChangeBrowser extends CertificateAction {
 	URLLauncher.addAction("changebrowser", this);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
 	try {
 	    IBrowsers b = BrowserFactory.getInstance();

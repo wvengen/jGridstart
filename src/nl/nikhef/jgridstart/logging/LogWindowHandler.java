@@ -116,6 +116,7 @@ public class LogWindowHandler extends Handler {
      * 
      * @param record the LogRecord object
      */
+    @Override
     public synchronized void publish(LogRecord record) {
 	String message = null;
 	// check if the record is loggable
@@ -134,10 +135,12 @@ public class LogWindowHandler extends Handler {
 	}
     }
 
+    @Override
     public void close() {
 	window.showInfo("logging handler closed");
     }
 
+    @Override
     public void flush() {
     }
     

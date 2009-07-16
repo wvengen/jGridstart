@@ -13,6 +13,7 @@ public class PasswordCacheTest extends TestCase {
     
     private PasswordCache cache = null;
     
+    @Override
     public void setUp() {
 	cache = PasswordCache.getInstance();
 	cache.setUI(PasswordCache.UI_NONE);

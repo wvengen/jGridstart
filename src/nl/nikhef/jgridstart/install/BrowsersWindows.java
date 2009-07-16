@@ -7,10 +7,6 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 import at.jta.Key;
 import at.jta.RegistryErrorException;
 import at.jta.Regor;

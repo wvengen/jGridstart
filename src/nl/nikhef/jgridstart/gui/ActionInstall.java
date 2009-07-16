@@ -7,10 +7,7 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.URLLauncher;
@@ -56,6 +53,7 @@ public class ActionInstall extends CertificateAction {
 	return PasswordGenerator.generatePronouncable(7);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
 	TempFileWriter pkcs = null;
 	CertificatePair cert = getCertificatePair();

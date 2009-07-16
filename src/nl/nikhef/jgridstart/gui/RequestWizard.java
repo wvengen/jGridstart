@@ -4,8 +4,6 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -333,6 +331,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	 * gui in the sense that a property is added to the TemplateWizard
 	 * and it is refreshed. This gives a template the opportunity to
 	 * change the display based on a property (e.g. a checkbox) */
+	@Override
 	protected void process(List<String> keys) {
 	    // process messages
 	    for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {

@@ -26,7 +26,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.swing.UIManager;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -220,6 +219,7 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
      * This also sets the current step to the first one if none is selected
      * as of yet (only when there are pages defined).
      */
+    @Override
     public void setVisible(boolean visible) {
 	// need to setup some stuff if no step selected
 	if (visible && step < 0 && pages.size() > 0)
@@ -317,6 +317,7 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
     }
     
 
+    @Override
     public void setBackground(Color c) {
 	super.setBackground(c);
 	if (pane!=null) pane.setBackground(c);

@@ -31,6 +31,7 @@ public class FileFilterSuffix extends FileFilter {
 	extensions = ext.split(",");
     }
 
+    @Override
     public boolean accept(File f) {
 	if (f.isDirectory())
 	    return false;
@@ -43,6 +44,7 @@ public class FileFilterSuffix extends FileFilter {
 	return false;
     }
 
+    @Override
     public String getDescription() {
 	String desc = description;
 	desc += " (";

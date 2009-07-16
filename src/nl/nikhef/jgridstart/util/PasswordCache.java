@@ -1,14 +1,6 @@
 package nl.nikhef.jgridstart.util;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -333,6 +325,7 @@ public class PasswordCache {
 	    timers.put(loc, t);
 	    logger.finest("Password timeout reset for "+loc);
 	}
+	@Override
 	public void run() {
 	    invalidate(loc);
 	}

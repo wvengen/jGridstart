@@ -36,26 +36,31 @@ public class PrivateFileWriter extends FileWriter {
 	return file;
     }
 
+    @Override
     public void write(char[] cbuf) throws IOException {
 	ensurePermissions();
 	super.write(cbuf);
     }
 
+    @Override
     public void write(char[] cbuf, int off, int len) throws IOException {
 	ensurePermissions();
 	super.write(cbuf, off, len);
     }
 
+    @Override
     public void write(int c) throws IOException {
 	ensurePermissions();
 	super.write(c);
     }
 
+    @Override
     public void write(String str) throws IOException {
 	ensurePermissions();
 	super.write(str);
     }
 
+    @Override
     public void write(String str, int off, int len) throws IOException {
 	ensurePermissions();
 	super.write(str, off, len);

@@ -17,6 +17,7 @@ public class ActionShowDetails extends CertificateAction {
 	URLLauncher.addAction("showdetails", this);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
 	CertificatePair cert = getCertificatePair();
 	boolean curVal = Boolean.valueOf(cert.getProperty("view.showdetails"));

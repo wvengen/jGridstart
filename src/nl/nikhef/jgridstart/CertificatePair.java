@@ -60,7 +60,6 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PasswordFinder;
 
 /** Class containing everything related to a grid certificate.
  * <p>
@@ -117,13 +116,14 @@ public class CertificatePair extends Properties implements ItemSelectable {
     protected CertificatePair() {
 	super();
 	Runtime.getRuntime().addShutdownHook(new Thread() {
-	   public void run() {
-	       if (path!=null) {
-		   try {
-		       store();
-		   } catch (IOException e) { }
-	       }
-	   }
+	    @Override
+	    public void run() {
+		if (path!=null) {
+		    try {
+			store();
+		    } catch (IOException e) { }
+		}
+	    }
 	});
     }
 
@@ -305,6 +305,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
     }
 
     /** Reset the contents to this object to the empty state */
+    @Override
     public void clear() {
 	path = null;
 	cert = null;
@@ -959,7 +960,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return getPrincipalValue(id, false);
     }
 
-
+    @Override
     public String toString() {
 	try {
 	    if (getCertificate() == null && getCSR() == null)

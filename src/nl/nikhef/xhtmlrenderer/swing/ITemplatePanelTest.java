@@ -64,10 +64,12 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
     /** Whether showFrame() is called for the first time, see createPanel() */
     private boolean isFirstTime = true;
     
+    @Override
     protected void setUp() throws IOException {
 	tester = new ComponentTester();
 	LogManager.getLogManager().readConfiguration(Main.class.getResourceAsStream("/logging.properties"));
     }
+    @Override
     protected void tearDown() {
 	// Default JUnit test runner keeps references to Tests for its
 	// lifetime, so TestCase fields won't be GC'd for the lifetime of the

@@ -13,7 +13,6 @@ import abbot.finder.matchers.NameMatcher;
 
 import nl.nikhef.jgridstart.gui.util.TemplateWizard.PageListener;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
-import nl.nikhef.xhtmlrenderer.swing.ITemplatePanelTest;
 import nl.nikhef.xhtmlrenderer.swing.TemplateDocument;
 
 public class TemplateWizardTest extends TemplateButtonPanelTest {

@@ -1,7 +1,6 @@
 package nl.nikhef.jgridstart.gui;
 
 import java.awt.event.ActionEvent;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
@@ -36,6 +35,7 @@ public class ActionMakeDefault extends CertificateAction {
 	}
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
 	CertificatePair cert = selection.getCertificatePair();
 	try {

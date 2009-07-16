@@ -17,6 +17,7 @@ public class ActionRevoke extends CertificateAction {
 	URLLauncher.addAction("revoke", this);
     }
     
+    @Override
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
 	String message = 

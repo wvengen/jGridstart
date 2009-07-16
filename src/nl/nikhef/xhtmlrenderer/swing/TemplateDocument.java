@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.internal.matchers.SubstringMatcher;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -34,7 +33,8 @@ import org.xml.sax.SAXException;
  * When the attribute <code>c</code> is present on any Node, the contents of
  * that node is replaced by the value of the attribute. The value can be XHTML
  * itself.<br>
- * Example: {@code <p>Please look at <a href="${url}" c="the url ${url}"/> for details.</p>}<br>
+ * Example:
+ * <code>&lt;p&gt;Please look at &lt;a href="${url}" c="the url ${url}"/&gt; for details.&lt;/p&gt;</code><br>
  * This will make a link to the URL specified by property <code>url</code> with 
  * the description "<i>the url ...</i>" (with the dots replaced by the actual url).
  * <p>
@@ -63,17 +63,18 @@ import org.xml.sax.SAXException;
  *   <li><code><i>string1</i> != <i>string2</i></code> to check if two strings are unequal (whitespace is trimmed)</li>
  * </ul>
  * <br>
- * Example: {@code <p if="${url} and ${desc}">Visit <a href="${url}" c="${desc}"/></p>}<br>
+ * Example:
+ * <code>&lt;p if="${url} and ${desc}"&gt;Visit &lt;a href="${url}" c="${desc}"/&gt;&lt;/p&gt;</code><br>
  * to only show a link with description if both relevant variables are defined.
  * <p>
  * <strong>Replacement with conditional</strong>
  * <p>
  * It is also possible to use a conditional with a replacement by using
- * {@code ${(<expression>)}} as a variable in an attribute. This can be used, for example,
- * to change the class of an element based on whether a variable is set or not:
- * {@code <p class="has-${(${foo})}">yeah</p>}, which can be styled by css class
- * {@code has-true} when {@code foo} is set, or {@code has-false} when {@code foo}
- * is unset.
+ * <code>${(&lt;expression&gt;)}</code> as a variable in an attribute. This can be
+ *  used, for example, to change the class of an element based on whether a variable
+ * is set or not: <code>&lt;p class="has-${(${foo})}"&gt;yeah&lt;/p&gt;</code>, which
+ * can be styled by css class {@code has-true} when {@code foo} is set, or
+ * {@code has-false} when {@code foo} is unset.
  * <p>
  * <strong>Other remarks</strong>
  * <p>

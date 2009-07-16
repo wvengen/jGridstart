@@ -94,35 +94,42 @@ public class ArrayListModel<T> extends ArrayList<T> implements ListModel {
     /*
      * Overrides just to call listeners
      */
+    @Override
     public boolean add(T o) {
 	boolean r = super.add(o);
 	if (r) notifyAdded(getSize()-1, getSize()-1);
 	return r;
     }
+    @Override
     public void add(int index, T o) {
 	super.add(index, o);
 	notifyAdded(index, index);
     }
+    @Override
     public T remove(int index) {
 	T o = super.remove(index);
 	notifyRemoved(index, index);
 	return o;
     }
+    @Override
     public boolean remove(Object o) {
 	int index = indexOf(o);
 	if (index<0) return false;
 	remove(index);
 	return true;
     }
+    @Override
     public void removeRange(int from, int to) {
 	super.removeRange(from, to);
 	notifyRemoved(from, to);
     }
+    @Override
     public void clear() {
 	int size = getSize();
 	super.clear();
 	notifyRemoved(0, size-1);
     }
+    @Override
     public T set(int index, T el) {
 	T o = super.set(index, el);
 	notifyChanged(index);

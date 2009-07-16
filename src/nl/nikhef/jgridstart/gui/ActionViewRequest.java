@@ -6,7 +6,6 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.gui.ActionViewVerificationForm.VerificationDialog;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
@@ -40,6 +39,7 @@ public class ActionViewRequest extends CertificateAction {
 	this.defaultPage = defaultPage;
     }
     
+    @Override
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
 	TemplateWizard dlg = null;
