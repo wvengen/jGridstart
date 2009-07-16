@@ -4,6 +4,8 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -186,8 +188,13 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	
 	// generate installation password, update default browser
 	if (curPage==3) {
-	    // set browser properties
 	    try {
+		if (oldPage!=3) {
+		    // generate export password, unless it is a reload (!)
+		    data().setProperty("install.passwd", String.valueOf(ActionInstall.generatePassword()));
+		    data().setProperty("install.passwd.volatile", "true");
+		}
+		// set browser properties
 		System.setProperty("install.browser", BrowserFactory.getInstance().getDefaultBrowser());
 		String browserid = data().getProperty("install.browser");
 		if (browserid==null) browserid = System.getProperty("install.browser");
@@ -209,6 +216,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    } catch (BrowserNotAvailableException e) {
 		// should not happen as we query default browser
 		ErrorMessage.internal(this, e);
+	    } catch (Exception e) {
+		ErrorMessage.error(this, "Certificate installation failed", e);
 	    }
 	}
 
@@ -239,7 +248,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	if (step==2 && cert!=null && Boolean.valueOf(cert.getProperty("cert")))
 	    classes += " wizard-done";
 	// step 3: done if certificate installed previously
-	if (step==3 && cert!=null && cert.getProperty("cert.installed")!=null)
+	if (step==3 && cert!=null && cert.getProperty("install.done")!=null)
 	    classes += " wizard-done";
 	return (classes=="" ? "<li>" : "<li class='"+classes+"'>") + getDocumentTitle(step) + "</li>\n";
     }

@@ -17,6 +17,7 @@ import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.install.BrowserFactory;
 import nl.nikhef.jgridstart.util.PasswordCache;
+import nl.nikhef.jgridstart.util.PasswordGenerator;
 import nl.nikhef.jgridstart.util.TempFileWriter;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
@@ -45,20 +46,19 @@ public class ActionInstall extends CertificateAction {
 	}
     }
     
-    /** Generate a random password suitable for export 
+    /** Generate a random password suitable for export
+     * 
      * @throws NoSuchProviderException 
      * @throws NoSuchAlgorithmException */
-    public char[] generatePassword() throws NoSuchAlgorithmException, NoSuchProviderException {
-	// generate temporary password used to import in browser and write pkcs file
-	SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-	char[] pw = new char[7]; // TODO Illegal key size exception if larger password :(
-	for (int i=0; i<pw.length; i++) pw[i] = (char)(random.nextInt(128-32)+32);
-	return pw;
+    public static char[] generatePassword()
+    		throws NoSuchAlgorithmException, NoSuchProviderException {
+	// maximum length is 7 if no crypto upgrade package installed
+	return PasswordGenerator.generatePronouncable(7);
     }
 
     public void actionPerformed(ActionEvent e) {
 	TempFileWriter pkcs = null;
-	CertificatePair cert = null;
+	CertificatePair cert = getCertificatePair();
 	
 	try {
 	    // parse arguments
@@ -91,9 +91,7 @@ public class ActionInstall extends CertificateAction {
 			options, options[0]);
 		if (ret!=JOptionPane.OK_OPTION) return;
 
-		cert = selection.getCertificatePair();
 		logger.finer("Action: "+getValue(NAME));
-
 	    }
 	    
 	    // copy password to clipboard
@@ -108,10 +106,14 @@ public class ActionInstall extends CertificateAction {
 	    PasswordCache.getInstance().setAlwaysAskForEncrypt(oldAsk);
 	    // now install and cleanup
 	    pkcs.close(); // required for Windows to avoid "being used by another process" error
-	    BrowserFactory.getInstance().installPKCS12(pkcs.getFile());
+	    if (cert.getProperty("install.browser")!=null)
+		BrowserFactory.getInstance().installPKCS12(cert.getProperty("install.browser"), pkcs.getFile());
+	    else
+		BrowserFactory.getInstance().installPKCS12(pkcs.getFile());
 	    pkcs=null; // to avoid deleting it since it still may be needed during install
 	               // it is deleted anyway on program exit
- 	    
+ 	    cert.setProperty("install.done", "true");
+	    
 	} catch (PasswordCancelledException e1) {
 	    // do nothing
 	} catch (Exception e1) {
