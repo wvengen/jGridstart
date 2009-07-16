@@ -340,6 +340,9 @@ public class PasswordCache {
     
     /** user cancelled password entry */
     public static class PasswordCancelledException extends IOException {
+	public PasswordCancelledException() {
+	    super();
+	}
 	@Override
 	public String toString() {
 	    return "Password request was cancelled";
