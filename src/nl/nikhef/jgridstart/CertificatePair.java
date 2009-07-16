@@ -187,7 +187,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		else return "true";
 	    if (key.equals("subject"))
 		if (getCertificate()==null && getCSR()==null) return null;
-		else return getSubjectPrincipalValue("x-full");
+		else return getSubjectPrincipalValue("x-full-dn");
 	    if (key.startsWith("subject."))
 		return getSubjectPrincipalValue(key.substring(8));
 	    if (key.equals("issuer"))
@@ -619,7 +619,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	// functionally based on
 	// org.globus.tools.GridCertRequest.genCertificateRequest()
 	
-	logger.finer("Generating certificate request to "+dst);
+	String subject = p.getProperty("subject");
+	logger.finer("Generating certificate request for \""+subject+"\" to "+dst);
 
 	CertificatePair cert = new CertificatePair();
 	cert.path = dst;
@@ -627,7 +628,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	String sigAlgName = "SHA1WithRSA";
 	String keyAlgName = "RSA";
 
-	X509Name name = new X509Name(p.getProperty("subject"));
+	X509Name name = new X509Name(subject);
 
 	// Generate new key pair
 	KeyPairGenerator keygen = KeyPairGenerator.getInstance(keyAlgName);
@@ -933,8 +934,10 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * <dl>
      *   <dt>{@code x-email}</dt>
      *       <dd>email address, one of the several fields</dd>
-     *   <dt>x-full</dt>
+     *   <dt>{@code x-full}</dt>
      *       <dd>string of the whole subject or issuer, parts separated by {@code '/'}</dd>
+     *   <dt>{@code x-full-dn}</dt>
+     *       <dd>string of the whole subject or issuer, parts separated by {@code ','}</dd>
      * </dl>
      * 
      * @param id name as present in X509Name.DefaultLookup
@@ -949,6 +952,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    return getPrincipalValue(X509Name.E, where);
 	} else if (id.equals("x-full")) {
 	    return getPrincipalValue((DERObjectIdentifier)null, where);
+	} else if (id.equals("x-full-dn")) {
+	    return getPrincipalValue((DERObjectIdentifier)null, where).replace('/', ',').substring(1);
 	}
 	// fallback to X509Name definition
 	return getPrincipalValue((DERObjectIdentifier)X509Name.DefaultLookUp.get(id), where);	

@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
@@ -36,6 +37,21 @@ public class FileUtils {
 		    in.getAbsolutePath(), out.getAbsolutePath()};
 	    return Exec(cmd) == 0;
 	}
+    }
+    
+    /**
+     * Return the contents of a text file as String
+     */
+    public static String readFile(File file) throws IOException {
+	String s = System.getProperty("line.separator");
+	BufferedReader r = new BufferedReader(new FileReader(file));
+	StringBuffer buf = new StringBuffer();
+	String line;
+	while ( (line = r.readLine() ) != null) {
+	    buf.append(line);
+	    buf.append(s);
+	}
+	return buf.toString();
     }
 
     /**

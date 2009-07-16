@@ -53,8 +53,10 @@ public class CertificateRequest {
 	subject += ", O=users";
 	subject += ", O=" + p.getProperty("org");
 	subject += ", CN=" + p.getProperty("givenname").trim() +
-	" " + p.getProperty("surname").trim();
+			" " + p.getProperty("surname").trim();
+	// simulate x-full propery from certificate to generate request
 	p.setProperty("subject", subject);
+	p.setProperty("subject.volatile", "true");
     }
     
     /** Lock fields on which the request is dependent.

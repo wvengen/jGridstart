@@ -87,6 +87,7 @@ public class JGSFrame extends JFrame {
 	new ActionImport(this, store, selection);
 	new ActionInstall(this, selection);
 	//new ActionRevoke(this, selection);
+	new ActionRenew(this, store, selection);
 	new ActionExport(this, selection);
 	new ActionMakeDefault(this, store, selection);
 	new ActionShowDetails(this, selection) {
@@ -200,7 +201,7 @@ public class JGSFrame extends JFrame {
 	    menu.setMnemonic('A');
 	    menu.add(new JMenuItem(getAction("viewrequest")));
 	    menu.add(new JMenuItem(getAction("install")));
-	    menu.add(new JMenuItem("Renew certificate...", 'N')).setEnabled(false);
+	    menu.add(new JMenuItem(getAction("renew")));
 	    //menu.add(new JMenuItem(getAction("revoke")));
 	    menu.addSeparator();
 	    menu.add(new JMenuItem(getAction("export")));

@@ -3,6 +3,7 @@ package nl.nikhef.jgridstart;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
@@ -10,6 +11,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
@@ -20,6 +22,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
+
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
+import org.bouncycastle.mail.smime.SMIMEException;
+import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 
 import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PEMReader;
@@ -333,6 +344,48 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	    dst.delete();
 	    throw e;
 	}
+    }
+    /** Renew a certificate.
+     * <p>
+     * This generates a new certificate request in the store, but S/MIME
+     * signs it as well.
+     * 
+     * @throws IOException 
+     * @throws PasswordCancelledException 
+     * @throws IllegalArgumentException 
+     * @throws SignatureException 
+     * @throws NoSuchProviderException 
+     * @throws NoSuchAlgorithmException 
+     * @throws InvalidKeyException 
+     * @throws MessagingException 
+     * @throws SMIMEException 
+     */
+    public CertificatePair generateRenewal(CertificatePair oldCert) throws IllegalArgumentException, PasswordCancelledException, IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, MessagingException, SMIMEException {
+	// ask for private key first, cancel would skip everything
+	PrivateKey oldKey = oldCert.getPrivateKey();
+	
+	// generate request
+	CertificatePair newCert = generateRequest(oldCert);
+	
+	// create S/MIME message from it
+	MimeBodyPart data = new MimeBodyPart();
+	data.setText(FileUtils.readFile(newCert.getCSRFile()));
+	// add signature
+	SMIMESignedGenerator gen = new SMIMESignedGenerator();
+	gen.addSigner(oldKey, oldCert.getCertificate(), SMIMESignedGenerator.DIGEST_SHA1);
+	// TODO gen.addCertificates() ?
+	MimeMultipart multipart = gen.generate(data, "BC");
+	
+	MimeMessage msg = new MimeMessage(Session.getDefaultInstance(System.getProperties()));
+	msg.setContent(multipart, multipart.getContentType());
+	msg.saveChanges();
+	
+	// and store it as new CSR
+	FileOutputStream out = new FileOutputStream(newCert.getCSRFile());
+	msg.writeTo(out);
+	out.close();
+	
+	return newCert;
     }
 
     /** Return the default certificate.<p>
