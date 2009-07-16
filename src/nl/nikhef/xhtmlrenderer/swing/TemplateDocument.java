@@ -38,6 +38,12 @@ import org.xml.sax.SAXException;
  * This will make a link to the URL specified by property <code>url</code> with 
  * the description "<i>the url ...</i>" (with the dots replaced by the actual url).
  * <p>
+ * It is also possible extract a portion of a string by square bracket notation. For example,
+ * when property <code>os.name</code> is equal to <code>Windows NT</code>, one can retrieve
+ * the first three characters by referencing the variable with <code>${os.name[0:3]}</code>.
+ * If the first number is omitted, zero is used; if the last number is omitted, the length
+ * of the string is used.
+ * <p>
  * <strong>Conditionals</strong>
  * <p>
  * When the attribute <code>if</code> is present on any Node, that node is
