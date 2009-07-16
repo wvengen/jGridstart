@@ -59,7 +59,6 @@
 	<property name="dep.bouncycastle" location="${dir.thirdparty}/bouncycastle/bcprov-jdk14-143.jar"/>
 	<property name="dep.bouncycastle.smime" location="${dir.thirdparty}/bouncycastle/bcmail-jdk14-143.jar"/>
 	<property name="dep.javamail" location="${dir.thirdparty}/bouncycastle/mail-1.4.1.jar"/>
-	<property name="dep.activation" location="${dir.thirdparty}/bouncycastle/activation.jar"/>
 	<property name="dep.cli" location="${dir.thirdparty}/commons-cli/commons-cli-1.2.jar"/>
 	<property name="dep.junit" location="${dir.thirdparty}/junit/junit-4.5.jar"/>
 	<property name="dep.abbot" location="${dir.thirdparty}/junit/abbot.jar"/>
@@ -68,12 +67,17 @@
 	<property name="dep.itext" location="${dir.thirdparty}/flyingsaucer/iText-2.0.8.jar"/>
 	<property name="dep.winregistry" location="${dir.thirdparty}/winregistry/WinRegistry-3.4.jar"/>
 	<property name="dep.apiviz" location="${dir.thirdparty}/javadoc/apiviz-1.3.0.GA.jar"/>
+	<!-- activation framework is present in Java 1.6 and we don't use
+	     it apart for resolving; so we can omit it when compiling there
+	     to avoid ProGuard Warnings (which are fatal) -->
+	<condition property="dep.activation" value="${dir.thirdparty}/bouncycastle/activation.jar">
+		<not><available classname="javax.activation.DataHandler"/></not>
+  	</condition>
 	<path id="path.dependencies">
 		<!-- TODO use jdk13 library versions and test -->
 		<pathelement location="${dep.bouncycastle}"/>
 		<pathelement location="${dep.bouncycastle.smime}"/>
 			<pathelement location="${dep.javamail}"/>
-			<pathelement location="${dep.activation}"/>
 		<pathelement location="${dep.cli}"/>
 		<pathelement location="${dep.junit}"/>
 		<pathelement location="${dep.abbot}"/>
@@ -154,15 +158,13 @@
 			     package reference javax.mail which we don't want to include as well (so that
 			     ProGuard can resolve them). Solution: only include part of the smime package.
 			     In addition to this, certificate renewal also requires S/MIME mail stuff.
-			     The activation framework doesn't appear to be needed during run, but ProGuard
-			     needs it to resolve its references, so we include it anyway (it's small). -->
+			     The activation framework doesn't appear to be needed during run -->
 			<zipfileset src="${dep.bouncycastle.smime}">
 				<include name="org/bouncycastle/cms/**"/>
 				<include name="org/bouncycastle/mail/smime/*.class/"/>
 				<include name="org/bouncycastle/mail/smime/util/*.class/"/>
 			</zipfileset>
 			<zipfileset src="${dep.javamail}" includes="**/*.class"/>
-			<zipfileset src="${dep.activation}" includes="**/*.class"/>
 		</jar>
 		<!-- minimize jar file; skipnonpubliclibraryclasses needed for java1.6 -->
 		<proguard obfuscate="false" skipnonpubliclibraryclasses="false">
@@ -174,6 +176,7 @@
 			<libraryjar file="${dep.bouncycastle}"/>
 			<libraryjar file="${dep.junit}"/>
 			<libraryjar file="${dep.abbot}"/>
+			<libraryjar file="${dep.activation}"/>
 			<keepclasseswithmembers access="public">
 				<method access="public static" type="void"
 					name="main" parameters="java.lang.String[]"/>
