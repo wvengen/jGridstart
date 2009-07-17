@@ -15,13 +15,33 @@ public class CertificateRequest {
     /** Set default properties based on an amount of guessing to aid
      * the user in filling in the form.
      * <p>
-     * Currently this looks at system properties
-     * {@literal jgridstart.defaults.*} and sets defaults from these
-     * if not yet set.
+     * First properties are copied from its parent, if any. If the parent
+     * has no such property, it looks at system properties
+     * {@literal jgridstart.defaults.*} and sets defaults from these.
+     * If a property already exists, it is not overwritten.
+     * <p>
+     * The parent is meant for renewing certificates, where most properties
+     * need to be copied from the parent certificate, but not all.
      * 
      * @param p Properties to set
+     * @param parent Parent Properties to copy from 
      */
-    static public void preFillData(Properties p) {
+    static public void preFillData(Properties p, Properties parent) {
+	// copy relevant values from parent, if any
+	if (parent!=null) {
+	    for (Iterator<Entry<Object, Object>> it = parent.entrySet().iterator(); it.hasNext(); ) {
+		Entry<Object, Object> entry = it.next();
+		String name = (String)entry.getKey();
+		String value = (String)entry.getValue();
+		// filter out state properties that shouldn't be copied
+		if (name.equals("request.submitted")) continue;
+		if (name.equals("request.processed")) continue;
+		if (name.equals("install.done")) continue;
+		// copy if unset
+		if (!p.containsKey(name))
+		    p.setProperty(name, value);
+	    }
+	}
 	// read defaults from system properties
 	for (Iterator<Entry<Object, Object>> it = System.getProperties().entrySet().iterator(); it.hasNext(); ) {
 	    Entry<Object, Object> entry = it.next();
@@ -33,6 +53,16 @@ public class CertificateRequest {
 		    p.setProperty(name.substring(defaultsPrefix.length()), value);
 	    }
 	}
+    }
+    /** Set default properties to aid user in filling in the form.
+     * <p>
+     * This is equal to {@link #preFillData(Properties, Properties) preFillData(Properties, null)}.
+     * 
+     * @see #preFillData(Properties, Properties)
+     * @param p Properties to set
+     */
+    static public void preFillData(Properties p) {
+	preFillData(p);
     }
     
     /** Complete data entered before creating a certificate signing

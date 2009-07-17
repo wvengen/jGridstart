@@ -342,9 +342,9 @@ public class JGSFrame extends JFrame {
 	}
 	boolean certPresent = false;
 	try {
-	    certPresent = c!=null && c.getCertificate()==null;
+	    certPresent = (c!=null && c.getCertificate()!=null);
 	} catch (IOException e) { }
-	certInfoButtons.get("viewrequest").setVisible(certPresent);
+	certInfoButtons.get("viewrequest").setVisible(c!=null && !certPresent);
 	certInfoButtons.get("install").setVisible(certPresent);
 	//certInfoButtons.get("revoke").setVisible(c!=null);
 	

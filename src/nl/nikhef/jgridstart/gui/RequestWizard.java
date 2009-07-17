@@ -38,6 +38,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     protected CertificateSelection selection = null;
     /** the resulting CertificatePair, or null if not yet set */
     protected CertificatePair cert = null;
+    /** the parent CertificatePair in case of a renewal */
+    protected CertificatePair certParent = null;
     /** working thread */
     protected SwingWorker<Void, String> worker = null;
 
@@ -68,6 +70,22 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	this.cert = cert;
 	this.selection = sel;
 	setData(cert);
+    }
+    /** Certificate renewal */
+    public RequestWizard(Frame parent, CertificateStore store, CertificatePair certParent, CertificateSelection sel) {
+	super(parent);
+	this.store = store;
+	this.certParent = certParent;
+	this.selection = sel;
+	setData(new Properties());
+    }
+    /** Certificate renewal */
+    public RequestWizard(Dialog parent, CertificateStore store, CertificatePair certParent, CertificateSelection sel) {
+	super(parent);
+	this.store = store;
+	this.certParent = certParent;
+	this.selection = sel;
+	setData(new Properties());
     }
     @Override
     protected void initialize() {
@@ -106,13 +124,23 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     @Override
     public void setData(Properties p) {
 	super.setData(p);
-	// help the user by prefilling some elements
-	CertificateRequest.preFillData(p);
-	// set static properties for the forms
-	if (cert==null)
-	    data().setProperty("wizard.title.html", "Request a new certificate");
-	else
-	    data().setProperty("wizard.title.html", "Certificate Request");
+	// also set static properties for the forms
+	// initialize properties when new request / renewal
+	if (cert==null) {
+	    // help the user by prefilling some elements
+	    CertificateRequest.preFillData(p, certParent);
+	    if (certParent==null) {
+	    	data().setProperty("wizard.title", "Request a new certificate");
+	    } else {
+		// cannot edit fields for renewal
+		CertificateRequest.postFillDataLock(p);
+    	    	data().setProperty("wizard.title", "Renew a certificate");
+	    }
+	} else {
+	    data().setProperty("wizard.title", "Certificate Request");
+	}
+	data().setProperty("wizard.title.volatile", "true");
+	data().setProperty("wizard.title.html", data().getProperty("wizard.title"));
 	data().setProperty("wizard.title.html.volatile", "true");
 	data().setProperty("organisations.html.options", Organisation.getAllOptionsHTML(cert));
 	data().setProperty("organisations.html.options.volatile", "true");
@@ -171,6 +199,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	}
 	
 	// say "Close" when a certificate is present because everything is done by then
+	// TODO this won't work for renewals
 	try {
 	    if (cert!=null && cert.getCertificate()!=null)
 		cancelAction.putValue(AbstractAction.NAME, "Close");

@@ -345,11 +345,13 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    String key = (String)en.nextElement();
 	    if (Boolean.valueOf(p.getProperty(key+".volatile")))
 		propsToRemove.add(key);
+	    // remove "*.volatile" entries, also stray ones without a property
+	    if (key.endsWith(".volatile"))
+		propsToRemove.add(key);
 	}
 	for (Iterator<String> it = propsToRemove.iterator(); it.hasNext(); ) {
 	    String key = it.next();
 	    p.remove(key);
-	    p.remove(key+".volatile");
 	}
 	// and store with OutputStream for Java 1.5 and below
 	p.store(new PrivateFileWriter(getPropertiesFile()).getOutputStream(),
