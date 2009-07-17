@@ -390,12 +390,14 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 
     /** {@inheritDoc}
      * <p>
-     * Also calls the {@link PageListener#pageEnter} handler so data
-     * updated there is refreshed as well.
+     * Actually calls {@link #setStep} so that the {@link PageListener}
+     * and other hooks are properly updated.
+     * 
+     * @return always returns {@code true}
      */
     public boolean refresh() {
-	if (handler!=null) handler.pageEnter(this, step, step);
-	return pane.refresh();
+	setStep(step);
+	return true;
     }
 
     public void reloadDocument(Document doc) {
