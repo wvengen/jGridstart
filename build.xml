@@ -73,7 +73,7 @@
 	     lower versions. This is a little trick with ProGuard's jarfilter -->
 	<property name="dep.activation" location="${dir.thirdparty}/bouncycastle/activation.jar"/>
 	<condition property="dep.activation.proguardfilter" value="(!**)">
-		<not><available classname="javax.activation.DataHandler"/></not>
+		<available classname="javax.activation.DataHandler"/>
   	</condition>
 	<path id="path.dependencies">
 		<!-- TODO use jdk13 library versions and test -->
@@ -168,11 +168,11 @@
 			<zipfileset src="${dep.javamail}" includes="**/*.class"/>
 		</jar>
 	</target>
-
+	
 	<!--
-	  - Distribution creation target
+	  - ProGuard-minimised JAR creation
 	  -->
-	<target name="jar" depends="keystore,jar.large">
+	<target name="jar.small" depends="jar.large">
 		<!-- minimize jar file; skipnonpubliclibraryclasses needed for java1.6 -->
 		<proguard obfuscate="false" skipnonpubliclibraryclasses="false">
 			<injar file="${dir.dist}/${target.name}.large.jar"/>
@@ -195,8 +195,15 @@
 			<keepclasseswithmembers access="public" name="org.xhtmlrenderer.util.Configuration">
 				<method name="*"/>
 			</keepclasseswithmembers>
-		</proguard>				
-		<delete file="${dir.dist}/${target.name}.large.jar"/>
+		</proguard>
+	</target>
+
+	<!--
+	  - Distribution creation target
+	  -->
+	<target name="dist" depends="keystore,jar.large">
+		<!-- copy large/small jar to distribution -->
+		<copy file="${dir.dist}/${target.name}.large.jar" tofile="${dir.dist}/${target.name}.jar"/>
 		<!-- sign it, required for java web start -->
 		<signjar keystore="${keystore.file}" jar="${dir.dist}/${target.name}.jar"
 			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
@@ -213,7 +220,6 @@
 		<!-- copy bouncycastle jar to deployment area -->
 		<copy file="${dep.bouncycastle}" todir="${dir.dist}"/>
 	</target>
-	<target name="dist" depends="jar"/>
 
 	<!--
 	  - Cleaning target
