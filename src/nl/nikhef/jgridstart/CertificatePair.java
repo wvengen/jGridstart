@@ -227,8 +227,10 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		return DateFormat.getDateInstance().format(getCertificate().getNotAfter());
 	    }
 	    if (key.equals("state.icon")) {
+		if (Boolean.valueOf(getProperty("cert")) && !Boolean.valueOf(getProperty("valid")))
+		    return "expired";
 		if (!Boolean.valueOf(getProperty("cert")) && Boolean.valueOf(getProperty("request")))
-			return "warning";
+		    return "warning";
 		if (Boolean.valueOf(getProperty("valid")))
 		    return "valid";
 		// TODO if (Boolean.valueOf(getProperty(""))) return "renew";
@@ -282,6 +284,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    String state = getProperty(key);
 	    if (state == "valid")
 		return "<b color='green'>&#x2713;</b>";
+	    if (state == "expired")
+		return "<b color='gray'>&#x25cf;</b>";
 	    else if (state == "warning")
 		return "<font size='+1'><b color='#cc9900'>!</b></font>";
 	    else
