@@ -17,7 +17,7 @@
 	<property name="target.jvmversion" value="1.5"/>
 	
 	<!-- Java Web Start base url (for use in JNLP files) -->
-	<property name="wwwbase" value="http://www.nikhef.nl/~wvengen/jgridstart03b/"/>
+	<property name="wwwbase" value="http://www.nikhef.nl/~wvengen/jgridstart-devel/"/>
 	
 	<!-- location of source files -->
 	<property name="dir.src" location="src"/>
