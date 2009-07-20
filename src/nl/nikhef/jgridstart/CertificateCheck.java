@@ -51,6 +51,7 @@ public class CertificateCheck {
     public void check() throws CertificateCheckException {
 	checkAccessPath();
 	checkPrivateKey();
+	checkCSR();
 	checkCertificate();
     }
     
@@ -111,6 +112,7 @@ public class CertificateCheck {
      */
     protected void checkCertificate() throws CertificateCheckException {
 	File f = cert.getCertFile();
+	// certificate request must exist when no certificate is present
 	if (!f.exists())
 	    return;
 	if (!f.isFile())
@@ -121,6 +123,34 @@ public class CertificateCheck {
 	try {
 	    if (cert.getCertificate() == null)
 	        fail("Certificate file contains no certificate", f);
+	} catch (IOException e) {
+	    throw new CertificateCheckException(e);
+	}
+    }
+    
+    /** Check the certificate signing request (CSR).
+     * <p>
+     * This is only checked if the certificate does not exist, since
+     * only then is the CSR relevant.
+     */
+    protected void checkCSR() throws CertificateCheckException {
+	File f = cert.getCSRFile();
+	// certificate request must only exist when no certificate is present
+	try {
+	    if (cert.getCertificate()!=null) 
+	    	return;
+	} catch(IOException e) { /* need to check CSR as well */ }
+
+	if (!f.exists())
+	    fail("Certificate nor certificate signing request found", f);
+	if (!f.isFile())
+	    fail("Certificate signing request is not a file", f);
+	if (!f.canRead())
+	    fail("Certificate signing request cannot be read", f);
+	// check if certificate was loaded or can be loaded
+	try {
+	    if (cert.getCSR() == null)
+	        fail("Certificate signing request file contains no request", f);
 	} catch (IOException e) {
 	    throw new CertificateCheckException(e);
 	}

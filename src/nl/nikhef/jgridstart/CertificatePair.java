@@ -325,12 +325,17 @@ public class CertificatePair extends Properties implements ItemSelectable {
     }
 
     /** Load a certificate from a directory */
-    protected void load(File f) throws IOException, CertificateCheckException {
+    protected void load(File f) throws IOException {
 	clear();
 	path = f;
 
 	// make sure it's ok
-	check(false);
+	try {
+	    check(false);
+	} catch(CertificateCheckException e) {
+	    setProperty("state.message", e.getMessage());
+	    setProperty("state.message.volatile", "true");
+	}
 
 	// read additional properties, not fatal if not present
 	if (getPropertiesFile().exists()) {
@@ -863,8 +868,6 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		isCertificationRequestProcessed();
 	// TODO proper error reporting or don't catch
 	} catch (IOException e) {
-	    return false;
-	} catch (CertificateCheckException e) {
 	    return false;
 	}	
 	return true;

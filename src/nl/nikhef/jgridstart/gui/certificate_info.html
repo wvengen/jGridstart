@@ -5,16 +5,24 @@
 </head>
 <body class="infopane">
 	<h1>Certificate of <span c="${subject.cn}"/></h1>
-	<div if="!${cert}">
-	  <p class="topinfo-bad" if="!${request}">This certificate is incomplete, please consider removing it.</p>
-	  <div if="${request}">
-	    <p class="topinfo-ok" if="!${request.submitted}">Your request still <a href="action:viewrequest">needs to be submitted</a> to the certificate authority.</p>
-	    <div if="${request.submitted}">
-	      <p class="topinfo-ok" if="!${request.processed}">Your request is currently awaiting approval.</p>
-	      <p class="topinfo-ok" if="${request.processed}">Your request has been accepted, you can now <a href="action:viewrequest">retrieve your certificate</a>.</p>
-	    </div>
-	  </div>
-	</div>
+
+	<p class="topinfo-bad" if="!${cert} and !${request}">
+      This certificate is incomplete, please consider removing it.</p>
+
+    <p class="topinfo-ok" if="!${cert} and ${request} and !${request.submitted}">
+	  Your request still needs to be <a href="action:viewrequest">submitted</a> to the certificate authority.</p>
+
+    <p class="topinfo-ok" if="!${cert} and ${request} and !${request.submitted} and !${request.processed}">
+      Your request is currently awaiting approval (<a href="action:viewrequest">more...</a>).</p>
+	  
+    <p class="topinfo-ok" if="!${cert} and ${request} and !${request.submitted} and ${request.processed}">
+      Your request has been accepted, you can now <a href="action:install">retrieve your certificate</a>.</p>
+	  
+	<p class="topinfo-bad" if="${cert} and !${valid}">
+	  This certificate is expired, you can no longer use it.</p>
+
+    <!-- message from certificate check -->
+	<p class="topinfo-message" if="${state.message}" c="${state.message}"/>
 
 	<table summary="certificate details" cellpadding="3">
 		<tr>

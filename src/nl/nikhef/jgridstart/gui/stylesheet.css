@@ -23,6 +23,12 @@ th {
 	color: #660000;
 	font-weight: bold;
 }
+.topinfo-message {
+	font-size: 90%;
+	font-style: italic;
+	margin-top: -4ex;
+	padding-top: 0;
+}
 
 .valid {
 	color: green;
