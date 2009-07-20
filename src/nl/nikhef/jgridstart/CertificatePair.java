@@ -146,7 +146,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
      *     <dd>localised validity interval</dd>
      * <dt>cert, request</dt>
      *     <dd>is {@code true} when certificate respectively CSR are present</dd>
-     * <dt>subject, issuer, usage</dt>
+     * <dt>subject, issuer</dt>
+     *     <dd>dinstinguished name in certificate or else CSR, in slash-notation</dd>
+     * <dt>usage</dt>
      *     <dd>is {@code true} when child keys can be present</dd>
      * <dt>usage.any, usage.serverauth, usage.clientauth, usage.codesigning,
      *   <dd>usage.emailprotection, usage.timestamping, usage.ocspsigning</dt>
@@ -187,21 +189,26 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		else return "true";
 	    if (key.equals("subject"))
 		if (getCertificate()==null && getCSR()==null) return null;
-		else return getSubjectPrincipalValue("x-full-dn");
+		else return getSubjectPrincipalValue("x-dn-slash");
 	    if (key.startsWith("subject."))
 		return getSubjectPrincipalValue(key.substring(8));
 	    if (key.equals("issuer"))
 		if (getCertificate()==null) return null;
-		else return "true";
+		else return getIssuerPrincipalValue("x-dn-slash");
 	    if (key.startsWith("issuer."))
 		return getIssuerPrincipalValue(key.substring(7));
 	    if (key.equals("org")) {
 		if (containsKey(key)) return super.getProperty(key);
 		if (getProperty("subject")==null) return null;
-		// return last defined organisation
+		// parse organisation from subject
+		Organisation org = Organisation._getFromCertificate(this);
+		if (org==null) return null;
+		return org.getProperty("id");
+		/*
 		// TODO doesn't work when organisation unit is involved; need to move to Organisation
 		String[] orgs = getProperty("subject.o").split(",\\s*");
 		return orgs[orgs.length-1];
+		*/
 	    }
 	    if (key.equals("modulus"))
 		if (getCertificate()!=null) return ((RSAPublicKey)getCertificate().getPublicKey()).getModulus().toString();
@@ -634,6 +641,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	String sigAlgName = "SHA1WithRSA";
 	String keyAlgName = "RSA";
 
+	// needs comma-notation, so convert if slash-notation
+	if (subject.trim().startsWith("/"))
+	    subject = subject.substring(1).replace('/', ',');
 	X509Name name = new X509Name(subject);
 
 	// Generate new key pair
@@ -940,10 +950,12 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * <dl>
      *   <dt>{@code x-email}</dt>
      *       <dd>email address, one of the several fields</dd>
-     *   <dt>{@code x-full}</dt>
-     *       <dd>string of the whole subject or issuer, parts separated by {@code '/'}</dd>
-     *   <dt>{@code x-full-dn}</dt>
-     *       <dd>string of the whole subject or issuer, parts separated by {@code ','}</dd>
+     *   <dt>{@code x-dn-slash} or {@code x-dn}</dt>
+     *       <dd>string of the whole subject or issuer distinguished name,
+     *           parts separated by {@code '/'}</dd>
+     *   <dt>{@code x-dn-comma}</dt>
+     *       <dd>string of the whole subject or issuer distinguished name,
+     *           parts separated by {@code ','}</dd>
      * </dl>
      * 
      * @param id name as present in X509Name.DefaultLookup
@@ -956,13 +968,13 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    if ((s=getPrincipalValue(X509Name.EmailAddress, where)) != null)
 		return s;
 	    return getPrincipalValue(X509Name.E, where);
-	} else if (id.equals("x-full")) {
+	} else if (id.equals("x-dn-comma")) {
 	    return getPrincipalValue((DERObjectIdentifier)null, where);
-	} else if (id.equals("x-full-dn")) {
+	} else if (id.equals("x-dn-slash")) {
 	    return getPrincipalValue((DERObjectIdentifier)null, where).replace('/', ',').substring(1);
 	}
 	// fallback to X509Name definition
-	return getPrincipalValue((DERObjectIdentifier)X509Name.DefaultLookUp.get(id), where);	
+	return getPrincipalValue((DERObjectIdentifier)X509Name.DefaultLookUp.get(id), where);
     }
     public String getSubjectPrincipalValue(String id) {
 	return getPrincipalValue(id, true);

@@ -62,14 +62,28 @@ public class Organisation extends Properties {
 	    organisations.get(keyParts[0]).setProperty(keyParts[1], allProps.getProperty(key));
 	}
     }
-    /** Returns the Organisation belonging to a CertificatePair, or null of not found.
-     *
+    /** Returns the Organisation belonging to a CertificatePair, or {@code null} of not found.
+     * <p>
+     * When the certificate property {@code org} is present, it returns that. Otherwise it
+     * parses the certificate's organisations and returns the most probable one.
+     * <p>
      * TODO check property and certificate subject are not out-of-sync
      */
     public static Organisation getFromCertificate(CertificatePair cert) {
 	// from direct property if set
 	if (cert.getProperty("org")!=null)
 	    return get(cert.getProperty("org"));
+	return _getFromCertificate(cert);
+    }
+
+    /** Returns the Organisation belonging to a CertificatePair, or {@code null} of not found.
+     * <p>
+     * This version always parses the certificate's organisations. Please don't use this
+     * version in your code, use {@link #getFromCertificate}; this method is present to avoid
+     * recursion in {@link CertificatePair#getProperty}.
+     */
+    public static Organisation _getFromCertificate(CertificatePair cert) {
+	if (organisations==null) readAll();
 	// else parse subject: find in certificate
 	// a weight is given for finding the most meaningful organisation
 	String sorg = cert.getProperty("subject.o");
@@ -82,7 +96,7 @@ public class Organisation extends Properties {
 		Organisation curorg = organisations.get(sorgs[i]);
 		int curweight = 0;
 		// calculate weight
-		if (!Boolean.valueOf(org.getProperty("signup")))
+		if (!Boolean.valueOf(curorg.getProperty("signup")))
 		    curweight -= 10;
 		// test if this organisation is a better match
 		if (curweight > weight) {

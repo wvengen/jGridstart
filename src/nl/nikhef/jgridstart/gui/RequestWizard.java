@@ -17,6 +17,8 @@ import org.jdesktop.swingworker.SwingWorker;
 import org.xhtmlrenderer.swing.BasicPanel;
 import org.xhtmlrenderer.swing.LinkListener;
 
+import com.sun.xml.internal.ws.util.CompletedFuture;
+
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateRequest;
 import nl.nikhef.jgridstart.CertificateSelection;
@@ -78,6 +80,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	this.certParent = certParent;
 	this.selection = sel;
 	setData(new Properties());
+	data().setProperty("renewal", "true");
     }
     /** Certificate renewal */
     public RequestWizard(Dialog parent, CertificateStore store, CertificatePair certParent, CertificateSelection sel) {
@@ -86,6 +89,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	this.certParent = certParent;
 	this.selection = sel;
 	setData(new Properties());
+	data().setProperty("renewal", "true");
     }
     @Override
     protected void initialize() {
@@ -128,15 +132,19 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	// initialize properties when new request / renewal
 	if (cert==null) {
 	    // help the user by prefilling some elements
-	    CertificateRequest.preFillData(p, certParent);
 	    if (certParent==null) {
+		CertificateRequest.preFillData(p, certParent);
 	    	data().setProperty("wizard.title", "Request a new certificate");
 	    } else {
+		// parse fields from dn if needed
+		CertificateRequest.completeData(certParent);
+		CertificateRequest.preFillData(p, certParent);
 		// cannot edit fields for renewal
 		CertificateRequest.postFillDataLock(p);
     	    	data().setProperty("wizard.title", "Renew a certificate");
 	    }
 	} else {
+	    CertificateRequest.completeData(cert);
 	    data().setProperty("wizard.title", "Certificate Request");
 	}
 	data().setProperty("wizard.title.volatile", "true");
@@ -161,6 +169,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		CertificateRequest.postFillDataLock(data());
 	}
 	
+	// make sure input fields for certificate are ok
 	if (curPage==0 && cert==null) {
 	    // make sure passwords are equal
 	    if (data().getProperty("password1")!=null &&
@@ -171,7 +180,10 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		return false;
 	    }
 	    // and a level was chosen
-	    if (data().getProperty("level")==null) {
+	    //   Not needed for renewal, since it may be that the level wasn't
+	    //   specified because the parent hadn't set the level explictely
+	    //   after an import, for example.
+	    if (certParent==null && data().getProperty("level")==null) {
 		JOptionPane.showMessageDialog(this,
 			"Please select a certification level",
 			"Missing data", JOptionPane.ERROR_MESSAGE);
@@ -204,7 +216,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    if (cert!=null && cert.getCertificate()!=null)
 		cancelAction.putValue(AbstractAction.NAME, "Close");
 	} catch (IOException e) { }
-	
+
 	if ((curPage==1 || curPage==2) && curPage!=oldPage) {
 	    // on page two we need to execute the things
 	    //  curPage!=oldPage is really needed, since worker.execute()
@@ -305,7 +317,11 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    try {
 		// generate request when no key or certificate
 		if (cert==null) {
-		    CertificateRequest.postFillData(w.data());
+		    // only post-process if no parent, because it may overwrite details
+		    // from the parent
+		    if (certParent==null)
+			CertificateRequest.postFillData(w.data());
+		    // generate request!
 		    CertificatePair newCert = store.generateRequest(w.data(), w.data().getProperty("password1").toCharArray());
 		    // clear password
 		    w.data().remove("password1");

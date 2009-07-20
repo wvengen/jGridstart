@@ -4,6 +4,8 @@ import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+
 import javax.swing.JFrame;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
@@ -25,6 +27,22 @@ public class ActionRenew extends CertificateAction {
 	putValue(NAME, "Renew...");
 	putValue(MNEMONIC_KEY, new Integer('W'));
 	URLLauncher.addAction("renew", this);
+    }
+
+    @Override
+    public boolean wantsEnabled() {
+	try {
+	    // need valid certificate 
+	    if (getCertificatePair()==null) return false;
+	    if (getCertificatePair().getCertificate()==null) return false;
+	    if (!Boolean.valueOf(getCertificatePair().getProperty("valid"))) return false;
+	    // demo certificates are not eligible for renewal
+	    if (getCertificatePair().getProperty("level").equals("demo")) return false;
+	    // ok!
+	    return true;
+	} catch (IOException e) {
+	    return false;
+	}
     }
     
     @Override

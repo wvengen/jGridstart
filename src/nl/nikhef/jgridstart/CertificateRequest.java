@@ -27,8 +27,9 @@ public class CertificateRequest {
      * @param parent Parent Properties to copy from 
      */
     static public void preFillData(Properties p, Properties parent) {
-	// copy relevant values from parent, if any
+	// parse parent properties
 	if (parent!=null) {
+	    // just copy most properties
 	    for (Iterator<Entry<Object, Object>> it = parent.entrySet().iterator(); it.hasNext(); ) {
 		Entry<Object, Object> entry = it.next();
 		String name = (String)entry.getKey();
@@ -102,5 +103,25 @@ public class CertificateRequest {
 	p.setProperty("subject.lock", Boolean.toString(true));
 	p.setProperty("level.lock", Boolean.toString(true));
 	p.setProperty("org.lock", Boolean.toString(true));
+    }
+    
+    /** Completes fields from certificate.
+     * <p>
+     * When an external certificate is imported, its DN has to be parsed
+     * to get names, level, etc. This is kinda reverse of {#postFillData}.
+     */
+    static public void completeData(Properties p) {
+	// by default medium level, overriden if O=dutch-demo is present
+	if (p.getProperty("subject")!=null &&
+		p.getProperty("subject").toUpperCase().contains("O=DUTCH-DEMO"))
+	    p.setProperty("level", "demo");
+	else
+	    p.setProperty("level", "medium");
+
+	// name
+	if (p.getProperty("subject.cn")!=null) {
+	    p.setProperty("fullname", p.getProperty("subject.cn"));
+	    p.setProperty("fullname.lock", "true");
+	}
     }
 }
