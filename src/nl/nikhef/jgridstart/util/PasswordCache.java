@@ -16,6 +16,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 
+import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
+
 import org.bouncycastle.openssl.PasswordFinder;
 
 /** Class that caches passwords for a limited time so that the user doesn't
@@ -340,5 +342,26 @@ public class PasswordCache {
 	public String toString() {
 	    return "Password request was cancelled";
 	}
+    }
+    
+    /** TODO document */
+    public static boolean isPasswordWrongException(Exception e) {
+	if (e.getMessage()==null) return false;
+	// Since readPEM "throws IOException" the specific information
+	// that it might have been a PasswordException is lost :(
+	// So now I have to parse the message string ...
+	return e.getMessage().contains("org.bouncycastle.openssl.PasswordException") &&
+	       e.getMessage().contains("wrong password");
+    }
+    /** TODO document */
+    public static boolean isPasswordNotSuppliedException(Exception e) {
+	if (e.getMessage()==null) return false;
+	return e.getMessage().contains("org.bouncycastle.openssl.PasswordException") &&
+	       e.getMessage().contains("No password finder specified, but a password is required");
+    }
+    /** TODO document */
+    public static boolean isPasswordCancelledException(Exception e) {
+	if (e.getMessage()==null) return false;
+	return e.getMessage().contains("Password is null");
     }
 }

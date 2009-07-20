@@ -96,13 +96,10 @@ public class CertificateCheck {
 	    Object o = PEMReader.readObject(f, KeyPair.class);
 	    if (o==null)
 		fail("Private key file contains no private key", f);
+	} catch (PasswordCancelledException e) {
+	    // is ok :)
 	} catch (IOException e) {
-	    // Since readPEM "throws IOException" the specific information
-	    // that it might have been a PasswordException is lost :(
-	    // So now I have to parse the message string ...
-	    if (!e.getMessage().contains("org.bouncycastle.openssl.PasswordException") &&
-		    !e.getMessage().contains("wrong password"))
-		throw new CertificateCheckException(e);
+	    throw new CertificateCheckException(e);
 	}
     }
 

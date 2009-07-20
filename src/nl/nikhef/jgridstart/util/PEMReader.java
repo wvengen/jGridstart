@@ -47,14 +47,22 @@ public class PEMReader extends org.bouncycastle.openssl.PEMReader {
 	try {
 	    return super.readObject();
 	} catch(IOException e) {
-	    if (in!=null)
+	    if (in!=null) {
+		// if no password finder was supplied, don't invalidate. This is to
+		// allow just opening a file without bothering the user for a password
+		// and silently do something else. In all other cases, the password
+		// must be invalidated so it will be asked again
+		if (PasswordCache.isPasswordNotSuppliedException(e))
+		    throw new PasswordCancelledException();
+
 		PasswordCache.getInstance().invalidate(in.getCanonicalPath());
-	    // Convert back to PasswordCancelledException if none was supplied.
-	    //   When the empty string was supplied as password, the exception
-	    //   message is different, so this can be used to detect if the
-	    //   password was cancelled.
-	    if (in!=null && e.toString().contains("Password is null"))
-		throw new PasswordCancelledException();
+		// Convert back to PasswordCancelledException if none was supplied.
+		//   When the empty string was supplied as password, the exception
+		//   message is different, so this can be used to detect if the
+		//   password was cancelled.
+		if (PasswordCache.isPasswordCancelledException(e))
+		    throw new PasswordCancelledException();
+	    }
 	    throw e;
 	}
     }
