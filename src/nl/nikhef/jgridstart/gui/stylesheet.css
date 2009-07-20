@@ -1,5 +1,6 @@
 /*
- * Common markup (used in all pages)
+ * Certificate info pane markup
+ * TODO - move to style.css
  */
 h1 {
 	font-weight: normal;
@@ -80,11 +81,15 @@ th {
 	color: black;
 }
 
-td.location {
+td.location, td.dn {
 	font-family: monospace;
 	font-size: 80%;
 }
- 
+
+.showdetails {
+	margin-top: 1ex;
+	margin-left: -0.5em;
+}
 .showdetails a {
 	color: black;
 	text-decoration: none;

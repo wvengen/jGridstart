@@ -12,10 +12,10 @@
     <p class="topinfo-ok" if="!${cert} and ${request} and !${request.submitted}">
 	  Your request still needs to be <a href="action:viewrequest">submitted</a> to the certificate authority.</p>
 
-    <p class="topinfo-ok" if="!${cert} and ${request} and !${request.submitted} and !${request.processed}">
+    <p class="topinfo-ok" if="!${cert} and ${request} and ${request.submitted} and !${request.processed}">
       Your request is currently awaiting approval (<a href="action:viewrequest">more...</a>).</p>
 	  
-    <p class="topinfo-ok" if="!${cert} and ${request} and !${request.submitted} and ${request.processed}">
+    <p class="topinfo-ok" if="!${cert} and ${request} and ${request.processed}">
       Your request has been accepted, you can now <a href="action:install">retrieve your certificate</a>.</p>
 	  
 	<p class="topinfo-bad" if="${cert} and !${valid}">
@@ -48,8 +48,8 @@
 			<td class="validity">
 				<span if="${valid.notbefore}" c="from ${valid.notbefore}"/>
 				<span if="${valid.notafter}" c="to ${valid.notafter}"/>
-				<span if="${valid}" class="valid" title="certificate is valid and can be used" c="${state.icon.html}"/>
-				<span if="!${valid}" class="invalid" title="certificate is expired or revoked" c="${state.icon.html}"/>
+				<span if="${valid}" class="valid" title="certificate is valid and can be used">&#x2713;</span>
+				<span if="!${valid}" class="invalid" title="certificate is expired or revoked">&#x2715;</span>
 			</td>
 		</tr>
 		<!--
@@ -63,16 +63,21 @@
 			</td>
 		</tr>
 		-->
-	</table>
-	<p class="showdetails">
-		<a href="action:showdetails" class="shown-${(${view.showdetails})}">Details</a>
-	</p>
-	<table summary="certificate details" cellpadding="3" class="details" if="${view.showdetails}">	
+
 		<tr>
+			<td colspan="2" class="showdetails">
+				<a href="action:showdetails" class="shown-${(${view.showdetails})}">Details</a>
+			</td>
+		</tr>
+		<tr class="details" if="${view.showdetails} and ${subject}">
+			<th class="dn">DN</th>
+			<td class="dn" c="${subject.x-dn-slash}"/>
+		</tr>	
+		<tr class="details" if="${view.showdetails} and ${modulus}">
 			<th class="modulus">Modulus</th>
 			<td class="modulus"><span c="${modulus.first20}"/>...</td>
 		</tr>
-		<tr if="${usage}">
+		<tr class="details" if="${view.showdetails} and ${usage}">
 			<th class="usage">Usage</th>
 			<td class="usage">
 				<span if="${usage.any}" title="usable for anything">any,</span> 
@@ -80,7 +85,7 @@
 				<span if="${usage.emailprotection}" title="usable for signing and encrypting emails">Email protection,</span>
 			</td>
 		</tr>
-		<tr>
+		<tr class="details" if="${view.showdetails} and ${path}">
 			<th class="location">Location</th>
 			<td class="location" c="${path}"/>
 		</tr>
