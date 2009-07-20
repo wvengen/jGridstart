@@ -968,9 +968,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    if ((s=getPrincipalValue(X509Name.EmailAddress, where)) != null)
 		return s;
 	    return getPrincipalValue(X509Name.E, where);
-	} else if (id.equals("x-dn-comma")) {
-	    return getPrincipalValue((DERObjectIdentifier)null, where);
 	} else if (id.equals("x-dn-slash")) {
+	    return getPrincipalValue((DERObjectIdentifier)null, where);
+	} else if (id.equals("x-dn-comma")) {
 	    return getPrincipalValue((DERObjectIdentifier)null, where).replace('/', ',').substring(1);
 	}
 	// fallback to X509Name definition

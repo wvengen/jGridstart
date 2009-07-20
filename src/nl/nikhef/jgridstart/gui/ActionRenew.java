@@ -37,7 +37,7 @@ public class ActionRenew extends CertificateAction {
 	    if (getCertificatePair().getCertificate()==null) return false;
 	    if (!Boolean.valueOf(getCertificatePair().getProperty("valid"))) return false;
 	    // demo certificates are not eligible for renewal
-	    if (getCertificatePair().getProperty("level").equals("demo")) return false;
+	    if (getCertificatePair().getProperty("level") == "demo") return false;
 	    // ok!
 	    return true;
 	} catch (IOException e) {
