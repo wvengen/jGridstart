@@ -17,8 +17,6 @@ import org.jdesktop.swingworker.SwingWorker;
 import org.xhtmlrenderer.swing.BasicPanel;
 import org.xhtmlrenderer.swing.LinkListener;
 
-import com.sun.xml.internal.ws.util.CompletedFuture;
-
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateRequest;
 import nl.nikhef.jgridstart.CertificateSelection;
