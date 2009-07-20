@@ -315,10 +315,11 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    try {
 		// generate request when no key or certificate
 		if (cert==null) {
-		    // only post-process if no parent, because it may overwrite details
-		    // from the parent
+		    // generate subject, or copy from parent if renewal
 		    if (certParent==null)
 			CertificateRequest.postFillData(w.data());
+		    else
+			w.data().setProperty("subject", certParent.getProperty("subject"));
 		    // generate request!
 		    CertificatePair newCert = store.generateRequest(w.data(), w.data().getProperty("password1").toCharArray());
 		    // clear password
