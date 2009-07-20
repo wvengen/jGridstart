@@ -47,7 +47,10 @@
 	    In the password dialog for the <em>certificate backup</em>, enter the
 		password <tt id='passwd' c="${install.passwd}">tobaronetwothree</tt>
 		Note that this a temporary password, and that it has been copied to
-		your clipboard as well (use Ctrl-V to paste).</li>
+		your clipboard as well (use
+		  <span if="${os.name[0:3]}!=Mac">Ctrl-V</span>
+		  <span if="${os.name[0:3]}==Mac">Command-V</span>
+		to paste).</li>
 
 	
 	<!--
