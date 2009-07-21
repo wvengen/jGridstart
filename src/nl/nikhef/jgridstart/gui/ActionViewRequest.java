@@ -16,7 +16,7 @@ import nl.nikhef.jgridstart.gui.util.TemplateWizard;
  * action just views the form of the currently selected certificate and
  * doesn't create a new one.
  * <p>
- * The currently shown step can be supplied with the constructor.
+ * The currently shown step is derived from its state.
  * Alternatively, the action can be invoked with a number (as string)
  * in the actioncommand to display a specified step.
  * 
@@ -25,18 +25,11 @@ import nl.nikhef.jgridstart.gui.util.TemplateWizard;
  */
 public class ActionViewRequest extends CertificateAction {
     
-    /** Page of request wizard to show by default */
-    protected int defaultPage = 0;
-    
     public ActionViewRequest(JFrame parent, CertificateSelection s) {
 	super(parent, s);
 	putValue(NAME, "Request...");
 	putValue(MNEMONIC_KEY, new Integer('R'));
 	URLLauncher.addAction("viewrequest", this);
-    }
-    public ActionViewRequest(JFrame parent, CertificateSelection s, int defaultPage) {
-	this(parent, s);
-	this.defaultPage = defaultPage;
     }
     
     @Override
@@ -55,7 +48,15 @@ public class ActionViewRequest extends CertificateAction {
 	try {
 	    dlg.setStep(Integer.valueOf(e.getActionCommand()));
 	} catch (NumberFormatException e1) {
-	    dlg.setStep(defaultPage);
+	    // figure out correct step
+	    if (!Boolean.valueOf(getCertificatePair().getProperty("request.submitted")))
+		dlg.setStep(1);
+	    else if (!Boolean.valueOf(getCertificatePair().getProperty("request.processed")))
+		dlg.setStep(2);
+	    else if (!Boolean.valueOf(getCertificatePair().getProperty("request.installed")))
+		dlg.setStep(3);
+	    else
+		dlg.setStep(2); // form by default
 	}
 	dlg.setVisible(true);
     }

@@ -138,3 +138,33 @@ form table td.legend:first-child {
 	background: #eee;
 	color: black;
 }
+
+
+/*
+ * Semantic markup: status
+ */
+.info-ok {
+	color: #006600;
+	font-weight: bold;
+}
+.info-bad {
+	color: #660000;
+	font-weight: bold;
+}
+.info-detail {
+	font-size: 90%;
+	font-style: italic;
+	margin-top: -4ex;
+	padding-top: 0;
+}
+
+.valid {
+	color: green;
+	font-size: 110%;
+	font-weight: bold;
+}
+.invalid {
+	color: red;
+	font-size: 110%;
+	font-weight: bold;
+}

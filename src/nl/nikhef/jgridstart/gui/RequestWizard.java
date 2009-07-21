@@ -41,7 +41,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     /** the parent CertificatePair in case of a renewal */
     protected CertificatePair certParent = null;
     /** working thread */
-    protected SwingWorker<Void, String> worker = null;
+    protected GenerateWorker worker = null;
 
     /** New certificate request */
     public RequestWizard(Frame parent, CertificateStore store, CertificateSelection sel) {
@@ -196,6 +196,12 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		org.copyTo(data(), "org.");
 	}
 	
+	// clear error message, if any
+	if (curPage != newPage) {
+	    data().remove("wizard.error");
+	    data().remove("wizard.error.volatile");
+	}
+	
 	// ok!
 	return true;
     }
@@ -225,8 +231,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    //  that triggers this again. We don't want to get stuck in
 	    //  an update loop, do we.
 	    worker = new GenerateWorker(w, curPage);
+	    if (curPage==1) worker.useErrorDialog(false);
 	    worker.execute();
-	    // go next only when all actions are finished
 	}
 	// stop wizard when no certificate yet before install step
 	if (curPage==2) {
@@ -310,11 +316,19 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	protected Exception e = null;
 	/** current step */
 	protected int step = -1;
+	
+	protected boolean useErrordlg = true;
 
 	public GenerateWorker(TemplateWizard w, int step) {
 	    super();
 	    this.w = w;
 	    this.step = step;
+	}
+	
+	/** Set error handler behaviour: dialog, or set property
+	 *  for showing in template. */
+	public void useErrorDialog(boolean use) {
+	    this.useErrordlg = use;
 	}
 
 	/** worker thread that generates the certificate, etc. */
@@ -395,9 +409,16 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		if (key==null) continue;
 		// process cancel
 		if (key.equals("state.cancelled")) {
-		    if (e!=null)
-			ErrorMessage.error(getParent(), "Error during request", e);
-		    setStepRelative(-1);
+		    if (e!=null) {
+			if (useErrordlg) {
+			    ErrorMessage.error(getParent(), "Error during request", e);
+			    setStepRelative(-1);
+			} else {
+			    w.data().setProperty("wizard.error", e.getLocalizedMessage());
+			    w.data().setProperty("wizard.error.volatile", "true");
+			    w.refresh();
+			}
+		    }
 		    return;
 		}
 		// select certificate in main view on creation
