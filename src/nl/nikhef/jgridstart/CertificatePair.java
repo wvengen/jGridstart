@@ -45,6 +45,7 @@ import java.util.logging.Logger;
 
 import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.ca.*;
+import nl.nikhef.jgridstart.util.CryptoUtils;
 import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PEMReader;
 import nl.nikhef.jgridstart.util.PEMWriter;
@@ -885,7 +886,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	c.check();
 	if (checkPriv) c.checkPrivate();
     }
-
+    
     /** Return a value of a principal of the certificate issuer/subject.
      * <p>
      * This is taken from the certificate when present. If that fails, the CSR is
@@ -959,6 +960,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
      *   <dt>{@code x-dn-comma}</dt>
      *       <dd>string of the whole subject or issuer distinguished name,
      *           parts separated by {@code ','}</dd>
+     *   <dt>{@code x-hash}</dt>
+     *       <dd>openssl hash of subject dn, see {@link CryptoUtils#getSubjectHash}</dd>
      * </dl>
      * 
      * @param id name as present in X509Name.DefaultLookup
@@ -975,6 +978,22 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    return getPrincipalValue((DERObjectIdentifier)null, where);
 	} else if (id.equals("x-dn-comma")) {
 	    return getPrincipalValue((DERObjectIdentifier)null, where).replace('/', ',').substring(1);
+	} else if (id.equals("x-hash")) {
+	    if (where) {
+		try {
+		    return CryptoUtils.getSubjectHash(getCertificate());
+		} catch (Exception e1) { try {
+		    return CryptoUtils.getSubjectHash(getCSR());
+		} catch (Exception e2) {
+		    return null;
+		} }
+	    } else {
+		try {
+		    return CryptoUtils.getIssuerHash(getCertificate());
+		} catch (Exception e) {
+		    return null;
+		}
+	    }
 	}
 	// fallback to X509Name definition
 	return getPrincipalValue((DERObjectIdentifier)X509Name.DefaultLookUp.get(id), where);

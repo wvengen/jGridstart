@@ -75,7 +75,11 @@
 		</tr>	
 		<tr class="details" if="${view.showdetails} and ${modulus}">
 			<th class="modulus">Modulus</th>
-			<td class="modulus"><span c="${modulus.first20}"/>...</td>
+			<td class="modulus" c="${modulus.first20}..."/>
+		</tr>
+		<tr class="details" if="${view.showdetails} and ${subject.x-hash}">
+			<th class="hash">Subject Hash</th>
+			<td class="hash" c="${subject.x-hash}"/>
 		</tr>
 		<tr class="details" if="${view.showdetails} and ${usage}">
 			<th class="usage">Usage</th>
