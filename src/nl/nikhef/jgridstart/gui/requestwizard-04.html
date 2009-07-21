@@ -104,7 +104,7 @@
 	  -  Browsers that import by opening the PKCS#12 file directly
 	  -->
 	  
-	  <li if="${install.browser.certinst}==browser">
+	  <li if="${install.browser.certinst}==browser and ${install.browser}!=konqueror">
 	  	<em c="${install.browser.desc}">your webbrowser</em> will open a new window or tab.</li>
 
 	  <li if="${install.browser.certinst}==browser">
@@ -115,6 +115,9 @@
 		  <span if="${os.name[0:3]}!=Mac">Ctrl-V</span>
 		  <span if="${os.name[0:3]}==Mac">Command-V</span>
 		to paste).</li>
+		
+	<li if="${install.browser.certinst}==browser and ${install.browser}==konqueror">
+		In the konqueror window that appears, press the <em>Import All</em> button.</li>
 	    
 	 
 	<!-- For all OSes -->

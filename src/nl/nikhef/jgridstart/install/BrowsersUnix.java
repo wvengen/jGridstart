@@ -1,11 +1,18 @@
 package nl.nikhef.jgridstart.install;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
+
+import abbot.finder.Matcher;
+import abbot.util.Regexp;
 
 import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
 import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
@@ -103,6 +110,44 @@ class BrowsersUnix extends BrowsersCommon {
 	}
 	return output.toString().trim();
     }
+    
+    /** Get default browser from KDE setting.
+     * <p>
+     * The parameter specifies which kde version is looked for; they
+     * have different dot-directories.
+     * 
+     * @param versionid either "kde" or "kde4"
+     */
+    private String getDefaultBrowserKDE(String versionid) {
+	// http://docs.kde.org/development/en/kdebase-runtime/userguide/configuration-files.html
+	String cfg = System.getenv("HOME") + "/" + versionid + "share/config/kdeglobals";
+	try {
+	    BufferedReader read = new BufferedReader(new FileReader(cfg));
+	    String line;
+	    boolean inGeneralSection = false;
+	    while ( (line = read.readLine()) != null ) {
+		// keep track of current section in ini file
+		if (line.trim().toLowerCase().startsWith("[general]"))
+		    inGeneralSection = true;
+		else if (line.trim().startsWith("["))
+		    inGeneralSection = false;
+		// catch default browser in general section
+		if (inGeneralSection && line.trim().toLowerCase().startsWith("BrowserApplication")) {
+		    final Pattern pat = Pattern.compile("^\\s*BrowserApplication(\\[.*?\\])?\\s*=\\s*(.*?)\\s*$");
+		    String browser = pat.matcher(line).group(2);
+		    // empty means default browser = get from mime-type
+		    // TODO implement mime-type parsing ... but let's wait for users to actually complain before investing more time
+		    if (browser == "") return "konqueror";
+		    // custom entry begins with exlamaction mark; not sure if this is always the case
+		    if (browser.startsWith("!")) browser = browser.substring(1);
+		    return browser;
+		}
+	    }
+	} catch (IOException e) { }
+	// not found
+	return null;
+    }
+    
 
     @Override
     public String getDefaultBrowser() {
