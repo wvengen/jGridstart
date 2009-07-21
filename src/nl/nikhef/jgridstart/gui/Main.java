@@ -3,6 +3,8 @@ package nl.nikhef.jgridstart.gui;
 import java.util.logging.Logger;
 import java.util.logging.LogManager;
 
+import javax.swing.UIManager;
+
 import nl.nikhef.jgridstart.logging.LogWindowHandler;
 
 public class Main {
@@ -31,12 +33,14 @@ public class Main {
     }
 
     private static void createAndShowGUI() {
-	/*
-	try {
-	    logger.fine("set look and feel");
-	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	} catch(Exception e) { }
-	*/
+	// use system look and feel for known-good OSes only
+	if (System.getProperty("os.name").startsWith("Win") ||
+		System.getProperty("os.name").startsWith("Mac")) {
+	    try {
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    } catch(Exception e) { }
+	}
+	
 	JGSFrame frame = new JGSFrame();
 	frame.setDefaultCloseOperation(JGSFrame.EXIT_ON_CLOSE);
 
