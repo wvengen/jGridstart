@@ -44,9 +44,14 @@ class BrowsersUnix extends BrowsersCommon {
 	}
 	
 	// then find default browser
+	// TODO detect desktop environment instead of preferring Gnome
 	defaultBrowser = findDefaultBrowserEnvironment();
 	if (defaultBrowser==null)
 	    defaultBrowser = findDefaultBrowserGConf();
+	if (defaultBrowser==null)
+	    defaultBrowser = findDefaultBrowserKDE("kde4");
+	if (defaultBrowser==null)
+	    defaultBrowser = findDefaultBrowserKDE("kde");
 	// we only want the basename
 	if (defaultBrowser!=null)
 	    defaultBrowser = new File(defaultBrowser).getName();
@@ -118,7 +123,7 @@ class BrowsersUnix extends BrowsersCommon {
      * 
      * @param versionid either "kde" or "kde4"
      */
-    private String getDefaultBrowserKDE(String versionid) {
+    private String findDefaultBrowserKDE(String versionid) {
 	// http://docs.kde.org/development/en/kdebase-runtime/userguide/configuration-files.html
 	String cfg = System.getenv("HOME") + "/" + versionid + "share/config/kdeglobals";
 	try {
