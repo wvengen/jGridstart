@@ -87,9 +87,15 @@ class BrowsersWindows extends BrowsersCommon {
 		urlString
 	};
 	try {
+	    // execute browser
+	    //   don't wait for this, since starting a new browser when the
+	    //   process isn't running yet can take a loooong time
+	    Runtime.getRuntime().exec(cmd);
+	    /*
 	    StringBuffer output = new StringBuffer();
 	    if ( FileUtils.Exec(cmd, null, output) != 0)
 		throw new BrowserExecutionException(browserid, output.toString());
+	     */
 	} catch (IOException e) {
 	    throw new BrowserExecutionException(browserid, e);
 	}

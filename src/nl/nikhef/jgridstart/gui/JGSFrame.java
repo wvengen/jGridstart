@@ -1,6 +1,8 @@
 package nl.nikhef.jgridstart.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
+
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 
@@ -31,6 +33,9 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import org.jdesktop.swingworker.SwingWorker;
+
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
@@ -55,6 +60,8 @@ public class JGSFrame extends JFrame {
     private JSeparator identitySeparator = null;
     
     private AbstractButton viewCertificateList = null;
+    
+    private CertificatePair lastSelection = null;
     
     /**
      * This is the default constructor
@@ -354,5 +361,23 @@ public class JGSFrame extends JFrame {
 	// also update selected item in menu
 	if (store.size() > 1 && selection.getIndex() >= 0)
 	    identityMenu.getItem(identityIndex + selection.getIndex()).setSelected(true);
+	
+	// update status in background
+	if (lastSelection != c) {
+	    setCursor(Cursor.WAIT_CURSOR);
+	    new SwingWorker<Void, Void>() {
+		@Override
+		protected Void doInBackground() throws Exception {
+		    selection.getCertificatePair().refresh();
+		    return null;
+		}
+		@Override
+		protected void done() {
+		    setCursor(null);
+		}
+	    }.execute();
+	}
+	
+	lastSelection = c;
     }
 }
