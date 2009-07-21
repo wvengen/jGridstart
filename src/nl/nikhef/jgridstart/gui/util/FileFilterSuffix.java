@@ -53,4 +53,8 @@ public class FileFilterSuffix extends FileFilter {
 	desc = desc.substring(0, desc.length() - 2) + ")";
 	return desc;
     }
+    
+    public String[] getExtensions() {
+	return extensions;
+    }
 }
