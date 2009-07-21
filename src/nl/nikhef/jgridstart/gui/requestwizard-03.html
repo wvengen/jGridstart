@@ -8,11 +8,19 @@
 <div class="wizard-title" c="${wizard.title.html}"/>
 <div class="wizard-contents" c="${wizard.contents.html}"/>
 
+<!-- certificate present, can install -->
 <div class="wizard-page">
 
-	<p>Besides submitting your request for a certificate, you need
-	to send a signed registration form to the Certification Authority
-	by following these steps:</p>
+	<p if="!${cert} and !${request.processed}">
+	  Besides submitting your request for a certificate, you need
+	  to send a signed registration form to the Certification Authority
+	  by following these steps:
+	</p>
+	
+	<p if="${cert} or ${request.processed}">
+	  You have already gone through the following steps to verify your
+	  identity, they are shown for reference only.
+	</p>
 	
 	<form>
 	<ol>
@@ -50,7 +58,8 @@
 			<div class="help" if="${wizard.show.help4}">
 				When the Certification Authority receives the verification form, it
 				takes up to three working days to process. When your request has
-				been approved, this program will show you what to do next.<br/>
+				been approved, you will receive an email. When you then start this
+				program again, it will show what to do next.<br/>
 				If the approval takes longer than three working days, you may
 				contact the <a href="mailto:ca@dutchgrid.nl">DutchGrid CA</a>.
 			</div></li>

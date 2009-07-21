@@ -8,7 +8,14 @@
 <div class="wizard-title" c="${wizard.title.html}"/>
 <div class="wizard-contents" c="${wizard.contents.html}"/>
 
-<div class="wizard-page">
+<!-- certificate still to be downloaded, to that -->
+<div class="wizard-page" if="!${cert}">
+  <p if="!${request.processed}">Your request has not been processed yet.</p>
+  <p if="${request.processed}">Your request has been processed, retrieving certificate...</p>
+</div>
+
+<!-- certificate present, install! -->
+<div class="wizard-page" if="${cert}">
 
 <div if="!${install.done}">
   <p>Congratulations, your certificate has been approved and

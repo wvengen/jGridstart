@@ -202,6 +202,9 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 
     /** called when page in wizard is changed */
     public void pageEnter(TemplateWizard w, int oldPage, int curPage) {
+	// custom window title
+	setTitle(data().getProperty("wizard.title") + " - " + getDocumentTitle(curPage));
+	
 	// stop worker on page change when needed
 	if (worker!=null) {
 	    worker.cancel(true);
@@ -215,7 +218,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		cancelAction.putValue(AbstractAction.NAME, "Close");
 	} catch (IOException e) { }
 
-	if ((curPage==1 || curPage==2) && curPage!=oldPage) {
+	if ((curPage==1 || curPage==3) && curPage!=oldPage) {
 	    // on page two we need to execute the things
 	    //  curPage!=oldPage is really needed, since worker.execute()
 	    //  refreshes the page several times to update the status, and
@@ -224,7 +227,14 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    worker = new GenerateWorker(w, curPage);
 	    worker.execute();
 	    // go next only when all actions are finished
-	    //nextAction.setEnabled(false);
+	}
+	// stop wizard when no certificate yet before install step
+	if (curPage==2) {
+	    if (!Boolean.valueOf(cert.getProperty("cert")) &&
+		    !Boolean.valueOf(cert.getProperty("request.processed"))) {
+		nextAction.setEnabled(false);
+		cancelAction.putValue(AbstractAction.NAME, "Close");
+	    }
 	}
 	
 	// generate installation password, update default browser
@@ -281,8 +291,10 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		(Boolean.valueOf(cert.getProperty("request.submitted")) ||
 		 Boolean.valueOf(cert.getProperty("cert"))) )
 	    classes += " wizard-done";
-	// step 2: done if certificate present
-	if (step==2 && cert!=null && Boolean.valueOf(cert.getProperty("cert")))
+	// step 2: done if certificate present or request processed
+	if (step==2 && cert!=null &&
+		(Boolean.valueOf(cert.getProperty("cert")) ||
+		 Boolean.valueOf(cert.getProperty("request.processed")) ))
 	    classes += " wizard-done";
 	// step 3: done if certificate installed previously
 	if (step==3 && cert!=null && cert.getProperty("install.done")!=null)
@@ -355,7 +367,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    publish((String)null);
 		}
 		// and download when needed and possible
-		if (step==2 && cert.getCertificate()==null && 
+		if (cert.getCertificate()==null && 
 			Boolean.valueOf(cert.getProperty("request.processed"))) {
 		    cert.downloadCertificate();
 		    publish((String)null);
@@ -397,7 +409,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    }
 		}
 		// update next button
-		if (key.equals("state.cancontinue"))
+		if (key.equals("state.cancontinue") && step<pages.size()-1)
 		    nextAction.setEnabled(true);
 	    }
 	    // update content pane

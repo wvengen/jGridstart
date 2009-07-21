@@ -141,19 +141,19 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	    return;
 	}
 	step = s;
-	// Update the navigation bar
+	// Update the ui
 	updateWizardProperties(step);
-	// enter handler so it can update properties
-	if (handler!=null) handler.pageEnter(this, oldStep, s);
-	// set new contents and get title from that as well
-	getDocument(s).refresh();
-	pane.setDocument(getDocument(s));
 	setTitle(pane.getDocumentTitle());
 	// no "Previous" at start; no "Next" beyond the final "Close"
 	if (s == pages.size()-1)
 	    cancelAction.putValue(Action.NAME, "Close");
 	nextAction.setEnabled(step < (pages.size()-1) );
 	prevAction.setEnabled(step > 0);
+	// enter handler so it can update properties
+	if (handler!=null) handler.pageEnter(this, oldStep, s);
+	// set new contents and get title from that as well
+	getDocument(s).refresh();
+	pane.setDocument(getDocument(s));
 	
 	// pack here to give child classes a chance to setPreferredSize()
 	// in their constructors or in setStep(). This is only called if

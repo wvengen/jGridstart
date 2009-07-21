@@ -10,13 +10,13 @@
       This certificate is incomplete, please consider removing it.</p>
 
     <p class="topinfo-ok" if="!${cert} and ${request} and !${request.submitted}">
-	  Your request still needs to be <a href="action:viewrequest">submitted</a> to the certificate authority.</p>
+	  Your request still needs to be <a href="action:viewrequest(1)">submitted</a> to the certificate authority.</p>
 
     <p class="topinfo-ok" if="!${cert} and ${request} and ${request.submitted} and !${request.processed}">
-      Your request is currently awaiting approval (<a href="action:viewrequest">more...</a>).</p>
+      Your request is currently awaiting approval (<a href="action:viewrequest(2)">more...</a>).</p>
 	  
     <p class="topinfo-ok" if="!${cert} and ${request} and ${request.processed}">
-      Your request has been accepted, you can now <a href="action:install">retrieve your certificate</a>.</p>
+      Your request has been accepted, you can now <a href="action:install(3)">retrieve your certificate</a>.</p>
 	  
 	<p class="topinfo-bad" if="${cert} and !${valid}">
 	  This certificate is expired, you can no longer use it.</p>
