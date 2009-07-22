@@ -8,7 +8,7 @@
 <div class="wizard-title" c="${wizard.title.html}"/>
 <div class="wizard-contents" c="${wizard.contents.html}"/>
 
-<!-- certificate still to be downloaded, to that -->
+<!-- certificate still to be downloaded -->
 <div class="wizard-page" if="!${cert}">
   <p if="!${request.processed}">Your request has not been processed yet.</p>
   <p if="${request.processed}">Your request has been processed, retrieving certificate...</p>
@@ -19,7 +19,8 @@
 
 <div if="!${install.done}">
   <p>Congratulations, your certificate has been approved and
-  was retrieved from the Certification Authority. As a final step, you will want to
+  was retrieved from the Certification Authority. To be able to access
+  web-based services, you will finally want to
   install it into your webbrowser, <em c="${install.browser.desc}">your webbrowser</em>
   (<a href='action:changebrowser'>change browser</a>).</p>
   <p>Please follow these steps:</p>
