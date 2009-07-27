@@ -33,8 +33,9 @@ public class FileFilterSuffix extends FileFilter {
 
     @Override
     public boolean accept(File f) {
+	// need to be able to select dirs or the user wouldn't be able to browse them!
 	if (f.isDirectory())
-	    return false;
+	    return true;
 
 	String lcname = f.getName().toLowerCase();
 	for (int i = 0; i < extensions.length; i++)
