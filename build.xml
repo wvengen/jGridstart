@@ -91,7 +91,7 @@
 		<pathelement location="${dep.winregistry}"/>
 	</path>
 	
-	<fileset dir="${dir.build}" id="distfiles">
+	<patternset id="distfiles">
 		<!-- exclude non-production files -->
 		<exclude name="**/test*"/>
 		<exclude name="**/*test/**"/>
@@ -103,7 +103,7 @@
 		<exclude name="**/AllTests$*.class"/>
 		<exclude name="**/CVS"/>
 		<exclude name="**/.svn"/>
-	</fileset>
+	</patternset>
 
 	<!--
 	  - Initialisation and other setup
@@ -159,7 +159,9 @@
 				<attribute name="Main-Class" value="${target.main}"/>
 				<attribute name="Class-Path" value="${dep.bouncycastle.basename}"/>
 			</manifest>
-			<fileset refid="distfiles"/>
+			<fileset dir="${dir.build}">
+				<patternset refid="distfiles"/>
+			</fileset>
 			<zipfileset src="${dep.commons-lang}" includes="**/*.class"/>
 			<zipfileset src="${dep.commons-cli}" includes="**/*.class"/>
 			<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
@@ -253,7 +255,8 @@
 				<attribute name="Built-By" value="${user.name}"/>
 				<attribute name="Main-Class" value="${browsertool.target.main}"/>
 			</manifest>
-			<fileset refid="distfiles">
+			<fileset dir="${dir.build}">
+				<patternset refid="distfiles"/>
 				<include name="nl/nikhef/jgridstart/install/**"/>
 				<include name="nl/nikhef/jgridstart/util/**"/>
 			</fileset>
