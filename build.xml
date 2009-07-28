@@ -59,7 +59,8 @@
 	<property name="dep.bouncycastle" location="${dir.thirdparty}/bouncycastle/bcprov-jdk14-143.jar"/>
 	<property name="dep.bouncycastle.smime" location="${dir.thirdparty}/bouncycastle/bcmail-jdk14-143.jar"/>
 	<property name="dep.javamail" location="${dir.thirdparty}/bouncycastle/mail-1.4.1.jar"/>
-	<property name="dep.cli" location="${dir.thirdparty}/commons-cli/commons-cli-1.2.jar"/>
+	<property name="dep.commons-cli" location="${dir.thirdparty}/commons/commons-cli-1.2.jar"/>
+	<property name="dep.commons-lang" location="${dir.thirdparty}/commons/commons-lang-2.4.jar"/>
 	<property name="dep.junit" location="${dir.thirdparty}/junit/junit-4.5.jar"/>
 	<property name="dep.abbot" location="${dir.thirdparty}/junit/abbot.jar"/>
 	<property name="dep.swingworker" location="${dir.thirdparty}/swingworker/swing-worker-1.2.jar"/>
@@ -80,7 +81,8 @@
 		<pathelement location="${dep.bouncycastle}"/>
 		<pathelement location="${dep.bouncycastle.smime}"/>
 			<pathelement location="${dep.javamail}"/>
-		<pathelement location="${dep.cli}"/>
+		<pathelement location="${dep.commons-lang}"/>
+		<pathelement location="${dep.commons-cli}"/>
 		<pathelement location="${dep.junit}"/>
 		<pathelement location="${dep.abbot}"/>
 		<pathelement location="${dep.swingworker}"/> <!-- for java1.5 and below -->
@@ -88,6 +90,20 @@
 			<pathelement location="${dep.itext}"/>
 		<pathelement location="${dep.winregistry}"/>
 	</path>
+	
+	<fileset dir="${dir.build}" id="distfiles">
+		<!-- exclude non-production files -->
+		<exclude name="**/test*"/>
+		<exclude name="**/*test/**"/>
+		<exclude name="**/*tests/**"/>
+		<exclude name="**/package.html"/>
+		<exclude name="**/*Test.class"/>
+		<exclude name="**/*Test$*.class"/>
+		<exclude name="**/AllTests.class"/>
+		<exclude name="**/AllTests$*.class"/>
+		<exclude name="**/CVS"/>
+		<exclude name="**/.svn"/>
+	</fileset>
 
 	<!--
 	  - Initialisation and other setup
@@ -143,14 +159,9 @@
 				<attribute name="Main-Class" value="${target.main}"/>
 				<attribute name="Class-Path" value="${dep.bouncycastle.basename}"/>
 			</manifest>
-			<fileset dir="${dir.build}">
-				<!-- remove non-production files -->
-				<exclude name="**/test*"/>
-				<exclude name="**/*test/**"/>
-				<exclude name="**/*tests/**"/>
-				<exclude name="**/package.html"/>
-			</fileset>
-			<zipfileset src="${dep.cli}" includes="**/*.class"/>
+			<fileset refid="distfiles"/>
+			<zipfileset src="${dep.commons-lang}" includes="**/*.class"/>
+			<zipfileset src="${dep.commons-cli}" includes="**/*.class"/>
 			<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
 			<zipfileset src="${dep.xhtmlrenderer}" includes="**/*.class" excludes="**/tool/**"/>
 			<zipfileset src="${dep.itext}" includes="**/*.class,**/fonts/*" excludes="**/tools/**"/>
@@ -242,12 +253,7 @@
 				<attribute name="Built-By" value="${user.name}"/>
 				<attribute name="Main-Class" value="${browsertool.target.main}"/>
 			</manifest>
-			<fileset dir="${dir.build}">
-				<!-- remove non-production files -->
-				<exclude name="**/test*"/>
-				<exclude name="**/*test/**"/>
-				<exclude name="**/*tests/**"/>
-				<exclude name="**/package.html"/>
+			<fileset refid="distfiles">
 				<include name="nl/nikhef/jgridstart/install/**"/>
 				<include name="nl/nikhef/jgridstart/util/**"/>
 			</fileset>
@@ -276,6 +282,7 @@
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
 			<link href="http://bouncycastle.org/docs/docs1.4/"/>
 			<link href="http://bouncycastle.org/docs/mdocs1.4/"/>
+			<link href="http://commons.apache.org/lang/api-release/"/>
 			<link href="http://commons.apache.org/cli/api-1.2/"/>
 			<link href="http://junit.org/junit/javadoc/4.5/"/>
 			<link href="http://abbot.sourceforge.net/doc/api/"/>

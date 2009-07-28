@@ -2,11 +2,6 @@
 <classpath>
 	<classpathentry kind="src" output="bin" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="thirdparty/commons-cli/commons-cli-1.2.jar" sourcepath="thirdparty/commons-cli/commons-cli-1.2-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="http://commons.apache.org/cli/api-release/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="thirdparty/swingworker/swing-worker-1.2.jar" sourcepath="thirdparty/swingworker/swing-worker-src-1.2.zip">
 		<attributes>
 			<attribute name="javadoc_location" value="https://swingworker.dev.java.net/nonav/javadoc/"/>
@@ -42,6 +37,16 @@
 	<classpathentry kind="lib" path="thirdparty/bouncycastle/mail-1.4.1.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="http://java.sun.com/products/javamail/javadocs/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="thirdparty/commons/commons-cli-1.2.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://commons.apache.org/cli/api-release/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="thirdparty/commons/commons-lang-2.4.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://commons.apache.org/lang/api-release/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>

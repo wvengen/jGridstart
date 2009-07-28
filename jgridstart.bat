@@ -5,7 +5,7 @@ REM
 
 set BASE=%~dp0
 set LIB=%BASE%\thirdparty
-set CLASSPATH=%LIB%\bouncycastle\bcprov-jdk14-143.jar;%LIB%\bouncycastle\mail-1.4.1.jar;%LIB%\commons-cli\commons-cli-1.2.jar;%LIB%\flyingsaucer\core-renderer-minimal.jar;%LIB%\flyingsaucer\iText-2.0.8.jar;%LIB%\swingworker\swing-worker-1.2.jar;%LIB%\winregistry\WinRegistry-3.4.jar;%BASE%\bin
+set CLASSPATH=%LIB%\bouncycastle\bcprov-jdk14-143.jar;%LIB%\bouncycastle\mail-1.4.1.jar;%LIB%\commons\commons-cli-1.2.jar;%LIB%\commons\commons-lang-2.4.jar;%LIB%\flyingsaucer\core-renderer-minimal.jar;%LIB%\flyingsaucer\iText-2.0.8.jar;%LIB%\swingworker\swing-worker-1.2.jar;%LIB%\winregistry\WinRegistry-3.4.jar;%BASE%\bin
 set INVOKED_PROGRAM=%0
 
 REM undocumented behaviour: first parameter can be "test" to run unit tests,
