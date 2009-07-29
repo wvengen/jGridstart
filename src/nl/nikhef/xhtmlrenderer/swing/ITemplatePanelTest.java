@@ -414,6 +414,29 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	assertTrue(((JRadioButton)btns[1]).isSelected());
     }
     
+    /** List box: value set by html (1) */
+    @Test
+    public void testListBoxValue1() throws Exception {
+	createPanel("<select name='foo'>" +
+        	    "<option value='some' selected='selected'>Some option</option>" +
+        	    "<option value='other'>Some other option</option>" +
+        	    "</select>");
+	JComboBox combo = (JComboBox)find(new ClassMatcher(JComboBox.class));
+	assertEquals(0, combo.getSelectedIndex());
+	assertEquals("some", panel.data().getProperty("foo"));
+    }
+    /** List box: value set by html (2) */
+    @Test
+    public void testListBoxValue2() throws Exception {
+	createPanel("<select name='foo'>" +
+        	    "<option value='some'>Some option</option>" +
+        	    "<option value='other' selected='selected'>Some other option</option>" +
+        	    "</select>");
+	JComboBox combo = (JComboBox)find(new ClassMatcher(JComboBox.class));
+	assertEquals(1, combo.getSelectedIndex());
+	assertEquals("other", panel.data().getProperty("foo"));
+    }
+    
     /* TODO add tests for combobox/list in both modes */
     
     /* TODO add tests for submit, incl. setSubmitAction */

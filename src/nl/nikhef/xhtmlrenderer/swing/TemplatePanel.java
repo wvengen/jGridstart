@@ -7,6 +7,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,6 +24,7 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.ListModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -327,16 +330,20 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 		// combo box or list
 		// find selected items from document; see also listSelectionChanged()
 		// TODO implement multiple selection
+		ListModel model = null;
 		int index = -1;
-		NodeList nodes = e.getElementsByTagName("option");
-		for (int i=0; i<nodes.getLength(); i++) {
-		    Node nodeValue = nodes.item(i).getAttributes().getNamedItem("value");
-		    if (nodeValue==null) continue;
-		    if (nodeValue.getNodeValue().equals(value)) {
-			    index = i;
-			    break;
+		if (c instanceof JComboBox)
+		    model = ((JComboBox)c).getModel();
+		else if (c instanceof JList)
+		    model = ((JList)c).getModel();
+		for (int i=0; i<model.getSize(); i++) {
+		    String thisval = getSelectValue(model.getElementAt(i));
+		    if (thisval!=null && thisval.equals(value)) {
+			index = i;
+			break;
 		    }
 		}
+		
 		if (c instanceof JComboBox) {
 		    if (value!=null)
 			((JComboBox)c).setSelectedIndex(index);
@@ -351,7 +358,7 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 		if (value!=null)
 		    ((JRadioButton)c).setSelected(ivalue.equals(value));
 		((AbstractButton)c).addChangeListener(new FormComponentListener(e, c));
-	    } else if (c instanceof JButton) {
+	    } else if (c instanceof JButton && !"submit".equals(e.getAttribute("type"))) {
 		// ordinary button
 		// remove actionlisteners that pops up useless dialog, add new one
 		for (int i=0; i<((JButton)c).getActionListeners().length; i++)
@@ -400,17 +407,15 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 		     * selected index and look up the corresponding value from the
 		     * document.
 		     * TODO implement lists with multiple selections */
-		    int index = -1;
+		    Object sel = null;
 		    if (source instanceof JComboBox)
-			index = ((JComboBox)source).getSelectedIndex();
+			sel = ((JComboBox)source).getSelectedItem();
 		    else if (source instanceof JList)
-			index = ((JList)source).getSelectedIndex();
-		    // TODO warn if neither?
-		    NodeList nodes = el.getElementsByTagName("option");
-		    if (index>=0 && index<nodes.getLength()) {
-			Node value = nodes.item(index).getAttributes().getNamedItem("value");
+			sel = ((JList)source).getSelectedValue();
+		    if (sel!=null) {
+			String value = getSelectValue(sel);
 			if (value!=null)
-			    data.setProperty(name, value.getNodeValue());
+			    data.setProperty(name, value);
 		    }
 		
 		} else if (source instanceof JTextComponent) {
@@ -454,7 +459,7 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 	    public void actionPerformed(ActionEvent e) {
 		if (e.getSource() instanceof JButton) {
 		    String href = el.getAttribute("href");
-		    if (href!=null) {
+		    if (href!=null && href!="") {
 			// activate all link listeners
 			List<FSMouseListener> ls = (List<FSMouseListener>)getMouseTrackingListeners();
 			for (Iterator<FSMouseListener> it = ls.iterator(); it.hasNext(); ) {
@@ -464,6 +469,17 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 			}
 		    }
 		}
+	    }
+	}
+	/** Helper method to read value from private {@code SelectField.NameValuePair} object */
+	public String getSelectValue(Object obj) {
+	    try {
+		final Class<?> pairClass = Class.forName("org.xhtmlrenderer.simple.extend.form.SelectField$NameValuePair");
+		final Method getValueMethod = pairClass.getMethod("getValue", new Class<?>[] {});
+		getValueMethod.setAccessible(true);
+		return (String)getValueMethod.invoke(obj, new Object[]{});
+	    } catch (Exception e) {
+		return null;
 	    }
 	}
     }
