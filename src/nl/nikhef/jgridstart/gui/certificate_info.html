@@ -33,7 +33,9 @@
 		</tr>
 		<tr>
 			<th class="org">Organisation</th>
-			<td class="org" c="${subject.o.html}"></td>
+			<td class="org">
+				<span c="${subject.o.html}"/><span if="${subject.ou}" c=", ${subject.ou.html}"/>
+			</td>
 		</tr>
 		<tr if="${issuer}">
 			<th class="issuer">Issuer</th>

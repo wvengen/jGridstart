@@ -67,8 +67,13 @@ public class CertificateRequest {
     }
     
     /** Complete data entered before creating a certificate signing
-     * request. This should be called before CertificateStore.generateRequest()
+     * request.
+     * <p>
+     * This should be called before CertificateStore.generateRequest()
      * or CertificatePair.generateRequest() is called.
+     * <p>
+     * Currently assumes that the {@code org} property is a comma-separated
+     * list of organisation, organisation-units (if any OUs).
      * 
      * @param p Properties to update
      */
@@ -82,7 +87,12 @@ public class CertificateRequest {
 	if (p.getProperty("level").equals("demo"))
 	    subject += ", O=dutch-demo";
 	subject += ", O=users";
-	subject += ", O=" + p.getProperty("org");
+	
+	String[] orgs = p.getProperty("org").split(",\\s*");
+	subject += ", O=" + orgs[0];
+	for (int i=1; i<orgs.length; i++)
+	    subject += ", OU=" + orgs[i];
+	
 	subject += ", CN=" + p.getProperty("givenname").trim() +
 			" " + p.getProperty("surname").trim();
 	// simulate x-full propery from certificate to generate request

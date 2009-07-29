@@ -37,10 +37,7 @@
 			<div class="help" if="${wizard.show.help2}">
 				You need to visit a Registration Authority, who will confirm your
 				identity, and will sign the form that you printed in the previous step.
-				Your Registration Authority is
-				<a href="mailto:${org.ra.email}" c="${org.ra.name}">Someone</a> from
-				<a href="${org.url}" c="${org.name}">Organisation</a><span if="${org.ra.address}">, 
-				<span c="${org.ra.address}"/></span>.
+				Your Registration Authority is <span c="${org.ras.html}"/>
 				(though you can visit
 				<a href="https://ca.dutchgrid.nl/request/showra?o=${org}">another</a>
 				as well).<br/>

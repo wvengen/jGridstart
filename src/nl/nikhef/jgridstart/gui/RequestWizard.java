@@ -190,7 +190,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	}
 	
 	// set organisation info if not present
-	if (data().getProperty("org.ra.name")==null) {
+	if (data().getProperty("org.ras")==null) {
 	    Organisation org = Organisation.get(data().getProperty("org"));
 	    if (org!=null)
 		org.copyTo(data(), "org.");

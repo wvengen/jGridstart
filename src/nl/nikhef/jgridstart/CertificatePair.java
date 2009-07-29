@@ -139,7 +139,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * Usually this just returns the
      * value set by {@link #setProperty}, but there are some cases where the
      * value is taken directly from the certificate or certificate
-     * signing request. Please see {@link #getSubjectPrincipalValue} for more info.
+     * signing request.
      * <dl>
      * <dt>valid</dt>
      *     <dd>is {@code true} if the certificate is valid, {@code null} otherwise</dd>
@@ -148,7 +148,10 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * <dt>cert, request</dt>
      *     <dd>is {@code true} when certificate respectively CSR are present</dd>
      * <dt>subject, issuer</dt>
-     *     <dd>dinstinguished name in certificate or else CSR, in slash-notation</dd>
+     *     <dd>dinstinguished name in certificate or else CSR, in slash-notation.
+     *     Specific fields can be requested as well, e.g. {@code subject.o} for
+     *     a comma-separated list of subject organisations; see
+     *     {@link #getSubjectPrincipalValue}.</dd>
      * <dt>usage</dt>
      *     <dd>is {@code true} when child keys can be present</dd>
      * <dt>usage.any, usage.serverauth, usage.clientauth, usage.codesigning,
@@ -157,7 +160,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * <dt>modulus, modulus.first20</dt>
      *     <dd>the public key's modulus, and its first 20 characters</dd>
      * <dt>org</dt>
-     *     <dd>is returned when set, or guessed from subject if unset</dd>
+     *     <dd>the certificate's (or request's) organisation; this is the last
+     *     last organisation RDN, optionally with one or more organisation-unit
+     *     RDNs appended (separated by a comma).</dd>
      * <dt>state.icon</dt>
      *     <dd>Icon for certificate state, one of {@code valid}, {@code warning},
      *     {@code renew} or {@code error}.</dd>
@@ -174,7 +179,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
     public String getProperty(String key) {
 	// parse html
 	if (key.endsWith(".html")) {
-	    String r = getPropertyHtml(key.substring(0, key.length()-5));
+	    if (containsKey(key)) return super.getProperty(key);
+	    key = key.substring(0, key.length()-5);
+	    String r = getPropertyHtml(key);
 	    if (r!=null) return r;
 	}
 	try {
@@ -202,14 +209,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		if (containsKey(key)) return super.getProperty(key);
 		if (getProperty("subject")==null) return null;
 		// parse organisation from subject
-		Organisation org = Organisation._getFromCertificate(this);
-		if (org==null) return null;
-		return org.getProperty("id");
-		/*
-		// TODO doesn't work when organisation unit is involved; need to move to Organisation
-		String[] orgs = getProperty("subject.o").split(",\\s*");
-		return orgs[orgs.length-1];
-		*/
+		return Organisation.getFromCertificate(this).getProperty("x-full-rdn");
 	    }
 	    if (key.equals("modulus"))
 		if (getCertificate()!=null) return ((RSAPublicKey)getCertificate().getPublicKey()).getModulus().toString();
@@ -274,8 +274,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
     }
     /** Return a property in html format, or null if not defined. */
     protected String getPropertyHtml(String key) {
-	// hyperlink organisations
 	if (key.endsWith(".o")) {
+	    // hyperlink organisations
 	    String sorgs = getProperty(key);
 	    if (sorgs==null) return null;
 	    String[] orgs = sorgs.split(",\\s*");
@@ -286,9 +286,19 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		    sorgs += org.getNameHTML() + ", ";
 		} catch (Exception e) { }
 	    }
-	    return sorgs.substring(0, sorgs.length()-2).trim();
-	}
-	if (key.equals("state.icon")) {
+	    return sorgs.length()>2 ? sorgs.substring(0, sorgs.length()-2).trim() : "";
+	    
+	} else if (key.endsWith(".ou")) {
+	    // hyperlink sub-units based on organisation
+	    // TODO allow multiple sub-units
+	    Organisation org = Organisation.getFromCertificate(this);
+	    if (org==null) return getProperty(key);
+	    try {
+		return org.getNameHTML();
+	    } catch (Exception e) { }
+	    	    
+	} else if (key.equals("state.icon")) {
+	    // convert icon name to html portion
 	    String state = getProperty(key);
 	    if (state == "valid")
 		return "<b color='green'>&#x2713;</b>";

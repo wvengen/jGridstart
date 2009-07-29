@@ -62,7 +62,7 @@ public class ComponentCertificateList extends JList {
 		dfl += "&nbsp;<b color='#ffcc00'>&#x2730</b>";
 	    // organisation
 	    Organisation org = Organisation.getFromCertificate(cert);
-	    if (org!=null) line1 += org.getProperty("name");
+	    if (org!=null) line1 += org.getProperty("name.full"); // TODO full name, incl. O if OU
 	    // set html contents
 	    String s =
 		"<html><body width='100%'>" +
