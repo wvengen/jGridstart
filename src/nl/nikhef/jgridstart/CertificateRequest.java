@@ -110,6 +110,7 @@ public class CertificateRequest {
     static public void postFillDataLock(Properties p) {
 	p.setProperty("givenname.lock", Boolean.toString(true));
 	p.setProperty("surname.lock", Boolean.toString(true));
+	p.setProperty("email.lock", Boolean.toString(true));
 	p.setProperty("subject.lock", Boolean.toString(true));
 	p.setProperty("level.lock", Boolean.toString(true));
 	p.setProperty("org.lock", Boolean.toString(true));
