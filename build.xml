@@ -194,7 +194,7 @@
 		<!-- minimize jar file; skipnonpubliclibraryclasses needed for java1.6 -->
 		<proguard obfuscate="false" skipnonpubliclibraryclasses="false">
 			<injar file="${dir.dist}/${target.name}.large.jar"/>
-			<outjar file="${dir.dist}/${target.name}.jar"/>
+			<outjar file="${dir.dist}/${target.name}.small.jar"/>
 			<libraryjar file="${java.home}/lib/rt.jar"/>
 			<libraryjar file="${java.home}/lib/jce.jar"/>
 			<libraryjar file="${java.home}/lib/jsse.jar"/>
@@ -205,6 +205,20 @@
 			<keepclasseswithmembers access="public">
 				<method access="public static" type="void"
 					name="main" parameters="java.lang.String[]"/>
+			</keepclasseswithmembers>
+			<!-- Somehow xhtmlrenderer classes are stripped too much, this is a workaround. Error e.g.
+			     "Invalid index 2 in LocalVariableTable in class file org/xhtmlrenderer/render/Box" -->
+			<keepclasseswithmembers name="org.xhtmlrenderer.render.Box">
+				<method name="*"/>
+			</keepclasseswithmembers>
+			<keepclasseswithmembers name="org.xhtmlrenderer.swing.NaiveUserAgent">
+				<method name="*"/>
+			</keepclasseswithmembers>
+			<keepclasseswithmembers name="org.xhtmlrenderer.css.**">
+				<method name="*"/>
+			</keepclasseswithmembers>
+			<keepclasseswithmembers name="org.xhtmlrenderer.newtable.**">
+				<method name="*"/>
 			</keepclasseswithmembers>
 			<!-- logging is dynamically configured -->
 			<keepclasseswithmembers access="public" name="org.xhtmlrenderer.util.XRSimpleLogFormatter">
@@ -219,9 +233,9 @@
 	<!--
 	  - Distribution creation target
 	  -->
-	<target name="dist" depends="keystore,jar.large">
+	<target name="dist" depends="keystore,jar.small">
 		<!-- copy large/small jar to distribution -->
-		<copy file="${dir.dist}/${target.name}.large.jar" tofile="${dir.dist}/${target.name}.jar"/>
+		<copy file="${dir.dist}/${target.name}.small.jar" tofile="${dir.dist}/${target.name}.jar"/>
 		<!-- sign it, required for java web start -->
 		<signjar keystore="${keystore.file}" jar="${dir.dist}/${target.name}.jar"
 			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
