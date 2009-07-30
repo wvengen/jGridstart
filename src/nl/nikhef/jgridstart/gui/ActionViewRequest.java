@@ -4,6 +4,8 @@ import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+
 import javax.swing.JFrame;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
@@ -30,6 +32,20 @@ public class ActionViewRequest extends CertificateAction {
 	putValue(NAME, "Request...");
 	putValue(MNEMONIC_KEY, new Integer('R'));
 	URLLauncher.addAction("viewrequest", this);
+    }
+
+    @Override
+    public boolean wantsEnabled() {
+	try {
+	    // need valid request or certificate 
+	    if (getCertificatePair()==null) return false;
+	    if (getCertificatePair().getCertificate()==null &&
+		    getCertificatePair().getCSR()==null) return false;
+	    // ok!
+	    return true;
+	} catch (IOException e) {
+	    return false;
+	}
     }
     
     @Override
