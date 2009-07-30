@@ -165,7 +165,12 @@
 			<zipfileset src="${dep.commons-lang}" includes="**/*.class"/>
 			<zipfileset src="${dep.commons-cli}" includes="**/*.class"/>
 			<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
-			<zipfileset src="${dep.xhtmlrenderer}" includes="**/*.class" excludes="**/tool/**"/>
+			<zipfileset src="${dep.xhtmlrenderer}">
+				<include name="**/*.class"/>
+ 				<exclude name="**/tool/**"/>
+				<exclude name="**/swt/**"/>
+				<exclude name="**/SWT**"/>
+			</zipfileset>
 			<zipfileset src="${dep.itext}" includes="**/*.class,**/fonts/*" excludes="**/tools/**"/>
 			<zipfileset src="${dep.winregistry}" includes="**/*.class"/>
 			<!-- iText needs some org.bouncycastle.cms classes but some other classes in this
