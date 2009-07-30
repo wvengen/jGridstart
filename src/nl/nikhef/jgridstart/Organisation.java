@@ -135,14 +135,20 @@ public class Organisation extends Properties {
 		String[] r = org.getProperty("ra").split(",\\s*");
 		String sras = "";
 		String srashtml = "";
+		String sranames = "";
+		String sranameshtml = "";
 		for (int j=0; j<r.length; j++) {
 		    RA curra = ras.get(r[j]);
 		    if (curra==null) continue;
 		    sras += curra.getDetails() + ", or ";
 		    srashtml += curra.getDetailsHTML() + ", or ";
+		    sranames += curra.getName() + ", or ";
+		    sranameshtml += curra.getNameHTML() + ", or ";
 		}
 		if (sras.length()>5) org.setProperty("ras", sras.substring(0, sras.length()-5));
 		if (srashtml.length()>5) org.setProperty("ras.html", srashtml.substring(0, srashtml.length()-5));
+		if (sranames.length()>5) org.setProperty("ranames", sranames.substring(0, sranames.length()-5));
+		if (sranameshtml.length()>5) org.setProperty("ranames.html", sranameshtml.substring(0, sranameshtml.length()-5));
 	    }
 	}
 	
@@ -318,6 +324,9 @@ public class Organisation extends Properties {
 	    String key = (String)en.nextElement();
 	    p.setProperty(prefix+key, getProperty(key));
 	    p.setProperty(prefix+key+".volatile", "true");
+	    key += ".full";
+	    p.setProperty(prefix+key, getProperty(key));
+	    p.setProperty(prefix+key+".volatile", "true");
 	}
     }
     
@@ -339,9 +348,17 @@ public class Organisation extends Properties {
 	protected RA(String id) {
 	    setProperty("id", id);
 	}
+	public String getName() {
+	    return getProperty("name");
+	}
+	public String getNameHTML() {
+	    if (getProperty("email")!=null)
+		return "<a href='mailto:" + getProperty("email") + "'>" + getName() + "</a>";
+	    return getProperty("name");
+	}
 	public String getDetails() {
 	    String details = "";
-	    details += getProperty("name");
+	    details += getName();
 	    if (containsKey("org"))
 	    	details += " (" + orgIndex.get(getProperty("org")).getProperty("name") + ")";
 	    details += ", " + getProperty("address");
@@ -349,7 +366,7 @@ public class Organisation extends Properties {
 	}
 	public String getDetailsHTML() {
 	    String details = "";
-	    details += "<a href='mailto:" + getProperty("email") + "'>" + getProperty("name") + "</a>";
+	    details += getNameHTML();
 	    if (containsKey("org")) {
 		try { 
 	    		details += " (" + orgIndex.get(getProperty("org")).getNameHTML() + ")";

@@ -66,7 +66,7 @@
 	      <td>Street addres <span class="comment">(physical delivery address)</span> <br/><input type="text" class="fillin" name="street"/></td>
 	    </tr>
 	    <tr>
-	      <td>Organisation <br/><div class="fillin" c="${org.name}">Foo inc.</div></td>
+	      <td>Organisation <br/><div class="fillin" c="${org.rdn.full}">Foo inc.</div></td>
 	      <td>ZIP code <br/><input type="text" class="fillin" name="zip"/></td>
 	    </tr>
 	    <tr>
@@ -90,8 +90,7 @@
 	      <td class="signature-info">Place and date <div class="fillin"></div></td>
 	    </tr>
 	    <tr><td>
-	      Please take this form to <span c="${org.ra.name}"/>
-	      <a href="mailto:${org.ra.email}" c="&amp;lt;${org.ra.email}&amp;gt;">**your agent**</a>
+	      Please take this form to an RA, like <span c="${org.ranames.html}"/>.
 	    </td></tr></table>
       </div>
 
