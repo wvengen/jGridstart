@@ -7,7 +7,7 @@
 	<h1>Certificate of <span c="${subject.cn}"/></h1>
 
 	<p class="topinfo-bad" if="!${cert} and !${request}">
-      This certificate is incomplete, please consider removing it.</p>
+      This certificate is incomplete, you might consider removing it.</p>
 
     <p class="topinfo-ok" if="!${cert} and ${request} and !${request.submitted}">
 	  Your request still needs to be <a href="action:viewrequest(1)">submitted</a> to the certificate authority.</p>

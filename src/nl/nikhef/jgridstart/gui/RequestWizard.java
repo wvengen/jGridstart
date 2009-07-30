@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
@@ -177,15 +179,33 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 			"Passwords don't match", JOptionPane.ERROR_MESSAGE);
 		return false;
 	    }
-	    // and a level was chosen
-	    //   Not needed for renewal, since it may be that the level wasn't
+	    // make sure we have a valid email address
+	    try {
+		new InternetAddress(data().getProperty("email")).validate();
+	    } catch (AddressException e) {	    
+		JOptionPane.showMessageDialog(this,
+			"Please enter a valid email address.\n(" + e.getLocalizedMessage() + ")",
+			"Bad email address", JOptionPane.ERROR_MESSAGE);
+		return false;
+	    }
+	    // Not needed for renewal, since it may be that the level wasn't
 	    //   specified because the parent hadn't set the level explictely
 	    //   after an import, for example.
-	    if (certParent==null && data().getProperty("level")==null) {
-		JOptionPane.showMessageDialog(this,
-			"Please select a certification level",
-			"Missing data", JOptionPane.ERROR_MESSAGE);
-		return false;
+	    if (certParent==null) {
+		// and a level was chosen
+		if (data().getProperty("level")==null) {
+		    JOptionPane.showMessageDialog(this,
+			    "Please select a certification level",
+			    "Missing data", JOptionPane.ERROR_MESSAGE);
+		    return false;
+		}
+		if (data().getProperty("givenname").length()==0 ||
+			data().getProperty("surname").length()==0 ) {
+		    JOptionPane.showMessageDialog(this,
+			    "Please enter your full name",
+			    "Missing data", JOptionPane.ERROR_MESSAGE);
+		    return false;
+		}
 	    }
 	}
 	
