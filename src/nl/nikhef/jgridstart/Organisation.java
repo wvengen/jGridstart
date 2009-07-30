@@ -284,6 +284,8 @@ public class Organisation extends Properties {
 	    if (getParent()!=null)
 		return getParent().getProperty(key) + ", " + super.getProperty(key);
 	}
+	if (key.equals("lookupurl"))
+	    return getLookupUrl();
 	return super.getProperty(key);
     }
     
@@ -314,6 +316,18 @@ public class Organisation extends Properties {
 		"</option>";
     }
     
+    /** Returns link to website for doing an RA lookup for this organisation.
+     * <p>
+     * TODO make this configurable
+     */
+    public String getLookupUrl() {
+	String url = "https://ca.dutchgrid.nl/request/showra?o=";
+	if (getParent()!=null)
+	    url += getParent().getProperty("rdn") + "&ou=";
+	url += getProperty("rdn");
+	return url;
+    }
+    
     /** Copy all properties to a {@linkplain Properties} instance.
      * <p>
      * These are volatile attributes since they are bound to an organisation,
@@ -324,10 +338,13 @@ public class Organisation extends Properties {
 	    String key = (String)en.nextElement();
 	    p.setProperty(prefix+key, getProperty(key));
 	    p.setProperty(prefix+key+".volatile", "true");
+	    // expand generated properties
 	    key += ".full";
 	    p.setProperty(prefix+key, getProperty(key));
 	    p.setProperty(prefix+key+".volatile", "true");
 	}
+	p.setProperty(prefix+"lookupurl", getLookupUrl());
+	p.setProperty(prefix+"lookupurl.volatile", "true");
     }
     
     /** Return a sub-unit for this organisation */
