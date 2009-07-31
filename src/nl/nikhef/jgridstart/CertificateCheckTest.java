@@ -82,8 +82,6 @@ public class CertificateCheckTest extends TestCase {
     @Test public void testO_02() throws Exception { test("testO-02",""); }
     /** Ordinary, correct key+request */
     @Test public void testO_03() throws Exception { test("testO-03",""); }
-    /** Only key. TODO warning? */
-    @Test public void testO_04() throws Exception { test("testO-04",""); }
     /** Test ordinary cert+key with different password */
     @Test public void testO_05() throws Exception { test("testO-05","jjzlkxOIoi234jioOIj"); }
     /** Test ordinary cert+key with DSA algorithm */
@@ -127,4 +125,6 @@ public class CertificateCheckTest extends TestCase {
     @Test public void testE_10() throws Exception { testE("testE-10", "jjzlkxOIoi234jioOIj"); }
     /** Key/certificate mismatch, both DSA */
     @Test public void testE_11() throws Exception { testE("testE-11", "qqq123"); }
+    /** Only key. */
+    @Test public void testE_12() throws Exception { testE("testE-12",""); }
 }
