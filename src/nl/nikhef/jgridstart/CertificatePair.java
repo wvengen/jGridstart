@@ -368,7 +368,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	Properties p = (Properties)CertificatePair.super.clone();
 	// remove volatile properties
 	ArrayList<String> propsToRemove = new ArrayList<String>();
-	for (Enumeration<Object> en=p.keys(); en.hasMoreElements(); ) {
+	for (Enumeration<?> en=p.propertyNames(); en.hasMoreElements(); ) {
 	    String key = (String)en.nextElement();
 	    if (Boolean.valueOf(p.getProperty(key+".volatile")))
 		propsToRemove.add(key);

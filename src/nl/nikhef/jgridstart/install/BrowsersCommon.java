@@ -4,12 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
 import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
@@ -117,10 +117,9 @@ abstract class BrowsersCommon implements IBrowsers {
 	Properties p = new Properties();
 	p.load(getClass().getResourceAsStream("browsers.properties"));
 	// split into browsers
-	for (Iterator<Entry<Object,Object>> it = p.entrySet().iterator(); it.hasNext(); ) {
-	    Entry<Object, Object> o = it.next();
-	    String key = (String)o.getKey();
-	    String value = (String)o.getValue();
+	for (Enumeration<?> it = p.propertyNames(); it.hasMoreElements(); ) {
+	    String key = (String)it.nextElement();
+	    String value = p.getProperty(key);
 	    int idx = key.indexOf('.');
 	    String browser = key.substring(0, idx);
 	    if (!knownBrowsers.containsKey(browser))

@@ -92,7 +92,7 @@ public class Organisation extends Properties {
 	orgIndex = new HashMap<String, Organisation>();
 	orgRdn = new HashMap<String, Organisation>();
 	ras = new HashMap<String, RA>();
-	Enumeration<Object> e = allProps.keys();
+	Enumeration<?> e = allProps.propertyNames();
 	while (e.hasMoreElements()) {
 	    String key = (String)e.nextElement();
 	    String[] keyParts = key.split("\\.");
@@ -334,7 +334,7 @@ public class Organisation extends Properties {
      * not a Certificate. */
     public void copyTo(Properties p, String prefix) {
 	// then copy this organisation's properties
-	for (Enumeration<Object> en = keys(); en.hasMoreElements(); ) {
+	for (Enumeration<?> en = propertyNames(); en.hasMoreElements(); ) {
 	    String key = (String)en.nextElement();
 	    p.setProperty(prefix+key, getProperty(key));
 	    p.setProperty(prefix+key+".volatile", "true");

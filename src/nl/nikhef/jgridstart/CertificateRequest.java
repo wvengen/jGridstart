@@ -1,8 +1,7 @@
 package nl.nikhef.jgridstart;
 
-import java.util.Iterator;
+import java.util.Enumeration;
 import java.util.Properties;
-import java.util.Map.Entry;
 
 import nl.nikhef.xhtmlrenderer.swing.TemplateDocument;
 
@@ -30,10 +29,9 @@ public class CertificateRequest {
 	// parse parent properties
 	if (parent!=null) {
 	    // just copy most properties
-	    for (Iterator<Entry<Object, Object>> it = parent.entrySet().iterator(); it.hasNext(); ) {
-		Entry<Object, Object> entry = it.next();
-		String name = (String)entry.getKey();
-		String value = (String)entry.getValue();
+	    for (Enumeration<?> it = parent.propertyNames(); it.hasMoreElements(); ) {
+		String name = (String)it.nextElement();
+		String value = parent.getProperty(name);
 		// filter out state properties that shouldn't be copied
 		if (name.equals("request.submitted")) continue;
 		if (name.equals("request.processed")) continue;
@@ -44,10 +42,9 @@ public class CertificateRequest {
 	    }
 	}
 	// read defaults from system properties
-	for (Iterator<Entry<Object, Object>> it = System.getProperties().entrySet().iterator(); it.hasNext(); ) {
-	    Entry<Object, Object> entry = it.next();
-	    String name = (String)entry.getKey();
-	    String value = (String)entry.getValue();
+	for (Enumeration<?> it = System.getProperties().propertyNames(); it.hasMoreElements(); ) {
+	    String name = (String)it.nextElement();
+	    String value = System.getProperty(name);
 	    if (name.startsWith(defaultsPrefix) ) {
 		String localName = name.substring(defaultsPrefix.length()+1);
 		if (!p.containsKey(localName))

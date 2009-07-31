@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.internet.AddressException;
@@ -151,7 +150,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    }
 	} else {
 	    CertificateRequest.completeData(cert);
-	    data().setProperty("wizard.title", "Certificate Request");
+	    if (!data().containsKey("wizard.title"))
+		data().setProperty("wizard.title", "Certificate Request");
 	}
 	data().setProperty("wizard.title.volatile", "true");
 	data().setProperty("wizard.title.html", data().getProperty("wizard.title"));
@@ -256,8 +256,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    //  refreshes the page several times to update the status, and
 	    //  that triggers this again. We don't want to get stuck in
 	    //  an update loop, do we.
-	    worker = new GenerateWorker(w, curPage);
-	    if (curPage==1) worker.useErrorDialog(false);
+	    worker = new GenerateWorker(curPage);
+	    worker.useErrorDialog(curPage==1);
 	    worker.execute();
 	}
 	// stop wizard when no certificate yet before install step
@@ -282,14 +282,14 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		String browserid = data().getProperty("install.browser");
 		if (browserid==null) browserid = System.getProperty("install.browser");
 		// remove the old browser Properties
-		for (Enumeration<Object> en = data().keys(); en.hasMoreElements(); ) {
+		for (Enumeration<?> en = data().propertyNames(); en.hasMoreElements(); ) {
 		    String key = (String)en.nextElement();
 		    if (!key.startsWith("install.browser.")) continue;
 		    data().remove(key);
 		}
 		// copy the browser's Properties
 		Properties p = BrowserFactory.getInstance().getBrowserProperties(browserid);
-		for (Enumeration<Object> en = p.keys(); en.hasMoreElements(); ) {
+		for (Enumeration<?> en = p.propertyNames(); en.hasMoreElements(); ) {
 		    String key = (String)en.nextElement();
 		    data().setProperty("install.browser."+key, p.getProperty(key));
 		    data().setProperty("install.browser."+key+".volatile", "true");
@@ -336,8 +336,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 
     /** worker thread for generation of a certificate */
     protected class GenerateWorker extends SwingWorker<Void, String> {
-	/** gui element to refresh on update; don't use in worker thread! */
-	protected TemplateWizard w;
+	/** properties, clone of templatewizard */
+	protected Properties p;
 	/** exception from background thread */
 	protected Exception e = null;
 	/** current step */
@@ -345,10 +345,11 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	
 	protected boolean useErrordlg = true;
 
-	public GenerateWorker(TemplateWizard w, int step) {
+	public GenerateWorker(int step) {
 	    super();
-	    this.w = w;
 	    this.step = step;
+	    // clone properties to avoid concurrent access
+	    this.p = (Properties)data().clone();
 	}
 	
 	/** Set error handler behaviour: dialog, or set property
@@ -361,35 +362,34 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	@Override
 	protected Void doInBackground() throws Exception {
 	    // Generate a keypair and certificate signing request
+	    // Access properties using p to avoid concurrency problems
+	    // TODO cert access still dubious 
 	    // TODO make this configurable
-	    // TODO check w.data() can safely be accessed in this thread
-	    // TODO check error handling
 	    try {
 		// generate request when no key or certificate
 		if (cert==null) {
 		    // generate subject, or copy from parent if renewal
 		    if (certParent==null)
-			CertificateRequest.postFillData(w.data());
+			CertificateRequest.postFillData(p);
 		    else
-			w.data().setProperty("subject", certParent.getProperty("subject"));
+			p.setProperty("subject", certParent.getProperty("subject"));
 		    // generate request!
-		    CertificatePair newCert = store.generateRequest(w.data(), w.data().getProperty("password1").toCharArray());
+		    CertificatePair newCert = store.generateRequest(p, p.getProperty("password1").toCharArray());
 		    // clear password
-		    w.data().remove("password1");
-		    w.data().remove("password1.volatile");
-		    w.data().remove("password2");
-		    w.data().remove("password2.volatile");
+		    p.remove("password1");
+		    p.remove("password1.volatile");
+		    p.remove("password2");
+		    p.remove("password2.volatile");
 		    // copy properties to certificate pair
-		    for (Iterator<Map.Entry<Object, Object>> it =
-			w.data().entrySet().iterator(); it.hasNext(); ) {
-			Map.Entry<Object, Object> e = it.next();
-			newCert.put(e.getKey(), e.getValue());
+		    for (Enumeration<?> en = p.propertyNames(); en.hasMoreElements(); ) {
+			String key = (String)en.nextElement();
+			if (key!=null && p.getProperty(key)!=null)
+			    newCert.setProperty(key, p.getProperty(key));
 		    }
 		    // and make sure data is saved
 		    newCert.store();
 		    // TODO check if cert can safely be set in this thread
 		    cert = newCert;
-		    setData(cert);
 		    publish("state.certificate_created");
 		}
 		// upload request only if no certificate present yet
@@ -440,9 +440,9 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 			    ErrorMessage.error(getParent(), "Error during request", e);
 			    setStepRelative(-1);
 			} else {
-			    w.data().setProperty("wizard.error", e.getLocalizedMessage());
-			    w.data().setProperty("wizard.error.volatile", "true");
-			    w.refresh();
+			    data().setProperty("wizard.error", e.getLocalizedMessage());
+			    data().setProperty("wizard.error.volatile", "true");
+			    refresh();
 			}
 		    }
 		    return;
@@ -450,6 +450,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		// select certificate in main view on creation
 		if (key.equals("state.certificate_created")) {
 		    assert(cert!=null);
+		    setData(cert);
 		    if (selection!=null) {
 			int index = store.indexOf(cert);
 			selection.setSelection(index);
@@ -460,7 +461,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    nextAction.setEnabled(true);
 	    }
 	    // update content pane
-	    w.refresh();
+	    refresh();
 	}
     }
 }
