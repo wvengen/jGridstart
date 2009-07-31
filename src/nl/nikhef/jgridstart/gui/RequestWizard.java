@@ -77,20 +77,25 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     public RequestWizard(Frame parent, CertificateStore store, CertificatePair certParent, CertificateSelection sel) {
 	super(parent);
 	this.store = store;
-	this.certParent = certParent;
 	this.selection = sel;
-	setData(new Properties());
-	data().setProperty("renewal", "true");
+	setRenewal(certParent);
     }
     /** Certificate renewal */
     public RequestWizard(Dialog parent, CertificateStore store, CertificatePair certParent, CertificateSelection sel) {
 	super(parent);
 	this.store = store;
-	this.certParent = certParent;
 	this.selection = sel;
+	setRenewal(certParent);
+    }
+    /** Make this request wizard a renewal request */
+    private void setRenewal(CertificatePair certParent) {
+	this.certParent = certParent;
 	setData(new Properties());
 	data().setProperty("renewal", "true");
+	data().setProperty("renewal.parent.path", certParent.getProperty("path"));
+	data().setProperty("renewal.parent.modulus", certParent.getProperty("modulus"));
     }
+    
     @Override
     protected void initialize() {
 	super.initialize();
@@ -138,9 +143,10 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    } else {
 		// parse fields from dn if needed
 		CertificateRequest.completeData(certParent);
-		CertificateRequest.preFillData(p, certParent);
-		// cannot edit fields for renewal
-		CertificateRequest.postFillDataLock(p);
+		CertificateRequest.preFillData(data(), certParent);
+		// cannot edit fields for renewal; except email!!!
+		CertificateRequest.postFillDataLock(data());
+		data().setProperty("email.lock", Boolean.toString(false));
     	    	data().setProperty("wizard.title", "Renew a certificate");
 	    }
 	} else {

@@ -8,8 +8,8 @@
 <div class="wizard-title" c="${wizard.title.html}"/>
 <div class="wizard-contents" c="${wizard.contents.html}"/>
 
-<!-- certificate present, can install -->
-<div class="wizard-page">
+<!-- new certificate request -->
+<div class="wizard-page" if="!${renewal}">
 
 	<p if="!${cert} and !${request.processed}">
 	  Besides submitting your request for a certificate, you need
@@ -55,13 +55,38 @@
 			<div class="help" if="${wizard.show.help4}">
 				When the Certification Authority receives the verification form, it
 				takes up to three working days to process. When your request has
-				been approved, you will receive an email. When you then start this
-				program again, it will show what to do next.<br/>
+				been approved, you will receive an email containing further
+				instructions.<br/>
 				If the approval takes longer than three working days, you may
 				contact the <a href="mailto:ca@dutchgrid.nl">DutchGrid CA</a>.
 			</div></li>
 	</ol>
 	</form>
+
+</div>
+
+
+<!-- renewal request, no steps required but waiting -->
+<div class="wizard-page" if="${renewal}">
+	
+	<p if="!${cert} and !{request.submitted}">
+	  You still need to submit your certificate renewal request, please
+	  go back.
+	</p>
+
+	<p if="!${cert} and ${request.submitted} and !${request.processed}">
+	  The Certification Authority takes up to three days to process your
+	  request, after which you will receive an email containing further
+	  instructions.  
+	  <br/>
+	  If the approval takes longer than three working days, you may
+	  contact the <a href="mailto:ca@dutchgrid.nl">DutchGrid CA</a>
+	</p>
+	
+	<p if="${cert} or ${request.processed}">
+	  Your request has been processed already, please proceed by
+	  pressing <em>Next</em>.
+	</p>
 
 </div>
 
