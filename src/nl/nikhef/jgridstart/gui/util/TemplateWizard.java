@@ -349,7 +349,6 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
     }
 
     public Properties data() {
-	System.out.println("[data()]: wizard.title="+pane.data().getProperty("wizard.title"));
 	return pane.data();
     }
 
