@@ -869,18 +869,17 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws KeyManagementException 
      */
     public boolean refresh() throws KeyManagementException, NoSuchAlgorithmException {
-	if (path == null)
-	    return false;
-	// reload from disk
-	try {
-	    load(path);
-	    // see if certificate can be downloaded
-	    if (!Boolean.valueOf(getProperty("request.processed")))
-		isCertificationRequestProcessed();
-	// TODO proper error reporting or don't catch
-	} catch (IOException e) {
-	    return false;
-	}	
+	// TODO should check if disk contents changed, update if so.
+	//      load(path) should not be done here, since that clears
+	//      the current state. E.g. at some point in the request-new
+	//      wizard, the selection is set to the newly created
+	//      CertificatePair. This calls refresh() and shouldn't throw
+	//      away volatile properties, for example.
+
+	// see if certificate can be downloaded
+	if (!Boolean.valueOf(getProperty("request.processed")))
+	    isCertificationRequestProcessed();
+	
 	return true;
     }
     

@@ -262,7 +262,9 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	}
 	// stop wizard when no certificate yet before install step
 	if (curPage==2) {
-	    if (!Boolean.valueOf(cert.getProperty("cert")) &&
+	    if (cert==null) {
+		nextAction.setEnabled(false);
+	    } else if (!Boolean.valueOf(cert.getProperty("cert")) &&
 		    !Boolean.valueOf(cert.getProperty("request.processed"))) {
 		nextAction.setEnabled(false);
 		cancelAction.putValue(AbstractAction.NAME, "Close");
@@ -336,7 +338,6 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 
     /** worker thread for generation of a certificate */
     protected class GenerateWorker extends SwingWorker<Void, String> {
-	/** properties, clone of templatewizard */
 	protected Properties p;
 	/** exception from background thread */
 	protected Exception e = null;
@@ -348,8 +349,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	public GenerateWorker(int step) {
 	    super();
 	    this.step = step;
-	    // clone properties to avoid concurrent access
-	    this.p = (Properties)data().clone();
+	    this.p = data();
 	}
 	
 	/** Set error handler behaviour: dialog, or set property
@@ -362,8 +362,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	@Override
 	protected Void doInBackground() throws Exception {
 	    // Generate a keypair and certificate signing request
-	    // Access properties using p to avoid concurrency problems
-	    // TODO cert access still dubious 
+	    // TODO verify concurrency 
 	    // TODO make this configurable
 	    try {
 		// generate request when no key or certificate
@@ -374,6 +373,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    else
 			p.setProperty("subject", certParent.getProperty("subject"));
 		    // generate request!
+		    // TODO check thread safety ... :/
 		    CertificatePair newCert = store.generateRequest(p, p.getProperty("password1").toCharArray());
 		    // clear password
 		    p.remove("password1");
@@ -388,7 +388,6 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    }
 		    // and make sure data is saved
 		    newCert.store();
-		    // TODO check if cert can safely be set in this thread
 		    cert = newCert;
 		    publish("state.certificate_created");
 		}
