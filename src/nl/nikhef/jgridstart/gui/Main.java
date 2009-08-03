@@ -1,5 +1,8 @@
 package nl.nikhef.jgridstart.gui;
 
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.logging.Logger;
 import java.util.logging.LogManager;
 
@@ -23,6 +26,10 @@ public class Main {
     public static void main(String[] args) {
 	logger.addHandler(LogWindowHandler.getInstance());
 	logger.fine("main starting");
+	// load system properties, not fatal if it fails
+	try {
+	    System.getProperties().load(Main.class.getResourceAsStream("/resources/conf/global.properties"));
+	} catch (IOException e) { }
 	// Schedule a job for the event-dispatching thread:
 	// creating and showing this application's GUI.
 	javax.swing.SwingUtilities.invokeLater(new Runnable() {

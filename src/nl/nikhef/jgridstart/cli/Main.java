@@ -43,6 +43,11 @@ public class Main {
     
     /** command-line interface entry point */
     public static void main(String[] args) {
+	// load system properties, not fatal if it fails
+	try {
+	    System.getProperties().load(Main.class.getResourceAsStream("/resources/conf/global.properties"));
+	} catch (IOException e) { }
+
 	// parse command-line arguments
 	try {
 	    CommandLine line = parseCLIOptions(args);
