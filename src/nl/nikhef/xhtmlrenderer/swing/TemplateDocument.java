@@ -296,6 +296,7 @@ public class TemplateDocument extends DocumentDelegate {
 		try { to = Integer.parseInt(match.group(5)); } catch(Exception e) { }
 		sub = sub.substring(from, to);
 	    }
+	    sub = sub.replaceAll("([$\\\\])", "\\\\$1"); // need escaping in replacement string
 	    match.appendReplacement(dstbuf, sub);
 	}
 	match.appendTail(dstbuf);

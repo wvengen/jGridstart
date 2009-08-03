@@ -275,4 +275,24 @@ public class TemplateDocumentTest extends TestCase {
 	TemplateDocument template = new TemplateDocument(parseBody(body));
 	assertTrue(bodyEquals(template, "<p>"+System.getProperty("os.name")+"</p>"));
     }
+    
+    /** Test if backslashes are displayed properly.
+     * <p>
+     * Regular expressions are used in the implementation of {@linkplain TemplateDocument}
+     * in which some symbols are treated especially. We have to make sure these are
+     * processed properly. */
+    @Test
+    public void testBackslash() throws Exception {
+	Properties p = new Properties();
+	p.setProperty("txt", "\\");
+	templateTest("<p c='${txt}'/>", "<p>\\</p>", p);
+    }
+    /** Test if dollar sign is displayed properly.
+     * @see #testBackslash */
+    @Test
+    public void testDollar() throws Exception {
+	Properties p = new Properties();
+	p.setProperty("txt", "$");
+	templateTest("<p c='${txt}'/>", "<p>$</p>", p);
+    }
 }
