@@ -10,7 +10,7 @@
 	<!-- internal name -->
 	<property name="target.name" value="${ant.project.name}"/>
 	<!-- the program's version -->
-	<property name="target.version" value="0.0.3"/>
+	<property name="target.version" value="1.0alpha1"/>
 	<!-- main class to execute -->
 	<property name="target.main" value="nl.nikhef.jgridstart.gui.Main"/>
 	<!-- java virtual machine version to compile for -->
@@ -51,7 +51,7 @@
 	  --> 
 	<property name="dir.keystore" location=".."/>
 	<property file="${dir.keystore}/keystore.properties"/>
-
+	
 	<!--
 	  - dependencies
 	  -->
@@ -123,6 +123,15 @@
 	<!-- proguard -->
 	<taskdef resource="proguard/ant/task.properties"
 		classpath="${dir.thirdparty}/proguard/proguard.jar"/>
+	<!-- subversion -->
+	<typedef resource="com/googlecode/svntask/svntask.xml">
+		<classpath><fileset dir="${dir.thirdparty}/svnant">
+			<include name="svnkit.jar"/>
+			<include name="svntask.jar"/>
+		</fileset></classpath>
+	</typedef>
+	<svn><info path="." revisionProperty="revisionVersion" /></svn>
+	<property name="target.revision" value="${revisionVersion}"/>
 	
 	<!-- timestamp -->
 	<target name="init">
@@ -138,13 +147,24 @@
 		<javac srcdir="${dir.src}" destdir="${dir.build}" target="${target.jvmversion}">
 			<classpath refid="path.dependencies" />
 		</javac>
-		<!-- and copy resources; skip VCS dirs (and other hidden .*)  -->
+		<!-- copy resources; skip VCS dirs (and other hidden .*)  -->
 		<copy todir="${dir.build}">
 			<fileset dir="${dir.src}">
 				<exclude name="**/*.java"/>
 				<exclude name="**/CVS"/>
 				<exclude name="**/.*"/>
+				<exclude name="resources/conf/global.properties"/>
 			</fileset>
+		</copy>
+		<!-- set global variables from build -->
+		<copy file="${dir.src}/resources/conf/global.properties"
+		      tofile="${dir.build}/resources/conf/global.properties">
+			<filterchain>
+				<replacetokens>
+					<token key="jgridstart.version" value="${target.version}"/>
+					<token key="jgridstart.revision" value="${target.revision}"/>
+				</replacetokens>
+			</filterchain>
 		</copy>
 	</target>
 	
