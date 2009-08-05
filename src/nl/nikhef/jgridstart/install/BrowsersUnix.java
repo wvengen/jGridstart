@@ -2,7 +2,6 @@ package nl.nikhef.jgridstart.install;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
@@ -11,14 +10,11 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import abbot.finder.Matcher;
-import abbot.util.Regexp;
-
 import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
 import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
 import nl.nikhef.jgridstart.util.FileUtils;
 
-/** Unix/Linux/BSD/... implementation of browser discovery and launch */
+/** Unix/Linux/BSD/... implementation of browser discovery and launch. */
 class BrowsersUnix extends BrowsersCommon {
     
     private String defaultBrowser = null;
@@ -44,14 +40,9 @@ class BrowsersUnix extends BrowsersCommon {
 	}
 	
 	// then find default browser
-	// TODO detect desktop environment instead of preferring Gnome
 	defaultBrowser = findDefaultBrowserEnvironment();
 	if (defaultBrowser==null)
-	    defaultBrowser = findDefaultBrowserGConf();
-	if (defaultBrowser==null)
-	    defaultBrowser = findDefaultBrowserKDE("kde4");
-	if (defaultBrowser==null)
-	    defaultBrowser = findDefaultBrowserKDE("kde");
+	    defaultBrowser = findDefaultBrowserDesktop();
 	// we only want the basename
 	if (defaultBrowser!=null)
 	    defaultBrowser = new File(defaultBrowser).getName();
@@ -90,6 +81,32 @@ class BrowsersUnix extends BrowsersCommon {
 	if (FileUtils.Exec(new String[] { "readlink", path }, output)!=0)
 	    return null;
 	return output.trim();
+    }
+    
+    /** Get default browser from desktop environment */
+    private String findDefaultBrowserDesktop() {
+	String browser = null;
+
+	if (System.getenv("GNOME_DESKTOP_SESSION_ID")!=null) {
+	    // get from gconf
+	    browser = findDefaultBrowserGConf();
+	    
+	} else if (System.getenv("KDE_FULL_SESSION")!=null) {
+	    // get from kde settings
+	    browser = findDefaultBrowserKDE("kde4");
+	    if (browser==null)
+		browser = findDefaultBrowserKDE("kde");
+	    
+	} else {
+	    // otherwise try all
+	    browser = findDefaultBrowserGConf();
+	    if (browser==null)
+		browser = findDefaultBrowserKDE("kde4");
+	    if (browser==null)
+		browser = findDefaultBrowserKDE("kde");
+	}
+	
+	return browser;
     }
     
     /** Get default browser from GConf setting */
