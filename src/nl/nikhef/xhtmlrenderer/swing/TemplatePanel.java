@@ -7,6 +7,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,12 +40,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xhtmlrenderer.extend.NamespaceHandler;
 import org.xhtmlrenderer.extend.ReplacedElement;
+import org.xhtmlrenderer.extend.ReplacedElementFactory;
 import org.xhtmlrenderer.extend.UserAgentCallback;
 import org.xhtmlrenderer.layout.LayoutContext;
 import org.xhtmlrenderer.render.BlockBox;
 import org.xhtmlrenderer.resource.XMLResource;
 import org.xhtmlrenderer.swing.FSMouseListener;
+import org.xhtmlrenderer.swing.ImageResourceLoader;
 import org.xhtmlrenderer.swing.LinkListener;
+import org.xhtmlrenderer.swing.RepaintListener;
 import org.xhtmlrenderer.swing.SwingReplacedElement;
 import org.xhtmlrenderer.swing.SwingReplacedElementFactory;
 import org.xhtmlrenderer.util.Configuration;
@@ -130,7 +134,9 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
     public TemplatePanel() {
 	super();
 	// install custom form handling hooks
-	getSharedContext().setReplacedElementFactory(new TemplateSwingReplacedElementFactory());
+	getSharedContext().setReplacedElementFactory(
+		new TemplateSwingReplacedElementFactory(null, new ImageResourceLoader())
+	);
 	setFormSubmissionListener(this);
     }
     
@@ -278,6 +284,16 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
      * property, if any. Also its listeners are set to update the corresponding
      * TemplatePanel property when the component's contents was changed. */
     protected class TemplateSwingReplacedElementFactory extends SwingReplacedElementFactory {
+	
+	public TemplateSwingReplacedElementFactory() {
+	    super();
+	}
+	public TemplateSwingReplacedElementFactory(RepaintListener listener) {
+	    super(listener);
+	}
+	public TemplateSwingReplacedElementFactory(final RepaintListener listener, final ImageResourceLoader irl) {
+	    super(listener, irl);
+	}
 
 	@Override
 	public ReplacedElement createReplacedElement(LayoutContext context, BlockBox box,
