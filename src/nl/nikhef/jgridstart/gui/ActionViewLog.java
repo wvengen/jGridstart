@@ -7,7 +7,7 @@ import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.logging.LogWindowHandler;
 
 public class ActionViewLog extends AbstractAction {
@@ -22,7 +22,7 @@ public class ActionViewLog extends AbstractAction {
 	putValue(NAME, "View log...");
 	putValue(MNEMONIC_KEY, new Integer('L'));
 	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control L"));
-	URLLauncher.addAction("viewlog", this);
+	URLLauncherCertificate.addAction("viewlog", this);
     }
 
     public void actionPerformed(ActionEvent e) {

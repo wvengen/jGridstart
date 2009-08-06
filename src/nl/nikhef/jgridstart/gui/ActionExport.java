@@ -8,8 +8,8 @@ import javax.swing.KeyStroke;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 /** Export selected certificate to PKCS#12/PEM file */
@@ -20,7 +20,7 @@ public class ActionExport extends CertificateAction {
 	putValue(NAME, "Export...");
 	putValue(MNEMONIC_KEY, new Integer('E'));
 	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control E"));
-	URLLauncher.addAction("export", this);
+	URLLauncherCertificate.addAction("export", this);
     }
     
     @Override

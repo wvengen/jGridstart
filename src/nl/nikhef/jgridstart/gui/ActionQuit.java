@@ -4,7 +4,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
@@ -22,7 +22,7 @@ public class ActionQuit extends AbstractAction {
 	putValue(NAME, "Quit");
 	putValue(MNEMONIC_KEY, new Integer('Q'));
 	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control Q"));
-	URLLauncher.addAction("quit", this);
+	URLLauncherCertificate.addAction("quit", this);
     }
 
     public void actionPerformed(ActionEvent e) {

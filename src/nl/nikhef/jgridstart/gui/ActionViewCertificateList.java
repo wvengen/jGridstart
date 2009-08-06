@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
 public class ActionViewCertificateList extends AbstractAction {
 
@@ -37,7 +37,7 @@ public class ActionViewCertificateList extends AbstractAction {
 	this.isSelected = isSelected;
 	putValue(NAME, "Show certificate list");
 	putValue(MNEMONIC_KEY, new Integer('L'));
-	URLLauncher.addAction("viewlist", this);
+	URLLauncherCertificate.addAction("viewlist", this);
 	c.setVisible(isSelected);
     }
     public ActionViewCertificateList(JFrame parent, JComponent c) {

@@ -9,8 +9,8 @@ import javax.swing.KeyStroke;
 
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
 /** Open the "request a new certificate" wizard
  * 
@@ -32,7 +32,7 @@ public class ActionRequest extends AbstractAction {
 	putValue(NAME, "Request new...");
 	putValue(MNEMONIC_KEY, new Integer('R'));
 	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control N"));
-	URLLauncher.addAction("request", this);
+	URLLauncherCertificate.addAction("request", this);
     }
     
     public void actionPerformed(ActionEvent e) {

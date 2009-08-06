@@ -11,7 +11,7 @@ import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
 /** Renew a certificate
  * 
@@ -26,7 +26,7 @@ public class ActionRenew extends CertificateAction {
 	this.store = store;
 	putValue(NAME, "Renew...");
 	putValue(MNEMONIC_KEY, new Integer('W'));
-	URLLauncher.addAction("renew", this);
+	URLLauncherCertificate.addAction("renew", this);
     }
 
     @Override

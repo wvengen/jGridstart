@@ -23,9 +23,9 @@ import nl.nikhef.jgridstart.CertificateRequest;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.Organisation;
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.install.BrowserFactory;
 import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
@@ -122,7 +122,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		// on the correct certificate.
 		if (uri.startsWith("action:"))
 		    selection.setSelection(cert);
-		URLLauncher.openURL(uri, panel);
+		URLLauncherCertificate.openURL(uri, panel);
 		// refresh document after action because properties may be updated
 		if (uri.startsWith("action:"))
 		    refresh();

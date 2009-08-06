@@ -21,10 +21,10 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.FileFilterSuffix;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
 import nl.nikhef.xhtmlrenderer.swing.TemplatePrintable;
 
@@ -41,7 +41,7 @@ public class ActionViewVerificationForm extends CertificateAction {
 	super(parent, s);
 	putValue(NAME, "Verification form");
 	putValue(MNEMONIC_KEY, new Integer('V'));
-	URLLauncher.addAction("verificationform", this);
+	URLLauncherCertificate.addAction("verificationform", this);
     }
     
     @Override

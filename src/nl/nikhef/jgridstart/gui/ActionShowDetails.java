@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
 
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
 public class ActionShowDetails extends CertificateAction {
     
@@ -13,7 +13,7 @@ public class ActionShowDetails extends CertificateAction {
 	super(parent, s);
 	putValue(NAME, "Details");
 	putValue(MNEMONIC_KEY, new Integer('D'));
-	URLLauncher.addAction("showdetails", this);
+	URLLauncherCertificate.addAction("showdetails", this);
     }
 
     @Override

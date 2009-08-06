@@ -70,7 +70,7 @@ public class TemplateButtonPanel extends JPanel implements ITemplatePanel {
 	contentpane.replaceLinkListener(new LinkListener() {
 	    @Override
             public void linkClicked(BasicPanel panel, String uri) {
-		URLLauncher.openURL(uri, panel);
+		URLLauncherCertificate.openURL(uri, panel);
 	    }
 	});
 	

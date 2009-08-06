@@ -16,8 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 
-import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
-
 import org.bouncycastle.openssl.PasswordFinder;
 
 /** Class that caches passwords for a limited time so that the user doesn't

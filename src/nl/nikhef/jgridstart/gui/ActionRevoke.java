@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
 public class ActionRevoke extends CertificateAction {
     
@@ -14,7 +14,7 @@ public class ActionRevoke extends CertificateAction {
 	this.parent = parent;
 	putValue(NAME, "Revoke...");
 	putValue(MNEMONIC_KEY, new Integer('R'));
-	URLLauncher.addAction("revoke", this);
+	URLLauncherCertificate.addAction("revoke", this);
     }
     
     @Override

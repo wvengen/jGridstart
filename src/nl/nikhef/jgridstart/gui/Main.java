@@ -1,7 +1,5 @@
 package nl.nikhef.jgridstart.gui;
 
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.logging.Logger;
 import java.util.logging.LogManager;

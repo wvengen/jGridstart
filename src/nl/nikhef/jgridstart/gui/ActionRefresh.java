@@ -7,7 +7,7 @@ import javax.swing.KeyStroke;
 import org.jdesktop.swingworker.SwingWorker;
 
 import nl.nikhef.jgridstart.CertificateStore;
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -26,7 +26,7 @@ public class ActionRefresh extends AbstractAction {
 	putValue(NAME, "Refresh");
 	putValue(MNEMONIC_KEY, new Integer('R'));
 	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("F5"));
-	URLLauncher.addAction("refresh", this);
+	URLLauncherCertificate.addAction("refresh", this);
     }
 
     @SuppressWarnings("deprecation") // for JFrame.setCursor()

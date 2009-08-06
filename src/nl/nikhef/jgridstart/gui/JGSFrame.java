@@ -39,8 +39,8 @@ import org.jdesktop.swingworker.SwingWorker;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
 public class JGSFrame extends JFrame {
@@ -79,6 +79,7 @@ public class JGSFrame extends JFrame {
 	store = new CertificateStore();
 	selection = new CertificateSelection(store);
 	PasswordCache.getInstance().setParent(this);
+	URLLauncherCertificate.setSelectionSource(selection);
 	
 	// setup gui
 	this.setSize(550, 350);
@@ -152,7 +153,7 @@ public class JGSFrame extends JFrame {
      * Relevant Actions in this application should register themselves
      * with BareBonesActionLaunch. */
     protected Action getAction(String id) {
-	Action action = URLLauncher.getAction(id);
+	Action action = URLLauncherCertificate.getAction(id);
 	assert(action!=null);
 	return action;
     }

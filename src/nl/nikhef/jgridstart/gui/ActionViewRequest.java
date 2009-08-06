@@ -9,8 +9,8 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
 /** Show the request wizard for an existing certificate.
  * <p>
@@ -31,7 +31,7 @@ public class ActionViewRequest extends CertificateAction {
 	super(parent, s);
 	putValue(NAME, "Request...");
 	putValue(MNEMONIC_KEY, new Integer('R'));
-	URLLauncher.addAction("viewrequest", this);
+	URLLauncherCertificate.addAction("viewrequest", this);
     }
 
     @Override

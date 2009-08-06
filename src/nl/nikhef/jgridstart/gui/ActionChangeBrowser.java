@@ -15,7 +15,7 @@ import javax.swing.ListSelectionModel;
 
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.install.BrowserFactory;
 import nl.nikhef.jgridstart.install.IBrowsers;
 
@@ -26,7 +26,7 @@ public class ActionChangeBrowser extends CertificateAction {
 	super(parent, s);
 	putValue(NAME, "Change Browser");
 	putValue(MNEMONIC_KEY, new Integer('B'));
-	URLLauncher.addAction("changebrowser", this);
+	URLLauncherCertificate.addAction("changebrowser", this);
     }
 
     @Override

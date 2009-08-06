@@ -12,8 +12,8 @@ import javax.swing.KeyStroke;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 /** Import a new certificate from a PKCS#12/PEM file */
@@ -32,7 +32,7 @@ public class ActionImport extends AbstractAction {
 	putValue(NAME, "Import...");
 	putValue(MNEMONIC_KEY, new Integer('I'));
 	putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control I"));
-	URLLauncher.addAction("import", this);
+	URLLauncherCertificate.addAction("import", this);
     }
     
     public void actionPerformed(ActionEvent e) {

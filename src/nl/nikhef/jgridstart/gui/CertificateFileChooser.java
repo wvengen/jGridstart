@@ -4,7 +4,6 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
-import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.FileFilterSuffix;
 
 /** Filechooser for PEM and PKCS#12 files */

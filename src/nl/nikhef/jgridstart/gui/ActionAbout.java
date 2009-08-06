@@ -4,7 +4,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
@@ -18,7 +18,7 @@ public class ActionAbout extends AbstractAction {
 	super();
 	putValue(NAME, "About...");
 	putValue(MNEMONIC_KEY, new Integer('A'));
-	URLLauncher.addAction("about", this);
+	URLLauncherCertificate.addAction("about", this);
     }
 
     public void actionPerformed(ActionEvent e) {

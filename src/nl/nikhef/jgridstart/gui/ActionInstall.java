@@ -12,6 +12,7 @@ import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
+import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.install.BrowserFactory;
 import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordGenerator;
@@ -31,7 +32,7 @@ public class ActionInstall extends CertificateAction {
 	super(parent, s);
 	putValue(NAME, "Install...");
 	putValue(MNEMONIC_KEY, new Integer('I'));
-	URLLauncher.addAction("install", this);
+	URLLauncherCertificate.addAction("install", this);
     }
     
     @Override

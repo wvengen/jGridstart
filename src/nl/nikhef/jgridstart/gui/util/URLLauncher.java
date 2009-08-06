@@ -50,6 +50,16 @@ public class URLLauncher {
     
     /** list of registered actions */
     protected static HashMap<String, Action> actions = new HashMap<String, Action>();
+    
+    /** Open the URL in an external web browser. */
+    protected static void runBrowser(String location, Component parent) {
+	try {
+	    BrowserFactory.getInstance().openUrl(location);
+	    //BareBonesBrowserLaunch.openURL(url.toExternalForm(), parent);
+	} catch (Exception e) {
+	    ErrorMessage.error(parent, "Could not launch URL", e);
+	}
+    }
 
     /** Open a URL
      * 
@@ -57,14 +67,7 @@ public class URLLauncher {
      * @param parent parent component for error dialog
      */
     public static void openURL(URL url, Component parent) {
-	if (url.toExternalForm().startsWith("action:"))
-	    performAction(url.toExternalForm().substring(7), parent);
-	else try {
-	    BrowserFactory.getInstance().openUrl(url.toExternalForm());
-	    //BareBonesBrowserLaunch.openURL(url.toExternalForm(), parent);
-	} catch (Exception e) {
-	    ErrorMessage.error(parent, "Could not launch URL", e);
-	}
+	openURL(url.toExternalForm(), parent);
     }
 
     /** Open a string URL
@@ -75,12 +78,8 @@ public class URLLauncher {
     public static void openURL(String surl, Component parent) {
 	if (surl.startsWith("action:"))
 	    performAction(surl.substring(7), parent);
-	else try {
-	    BrowserFactory.getInstance().openUrl(surl);
-	    //BareBonesBrowserLaunch.openURL(surl, parent);
-	} catch (Exception e) {
-	    ErrorMessage.error(parent, "Could not launch URL", e);
-	}
+	else
+	    runBrowser(surl, parent);
     }
     
     /** Open an URL
