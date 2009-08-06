@@ -6,6 +6,14 @@ import java.awt.print.PageFormat;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.css.CSSPrimitiveValue;
 import org.xhtmlrenderer.context.StyleReference;
 import org.xhtmlrenderer.css.newmatch.Matcher;
@@ -22,6 +30,9 @@ import org.xhtmlrenderer.simple.XHTMLPrintable;
  * <p>
  * Seems to work nicely on Windows, not yet so much on Linux.
  * <p>
+ * Currently also converts form elements to text items. TODO make this
+ * configurable.
+ * <p>
  * This code was based on a
  * <a href="http://markmail.org/message/37rc4vaiz6peto5h">thread</a>
  * on xhtmlrenderer's users mailing list.
@@ -29,7 +40,7 @@ import org.xhtmlrenderer.simple.XHTMLPrintable;
  * <p>
  * TODO test more and finish
  */
-class TemplatePrintable extends XHTMLPrintable {
+public class TemplatePrintable extends XHTMLPrintable {
 
     public TemplatePrintable(XHTMLPanel panel) {
 	super(panel);
@@ -48,7 +59,7 @@ class TemplatePrintable extends XHTMLPrintable {
             g2r.getSharedContext().setDPI(72f);
             g2r.getSharedContext().getTextRenderer().setSmoothingThreshold(0);
             g2r.getSharedContext().setUserAgentCallback(panel.getSharedContext().getUserAgentCallback());
-            g2r.setDocument(panel.getDocument(), panel.getSharedContext().getUac().getBaseURL());
+            g2r.setDocument(translateFormElements(panel.getDocument()), panel.getSharedContext().getUac().getBaseURL());
             g2r.getSharedContext().setReplacedElementFactory(panel.getSharedContext().getReplacedElementFactory());
             fixPageInfo(g2r.getSharedContext().getCss(), pf, g2r.getSharedContext().getDPI());
             g2r.layout((Graphics2D)g, null);
@@ -85,6 +96,55 @@ class TemplatePrintable extends XHTMLPrintable {
 	} catch (Exception e) { 
 	    // TODO warn
 	    e.printStackTrace();
+	}
+    }
+    
+    /** Replace form elements with text.
+     * <p>
+     * Translates form elements to ordinary DIV's so one doesn't
+     * see the form elements on printout:
+     * <code><pre>
+     * &lt;span class="replaced-form-element"&gt;<i>form element value</i>&lt;/span&gt;
+     * </pre></code>
+     */
+    public static Document translateFormElements(Document origDoc) {
+	// clone the document
+	try {
+	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	    Document newDoc = factory.newDocumentBuilder().newDocument();
+	    newDoc.appendChild(newDoc.importNode(origDoc.getFirstChild(), true));
+	    if (origDoc.getDocumentURI()!=null)
+		newDoc.setDocumentURI(origDoc.getDocumentURI());
+	    newDoc.setStrictErrorChecking(origDoc.getStrictErrorChecking());
+	    newDoc.setXmlStandalone(origDoc.getXmlStandalone());
+	    newDoc.setXmlVersion(origDoc.getXmlVersion());
+	    // iterate the document, replace form elements with their contents
+	    NodeList elements = newDoc.getElementsByTagName("*");
+	    for (int i=0; i<elements.getLength(); i++) {
+		Node el = elements.item(i);
+		String text = null;
+		// element: input
+		if ("input".equals(el.getNodeName()) ||
+			"button".equals(el.getNodeName())) {
+		    Node attr = el.getAttributes().getNamedItem("value");
+		    if (attr!=null) text = attr.getNodeValue();
+		    if (text==null) text = "";
+		}
+		// TODO: other form elements 
+
+		// now create document elements
+		if (text!=null) {
+		    Element newEl = newDoc.createElement("span");
+	    	    newEl.setTextContent(text);
+	    	    newEl.setAttribute("class", "replaced-form-element");
+	    	    el.getParentNode().replaceChild(newEl, el);
+		}
+	    }
+	    return newDoc;
+	    
+	} catch (ParserConfigurationException e) {
+	    // on error, return original document; no form element fix :(
+	    return origDoc;
 	}
     }
 }

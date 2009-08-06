@@ -26,6 +26,7 @@ import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.FileFilterSuffix;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
+import nl.nikhef.xhtmlrenderer.swing.TemplatePrintable;
 
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -111,6 +112,7 @@ public class ActionViewVerificationForm extends CertificateAction {
 	    SwingUtilities.invokeLater(new Runnable() {
 		public void run() {
 		    try {
+			panel.refresh(); // to update changed fields in document
 			panel.print();
 			src.setCursor(Cursor.getDefaultCursor());
 		    } catch (PrinterException e) {
@@ -161,8 +163,10 @@ public class ActionViewVerificationForm extends CertificateAction {
 		dest = new File(dest.toString() + ".pdf");
 	    // and render to pdf
 	    try {
+		panel.refresh(); // to update changed fields in document
 		ITextRenderer r = new ITextRenderer();
-		r.setDocument(panel.getDocument(), panel.getDocument().getDocumentURI());
+		r.setDocument(TemplatePrintable.translateFormElements(panel.getDocument()),
+			panel.getDocument().getDocumentURI());
 		OutputStream os;
 		os = new FileOutputStream(dest);
 		r.layout();

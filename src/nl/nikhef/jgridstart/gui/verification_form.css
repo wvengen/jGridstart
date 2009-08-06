@@ -36,14 +36,17 @@
 	font-size: 6pt;
 	color: #888888;
 }
-.form .fillin, .form .fillin-fixed {
+.form .fillin, .form .fillin-fixed, .form .replaced-form-element {
 	width: 100%;
 	font-family: monospace;
 	font-size: 11pt;
 	font-weight: bold;
 }
-.form .fillin {
+.form .fillin, .form .replaced-form-element {
 	min-height: 1.5em; /* ex seems to have problems :( */
+}
+.form .replaced-form-element {
+	display: block;
 }
 .form .nowrap {
 	white-space: nowrap;
@@ -169,7 +172,7 @@ table.userinfo, table.signature {
 	color: #888888;
 	padding: 0;
 	font-size: 7pt;
-	height: 14pt;
+	height: 12pt;
 	vertical-align: top;
 	text-align: right;
 	display: inline-block;

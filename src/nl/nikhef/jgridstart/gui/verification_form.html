@@ -24,6 +24,9 @@
       </tr>
 	</table>
 	
+	<!-- In the input fields, we specify here both name="var" and value="${var}". But at
+	     printing we replace form elements with DIVs, and that needs the data present
+		 in the document itself. -->
 	<div class="userdata">
 	  <table><tr>
 	    <td class="userinfo" style="width: 60%" rowspan="2">
@@ -31,10 +34,10 @@
 	        <tr><td colspan="2">Surname <br/><div class="fillin" c="${surname}">Doe</div></td></tr>
 	        <tr><td colspan="2">Given names <br/><div class="fillin" c="${givenname}">John</div></td></tr>
 	        <tr>
-	          <td>Place of Birth <br/><input type="text" class="fillin" name="birthplace" size="20"/></td>
-	          <td style="text-align:right">Date of birth <br/><input type="text" class="fillin" name="birthdate" size="8"/></td>
+	          <td>Place of Birth <br/><input type="text" class="fillin" name="birthplace" size="20" value="${birthplace}"/></td>
+	          <td style="text-align:right">Date of birth <br/><input type="text" class="fillin" name="birthdate" size="8" value="${birthdate}"/></td>
 	        </tr>
-	        <tr><td colspan="2">Identity paper type, number, country <br/><input type="text" class="fillin" name="id" size="30"/></td></tr>
+	        <tr><td colspan="2">Identity paper type, number, country <br/><input type="text" class="fillin" name="id" size="30" value="${id}"/></td></tr>
 	        <tr><td colspan="2">SOFI number <span class="comment">(optional)</span><div class="fillin" c="${sofi}"></div></td></tr>
 	      </table>
 	    </td>
@@ -63,18 +66,18 @@
 	  <table class="userinfo">
 	    <tr>
 	      <td>Name <br/><div class="fillin" c="${givenname} ${surname}">John Doe</div></td>
-	      <td>Street addres <span class="comment">(physical delivery address)</span> <br/><input type="text" class="fillin" name="street"/></td>
+	      <td>Street addres <span class="comment">(physical delivery address)</span> <br/><input type="text" class="fillin" name="street" value="${street}"/></td>
 	    </tr>
 	    <tr>
 	      <td>Organisation <br/><div class="fillin" c="${org.rdn.full}">Foo inc.</div></td>
-	      <td>ZIP code <br/><input type="text" class="fillin" name="zip"/></td>
+	      <td>ZIP code <br/><input type="text" class="fillin" name="zip" value="${zip}"/></td>
 	    </tr>
 	    <tr>
-	      <td>Phone number <br/><input type="text" class="fillin" name="phone"/></td>
-	      <td>Place <span class="comment">(and province where applicable)</span> <br/><input type="text" class="fillin" name="place"/></td>
+	      <td>Phone number <br/><input type="text" class="fillin" name="phone" value="${phone}"/></td>
+	      <td>Place <span class="comment">(and province where applicable)</span> <br/><input type="text" class="fillin" name="place" value="${place}"/></td>
 	    </tr>
 	    <tr>
-	      <td>Email address <br/><input type="text" class="fillin" name="email"/></td>
+	      <td>Email address <br/><input type="text" class="fillin" name="email" value="${email}"/></td>
 	    </tr>
 	  </table>
 	  
