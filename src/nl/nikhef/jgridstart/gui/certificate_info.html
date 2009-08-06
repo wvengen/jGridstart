@@ -1,52 +1,53 @@
 <html>
 <head>
 	<title c="Certificate of ${subject.cn}"/>
-	<link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+	<link rel="stylesheet" type="text/css" href="style.css"/>
 </head>
-<body class="infopane">
+<body id="infopane">
 	<h1>Certificate of <span c="${subject.cn}"/></h1>
 
-	<p class="topinfo-bad" if="!${cert} and !${request}">
+	<p class="info-bad" if="!${cert} and !${request}">
       This certificate is incomplete, you might consider removing it.</p>
 
-    <p class="topinfo-ok" if="!${cert} and ${request} and !${request.submitted}">
+    <p class="info-ok" if="!${cert} and ${request} and !${request.submitted}">
 	  Your request still needs to be <a href="action:viewrequest(1)">submitted</a> to the certificate authority.</p>
 
-    <p class="topinfo-ok" if="!${cert} and ${request} and ${request.submitted} and !${request.processed}">
+    <p class="info-ok" if="!${cert} and ${request} and ${request.submitted} and !${request.processed}">
       Your request is currently awaiting approval (<a href="action:viewrequest(2)">more...</a>).</p>
 	  
-    <p class="topinfo-ok" if="!${cert} and ${request} and ${request.processed}">
+    <p class="info-ok" if="!${cert} and ${request} and ${request.processed}">
       Your request has been accepted, you can now <a href="action:install(3)">retrieve your certificate</a>.</p>
 	  
-	<p class="topinfo-bad" if="${cert} and !${valid}">
+	<p class="info-bad" if="${cert} and !${valid}">
 	  This certificate is expired, you can no longer use it.</p>
 
     <!-- message from certificate check -->
-	<p class="topinfo-message" if="${state.message}" c="${state.message}"/>
+	<p class="info-detail" if="${state.message}" c="${state.message}">There is some problem and this is the exact cause shown here in /foo/bar/blyp/blablah/usercert.pem</p>
 
+	<form>
 	<table summary="certificate details" cellpadding="3">
 		<tr>
-			<th class="name">Name</th>
+			<th class="name"><label>Name</label></th>
 			<td class="name">
 				<span c="${subject.cn}"></span> <tt c="${subject.e}"></tt>
 			</td>
 		</tr>
 		<tr>
-			<th class="org">Organisation</th>
+			<th class="org"><label>Organisation</label></th>
 			<td class="org">
 				<span c="${subject.o.html}"/><span if="${subject.ou}" c=", ${subject.ou.html}"/>
 			</td>
 		</tr>
 		<tr if="${issuer}">
-			<th class="issuer">Issuer</th>
+			<th class="issuer"><label>Issuer</label></th>
 			<td class="issuer" c="${issuer.cn}"></td>
 		</tr>
 		<tr if="${cert.sn}">
-			<th class="serial">Serial</th>
+			<th class="serial"><label>Serial</label></th>
 			<td class="serial"><a href="https://ca.dutchgrid.nl/medium/query/?id=${cert.sn}" c="${cert.sn}"></a></td>
 		</tr>
 		<tr>
-			<th class="validity">Valid</th>
+			<th class="validity"><label>Valid</label></th>
 			<td class="validity">
 				<span if="${valid.notbefore}" c="from ${valid.notbefore}"/>
 				<span if="${valid.notafter}" c="to ${valid.notafter}"/>
@@ -67,35 +68,40 @@
 		-->
 
 		<tr>
-			<td colspan="2" class="showdetails">
-				<a href="action:showdetails" class="shown-${(${view.showdetails})}">Details</a>
+			<td colspan="2" class="showdetails legend">
+				<a href="action:showdetails" class="shown-${(${view.showdetails})}">
+					<img src='triangle-right.png' widht='13' height='13' alt='>' if="!${view.showdetails}"/>
+					<img src='triangle-down.png' widht='13' height='13' alt='v' if="${view.showdetails}"/>
+					Details
+				</a>
 			</td>
 		</tr>
 		<tr class="details" if="${view.showdetails} and ${subject}">
-			<th class="dn">DN</th>
+			<th class="dn"><label>DN</label></th>
 			<td class="dn" c="${subject.x-dn-slash}"/>
 		</tr>	
 		<tr class="details" if="${view.showdetails} and ${modulus}">
-			<th class="modulus">Modulus</th>
+			<th class="modulus"><label>Modulus</label></th>
 			<td class="modulus" c="${modulus.first20}..."/>
 		</tr>
 		<tr class="details" if="${view.showdetails} and ${subject.x-hash}">
-			<th class="hash">Subject Hash</th>
+			<th class="hash"><label>Subject Hash</label></th>
 			<td class="hash" c="${subject.x-hash}"/>
 		</tr>
 		<tr class="details" if="${view.showdetails} and ${usage}">
-			<th class="usage">Usage</th>
+			<th class="usage"><label>Usage</label></th>
 			<td class="usage">
-				<span if="${usage.any}" title="usable for anything">any,</span> 
+				<span if="${usage.any}" title="usable for anything">Anything,</span> 
 				<span if="${usage.clientauth}" title="usable for client authentication like in a web browser">Client authentication,</span> 
 				<span if="${usage.emailprotection}" title="usable for signing and encrypting emails">Email protection,</span>
 			</td>
 		</tr>
 		<tr class="details" if="${view.showdetails} and ${path}">
-			<th class="location">Location</th>
+			<th class="location"><label>Location</label></th>
 			<td class="location" c="${path}"/>
 		</tr>
 	</table>
+	</form>
 
 </body>
 </html>
