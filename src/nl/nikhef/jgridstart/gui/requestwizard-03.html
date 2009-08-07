@@ -24,7 +24,7 @@
 	
 	<form>
 	<ol>
-		<li>Fill in the paper form <input type="button" value="display form" href="action:verificationform" />
+		<li>Fill in and print the paper form <input type="button" value="display form" href="action:verificationform" />
 			<a class="helpbutton" href="action:toggle(wizard.show.help1)">(help)</a>
 			<div class="help" if="${wizard.show.help1}">
 				Press the <i>display form</i> button, enter your personal details,
@@ -39,9 +39,8 @@
 				identity, and will sign the form that you printed in the previous step.
 				Your Registration Authority is <span c="${org.ras.html}"/>
 				(though you can visit
-				<a href="${org.lookupurl}">another</a>
-				as well).<br/>
-				Do make sure to bring your proof-of-identity, such as passport or driving license.
+				<a href="${org.lookupurl}">another</a> as well).<br/>
+				<strong>Do make sure to bring your proof-of-identity, such as passport or driving license.</strong>
 			</div></li>
 		<li>Send the signed form to the Certification Authority
 			<a class="helpbutton" href="action:toggle(wizard.show.help3)">(help)</a>
