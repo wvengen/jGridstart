@@ -305,6 +305,9 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	} catch (CertificateException e) {
 	    deletePath(dst);
 	    throw e;
+	} catch (CertificateCheckException e) {
+	    deletePath(dst);
+	    throw e;
 	}
     }
     
