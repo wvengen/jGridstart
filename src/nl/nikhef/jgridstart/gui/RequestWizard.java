@@ -28,6 +28,7 @@ import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.install.BrowserFactory;
 import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
+import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 /** Wizard that asks the user for information and generates the certificate */
@@ -122,6 +123,17 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		// on the correct certificate.
 		if (uri.startsWith("action:"))
 		    selection.setSelection(cert);
+		// hook for install step to set private key password from form before action
+		if (data().getProperty("wizard.privkeypass")!=null) {
+		    assert(cert!=null);
+		    try {
+			PasswordCache.getInstance().set(cert.getKeyFile().getCanonicalPath(),
+			    data().getProperty("wizard.privkeypass").toCharArray());
+		    } catch (IOException e) {
+			ErrorMessage.internal(getParent(), e);
+		    }
+		}
+		// go!
 		URLLauncherCertificate.openURL(uri, panel);
 		// refresh document after action because properties may be updated
 		if (uri.startsWith("action:"))
@@ -165,6 +177,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	// make sure to keep the password safe
 	data().setProperty("password1.volatile", "true");
 	data().setProperty("password2.volatile", "true");
+	data().setProperty("wizard.privkeypass.volatile", "true");
     }
     
     /** called before a page in wizard is changed */
@@ -222,10 +235,16 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		org.copyTo(data(), "org.");
 	}
 	
-	// clear error message, if any
+	// clear error message and passwords, if any
 	if (curPage != newPage) {
 	    data().remove("wizard.error");
 	    data().remove("wizard.error.volatile");
+	    data().remove("password1");
+	    data().remove("password1.volatile");
+	    data().remove("password2");
+	    data().remove("password2.volatile");
+	    data().remove("wizard.privkeypass");
+	    data().remove("wizard.privkeypass.volatile");
 	}
 	
 	// ok!

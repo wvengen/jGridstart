@@ -37,8 +37,11 @@
 <form>
 
 <ol if="${install.browser.certinst} and !${install.browser.certinst}!=manual">
-	<li>Read these instructions, then press the <em>install</em> button below.<br/>
-		You may need to enter your private key password again</li>
+	<li>Please enter the private key password that you have given before.<br/>
+		<label for="privkeypass">Password:</label>
+		<input id="privkeypass" name="wizard.privkeypass" type="password" size="25"/></li>
+
+	<li>Read these instructions, then press the <em>install</em> button below.</li>
 		
 	<!--
 	  -  Mozilla browsers
