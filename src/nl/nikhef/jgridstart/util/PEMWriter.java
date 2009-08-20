@@ -5,6 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
+
+import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 import org.bouncycastle.openssl.PasswordFinder;
 
@@ -49,11 +52,14 @@ public class PEMWriter extends org.bouncycastle.openssl.PEMWriter {
     /** Write object to PEM encrypted specifying algorithm */
     public void writeObject(Object obj, String algorithm, PasswordFinder pwf) throws NoSuchAlgorithmException, IOException {
 	final SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-	writeObject(obj, algorithm, pwf.getPassword(), random);
+	char[] pw = pwf.getPassword();
+	if (pw==null) throw new PasswordCancelledException();
+	writeObject(obj, algorithm, pw, random);
+	Arrays.fill(pw, '\0');
     }
     
     /** Write object to PEM encrypted using {@link PasswordCache} */
-    public void writeObject(Object obj, String msg) throws NoSuchAlgorithmException, IOException {
+    public void writeObject(Object obj, String msg) throws NoSuchAlgorithmException, IOException, PasswordCancelledException {
 	PasswordFinder pwf = PasswordCache.getInstance().getEncryptPasswordFinder(msg, f.getCanonicalPath());
 	writeObject(obj, pwf);
     }
@@ -67,22 +73,31 @@ public class PEMWriter extends org.bouncycastle.openssl.PEMWriter {
     /** Write single object to PEM */
     public static void writeObject(File f, Object obj) throws IOException {
 	PEMWriter w = new PEMWriter(f);
-	w.writeObject(obj);
-	w.close();
+	try {
+	    w.writeObject(obj);
+	} finally {
+	    w.close();
+	}
     }
 
     /** Write single object to PEM specifying provider */
     public static void writeObject(File f, String provider, Object obj) throws IOException {
 	PEMWriter w = new PEMWriter(f, provider);
-	w.writeObject(obj);
-	w.close();
+	try {
+	    w.writeObject(obj);
+	} finally {
+	    w.close();
+	}
     }
     
     /** Write single object to PEM encrypted using {@link PasswordCache} */
-    public static void writeObject(File f, Object obj, String msg) throws NoSuchAlgorithmException, IOException {
+    public static void writeObject(File f, Object obj, String msg) throws NoSuchAlgorithmException, IOException, PasswordCancelledException {
 	PEMWriter w = new PEMWriter(f);
-	w.writeObject(obj, msg);
-	w.close();
+	try {
+	    w.writeObject(obj, msg);
+	} finally {
+	    w.close();
+	}
     }
     
     /** Wrote single object to PEM encrypted with specified password.
@@ -93,10 +108,13 @@ public class PEMWriter extends org.bouncycastle.openssl.PEMWriter {
      */
     public static void writeObject(File f, Object obj, final char[] pw) throws NoSuchAlgorithmException, IOException {
 	PEMWriter w = new PEMWriter(f);
-	w.writeObject(obj, new PasswordFinder() {
-	    public char[] getPassword() { return pw; }
-	});
-	w.close();
+	try {
+	    w.writeObject(obj, new PasswordFinder() {
+		public char[] getPassword() { return pw; }
+	    });
+	} finally {
+	    w.close();
+	}
     }
 
     // TODO finish variants

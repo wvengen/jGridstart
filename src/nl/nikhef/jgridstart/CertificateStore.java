@@ -247,16 +247,19 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      */
     public CertificatePair delete(int index) throws IOException {
 	logger.info("Deleting certificate #"+index+": "+get(index));
-	// remove from list
 	CertificatePair cert = super.remove(index);
+	deletePath(cert.getPath());
+	return cert;
+    }
+    /** Deletes a path on which a CertificatePair is based from disk. */
+    protected void deletePath(File certPath) throws IOException {
 	// and from disk; subdirs are not deleted
-	File[] items = cert.getPath().listFiles();
+	File[] items = certPath.listFiles();
 	for (int i=0; i<items.length; i++)
 	    if (!items[i].delete())
 		throw new IOException("Could not remove file: "+items[i]);
-	if (!cert.getPath().delete())
-	    throw new IOException("Could not remove certificate directory "+cert.getPath()); 
-	return null;
+	if (!certPath.delete())
+	    throw new IOException("Could not remove certificate directory "+certPath); 
     }
     public CertificatePair delete(CertificatePair cert) throws IOException {
 	return delete(indexOf(cert));
@@ -285,22 +288,22 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	    add(cert);
 	    return cert;
 	} catch(IOException e) {
-	    dst.delete();
+	    deletePath(dst);
 	    throw e;
 	} catch(NoSuchAlgorithmException e) {
-	    dst.delete();
+	    deletePath(dst);
 	    throw e;
 	} catch (UnrecoverableKeyException e) {
-	    dst.delete();
+	    deletePath(dst);
 	    throw e;
 	} catch (KeyStoreException e) {
-	    dst.delete();
+	    deletePath(dst);
 	    throw e;
 	} catch (NoSuchProviderException e) {
-	    dst.delete();
+	    deletePath(dst);
 	    throw e;
 	} catch (CertificateException e) {
-	    dst.delete();
+	    deletePath(dst);
 	    throw e;
 	}
     }
@@ -321,7 +324,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	    add(cert);
 	    return cert;
 	} catch(IOException e) {
-	    dst.delete();
+	    deletePath(dst);
 	    throw e;
 	}
     }
@@ -341,7 +344,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	    add(cert);
 	    return cert;
 	} catch(IOException e) {
-	    dst.delete();
+	    deletePath(dst);
 	    throw e;
 	}
     }

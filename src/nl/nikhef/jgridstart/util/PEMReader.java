@@ -31,8 +31,12 @@ public class PEMReader extends org.bouncycastle.openssl.PEMReader {
      */
     public static Object readObject(File in) throws FileNotFoundException, IOException {
 	PEMReader r = new PEMReader(in);
-	Object o = r.readObject();
-	r.close();
+	Object o = null;
+	try {
+	    o = r.readObject();
+	} finally {
+	    r.close();
+	}
 	return o;
     }
     
@@ -77,8 +81,11 @@ public class PEMReader extends org.bouncycastle.openssl.PEMReader {
     public static Object readObject(File in, Class<?> type) throws FileNotFoundException, IOException {
 	PEMReader r = new PEMReader(in);
 	Object o = null;
-	while ( (o=r.readObject())!=null && !type.isInstance(o) );
-	r.close();
+	try {
+	    while ( (o=r.readObject())!=null && !type.isInstance(o) );
+	} finally {
+	    r.close();
+	}
 	if (type.isInstance(o))
 	    return o;
 	return null;
@@ -91,8 +98,12 @@ public class PEMReader extends org.bouncycastle.openssl.PEMReader {
      */
     public static Object readObject(File in, String msg) throws FileNotFoundException, IOException {
 	PEMReader r = new PEMReader(in, msg);
-	Object o = r.readObject();
-	r.close();
+	Object o = null;
+	try {
+	    o = r.readObject();
+	} finally {
+	    r.close();
+	}
 	return o;
     }
 
@@ -106,11 +117,13 @@ public class PEMReader extends org.bouncycastle.openssl.PEMReader {
     public static Object readObject(File in, Class<?> type, String msg) throws FileNotFoundException, IOException {
 	PEMReader r = new PEMReader(in, msg);
 	Object o = null;
-	while ( (o=r.readObject())!=null && !type.isInstance(o) );
-	r.close();
+	try {
+	    while ( (o=r.readObject())!=null && !type.isInstance(o) );
+	} finally {
+	    r.close();
+	}
 	if (type.isInstance(o))
 	    return o;
 	return null;
     }
-
 }

@@ -94,12 +94,12 @@ public class PasswordCache {
     }
     
     /** Invalidate a cache entry */
-    protected void invalidate(String loc) {
+    public void invalidate(String loc) {
 	// overwrite password for a little security
 	if (passwords.containsKey(loc)) {
 	    Arrays.fill(passwords.get(loc), '\0');
 	    passwords.remove(loc);
-	    logger.finest("Password removed on timeout for "+loc);
+	    logger.finest("Password removed for "+loc);
 	}
 	// remove timer stuff
 	if (timers.containsKey(loc)) {

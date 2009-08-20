@@ -425,7 +425,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	}
 	cert.notifyChanged();
 	
-	// run checks on imported certificate
+	// Run checks on imported certificate. Since private key password
+	// was just entered at import, check private key in detail as well.
 	cert.check(true);
 
 	return cert;
@@ -477,12 +478,19 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	PasswordCache pwcache = PasswordCache.getInstance();
 	String storename = "PKCS#12 store " + src.getName();
 	KeyStore store = KeyStore.getInstance("PKCS12", "BC");
-	char[] pw = pwcache.getForDecrypt(storename, src.getCanonicalPath());
-	if (pw == null) {
-	    // user cancel
-	    throw new KeyStoreException("User cancelled password entry");
+	char[] pw = null;
+	while (pw==null) {
+	    pw = pwcache.getForDecrypt(storename, src.getCanonicalPath());
+	    try {
+		store.load(new FileInputStream(src), pw);
+	    } catch(IOException e) {
+		if (e.getLocalizedMessage().contains("wrong password")) {
+		    // if bad password, invalidate and ask again
+		    pw = null;
+		    pwcache.invalidate(src.getCanonicalPath());
+		}
+	    }
 	}
-	store.load(new FileInputStream(src), pw);
 
 	if (store.size() == 0)
 	    throw new IOException("Not a PKCS#12 file: " + src);
