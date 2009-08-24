@@ -44,9 +44,11 @@ import org.xhtmlrenderer.layout.LayoutContext;
 import org.xhtmlrenderer.render.BlockBox;
 import org.xhtmlrenderer.resource.XMLResource;
 import org.xhtmlrenderer.swing.FSMouseListener;
-import org.xhtmlrenderer.swing.ImageResourceLoader;
 import org.xhtmlrenderer.swing.LinkListener;
+/* For xhtmlrenderer CVS
+import org.xhtmlrenderer.swing.ImageResourceLoader;
 import org.xhtmlrenderer.swing.RepaintListener;
+*/
 import org.xhtmlrenderer.swing.SwingReplacedElement;
 import org.xhtmlrenderer.swing.SwingReplacedElementFactory;
 import org.xhtmlrenderer.util.Configuration;
@@ -133,7 +135,9 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 	super();
 	// install custom form handling hooks
 	getSharedContext().setReplacedElementFactory(
-		new TemplateSwingReplacedElementFactory(null, new ImageResourceLoader())
+		new TemplateSwingReplacedElementFactory()
+		// for xhtmlrenderer CVS
+		//new TemplateSwingReplacedElementFactory(null, new ImageResourceLoader())
 	);
 	setFormSubmissionListener(this);
     }
@@ -286,12 +290,14 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 	public TemplateSwingReplacedElementFactory() {
 	    super();
 	}
+	/* for xhtmlrenderer CVS
 	public TemplateSwingReplacedElementFactory(RepaintListener listener) {
 	    super(listener);
 	}
 	public TemplateSwingReplacedElementFactory(final RepaintListener listener, final ImageResourceLoader irl) {
 	    super(listener, irl);
 	}
+	*/
 
 	@Override
 	public ReplacedElement createReplacedElement(LayoutContext context, BlockBox box,

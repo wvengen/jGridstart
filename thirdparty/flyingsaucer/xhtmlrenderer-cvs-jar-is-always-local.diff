@@ -1,0 +1,16 @@
+Index: src/java/org/xhtmlrenderer/swing/ImageResourceLoader.java
+===================================================================
+RCS file: /cvs/xhtmlrenderer/src/java/org/xhtmlrenderer/swing/ImageResourceLoader.java,v
+retrieving revision 1.2
+diff -u -r1.2 ImageResourceLoader.java
+--- src/java/org/xhtmlrenderer/swing/ImageResourceLoader.java	24 Jul 2009 09:21:02 -0000	1.2
++++ src/java/org/xhtmlrenderer/swing/ImageResourceLoader.java	24 Aug 2009 09:53:55 -0000
+@@ -151,7 +151,7 @@
+     }
+ 
+     public boolean isImmediateLoadUri(final String uri) {
+-        return uri.startsWith("jar:file:") || uri.startsWith("file:");
++        return uri.startsWith("jar:") || uri.startsWith("file:");
+     }
+ 
+     public synchronized void loaded(final ImageResource ir, final int width, final int height) {

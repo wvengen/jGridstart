@@ -11,10 +11,16 @@ Current version of xhtmlrenderer is Release 8 (R8) with some extra patches.
 These are submitted as patches into its issue tracker:
 
 * Support option groups in select combobox
+  xhtmlrenderer-optgroup.diff
   https://xhtmlrenderer.dev.java.net/issues/show_bug.cgi?id=282
 
-* Make java web start image loading work (make all jar: urls local)
-  TODO
+* Make java web start image loading work (make all jar: urls local) (CVS only)
+  xhtmlrenderer-cvs-jar-is-always-local.diff
 
-* Remove spurious logging message for image loading
+* Remove spurious logging message for image loading (CVS only)
+  xhtmlrenderer-cvs-spurious-print-01.diff
   https://xhtmlrenderer.dev.java.net/issues/show_bug.cgi?id=285
+
+The supplied script rebuild.sh should enable you to rebuild xhtmlrenderer from
+scratch. You can either build R8 or CVS head; the default is R8. Note that when
+using CVS, TemplatePanel must be changed a little (see comments there).
