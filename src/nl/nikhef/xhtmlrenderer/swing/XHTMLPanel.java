@@ -1,6 +1,8 @@
 package nl.nikhef.xhtmlrenderer.swing;
 
 import java.awt.Font;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.util.Iterator;
@@ -68,9 +70,18 @@ public class XHTMLPanel extends org.xhtmlrenderer.simple.XHTMLPanel implements I
      * @throws PrinterException
      */
     public boolean print() throws PrinterException {
-	final PrinterJob printJob = PrinterJob.getPrinterJob();
-        printJob.setPrintable(new TemplatePrintable(this));
+	PrinterJob printJob = PrinterJob.getPrinterJob();
+	PageFormat format = printJob.defaultPage();
+	// nuke margins, we can set them in xhtmlrenderer and need a page fit 
+	Paper paper = format.getPaper();
+	paper.setImageableArea(1e-3d, 1e-3d, Double.MAX_VALUE, Double.MAX_VALUE);
+	format.setPaper(paper);
+	format = printJob.validatePage(format);
+	// print with dialog
+        printJob.setPrintable(new TemplatePrintable(this), format);
         if (printJob.printDialog()) {
+            format = printJob.validatePage(format);
+            printJob.setPrintable(new TemplatePrintable(this), format);
             printJob.print();
         }
 	return true;

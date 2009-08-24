@@ -5,10 +5,12 @@
  /* no user-interface elements in printed page */
  @media print {
    .ui { display: none; }
-   body {
-     margin: 0;
-     padding: 0;
-   }
+	body {
+		margin: 0;
+		padding: 0;
+		/* against this XHTMLPanel's set-bg-to-default hack */
+ 		background: white;
+ 	}
 }
 @page {
   size: A4 portrait;

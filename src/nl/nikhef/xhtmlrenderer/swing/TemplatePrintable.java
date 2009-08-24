@@ -3,6 +3,7 @@ package nl.nikhef.xhtmlrenderer.swing;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
+import java.awt.print.Paper;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -32,7 +33,7 @@ import org.xhtmlrenderer.simple.XHTMLPrintable;
  * Currently also converts form elements to text items. TODO make this
  * configurable.
  * <p>
- * This code was based on a
+ * Originally, this code was based on a
  * <a href="http://markmail.org/message/37rc4vaiz6peto5h">thread</a>
  * on xhtmlrenderer's users mailing list.
  * 
@@ -40,7 +41,7 @@ import org.xhtmlrenderer.simple.XHTMLPrintable;
  * TODO test more and finish
  */
 public class TemplatePrintable extends XHTMLPrintable {
-
+    
     public TemplatePrintable(XHTMLPanel panel) {
 	super(panel);
     }
@@ -60,42 +61,13 @@ public class TemplatePrintable extends XHTMLPrintable {
             g2r.getSharedContext().setUserAgentCallback(panel.getSharedContext().getUserAgentCallback());
             g2r.setDocument(translateFormElements(panel.getDocument()), panel.getSharedContext().getUac().getBaseURL());
             g2r.getSharedContext().setReplacedElementFactory(panel.getSharedContext().getReplacedElementFactory());
-            fixPageInfo(g2r.getSharedContext().getCss(), pf, g2r.getSharedContext().getDPI());
+            // scale down a little to match pdf export (tuned manually)
+            float oldFontScale = panel.getSharedContext().getTextRenderer().getFontScale();
+            g2r.getSharedContext().getTextRenderer().setFontScale(oldFontScale*0.92f);
             g2r.layout((Graphics2D)g, null);
             g2r.getPanel().assignPagePrintPositions((Graphics2D)g);
 	}
 	return super.print(g, pf, page);
-    }
-    
-    /** Fix margins.
-     * <p>
-     * Set CSS margins from printer pageformat.
-     */
-    @SuppressWarnings("unchecked")
-    protected void fixPageInfo(StyleReference style, PageFormat pf, float dpi) {
-	try {
-	    final Field matcherField = StyleReference.class.getDeclaredField("_matcher");
-	    matcherField.setAccessible(true);
-	    final Matcher matcher = (Matcher) matcherField.get(style);
-	    final Field pageRulesField = Matcher.class.getDeclaredField("_pageRules");
-	    pageRulesField.setAccessible(true);
-	    final List pageRules = (List) pageRulesField.get(matcher);
-	    if (!pageRules.isEmpty()) {
-		final PageRule pageRule = (PageRule) pageRules.get(0);
-		final Ruleset ruleset = pageRule.getRuleset();
-		final List<PropertyDeclaration> declarations = ruleset.getPropertyDeclarations();
-		for (PropertyDeclaration declaration : declarations) {
-		    final CSSPrimitiveValue value = declaration.getValue();
-		    final Field floatValueField = PropertyValue.class.getDeclaredField("_floatValue");
-		    floatValueField.setAccessible(true);
-		    //if (declaration.getPropertyName().equals())
-		    floatValueField.setFloat(value, (float)pf.getImageableX() / dpi); // FIXME margin-top != margin-left, ...
-		}
-	    }
-	} catch (Exception e) { 
-	    // TODO warn
-	    e.printStackTrace();
-	}
     }
     
     /** Replace form elements with text.
