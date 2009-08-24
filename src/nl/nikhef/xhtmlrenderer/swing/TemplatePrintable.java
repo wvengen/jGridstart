@@ -63,7 +63,7 @@ public class TemplatePrintable extends XHTMLPrintable {
             g2r.getSharedContext().setReplacedElementFactory(panel.getSharedContext().getReplacedElementFactory());
             // scale down a little to match pdf export (tuned manually)
             float oldFontScale = panel.getSharedContext().getTextRenderer().getFontScale();
-            g2r.getSharedContext().getTextRenderer().setFontScale(oldFontScale*0.92f);
+            g2r.getSharedContext().getTextRenderer().setFontScale(oldFontScale*0.9f);
             g2r.layout((Graphics2D)g, null);
             g2r.getPanel().assignPagePrintPositions((Graphics2D)g);
 	}
