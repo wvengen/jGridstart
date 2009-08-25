@@ -9,7 +9,6 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
-import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
 /** Show the request wizard for an existing certificate.
@@ -51,7 +50,7 @@ public class ActionViewRequest extends CertificateAction {
     @Override
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
-	TemplateWizard dlg = null;
+	RequestWizard dlg = null;
 	
 	Window w = findWindow(e.getSource());
 	if (w instanceof Frame)
@@ -65,14 +64,7 @@ public class ActionViewRequest extends CertificateAction {
 	    dlg.setStep(Integer.valueOf(e.getActionCommand()));
 	} catch (NumberFormatException e1) {
 	    // figure out correct step
-	    if (!Boolean.valueOf(getCertificatePair().getProperty("request.submitted")))
-		dlg.setStep(1);
-	    else if (!Boolean.valueOf(getCertificatePair().getProperty("request.processed")))
-		dlg.setStep(2);
-	    else if (!Boolean.valueOf(getCertificatePair().getProperty("request.installed")))
-		dlg.setStep(3);
-	    else
-		dlg.setStep(2); // form by default
+	    dlg.setStepDetect();
 	}
 	dlg.setVisible(true);
     }

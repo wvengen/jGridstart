@@ -96,6 +96,22 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	data().setProperty("renewal.parent.modulus", certParent.getProperty("modulus"));
     }
     
+    /** Set the current step to the one that is relevant for the process. */
+    public void setStepDetect() {
+	if (cert==null)
+	    setStep(0);
+	else if (!Boolean.valueOf(cert.getProperty("request.submitted")))
+	    setStep(1);
+	else if (!Boolean.valueOf(cert.getProperty("request.processed")))
+	    setStep(2);
+	else if (!Boolean.valueOf(cert.getProperty("install.done")))
+	    setStep(3);
+	else if (pages.size()>=5)
+	    setStep(4); // post-install step, if present
+	else
+	    setStep(2); // fallback to form page
+    }
+    
     @Override
     protected void initialize() {
 	super.initialize();
@@ -105,6 +121,9 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	pages.add(getClass().getResource("requestwizard-02.html"));
 	pages.add(getClass().getResource("requestwizard-03.html"));
 	pages.add(getClass().getResource("requestwizard-04.html"));
+	// add optional user-supplied html page at the end
+	if (getClass().getResource("requestwizard-05.html")!=null)
+	    pages.add(getClass().getResource("requestwizard-05.html"));
 	setHandler(this);
 	// extra special handling of "action:" links
 	replaceLinkListener(new LinkListener() {
