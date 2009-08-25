@@ -35,7 +35,7 @@ public class NikhefCA implements CA {
     /** Base URL of certificate authority */
     protected String base = "http://www.nikhef.nl/~wvengen/testca/";
 
-    /** Create new OpenCA plugin; initializes SSL configuration 
+    /** Create new NikhefCA plugin; initializes SSL configuration 
      * 
      * @throws NoSuchAlgorithmException 
      * @throws KeyManagementException */

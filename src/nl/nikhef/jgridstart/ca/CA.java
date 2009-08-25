@@ -5,19 +5,18 @@ import java.util.Properties;
 import java.security.cert.X509Certificate;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 
-/**
- * Interface for communicating with an (online) Certification Authority (CA)
- * 
+/** Interface for communicating with an (online) Certification Authority (CA)
+ * <p>
  * This interface provides an abstraction layer to access a certification authority.
  * It is up to each implementation to use the arguments available. A certificate
  * signing request serial number can be returned by an implementation's
- * uploadCertificateRequest() which is passed to downloadCertificate() later.
- * When an implementation doesn't have or need a certificate signing request
- * serial number, it can just return null from uploadCertificationRequest().
- * 
- *  If you are creating a new implementation and find that the current interface
- *  provides insufficient information, please contact the developers, and we'll
- *  see if an API update is sensible.
+ * {@link #uploadCertificationRequest} which is passed to {@link #downloadCertificate}
+ * later. When an implementation doesn't have or need a certificate signing request
+ * serial number, it can just return [@code null} from {@link #uploadCertificationRequest}.
+ * <p>
+ * If you are creating a new implementation and find that the current interface
+ * provides insufficient information, please contact the developers, and we'll
+ * see if an API update is sensible.
  * 
  * @author wvengen
  */
@@ -33,30 +32,29 @@ public interface CA {
     public String uploadCertificationRequest(
 	    PKCS10CertificationRequest req, Properties info) throws IOException;
 
-    /**
-     * Checks to see if a certificate signing request was processed by a CA. When
-     * true, the certificate can be downloaded using downloadCertificate().
-     * 
+    /** Checks to see if a certificate signing request was processed by a CA.
+     * <p>
+     * When true, the certificate can be downloaded using {@link #downloadCertificate}.
+     * <p>
      * Implementers of this CA interface could, for example, just return if
-     * downloadCertificate() would complete without errors, optionally caching the
+     * {@link #downloadCertificate} would complete without errors, optionally caching the
      * fetched certificate.
      * 
      * @param req the certificate signing request that was sent
      * @param reqserial the serial number of the certificate signing request that was
      *               returned by submission of the certificate signing request 
-     * @return The X509Certificate signed by the certificate authority
+     * @return whether the certificate is available at the CA or not
      * @throws IOException
      */
     public boolean isCertificationRequestProcessed(
 	    PKCS10CertificationRequest req, String reqserial) throws IOException;
 
-    /**
-     * Download a certificate from the CA.
+    /** Download a certificate from the CA.
      * 
      * @param req the certificate signing request that was sent
      * @param reqserial the serial number of the certificate signing request that was
      *               returned by submission of the certificate signing request 
-     * @return The X509Certificate signed by the certificate authority
+     * @return certificate signed by the certificate authority
      * @throws IOException
      */
     public X509Certificate downloadCertificate(
