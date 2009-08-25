@@ -237,6 +237,10 @@ public class OpenCA implements CA {
 	return downloadCertificate(req, reqserial) != null;
     }
     
+    public X509Certificate getCACertificate() throws IOException {
+	throw new IOException("OpenCA certificate download not supported");
+    }
+    
     // temporary property classes
     static class GrixProperty {
 	static private Properties p = null;
@@ -256,5 +260,6 @@ public class OpenCA implements CA {
 	}
     }
     static class UserProperty extends GrixProperty { }
+
 
 }

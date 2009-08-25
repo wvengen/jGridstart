@@ -145,4 +145,9 @@ public class LocalCA implements CA {
 	}
 	return cert;
     }
+    
+    public X509Certificate getCACertificate() {
+	assert(cacert!=null);
+	return cacert;
+    }
 }

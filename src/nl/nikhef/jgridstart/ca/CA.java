@@ -59,4 +59,7 @@ public interface CA {
      */
     public X509Certificate downloadCertificate(
 	    PKCS10CertificationRequest req, String reqserial) throws IOException;
+    
+    /** Return the CA certificate */
+    public X509Certificate getCACertificate() throws IOException;
 }

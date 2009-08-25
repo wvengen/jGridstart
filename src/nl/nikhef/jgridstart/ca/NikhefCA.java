@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
@@ -34,6 +35,8 @@ public class NikhefCA implements CA {
     
     /** Base URL of certificate authority */
     protected String base = "http://www.nikhef.nl/~wvengen/testca/";
+    /** CA certificate (cached) */
+    protected static X509Certificate cacert = null;
 
     /** Create new NikhefCA plugin; initializes SSL configuration 
      * 
@@ -139,5 +142,23 @@ public class NikhefCA implements CA {
 	if (cert==null)
 	    throw new IOException("Certificate could not be retrieved: "+scert);
 	return cert;
+    }
+    
+    /** {@inheritDoc}
+     * <p>
+     * Nikhef CA certificate is downloaded once each program run.
+     */
+    public X509Certificate getCACertificate() throws IOException {
+	if (cacert==null) {
+	    // download when not present
+	    String scert = ConnectionUtils.pageContents(new URL(base+"?action=retrieve_ca_cert"));
+	    StringReader reader = new StringReader(scert);
+	    PEMReader r = new PEMReader(reader);
+	    cacert = (X509Certificate)r.readObject();
+	    r.close();
+	    if (cacert==null)
+		throw new IOException("CA certificate could not be retrieved: "+scert);
+	}
+	return cacert;
     }
 }
