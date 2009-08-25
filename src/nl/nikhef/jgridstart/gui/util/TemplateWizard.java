@@ -129,8 +129,8 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
     public void setStep(int s) {
 	int oldStep = step;
 	// call pre-hook first
-	if (handler!=null && !handler.pageLeave(this, oldStep, s))
-	    if (step!=-1) return;
+	if (handler!=null && step>=0 && !handler.pageLeave(this, oldStep, s))
+	    return;
 	
 	// handle final "Close" step which just quits the dialog
 	if (s == pages.size()) {
