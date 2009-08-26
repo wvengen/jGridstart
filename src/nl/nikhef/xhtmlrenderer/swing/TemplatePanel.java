@@ -409,6 +409,7 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 	    
 	    protected void doUpdate(Object source) {
 		String name = el.getAttribute("name");
+		if ("".equals(name)) return;
 		
 		if (source instanceof JRadioButton) {
 		    if (((JRadioButton)source).isSelected())
