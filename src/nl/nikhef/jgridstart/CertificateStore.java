@@ -83,7 +83,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	if (hostname.startsWith("tutorial")) {
 	    certhome += "personal-dutchgrid-certificate";
 	} else {
-	    certhome += ".globus-test"; // XXX only for testing
+	    certhome += ".globus";
 	}
 	certhome += File.separator;
 	load(certhome);
