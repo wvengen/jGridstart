@@ -418,19 +418,18 @@ public class CertificatePair extends Properties implements ItemSelectable {
 
 	if (src.isDirectory()) {
 	    cert.importFromDirectory(src);
+	    cert.check(false); // private key is not decrypted here
 	} else 	if (ext.equals("p12") || ext.equals("pfx")) {
 	    cert.importFromPKCS(src);
+	    cert.check(true); // needed password at import, so check privkey as well
 	} else if (ext.equals("pem")) {
 	    cert.importFromPEM(src);
+	    cert.check(true); // as above
 	} else {
 	    throw new IOException("Cannot determine format to import from, unknown file extension: "+ext);
 	}
 	cert.notifyChanged();
 	
-	// Run checks on imported certificate. Since private key password
-	// was just entered at import, check private key in detail as well.
-	cert.check(true);
-
 	return cert;
     }
 
