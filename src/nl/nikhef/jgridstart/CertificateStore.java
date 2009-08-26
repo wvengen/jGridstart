@@ -45,6 +45,8 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 
     protected File path = null;
     protected PasswordCache pwcache = null;
+    /** Default certificate (the one copied to ~/.globus) */
+    protected CertificatePair defaultCert = null;
 
     /** new empty certificate store */
     public CertificateStore() {
@@ -402,29 +404,38 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * When the certificate is not found in the certificate store, it is added
      * as a new one. Because of this, make sure to invoke this method only after
      * a store is loaded using {@link #load} (or a constructor doing that).
+     * <p>
+     * This can be called pretty often, so the result is cached. Updates outside
+     * of this program will not be picked up as a result while running.
      * 
      * @return Default CertificatePair, or null if not present or not matched. 
      */
     public CertificatePair getDefault() {
-	File dflCertFile = new File(path, "usercert.pem");
-	if (!dflCertFile.canRead()) return null;
-	X509Certificate dflCert = null;
-	try {
-	    dflCert = (X509Certificate)PEMReader.readObject(dflCertFile, X509Certificate.class);
-	    if (dflCert!=null) {
-		for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {
-		    CertificatePair c = it.next();
-		    if (c.getCertificate()!=null && c.getCertificate().equals(dflCert))
-			return c;
+	if (defaultCert==null) {
+	    File dflCertFile = new File(path, "usercert.pem");
+	    if (!dflCertFile.canRead()) return null;
+	    X509Certificate dflCert = null;
+	    try {
+		dflCert = (X509Certificate)PEMReader.readObject(dflCertFile, X509Certificate.class);
+		if (dflCert!=null) {
+		    for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {
+			CertificatePair c = it.next();
+			if (c.getCertificate()!=null && c.getCertificate().equals(dflCert)) {
+			    defaultCert = c;
+			    break;
+			}
+		    }
 		}
+	    } catch (IOException e) { }
+	    // if no match: add to certificate store
+	    if (defaultCert==null) {
+		try {
+		    logger.info("Adding existing default certificate to certificate store");
+		    defaultCert = importFrom(path);
+		} catch (Exception e) { }
 	    }
-	} catch (IOException e) { }
-	// no match: add to certificate store
-	try {
-	    logger.info("Adding existing default certificate to certificate store");
-	    return importFrom(path);
-	} catch (Exception e) { }
-	return null;
+	}
+	return defaultCert;
     }
     
     /** Make a Certificate Pair the default certificate. This is done by
@@ -432,6 +443,8 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * so that the globus toolkit and other compatible tools can use it. 
      * @throws IOException */
     public void setDefault(CertificatePair c) throws IOException {
+	if (defaultCert==c) return;
+	
 	CertificatePair oldDfl = getDefault();
 	File dflKey = new File(path, "userkey.pem");
 	File dflCert = new File(path, "usercert.pem");
@@ -442,6 +455,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	FileUtils.CopyFile(c.getKeyFile(), dflKey);
 	FileUtils.CopyFile(c.getCertFile(), dflCert);
 	// update listeners
+	defaultCert = c;
 	if (oldDfl!=null) notifyChanged(indexOf(oldDfl));
 	notifyChanged(indexOf(c));
     }
