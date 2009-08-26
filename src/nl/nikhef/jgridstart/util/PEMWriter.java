@@ -55,7 +55,6 @@ public class PEMWriter extends org.bouncycastle.openssl.PEMWriter {
 	char[] pw = pwf.getPassword();
 	if (pw==null) throw new PasswordCancelledException();
 	writeObject(obj, algorithm, pw, random);
-	Arrays.fill(pw, '\0');
     }
     
     /** Write object to PEM encrypted using {@link PasswordCache} */

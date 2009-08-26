@@ -135,7 +135,7 @@ public class CertificateCheck {
      */
     protected void checkCSR() throws CertificateCheckException {
 	File f = cert.getCSRFile();
-	// certificate request must only exist when no certificate is present
+	// certificate request only really should exist when no certificate is present
 	try {
 	    if (cert.getCertificate()!=null) 
 	    	return;
