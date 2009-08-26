@@ -10,10 +10,18 @@
 
 <div class="wizard-page">
 
-<p>Congratulations, you now have access to the grid with your system!
-The following links can help you in using the grid:</p>
+<p if="${install.done}">
+	You have access to the grid with this system.
+	The following links can help you to get started using the grid:
+</p>
+
+<p if="!${install.done}">
+	You may want to go back and finish the previous steps.
+	Afterwards, the following links can help you to get started using the grid:
+ </p>
 
 <ul>
+	<li><a href="http://www.nikhef.nl/~wvengen/testca/?action=retrieve_ca_cert&amp;install=true">Install CA certificate</a> (recommended)</li>
 	<li><a href="https://voms.grid.sara.nl:8443/vomses">Subscribe to a virtual organisation (VOMS)</a></li>
 	<li><a href="https://grid.sara.nl/wiki/index.php/Using_the_Grid/">Using the Grid</a></li>
 </ul>
