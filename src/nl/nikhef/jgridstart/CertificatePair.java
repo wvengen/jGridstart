@@ -209,7 +209,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		if (containsKey(key)) return super.getProperty(key);
 		if (getProperty("subject")==null) return null;
 		// parse organisation from subject
-		return Organisation.getFromCertificate(this).getProperty("x-full-rdn");
+		String org = Organisation.getFromCertificate(this).getProperty("x-full-rdn");
+		if (org!=null) setProperty("org", org);
+		return org;
 	    }
 	    if (key.equals("modulus"))
 		if (getCertificate()!=null) return ((RSAPublicKey)getCertificate().getPublicKey()).getModulus().toString();
