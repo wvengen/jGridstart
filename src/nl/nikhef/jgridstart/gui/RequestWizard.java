@@ -258,10 +258,6 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	if (curPage != newPage) {
 	    data().remove("wizard.error");
 	    data().remove("wizard.error.volatile");
-	    data().remove("password1");
-	    data().remove("password1.volatile");
-	    data().remove("password2");
-	    data().remove("password2.volatile");
 	    data().remove("wizard.privkeypass");
 	    data().remove("wizard.privkeypass.volatile");
 	}
