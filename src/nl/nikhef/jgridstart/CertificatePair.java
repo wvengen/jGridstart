@@ -210,7 +210,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		if (getProperty("subject")==null) return null;
 		// parse organisation from subject
 		String org = Organisation.getFromCertificate(this).getProperty("x-full-rdn");
-		if (org!=null) setProperty("org", org);
+		if (org!=null) super.setProperty("org", org);
 		return org;
 	    }
 	    if (key.equals("modulus"))
