@@ -98,18 +98,23 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     
     /** Set the current step to the one that is relevant for the process. */
     public void setStepDetect() {
+	int step = 2; // fallback to form page
+	
 	if (cert==null)
-	    setStep(0);
-	else if (!Boolean.valueOf(cert.getProperty("request.submitted")))
-	    setStep(1);
-	else if (!Boolean.valueOf(cert.getProperty("request.processed")))
-	    setStep(2);
-	else if (!Boolean.valueOf(cert.getProperty("install.done")))
-	    setStep(3);
-	else if (pages.size()>=5)
-	    setStep(4); // post-install step, if present
-	else
-	    setStep(2); // fallback to form page
+	    step = 0;
+	else if (!Boolean.valueOf(cert.getProperty("cert"))) {
+	    if (!Boolean.valueOf(cert.getProperty("request.submitted")))
+		step = 1;
+	    else if (!Boolean.valueOf(cert.getProperty("request.processed")))
+		step = 2;
+	} else {
+	    if (!Boolean.valueOf(cert.getProperty("install.done")))
+		step = 3;
+	    else if (pages.size()>=5)
+		step = 4; // post-install step, if present
+	}
+	
+	setStep(step);
     }
     
     @Override
