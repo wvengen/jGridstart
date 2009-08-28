@@ -231,10 +231,32 @@ public class JGSFrame extends JFrame {
 	    jMenuBar.add(Box.createHorizontalGlue());
 	    menu = new JMenu("Help");
 	    menu.setMnemonic('H');
+	    addHelpItems(menu);
+	    menu.addSeparator();
 	    menu.add(new JMenuItem(getAction("about")));
 	    jMenuBar.add(menu);
 	}
 	return jMenuBar;
+    }
+    
+    /** Adds help items from global properties.
+     * <p>
+     * See the file {@code global.properties} for details, all properties starting
+     * with {@code jgridstart.help} are used here.
+     * 
+     * @param menu
+     */
+    private void addHelpItems(JMenu menu) {
+	final String prefix = "jgridstart.help";
+	if (System.getProperty(prefix)==null) return;
+	String[] items = System.getProperty(prefix).split(",\\s*");
+	for (int i=0; i<items.length; i++) {
+	    String item = items[i];
+	    menu.add(new ActionOpenURL(this,
+		    System.getProperty(prefix+"."+item+".title"),
+		    System.getProperty(prefix+"."+item+".mnemonic").charAt(0),
+		    System.getProperty(prefix+"."+item+".url")));
+	}
     }
 
     /**
