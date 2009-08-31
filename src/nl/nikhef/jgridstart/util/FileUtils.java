@@ -27,12 +27,39 @@ public class FileUtils {
 	    try {
 		int ret = Exec(new String[]{"robocopy.exe"});
 		if (ret!=0 && ret!=16) throw new InterruptedException();
-		// we have robocopy
+		// we have robocopy. But ... its destination filename
+		//   needs to be equal to the source filename :(
+		//   So we rename any existing file out of the way, copy
+		//   the new file, rename it to the new name, and restore
+		//   the optional original file. All this is required to
+		//   copy a file retaining its permissions.
+		// TODO proper return value handling (!)
+		
+		// move old file out of the way
+		File origFile = new File(out.getParentFile(), in.getName());
+		File origFileRenamed = null;
+		if (origFile.exists()) {
+		    origFileRenamed = new File(origFile.getParentFile(), origFile.getName()+".xxx_tmp");
+		    origFile.renameTo(origFileRenamed);
+		} else {
+		    origFile = null;
+		}
+		// copy file to new place
 		cmd = new String[]{"robocopy.exe",
-			    in.getAbsolutePath(),
-			    out.getAbsolutePath(),
-			    "/SEC", "/NP"};
-		return Exec(cmd) == 0;
+			    in.getParent(), out.getParent(),
+			    in.getName(),
+			    "/SEC", "/NP", "/NS", "/NC", "/NFL", "/NDL"};
+		ret = Exec(cmd);
+		// rename new file
+		if (ret==0) {
+		    new File(out.getParentFile(), in.getName()).renameTo(out);
+		}
+		
+		// move old file to original place again
+		if (origFile!=null)
+		    origFileRenamed.renameTo(origFile);
+		
+		return ret == 0;
 	    } catch (InterruptedException e) {
 		// use xcopy instead
 		cmd = new String[]{"xcopy.exe",
