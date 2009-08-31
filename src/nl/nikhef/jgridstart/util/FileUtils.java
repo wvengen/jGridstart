@@ -32,7 +32,7 @@ public class FileUtils {
 		cmd = new String[]{"robocopy.exe",
 			    in.getAbsolutePath(),
 			    out.getAbsolutePath(),
-			    "/COPYALL", "/NP"};
+			    "/SEC", "/NP"};
 	    } catch (InterruptedException e) {
 		// use xcopy instead
 		cmd = new String[]{"xcopy.exe",
