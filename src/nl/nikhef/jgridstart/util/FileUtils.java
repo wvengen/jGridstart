@@ -21,12 +21,18 @@ public class FileUtils {
     public static boolean CopyFile(File in, File out) throws IOException {
 	String[] cmd;
 	if (System.getProperty("os.name").startsWith("Windows")) {
+	    boolean hasRobocopy = false;
+	    
 	    // windows: use special copy program to retain permissions.
 	    //   on Vista, "xcopy /O" requires administrative rights, so we
 	    //   have to resort to using robocopy there.
 	    try {
 		int ret = Exec(new String[]{"robocopy.exe"});
 		if (ret!=0 && ret!=16) throw new InterruptedException();
+		hasRobocopy = true;
+	    } catch (InterruptedException e) { }
+	    
+	    if (hasRobocopy) {
 		// we have robocopy. But ... its destination filename
 		//   needs to be equal to the source filename :(
 		//   So we rename any existing file out of the way, copy
@@ -49,7 +55,7 @@ public class FileUtils {
 			    in.getParent(), out.getParent(),
 			    in.getName(),
 			    "/SEC", "/NP", "/NS", "/NC", "/NFL", "/NDL"};
-		ret = Exec(cmd);
+		int ret = Exec(cmd);
 		boolean success = (ret==0) || (ret==1);
 		// rename new file
 		if (success) {
@@ -61,7 +67,7 @@ public class FileUtils {
 		    origFileRenamed.renameTo(origFile);
 		
 		return success;
-	    } catch (InterruptedException e) {
+	    } else {
 		// use xcopy instead
 		cmd = new String[]{"xcopy.exe",
 		    in.getAbsolutePath(),
