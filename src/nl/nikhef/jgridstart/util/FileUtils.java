@@ -50,8 +50,9 @@ public class FileUtils {
 			    in.getName(),
 			    "/SEC", "/NP", "/NS", "/NC", "/NFL", "/NDL"};
 		ret = Exec(cmd);
+		boolean success = (ret==0) || (ret==1);
 		// rename new file
-		if (ret==0) {
+		if (success) {
 		    new File(out.getParentFile(), in.getName()).renameTo(out);
 		}
 		
@@ -59,7 +60,7 @@ public class FileUtils {
 		if (origFile!=null)
 		    origFileRenamed.renameTo(origFile);
 		
-		return ret == 0;
+		return success;
 	    } catch (InterruptedException e) {
 		// use xcopy instead
 		cmd = new String[]{"xcopy.exe",
