@@ -25,26 +25,26 @@ public class FileUtils {
 	    //   on Vista, "xcopy /O" requires administrative rights, so we
 	    //   have to resort to using robocopy there.
 	    try {
-		cmd = new String[] { "robocopy.exe" };
-		int ret = Runtime.getRuntime().exec(cmd).waitFor();
+		int ret = Exec(new String[]{"robocopy.exe"});
 		if (ret!=0 && ret!=16) throw new InterruptedException();
 		// we have robocopy
 		cmd = new String[]{"robocopy.exe",
 			    in.getAbsolutePath(),
 			    out.getAbsolutePath(),
 			    "/SEC", "/NP"};
+		return Exec(cmd) == 0;
 	    } catch (InterruptedException e) {
 		// use xcopy instead
 		cmd = new String[]{"xcopy.exe",
 		    in.getAbsolutePath(),
 		    out.getAbsolutePath(),
 		    "/O", "/Q", "/Y"};
+		    // If the file/ doesn't exist on copying, xcopy will ask whether you want
+		    // to create it as a directory or just copy a file, so we always
+		    // just put "F" in xcopy's stdin.
+		    return Exec(cmd, "F", null) == 1;
 	    }
 	    
-	    // If the file/ doesn't exist on copying, xcopy will ask whether you want
-	    // to create it as a directory or just copy a file, so we always
-	    // just put "F" in xcopy's stdin.
-	    return Exec(cmd, "F", null) == 0;
 	} else {
 	    // other, assume unix-like
 	    cmd = new String[]{"cp",
