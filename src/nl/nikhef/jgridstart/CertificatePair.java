@@ -44,7 +44,9 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
-import nl.nikhef.jgridstart.ca.*;
+import nl.nikhef.jgridstart.ca.CA;
+import nl.nikhef.jgridstart.ca.CAException;
+import nl.nikhef.jgridstart.ca.CAFactory;
 import nl.nikhef.jgridstart.util.CryptoUtils;
 import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PEMReader;
@@ -717,7 +719,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @throws KeyException 
      * @throws CertificateException 
      * @throws IOException */
-    public void uploadRequest() throws CertificateException, KeyException, NoSuchAlgorithmException, IllegalStateException, NoSuchProviderException, SignatureException, IOException {
+    public void uploadRequest() throws CertificateException, KeyException, NoSuchAlgorithmException, IllegalStateException, NoSuchProviderException, SignatureException, IOException, CAException {
 	logger.finer("Uploading certificate request for: "+this);
 	try {
 	    if (getCertificate()!=null) throw new IOException();
@@ -737,8 +739,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * Also sets the property {@code request.processed} accordingly.
      *  
      * @throws NoSuchAlgorithmException 
-     * @throws KeyManagementException */
-    public boolean isCertificationRequestProcessed() throws KeyManagementException, NoSuchAlgorithmException {
+     * @throws KeyManagementException 
+     * @throws CAException */
+    public boolean isCertificationRequestProcessed() throws KeyManagementException, NoSuchAlgorithmException, CAException {
 	boolean isProcessed;
 	try {
 	    isProcessed = getCA().isCertificationRequestProcessed(getCSR(), getProperty("request.serial"));
@@ -749,8 +752,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return isProcessed;
     }
     
-    /** Download the certificate from the certificate authority */
-    public void downloadCertificate() throws IOException, CertificateCheckException, KeyManagementException, NoSuchAlgorithmException {
+    /** Download the certificate from the certificate authority 
+     * @throws CAException */
+    public void downloadCertificate() throws IOException, CertificateCheckException, KeyManagementException, NoSuchAlgorithmException, CAException {
 	if (getCertificate()!=null) {
 	    logger.warning("Ignoring request to download certificate when already present: "+this);
 	    return;
@@ -773,9 +777,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * different CA's. 
      * @throws NoSuchAlgorithmException 
      * @throws KeyManagementException */
-    protected CA getCA() throws KeyManagementException, NoSuchAlgorithmException {
-	final CA ca = new NikhefCA();
-	return ca;
+    protected CA getCA() throws KeyManagementException, NoSuchAlgorithmException, CAException {
+	return CAFactory.getDefault();
     }
 
     /** get the source of this certificate, if any */
@@ -876,8 +879,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @return whether the refresh was successful or no
      * @throws NoSuchAlgorithmException 
      * @throws KeyManagementException 
+     * @throws CAException 
      */
-    public boolean refresh() throws KeyManagementException, NoSuchAlgorithmException {
+    public boolean refresh() throws KeyManagementException, NoSuchAlgorithmException, CAException {
 	// TODO should check if disk contents changed, update if so.
 	//      load(path) should not be done here, since that clears
 	//      the current state. E.g. at some point in the request-new

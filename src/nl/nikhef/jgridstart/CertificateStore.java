@@ -37,6 +37,7 @@ import nl.nikhef.jgridstart.util.PEMReader;
 import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
+import nl.nikhef.jgridstart.ca.CAException;
 import nl.nikhef.jgridstart.gui.util.ArrayListModel;
 
 public class CertificateStore extends ArrayListModel<CertificatePair> implements ItemListener {
@@ -141,7 +142,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * @throws KeyManagementException 
      * @throws IOException 
      */
-    public void refresh() throws KeyManagementException, NoSuchAlgorithmException, IOException {
+    public void refresh() throws KeyManagementException, NoSuchAlgorithmException, IOException, CAException {
 	if (path == null) {
 	    logger.warning("Refresh of empty certificate store");
 	    return;

@@ -198,7 +198,7 @@ public class Main {
      * @throws NoSuchAlgorithmException 
      * @throws KeyManagementException 
      * @throws CertificateCheckException */
-    protected static void actionGet(CommandLine line) throws ParseException, KeyManagementException, NoSuchAlgorithmException, IOException, CertificateCheckException {
+    protected static void actionGet(CommandLine line) throws ParseException, KeyManagementException, NoSuchAlgorithmException, IOException, CertificateCheckException, Exception {
 	CertificatePair cert = getCertificate(line);
 	cert.downloadCertificate();
     }

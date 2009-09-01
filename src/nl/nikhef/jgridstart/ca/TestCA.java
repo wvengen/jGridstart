@@ -4,13 +4,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Logger;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -24,44 +19,29 @@ import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
 
 /**
- * This class is used to download a certificate from a Nikhef CA
+ * This class is used to download a certificate from the Test CA
  * 
  * @author wvengen
  * 
  */
-public class NikhefCA implements CA {
+public class TestCA implements CA {
     
-    static final protected Logger logger = Logger.getLogger(NikhefCA.class.getName());
+    static final protected Logger logger = Logger.getLogger(TestCA.class.getName());
     
     /** Base URL of certificate authority */
-    protected String base = "http://www.nikhef.nl/~wvengen/testca/";
+    final protected String base = System.getProperty("jgridstart.ca.base");
     /** CA certificate (cached) */
     protected static X509Certificate cacert = null;
 
-    /** Create new NikhefCA plugin; initializes SSL configuration 
+    /** Create new NikhefCA plugin 
      * 
      * @throws NoSuchAlgorithmException 
      * @throws KeyManagementException */
-    public NikhefCA() throws NoSuchAlgorithmException, KeyManagementException {
-	// TODO try better way to create https connection. maybe using hostname verifier
-	//      or supply host certificate with application and require that. 
-
-	// Create a trust manager that does not validate certificate chains
-	TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-	    public X509Certificate[] getAcceptedIssuers() {
-		return null;
-	    }
-	    public void checkClientTrusted(X509Certificate[] certs, String authType) { }
-	    public void checkServerTrusted(X509Certificate[] certs, String authType) { }
-	} };
-
-	// Install the all-trusting trust manager
-	SSLContext sc = SSLContext.getInstance("SSL");
-	sc.init(null, trustAllCerts, new java.security.SecureRandom());
-	HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+    public TestCA() throws NoSuchAlgorithmException, KeyManagementException {
+	// nothing to do
     }
 
-    /** Uploads a user certificate signing request onto a Nikhef CA
+    /** Uploads a user certificate signing request onto the Test CA
      * 
      * @param req {@inheritDoc}
      * @param info {@inheritDoc}; only "email" is used here.
@@ -116,7 +96,7 @@ public class NikhefCA implements CA {
 	return downloadCertificate(req, reqserial) != null;
     }
 
-    /** Download a certificate from the Nikhef CA
+    /** Download a certificate from the Test CA
      * 
      * @param req {@inheritDoc} (not used by NikhefCA)
      * @param reqserial {@inheritDoc} 
@@ -146,7 +126,7 @@ public class NikhefCA implements CA {
     
     /** {@inheritDoc}
      * <p>
-     * Nikhef CA certificate is downloaded once each program run.
+     * Test CA certificate is downloaded once each program run.
      */
     public X509Certificate getCACertificate() throws IOException {
 	if (cacert==null) {

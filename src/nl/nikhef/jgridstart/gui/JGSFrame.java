@@ -391,6 +391,7 @@ public class JGSFrame extends JFrame {
 	    new SwingWorker<Void, Void>() {
 		@Override
 		protected Void doInBackground() throws Exception {
+		    // XXX exceptions are lost; usually ok but maybe not always
 		    selection.getCertificatePair().refresh();
 		    return null;
 		}
