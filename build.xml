@@ -35,6 +35,9 @@
 	<!-- extra tool definitions -->
 	<property name="browsertool.target.name" value="browsertool"/>
 	<property name="browsertool.target.main" value="nl.nikhef.jgridstart.install.BrowserTool"/>
+	
+	<property name="tests.target.name" value="tests"/>
+	<property name="tests.target.main" value="nl.nikhef.jgridstart.AllTests"/>
 
 	<!-- reference to property file defining the properties
 	  -     keystore.file      java keystore file
@@ -57,6 +60,7 @@
 	  -->
 
 	<property name="dep.bouncycastle" location="${dir.thirdparty}/bouncycastle/bcprov-jdk14-143.jar"/>
+	<basename property="dep.bouncycastle.basename" file="${dep.bouncycastle}"/>
 	<property name="dep.bouncycastle.smime" location="${dir.thirdparty}/bouncycastle/bcmail-jdk14-143.jar"/>
 	<property name="dep.bouncycastle.tsp" location="${dir.thirdparty}/bouncycastle/bctsp-jdk14-143.jar"/>
 	<property name="dep.javamail" location="${dir.thirdparty}/bouncycastle/mail-1.4.1.jar"/>
@@ -105,6 +109,38 @@
 		<exclude name="**/CVS"/>
 		<exclude name="**/.svn"/>
 	</patternset>
+	
+	<!-- files to include as dependencies in jars -->
+	<resources id="depfiles">
+		<zipfileset src="${dep.commons-lang}" includes="**/*.class"/>
+		<zipfileset src="${dep.commons-cli}" includes="**/*.class"/>
+		<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
+		<zipfileset src="${dep.xhtmlrenderer}">
+			<include name="**/*.class"/>
+				<exclude name="**/tool/**"/>
+			<exclude name="**/swt/**"/>
+			<exclude name="**/SWT**"/>
+		</zipfileset>
+		<zipfileset src="${dep.itext}">
+			<include name="**/*.class"/>
+			<include name="**/fonts/*"/>
+			<exclude name="**/tools/**"/>
+		</zipfileset>
+		<zipfileset src="${dep.winregistry}" includes="**/*.class"/>
+		<!-- iText needs some org.bouncycastle.cms classes but some other classes in this
+		     package reference javax.mail which we don't want to include as well (so that
+		     ProGuard can resolve them). Solution: only include part of the smime package.
+		     In addition to this, certificate renewal also requires S/MIME mail stuff.
+		     The activation framework doesn't appear to be needed during run -->
+		<zipfileset src="${dep.bouncycastle.smime}">
+			<include name="org/bouncycastle/cms/**"/>
+			<include name="org/bouncycastle/mail/smime/*.class/"/>
+			<include name="org/bouncycastle/mail/smime/util/*.class/"/>
+		</zipfileset>
+		<zipfileset src="${dep.bouncycastle.tsp}" includes="**/*.class"/>
+		<zipfileset src="${dep.javamail}" includes="**/*.class"/>
+	</resources>
+	
 
 	<!--
 	  - Initialisation and other setup
@@ -173,7 +209,6 @@
 	  -  Full JAR creation target
 	  -->
 	<target name="jar.large" depends="compile">
-		<basename property="dep.bouncycastle.basename" file="${dep.bouncycastle}"/>
 		<jar jarfile="${dir.dist}/${target.name}.large.jar">
 			<manifest>
 				<attribute name="Built-By" value="${user.name}"/>
@@ -183,33 +218,7 @@
 			<fileset dir="${dir.build}">
 				<patternset refid="distfiles"/>
 			</fileset>
-			<zipfileset src="${dep.commons-lang}" includes="**/*.class"/>
-			<zipfileset src="${dep.commons-cli}" includes="**/*.class"/>
-			<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
-			<zipfileset src="${dep.xhtmlrenderer}">
-				<include name="**/*.class"/>
- 				<exclude name="**/tool/**"/>
-				<exclude name="**/swt/**"/>
-				<exclude name="**/SWT**"/>
-			</zipfileset>
-			<zipfileset src="${dep.itext}">
-				<include name="**/*.class"/>
-				<include name="**/fonts/*"/>
-				<exclude name="**/tools/**"/>
-			</zipfileset>
-			<zipfileset src="${dep.winregistry}" includes="**/*.class"/>
-			<!-- iText needs some org.bouncycastle.cms classes but some other classes in this
-			     package reference javax.mail which we don't want to include as well (so that
-			     ProGuard can resolve them). Solution: only include part of the smime package.
-			     In addition to this, certificate renewal also requires S/MIME mail stuff.
-			     The activation framework doesn't appear to be needed during run -->
-			<zipfileset src="${dep.bouncycastle.smime}">
-				<include name="org/bouncycastle/cms/**"/>
-				<include name="org/bouncycastle/mail/smime/*.class/"/>
-				<include name="org/bouncycastle/mail/smime/util/*.class/"/>
-			</zipfileset>
-			<zipfileset src="${dep.bouncycastle.tsp}" includes="**/*.class"/>
-			<zipfileset src="${dep.javamail}" includes="**/*.class"/>
+			<resources refid="depfiles"/>
 		</jar>
 	</target>
 	
@@ -290,13 +299,15 @@
 		<delete file="${dir.dist}/${target.name}.jar"/>
 		<delete file="${dir.dist}/${target.name}.jnlp"/>
 		<delete file="${dir.dist}/bcprov.jnlp"/>
-		<basename property="dep.bouncycastle.basename" file="${dep.bouncycastle}"/>
 		<delete file="${dir.dist}/${dep.bouncycastle.basename}"/>
+		<delete file="${dir.dist}/${browsertool.target.name}.jar"/>
+		<delete file="${dir.dist}/${tests.target.name}.jar"/>
 	</target>
 
 	<!--
 	  - extra targets
 	  -->
+	<!-- browsertool -->
 	<target name="browsertool" depends="compile">
 		<jar jarfile="${dir.dist}/${browsertool.target.name}.jar">
 			<manifest>
@@ -314,6 +325,21 @@
 		<!-- sign it, required for java web start -->
 		<signjar keystore="${keystore.file}" jar="${dir.dist}/${browsertool.name}.jar"
 			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
+	</target>
+	
+	<!-- archive with unit tests -->
+	<target name="jar.tests" depends="compile">
+		<jar jarfile="${dir.dist}/${tests.target.name}.jar">
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+				<attribute name="Main-Class" value="${tests.target.main}"/>
+				<attribute name="Class-Path" value="${dep.bouncycastle.basename}"/>
+			</manifest>
+			<fileset dir="${dir.build}"/>
+			<resources refid="depfiles"/>
+			<zipfileset src="${dep.junit}" includes="**/*.class"/>
+			<zipfileset src="${dep.abbot}" includes="**/*.class"/>
+		</jar>
 	</target>
 
 	<!-- javadoc with APIviz, needs graphviz >= 2.20 -->
