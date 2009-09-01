@@ -124,7 +124,7 @@ public class DutchGridCA implements CA {
 	String[] pre;
 	try {
 	    pre = new String[] {
-	    	"query", ((RSAPublicKey)req.getPublicKey()).getModulus().toString().substring(0,20),
+	    	"id", ((RSAPublicKey)req.getPublicKey()).getModulus().toString(16).substring(0,20),
 	    	"fmt", "single"
 	    };
 	} catch (Exception e) {

@@ -216,11 +216,11 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		return org;
 	    }
 	    if (key.equals("modulus"))
-		if (getCertificate()!=null) return ((RSAPublicKey)getCertificate().getPublicKey()).getModulus().toString();
-		else if (getCSR()!=null) return ((RSAPublicKey)getCSR().getPublicKey()).getModulus().toString();
+		if (getCertificate()!=null) return ((RSAPublicKey)getCertificate().getPublicKey()).getModulus().toString(16);
+		else if (getCSR()!=null) return ((RSAPublicKey)getCSR().getPublicKey()).getModulus().toString(16);
 	    if (key.equals("modulus.first20")) {
-		if (getCertificate()!=null) return ((RSAPublicKey)getCertificate().getPublicKey()).getModulus().toString().substring(0,20);
-		else if (getCSR()!=null) return ((RSAPublicKey)getCSR().getPublicKey()).getModulus().toString().substring(0,20);
+		if (getCertificate()!=null) return ((RSAPublicKey)getCertificate().getPublicKey()).getModulus().toString(16).substring(0,20);
+		else if (getCSR()!=null) return ((RSAPublicKey)getCSR().getPublicKey()).getModulus().toString(16).substring(0,20);
 		else return null;
 	    }
 	    if (key.equals("valid")) {

@@ -39,7 +39,7 @@ public class TestCA implements CA {
      * @throws KeyManagementException */
     public TestCA() throws NoSuchAlgorithmException, KeyManagementException {
 	if (base==null)
-	    base = "http://ra.dutchgrid.nl/ra/public/submit";
+	    base = "http://www.nikhef.nl/~wvengen/testca/";
     }
 
     /** Uploads a user certificate signing request onto the Test CA
