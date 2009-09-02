@@ -232,7 +232,7 @@ public class FileUtils {
      * 
      * @param cmd command to run
      * @param input String to feed to process's stdin
-     * @param output String to which stdin and stdout is appended, or null
+     * @param output String to which stdout and stderr is appended, or null
      * @return process exit code
      * 
      * @throws IOException */
@@ -245,7 +245,7 @@ public class FileUtils {
 	Process p = Runtime.getRuntime().exec(cmd);
 	if (input!=null) {
 	    p.getOutputStream().write(input.getBytes());
-	    p.getOutputStream().flush();
+	    p.getOutputStream().close();
 	}
 	// retrieve output
 	String s = System.getProperty("line.separator");

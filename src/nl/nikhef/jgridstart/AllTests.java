@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanelTest;
 import nl.nikhef.jgridstart.install.BrowsersMacOSXTest;
+import nl.nikhef.jgridstart.util.FileUtilsTest;
 import nl.nikhef.jgridstart.util.PasswordCacheTest;
 import nl.nikhef.xhtmlrenderer.swing.TemplateDocumentTest;
 import nl.nikhef.xhtmlrenderer.swing.TemplatePanelTest;
@@ -19,6 +20,7 @@ public class AllTests {
     public static Test suite() {
 	TestSuite suite = new TestSuite("Test for nl.nikhef.jgridstart");
 	//$JUnit-BEGIN$
+	suite.addTestSuite(FileUtilsTest.class);
 	suite.addTestSuite(PasswordCacheTest.class);
 	suite.addTestSuite(CertificateCheckTest.class);
 	suite.addTestSuite(BrowsersMacOSXTest.class);
