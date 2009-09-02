@@ -94,6 +94,30 @@ public class FileUtilsTest extends TestCase {
     @Test public void testCopyUseronly3() throws Exception { copyFileTest(true, true, false, false); }
     @Test public void testCopyUseronly4() throws Exception { copyFileTest(true, false, false, false); }
     // skip tests without read permissions since copying can't be done then
+    
+    /** Windows robocopy test case where destination file name with same name as
+     * source filename is present. */
+    @Test
+    public void testCopyRobocopyCheck1() throws Exception {
+	File src = createDummyTempFile();
+	File tmpdir = FileUtils.createTempDir("test");
+	File tmpsrc = new File(tmpdir.getParentFile(), src.getName());
+	File tmpdst = new File(tmpdir.getParentFile(), "foobar.tmp");
+	final String dummyStr = "dummy test file with same name as file copied from";
+	try {
+	    FileWriter writer = new FileWriter(tmpsrc);
+	    writer.append(dummyStr);
+	    writer.close();
+	    FileUtils.CopyFile(src, tmpdst);
+	    assertTrimmedEquals(dummyStr, FileUtils.readFile(tmpdst));
+	} finally {
+	    src.delete();
+	    tmpsrc.delete();
+	    tmpdst.delete();
+	    tmpdir.delete();
+	}
+	
+    }
 
     public void copyFileTest(boolean read, boolean write, boolean exec, boolean userOnly) throws Exception  {
 	File src = createDummyTempFile();

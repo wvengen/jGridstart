@@ -56,7 +56,7 @@ public class FileUtils {
 			    in.getName(),
 			    "/SEC", "/NP", "/NS", "/NC", "/NFL", "/NDL"};
 		int ret = Exec(cmd);
-		boolean success = ret < 4;
+		boolean success = ret < 4 && ret >= 0;
 		// rename new file
 		if (success) {
 		    new File(out.getParentFile(), in.getName()).renameTo(out);
