@@ -3,6 +3,8 @@ package nl.nikhef.jgridstart.util;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,11 +22,20 @@ public class FileUtilsTest extends TestCase {
      */
     protected void assertPermissions(File f, boolean read, boolean write, boolean exec, boolean userOnly) throws AssertionFailedError, IOException {
 	try {
-	    assertEquals(read, f.canRead());
-	    assertEquals(write, f.canWrite());
-	    assertEquals(exec, f.canExecute());
-	} catch (java.lang.NoSuchMethodError e){
-	    // methods only available for Java 1.6 and higher
+	    // methods only available for Java 1.6 and higher; want to compile on 1.5 too
+	    final Method canRead = File.class.getDeclaredMethod("canRead", new Class[] {});
+	    final Method canWrite = File.class.getDeclaredMethod("canWrite", new Class[] {});
+	    final Method canExecute = File.class.getDeclaredMethod("canExecute", new Class[] {});
+	    
+	    assertEquals(read, ((Boolean)canRead.invoke(f, new Object[]{})).booleanValue());
+	    assertEquals(write, ((Boolean)canWrite.invoke(f, new Object[]{})).booleanValue());
+	    assertEquals(exec, ((Boolean)canExecute.invoke(f, new Object[]{})).booleanValue());
+	} catch (NoSuchMethodException e){
+	    // too bad ...
+	} catch (InvocationTargetException e) {
+	    throw new IOException(e.getLocalizedMessage());
+	} catch (IllegalAccessException e) {
+	    throw new IOException(e.getLocalizedMessage());
 	}
 	
 	if (System.getProperty("os.name").startsWith("Windows")) {
