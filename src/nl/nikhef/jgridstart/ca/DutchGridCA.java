@@ -73,7 +73,7 @@ public class DutchGridCA implements CA {
 		"email_1", info.getProperty("email"),
 		"email_2", info.getProperty("email"),
 		"requesttext", reqWriter.toString(),
-		"Public", "Upload Publishing Data",
+		"Publish", "Upload Publishing Data",
 		"robot", "true"
 	};
 
