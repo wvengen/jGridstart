@@ -28,9 +28,8 @@ public class FileUtils {
 	    //   have to resort to using robocopy there.
 	    try {
 		int ret = Exec(new String[]{"robocopy.exe"});
-		if (ret!=0 && ret!=16) throw new InterruptedException();
-		hasRobocopy = true;
-	    } catch (InterruptedException e) { }
+		if (ret==0 && ret==16) hasRobocopy = true;
+	    } catch (Exception e) { }
 	    
 	    if (hasRobocopy) {
 		// we have robocopy. But ... its destination filename
