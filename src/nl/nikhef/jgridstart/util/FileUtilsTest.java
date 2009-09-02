@@ -176,11 +176,12 @@ public class FileUtilsTest extends TestCase {
     }
     @Test
     public void testExecReadWrite() throws Exception {
-	String progname = "cat";
+	String[] cmd = new String[] { "echo" };
+	if (System.getProperty("os.name").startsWith("Windows"))
+	    cmd = new String[] { "cmd", "/C", "type", "CON:" };
 	String s = System.getProperty("line.separator");
-	if (System.getProperty("os.name").startsWith("Windows")) progname = "type";
 	StringBuffer out = new StringBuffer();
-	FileUtils.Exec(new String[]{progname}, "foo bar"+s, out);
+	FileUtils.Exec(cmd, "foo bar"+s, out);
 	assertEquals("foo bar"+s, out.toString());
     }
 }
