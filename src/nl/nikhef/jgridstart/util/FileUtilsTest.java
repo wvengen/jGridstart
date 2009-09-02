@@ -15,6 +15,19 @@ import org.junit.Test;
 
 public class FileUtilsTest extends TestCase {
     
+    /** as {@link #assertEquals} but then with lineendings trimmed */
+    public void assertTrimmedEquals(CharSequence expect, CharSequence real) throws AssertionFailedError {
+	String s = System.getProperty("line.separator");
+	String sexpect = expect.toString();
+	if (sexpect.startsWith(s)) sexpect = sexpect.substring(s.length(), sexpect.length());
+	if (sexpect.endsWith(s)) sexpect = sexpect.substring(0, sexpect.length()-s.length());
+	String sreal = expect.toString();
+	if (sreal.startsWith(s)) sreal = sreal.substring(s.length(), sreal.length());
+	if (sreal.endsWith(s)) sreal = sreal.substring(0, sreal.length()-s.length());
+	if (!sexpect.equals(sreal))
+	    throw new AssertionFailedError("expected:<"+sexpect+"> but was:<"+sreal+">");
+    }
+    
     /** Helper method: make sure file permissions are ok.
      * <p>
      * This method only checks it if it is possible to do so on this system
@@ -41,7 +54,6 @@ public class FileUtilsTest extends TestCase {
 	if (System.getProperty("os.name").startsWith("Windows")) {
 	    // no check 
 	} else {
-	    String n = userOnly ? "" : "not ";
 	    String perms = (read?"r":"-") + (write?"w":"-") + (exec?"x":"-");
 	    StringBuffer out = new StringBuffer();
 	    FileUtils.Exec(new String[]{"ls", "-l", "-d", f.getPath()}, null, out);
@@ -156,7 +168,10 @@ public class FileUtilsTest extends TestCase {
 
     @Test
     public void testExecSimple() throws Exception  {
-	assertEquals(0, FileUtils.Exec(new String[]{"echo", "hi there"}));
+	String[] cmd = new String[]{"echo", "hi there"};
+	if (System.getProperty("os.name").startsWith("Windows"))
+	    cmd = new String[]{"cmd", "/C", "echo", "hi there"};
+	assertEquals(0, FileUtils.Exec(cmd));
     }
     @Test
     public void testExecSimpleFail() throws Exception {
@@ -171,17 +186,28 @@ public class FileUtilsTest extends TestCase {
     @Test
     public void testExecRead() throws Exception {
 	StringBuffer out = new StringBuffer();
-	FileUtils.Exec(new String[]{"echo", "hi there"}, null, out);
-	assertEquals("hi there"+System.getProperty("line.separator"), out.toString());
+	String[] cmd = new String[]{"echo", "hi there"};
+	if (System.getProperty("os.name").startsWith("Windows"))
+	    cmd = new String[]{"cmd", "/C", "echo", "hi there"};
+	FileUtils.Exec(cmd, null, out);
+	assertTrimmedEquals("hi there", out.toString());
     }
     @Test
     public void testExecReadWrite() throws Exception {
-	String[] cmd = new String[] { "echo" };
-	if (System.getProperty("os.name").startsWith("Windows"))
-	    cmd = new String[] { "cmd", "/C", "type", "CON:" };
-	String s = System.getProperty("line.separator");
-	StringBuffer out = new StringBuffer();
-	FileUtils.Exec(cmd, "foo bar"+s, out);
-	assertEquals("foo bar"+s, out.toString());
+	// On Windows, exec has a problem that stdin isn't closed when the
+	// end of data to supply to the process's stdin is reached and hangs.
+	// So there we run a shell, and exit. On other systems just cat
+	// is enough.
+	if (!System.getProperty("os.name").startsWith("Windows")) {
+	    String[] cmd = new String[] { "cat" };
+	    StringBuffer out = new StringBuffer();
+	    FileUtils.Exec(cmd, "foo bar", out);
+	    assertTrimmedEquals("foo bar", out.toString());
+    	} else {
+	    String[] cmd = new String[] { "cmd" };
+	    StringBuffer out = new StringBuffer();
+	    FileUtils.Exec(cmd, "exit"+System.getProperty("line.separator"), out);
+	    assertTrue(out.toString().startsWith("Microsoft Windows"));
+    	}
     }
 }
