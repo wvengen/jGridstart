@@ -431,7 +431,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    publish("state.certificate_created");
 		}
 		// upload request only if no certificate present yet
-		if (cert.getCertificate()==null) {
+		if (cert.getCertificate()==null && !Boolean.valueOf(cert.getProperty("request.processed"))) {
 		    // upload request if it hasn't been done
 		    if (!Boolean.valueOf(cert.getProperty("request.submitted"))) {
 			cert.uploadRequest();

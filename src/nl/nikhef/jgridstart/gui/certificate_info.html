@@ -9,7 +9,7 @@
 	<p class="info-bad" if="!${cert} and !${request}">
       This certificate is incomplete, you might consider removing it manually.</p>
 
-    <p class="info-ok" if="!${cert} and ${request} and !${request.submitted}">
+    <p class="info-ok" if="!${cert} and ${request} and !${request.submitted} and !${request.processed}">
 	  Your request still needs to be <a href="action:viewrequest(1)">submitted</a> to the certificate authority.</p>
 
     <p class="info-ok" if="!${cert} and ${request} and ${request.submitted} and !${request.processed}">

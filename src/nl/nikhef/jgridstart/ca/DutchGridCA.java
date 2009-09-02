@@ -7,10 +7,8 @@ import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 
@@ -124,7 +122,7 @@ public class DutchGridCA implements CA {
 	String[] pre;
 	try {
 	    pre = new String[] {
-	    	"id", ((RSAPublicKey)req.getPublicKey()).getModulus().toString(16).substring(0,20),
+	    	"id", ((RSAPublicKey)req.getPublicKey()).getModulus().toString(16),
 	    	"fmt", "single"
 	    };
 	} catch (Exception e) {
