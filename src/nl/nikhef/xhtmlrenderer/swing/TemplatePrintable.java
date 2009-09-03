@@ -3,10 +3,6 @@ package nl.nikhef.xhtmlrenderer.swing;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
-import java.awt.print.Paper;
-import java.lang.reflect.Field;
-import java.util.List;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -14,13 +10,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.css.CSSPrimitiveValue;
-import org.xhtmlrenderer.context.StyleReference;
-import org.xhtmlrenderer.css.newmatch.Matcher;
-import org.xhtmlrenderer.css.parser.PropertyValue;
-import org.xhtmlrenderer.css.sheet.PageRule;
-import org.xhtmlrenderer.css.sheet.PropertyDeclaration;
-import org.xhtmlrenderer.css.sheet.Ruleset;
 import org.xhtmlrenderer.simple.Graphics2DRenderer;
 import org.xhtmlrenderer.simple.XHTMLPanel;
 import org.xhtmlrenderer.simple.XHTMLPrintable;
