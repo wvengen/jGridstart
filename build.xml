@@ -161,15 +161,13 @@
 	<taskdef resource="proguard/ant/task.properties"
 		classpath="${dir.thirdparty}/proguard/proguard.jar"/>
 	<!-- subversion -->
-	<typedef resource="com/googlecode/svntask/svntask.xml">
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml">
 		<classpath><fileset dir="${dir.thirdparty}/svnant">
-			<include name="svnkit.jar"/>
-			<include name="svntask.jar"/>
+			<include name="*.jar"/>
 		</fileset></classpath>
 	</typedef>
-	<svn><info path="." revisionProperty="revisionVersion" /></svn>
-	<property name="target.revision" value="${revisionVersion}"/>
-	
+	<svn failonerror="false"><wcVersion path="." prefix="svn."/></svn>
+	<property name="target.revision" value="${svn.revision.range}"/>
 	<!-- timestamp -->
 	<target name="init">
 		<tstamp/>
