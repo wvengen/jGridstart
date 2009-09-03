@@ -28,7 +28,7 @@ public class CertificateStoreTest extends TestCase {
      * <p>
      * Beware, symlinks might traverse into unwanted territory!
      */
-    protected void recursiveDelete(File what) {
+    protected static void recursiveDelete(File what) {
 	File[] children = what.listFiles();
 	for (int i=0; i<children.length; i++) {
 	    File c = children[i];
@@ -62,7 +62,7 @@ public class CertificateStoreTest extends TestCase {
      * @return path of newly created entry
      * @throws IOException
      */
-    protected File addCopyTest(String name, File store) throws IOException {
+    protected static File addCopyTest(String name, File store) throws IOException {
 	File path = FileUtils.createTempDir("user-cert-", store);
 	File copyFrom = CertificateCheckTest.getResourceFile(name);
 	File[] files = FileUtils.listFilesOnly(copyFrom);
@@ -81,7 +81,6 @@ public class CertificateStoreTest extends TestCase {
 	CertificateStore store = new CertificateStore();
 	store.load(path.getPath());
 	assertEquals(1, store.size());
-	// TODO finish
     }
 
     /** Load {@linkplain CertificateStore} from path */
@@ -123,6 +122,7 @@ public class CertificateStoreTest extends TestCase {
 	assertEquals(0, store.size());
     }
     
+    /** Test removal by index */
     @Test
     public void testDeleteInt() throws Exception {
 	CertificateStore store = new CertificateStore(newTestStore(2));
@@ -133,6 +133,7 @@ public class CertificateStoreTest extends TestCase {
 	assertEquals(0, store.size());
     }
 
+    /** Test removal by {@linkplain CertificatePair} */
     @Test
     public void testDeleteCertificatePair() throws Exception {
 	CertificateStore store = new CertificateStore(newTestStore(3));
@@ -142,23 +143,6 @@ public class CertificateStoreTest extends TestCase {
 	assertEquals(1, store.size());
     }
     
-    // TODO import from several PEM, PKCS, path good and bad tests; maybe separate class
-
-    @Test
-    public void testGenerateRequestProperties() throws Exception {
-	fail("Not yet implemented");
-    }
-
-    @Test
-    public void testGenerateRequestPropertiesCharArray() throws Exception {
-	fail("Not yet implemented");
-    }
-
-    @Test
-    public void testGenerateRenewal() throws Exception {
-	fail("Not yet implemented");
-    }
-
     @Test
     public void testGetDefault() throws Exception {
 	fail("Not yet implemented");
