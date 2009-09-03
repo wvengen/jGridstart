@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -84,6 +85,60 @@ public class FileUtils {
 		    "-f", "-p",
 		    in.getAbsolutePath(), out.getAbsolutePath()};
 	    return Exec(cmd) == 0;
+	}
+    }
+    
+    /** List ordinary files in a directory.
+     * <p>
+     * 
+     * @see File#listFiles
+     * @param path Directory to list files in
+     */
+    public static File[] listFilesOnly(File path) {
+	return path.listFiles(new FileFilter() {
+	    public boolean accept(File pathname) {
+		return pathname.isFile();
+	    }
+	});
+    }
+    
+    /** Moves a list of files to a directory.
+     * <p>
+     * When an error occurs, files already moved are put back and an
+     * {@linkplain IOException} is thrown.
+     * <p>
+     * It is discouraged to have files with the same name
+     * existing already in the destination path.
+     */
+    public static void MoveFiles(File[] fromFiles, File toPath) throws IOException {
+	// construct destination file names
+	File[] toFiles = new File[fromFiles.length];
+	for (int i=0; i<fromFiles.length; i++) {
+	    toFiles[i] = new File(toPath, fromFiles[i].getName());
+	}
+	// then copy
+	try {
+	    for (int i=0; i<fromFiles.length; i++) {
+		if (!fromFiles[i].renameTo(toFiles[i]))
+		    throw new IOException("Could not set default certificate " +
+			    " (move "+fromFiles[i]+" to "+toFiles[i]+")");
+	    }
+	} catch (IOException e) {
+	    String extra = "";
+	    // move already moved files back
+	    for (int i=0; i<fromFiles.length; i++) {
+		if (!fromFiles[i].exists()) {
+		    if (!toFiles[i].renameTo(fromFiles[i]))
+			extra += "  "+fromFiles[i].getPath()+"\n";
+		}
+	    }
+	    // and propagate exception
+	    if (extra=="")
+		throw e;
+	    else
+		throw new IOException(e.getMessage() +
+			"\n\nNote that the following files could NOT be restored:\n" +
+			extra);
 	}
     }
     

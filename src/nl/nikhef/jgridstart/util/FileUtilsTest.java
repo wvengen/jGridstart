@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -132,6 +133,37 @@ public class FileUtilsTest extends TestCase {
 	} finally {
 	    src.delete();
 	    dst.delete();
+	}
+    }
+    
+    @Test
+    public void testListFilesOnly() throws Exception {
+	File dir = FileUtils.createTempDir("test");
+	File file1 = new File(dir, "test01.tmp");
+	File file2 = new File(dir, "test02.tmp");
+	File file3 = new File(dir, "test03.tmp");
+	File filedir = new File(dir, "testdir.tmp");
+	
+	try {
+	    file1.createNewFile();
+	    file2.createNewFile();
+	    file3.createNewFile();
+	    filedir.mkdir();
+
+	    File[] files = FileUtils.listFilesOnly(dir);
+	    Arrays.sort(files);
+	    File [] wantfiles = new File[] {file1, file2, file3};
+	    Arrays.sort(wantfiles);
+
+	    assertEquals(wantfiles.length, files.length);
+	    for (int i=0; i<wantfiles.length; i++)
+		assertEquals(wantfiles[i].getCanonicalPath(), files[i].getCanonicalPath());
+	} finally {
+	    file1.delete();
+	    file2.delete();
+	    file3.delete();
+	    filedir.delete();
+	    dir.delete();
 	}
     }
 
