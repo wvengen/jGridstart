@@ -23,6 +23,7 @@ public class AllTests {
 	suite.addTestSuite(FileUtilsTest.class);
 	suite.addTestSuite(PasswordCacheTest.class);
 	suite.addTestSuite(CertificateCheckTest.class);
+	suite.addTestSuite(CertificateStoreTest.class);
 	suite.addTestSuite(BrowsersMacOSXTest.class);
 	suite.addTestSuite(TemplateDocumentTest.class);
 	suite.addTestSuite(TemplatePanelTest.class);
