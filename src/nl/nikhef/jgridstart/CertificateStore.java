@@ -29,6 +29,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.bouncycastle.mail.smime.SMIMEException;
 import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 
@@ -46,8 +47,10 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 
     protected File path = null;
     protected PasswordCache pwcache = null;
-    /** Default certificate (the one copied to ~/.globus) */
+    /** Default certificate (the one copied to {@code ~/.globus}) */
     protected CertificatePair defaultCert = null;
+    /** Prefix of user certificate subdirs of {@code ~/.globus} to load from */
+    protected final String userCertPrefix = "user-cert-";
 
     /** new empty certificate store */
     public CertificateStore() {
@@ -106,20 +109,26 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     /**
      * load certificates
      * 
-     * All subdirectories of the supplied path are loaded as separate
-     * certificates.
+     * All subdirectories of the supplied path that start with
+     * {@link #userCertPrefix} are loaded as separate certificates; in
+     * addition to this, the directory itself is loaded as well.
      * 
-     * @param path
-     *            Directory to load certificates from
+     * @param path Directory to load certificates from
      */
     public void load(File path) {
 	this.path = path;
 	if (!path.isDirectory()) return;
-	List<File> files = Arrays.asList(path.listFiles());
+	File[] files = (File[])ArrayUtils.addAll(new File[]{path}, path.listFiles());
+	
 	// add new items
-	for (Iterator<File> i = files.iterator(); i.hasNext();) {
-	    File f = i.next();
+	for (int i=0; i<files.length; i++) {
+	    File f = files[i];
+	    // filter out unwanted items
+	    if (f!=path && !f.getName().startsWith(userCertPrefix)) continue;
 	    if (!f.isDirectory()) continue;
+	    // for default cert, require key to exist
+	    if (f==path && !new File(f, "userkey.pem").exists()) continue;
+	    // make sure it doesn't exist already in this store
 	    boolean found = false;
 	    for (int j = 0; j < size(); j++) {
 		File a = get(j).getPath();
@@ -128,12 +137,10 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 		    break;
 		}
 	    }
+	    // add when required
 	    if (!found)
 		tryAdd(f);
 	}
-	// now if only one certificate is present it should be the
-	// default certificate
-	trySetDefault();
     }
 
     /**
@@ -159,24 +166,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	}
 	removeAll(removals);
 	// add new items
-	for (Iterator<File> i = files.iterator(); i.hasNext();) {
-	    File f = i.next();
-	    if (!f.isDirectory()) continue;
-	    boolean found = false;
-	    for (int j = 0; j < size(); j++) {
-		File a = get(j).getPath();
-		if (a.equals(f)) {
-		    found = true;
-		    break;
-		}
-	    }
-	    if (!found)
-		tryAdd(f);
-	}
-	// now if only one certificate is present it should be the
-	// default certificate
-	if (size()==1 && getDefault()==null)
-	    trySetDefault(get(0));
+	load(path);
     }
 
     /**
@@ -233,9 +223,6 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     }
     /** ItemListener handler to catch changes in CertificatePair */
     public void itemStateChanged(ItemEvent e) {
-	// now if only one certificate is present it should be the
-	// default certificate
-	trySetDefault();
 	// and notify selection change listeners
 	notifyChanged(indexOf(e.getItem()));
     }
@@ -397,14 +384,10 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	return newCert;
     }
 
-    /** Return the default certificate.<p>
-     * The default certificate is the one in {@code ~/.globus}
-     * (or the platform's equivalent). Normally this is a symlink to or copy of
-     * a certificate in the store.
+    /** Return the default certificate.
      * <p>
-     * When the certificate is not found in the certificate store, it is added
-     * as a new one. Because of this, make sure to invoke this method only after
-     * a store is loaded using {@link #load} (or a constructor doing that).
+     * The default certificate is the one in {@code ~/.globus}
+     * (or the platform's equivalent).
      * <p>
      * This can be called pretty often, so the result is cached. Updates outside
      * of this program will not be picked up as a result while running.
@@ -413,67 +396,74 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      */
     public CertificatePair getDefault() {
 	if (defaultCert==null) {
-	    File dflCertFile = new File(path, "usercert.pem");
-	    if (!dflCertFile.canRead()) return null;
-	    X509Certificate dflCert = null;
-	    try {
-		dflCert = (X509Certificate)PEMReader.readObject(dflCertFile, X509Certificate.class);
-		if (dflCert!=null) {
-		    for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {
-			CertificatePair c = it.next();
-			if (c.getCertificate()!=null && c.getCertificate().equals(dflCert)) {
-			    defaultCert = c;
-			    break;
-			}
-		    }
+	    // find certificate with same path as store, that's it
+	    for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {
+		CertificatePair c = it.next();
+		if (c.path == path) {
+		    defaultCert = c;
+		    break;
 		}
-	    } catch (IOException e) { }
-	    // if no match: add to certificate store
-	    if (defaultCert==null) {
-		try {
-		    logger.info("Adding existing default certificate to certificate store");
-		    defaultCert = importFrom(path);
-		} catch (Exception e) { }
 	    }
 	}
 	return defaultCert;
     }
     
-    /** Make a Certificate Pair the default certificate. This is done by
-     * symlinking or copying it to ~/.globus (or the platform's equivalent)
-     * so that the globus toolkit and other compatible tools can use it. 
+    /** Make a {@link CertificatePair} the default certificate.
+     * <p>
+     * This is done by switching the contents of the current default certificate
+     * directory with the new default certificate directory.
+     * <p>
+     * When the supplied {@linkplain CertificatePair} is already the default,
+     * nothing happens.
+     * 
      * @throws IOException */
     public void setDefault(CertificatePair c) throws IOException {
-	if (defaultCert==c) return;
+	CertificatePair oldDefault = getDefault();
+	if (oldDefault==c) return;
 	
-	CertificatePair oldDfl = getDefault();
-	File dflKey = new File(path, "userkey.pem");
-	File dflCert = new File(path, "usercert.pem");
-	if (c.getCertificate()==null)
-	    throw new IOException("Cannot set default to pending certificate: "+c);
-	logger.info("Setting default certificate: "+c);
-	// TODO check dflCert and dflKey are already present in certificate store!!!
-	FileUtils.CopyFile(c.getKeyFile(), dflKey);
-	FileUtils.CopyFile(c.getCertFile(), dflCert);
-	// update listeners
-	defaultCert = c;
-	if (oldDfl!=null) notifyChanged(indexOf(oldDfl));
-	notifyChanged(indexOf(c));
-    }
-    public void trySetDefault(CertificatePair c) {
+	// store current state
+	c.store();
+	if (oldDefault!=null) oldDefault.store();
+	
+	File defaultPath = path;
+	File certPath = c.getPath();
+	// first find a new directory to move current default files to
+	File certPathTmp = certPath;
+	while (certPathTmp.exists())
+	    certPathTmp = new File(certPathTmp.getParent(), certPathTmp.getName() + ".new.tmp");
+	certPathTmp.mkdir();
+	
+	// move old default certificate files to temporary directory
+	FileUtils.MoveFiles(FileUtils.listFilesOnly(defaultPath), certPathTmp);
 	try {
-	    setDefault(c);
-	} catch(IOException e) {
-	    logger.warning("Could not optionally set default certificate: "+e.getMessage());
+	    // move new certificate files to default place
+	    FileUtils.MoveFiles(FileUtils.listFilesOnly(certPath), defaultPath);
+	    try {
+		// rename temporary new dir to original path, after removing old one
+		if (!certPath.delete())
+		    throw new IOException("remove "+certPath);
+		if (!certPathTmp.renameTo(certPath))
+		    throw new IOException("rename "+certPathTmp+" to "+certPath);
+	    } catch(IOException e) {
+		// restore certificate files from default place
+		FileUtils.MoveFiles(FileUtils.listFilesOnly(defaultPath), certPath);
+		throw e;
+	    }
+	    // success!
+	    c.path = path;
+	    defaultCert = c;
+	    if (oldDefault!=null) oldDefault.path = certPath;
+	    
+	} catch (IOException e) {
+	    // restore files that were moved out of the way, and cleanup
+	    FileUtils.MoveFiles(FileUtils.listFilesOnly(certPathTmp), defaultPath);
+	    certPathTmp.delete();
+	    throw new IOException("Could not set default certificate\n("+e.getMessage()+")");
+	    
+	} finally {
+	    // make sure we leave a valid status
+	    defaultCert.load(defaultCert.getPath());
+	    if (oldDefault!=null) oldDefault.load(oldDefault.getPath());
 	}
-    }
-    /** Set the default certificate when only one present */
-    protected void trySetDefault() {
-	// not that getDefault() must be first since it can add a
-	// default certificate to the store
-	try {
-	    if (getDefault()==null && size()==1 && get(0).getCertificate()!=null)
-	        trySetDefault(get(0));
-	} catch (IOException e) { }
     }
 }

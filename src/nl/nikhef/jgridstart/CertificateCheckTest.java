@@ -15,9 +15,9 @@ import nl.nikhef.jgridstart.util.PasswordCache;
 public class CertificateCheckTest extends TestCase {
     
     /** Helper method: get {@linkplain File} for test number */
-    protected File getResourceFile(String name) throws IOException {
+    protected static File getResourceFile(String name) throws IOException {
 	try {
-	    return new File(getClass().getResource("CertificateCheck-tests/"+name).toURI());
+	    return new File(CertificateCheckTest.class.getResource("CertificateCheck-tests/"+name).toURI());
 	} catch (URISyntaxException e) { throw new IOException(e.getLocalizedMessage()); }
     }
     /** Helper method: get {@link CertificatePair}; not load()ed !!! */
