@@ -107,8 +107,8 @@ public class ArrayListModel<T> extends ArrayList<T> implements ListModel {
     }
     @Override
     public T remove(int index) {
-	T o = super.remove(index);
 	notifyRemoved(index, index);
+	T o = super.remove(index);
 	return o;
     }
     @Override
@@ -120,14 +120,14 @@ public class ArrayListModel<T> extends ArrayList<T> implements ListModel {
     }
     @Override
     public void removeRange(int from, int to) {
-	super.removeRange(from, to);
 	notifyRemoved(from, to);
+	super.removeRange(from, to);
     }
     @Override
     public void clear() {
 	int size = getSize();
-	super.clear();
 	notifyRemoved(0, size-1);
+	super.clear();
     }
     @Override
     public T set(int index, T el) {
