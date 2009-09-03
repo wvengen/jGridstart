@@ -107,6 +107,7 @@ public class PEMWriter extends org.bouncycastle.openssl.PEMWriter {
      */
     public static void writeObject(File f, Object obj, final char[] pw) throws NoSuchAlgorithmException, IOException {
 	PEMWriter w = new PEMWriter(f);
+	PasswordCache.getInstance().set(f.getCanonicalPath(), pw);
 	try {
 	    w.writeObject(obj, new PasswordFinder() {
 		public char[] getPassword() { return pw; }
