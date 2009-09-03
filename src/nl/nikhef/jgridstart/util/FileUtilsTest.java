@@ -22,7 +22,7 @@ public class FileUtilsTest extends TestCase {
 	String sexpect = expect.toString();
 	if (sexpect.startsWith(s)) sexpect = sexpect.substring(s.length(), sexpect.length());
 	if (sexpect.endsWith(s)) sexpect = sexpect.substring(0, sexpect.length()-s.length());
-	String sreal = expect.toString();
+	String sreal = real.toString();
 	if (sreal.startsWith(s)) sreal = sreal.substring(s.length(), sreal.length());
 	if (sreal.endsWith(s)) sreal = sreal.substring(0, sreal.length()-s.length());
 	if (!sexpect.equals(sreal))
@@ -102,15 +102,16 @@ public class FileUtilsTest extends TestCase {
     public void testCopyRobocopyCheck1() throws Exception {
 	File src = createDummyTempFile();
 	File tmpdir = FileUtils.createTempDir("test");
-	File tmpsrc = new File(tmpdir.getParentFile(), src.getName());
-	File tmpdst = new File(tmpdir.getParentFile(), "foobar.tmp");
-	final String dummyStr = "dummy test file with same name as file copied from";
+	File tmpsrc = new File(tmpdir, src.getName());
+	File tmpdst = new File(tmpdir, "foobar.tmp");
+	final String tmpsrcText = "dummy test file with same name as file copied from";
 	try {
 	    FileWriter writer = new FileWriter(tmpsrc);
-	    writer.append(dummyStr);
+	    writer.append(tmpsrcText);
 	    writer.close();
 	    FileUtils.CopyFile(src, tmpdst);
-	    assertTrimmedEquals(dummyStr, FileUtils.readFile(tmpdst));
+	    assertTrimmedEquals(dummyString, FileUtils.readFile(tmpdst));
+	    assertTrimmedEquals(tmpsrcText, FileUtils.readFile(tmpsrc));
 	} finally {
 	    src.delete();
 	    tmpsrc.delete();
