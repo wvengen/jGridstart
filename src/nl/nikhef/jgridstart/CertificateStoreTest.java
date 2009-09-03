@@ -45,12 +45,12 @@ public class CertificateStoreTest extends TestCase {
      * <p>
      * This is cleaned up automatically by {@link #tearDown}.
      * 
-     * @param num number of certificates to put in; must be <=6
+     * @param num number of certificates to put in
      */
     protected File newTestStore(int num) throws IOException {
 	File path = FileUtils.createTempDir("test-store", tmpBasePath);
 	for (int i=1; i<=num; i++) {
-	    addCopyTest("testO-0"+i, path);
+	    addCopyTest("testO-01", path);
 	}
 	return path;
     }
@@ -97,6 +97,22 @@ public class CertificateStoreTest extends TestCase {
     @Test
     public void testConstructWithFile() throws Exception {
 	CertificateStore store = new CertificateStore(newTestStore(1));
+	assertEquals(1, store.size());
+    }
+    
+    /** Make sure user-stuff is not confusing the store */
+    @Test
+    public void testLitterIsOk() throws Exception {
+	File path = newTestStore(1);
+	// add litter
+	new File(path, "some-cert-xxx").mkdir();
+	new File(path, "foobar.pem").createNewFile();
+	new File(path, "grix.properties").createNewFile();
+	new File(path, "certificates").mkdir();
+	File f = addCopyTest("testO-01", path);
+	f.renameTo(new File(path, "cool"));
+	// refresh and make sure it's still ok
+	CertificateStore store = new CertificateStore(path);
 	assertEquals(1, store.size());
     }
 
