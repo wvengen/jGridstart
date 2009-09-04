@@ -263,6 +263,10 @@
 			<keepclasseswithmembers access="public" name="org.xhtmlrenderer.util.Configuration">
 				<method name="*"/>
 			</keepclasseswithmembers>
+			<!-- CA class used is set in configfile -->
+			<keepclasseswithmembers name="nl.nikhef.jgridstart.ca.**">
+				<method name="*"/>
+			</keepclasseswithmembers>
 		</proguard>
 	</target>
 
