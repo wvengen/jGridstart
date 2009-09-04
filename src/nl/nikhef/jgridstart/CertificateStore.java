@@ -6,18 +6,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -28,7 +20,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.bouncycastle.mail.smime.SMIMEException;
 import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 
@@ -39,6 +30,31 @@ import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.ca.CAException;
 import nl.nikhef.jgridstart.gui.util.ArrayListModel;
 
+/** Mangement of multiple {@code .globus}-type certificates on disk
+ * <p>
+ * This represents a directory that has {@code .globus}-type subdirectories as
+ * its children, each of which is represented by a {@link CertificatePair}.
+ * <p>
+ * The default location of this store is {@code ~/.globus}. The key and
+ * certificate found in this directory itself are ignored; please see
+ * {@link CertificateStoreWithDefault} for handling those.
+ * <p>
+ * All this is implemented to allow multiple certificates to be present, for
+ * example when one is a member of multiple organisations, or if a renewal is
+ * in progress.
+ * <p>
+ * <h3>Listeners</h3>
+ * A user-interface may want to keep a list of certificates synchronised with
+ * this {@linkplain CertificateStore}. To this end, the {@link ItemListener}
+ * interface was implemented, and the {@link ArrayListModel} was used as its
+ * parent class. The former allows one to catch changes in a
+ * {@linkplain CertificatePair}, while the latter notifies its listeners when
+ * an item is added or removed.
+ * <p>
+ * 
+ * @author wvengen
+ *
+ */
 public class CertificateStore extends ArrayListModel<CertificatePair> implements ItemListener {
 
     static protected Logger logger = Logger.getLogger("nl.nikhef.jgridstart");
@@ -68,10 +84,10 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     }
     
     /** load certificates from the default directory
-     * 
-     * This is $HOME/.globus/ by default, but if the hostname starts
+     * <p>
+     * This is {@code ~/.globus} by default, but if the hostname starts
      * with "tutorial" we have something different.
-     * 
+     * <p>
      * TODO move this out of jGridStart and put it in a configfile
      */
     public void load() {
@@ -91,22 +107,20 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	load(certhome);
     }
     
-    /**
-     * load certificates
-     * 
+    /** Load certificates from store path
+     * <p>
      * All subdirectories of the supplied path are loaded as separate
      * certificates.
      * 
-     * @param path
-     *            Path to load certificates from
+     * @param path Path to load certificates from
+     * @see #load(File)
      */
     public void load(String path) {
 	load(new File(path));
     }
 
-    /**
-     * load certificates
-     * 
+    /** Load certificates from store path
+     * <p>
      * All subdirectories of the supplied path that start with
      * {@link #userCertPrefix} are loaded as separate certificates; in
      * addition to this, the directory itself is loaded as well.
@@ -116,16 +130,14 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     public void load(File path) {
 	this.path = path;
 	if (!path.isDirectory()) return;
-	File[] files = (File[])ArrayUtils.addAll(new File[]{path}, path.listFiles());
+	File[] files = path.listFiles();
 	
 	// add new items
 	for (int i=0; i<files.length; i++) {
 	    File f = files[i];
 	    // filter out unwanted items
-	    if (f!=path && !f.getName().startsWith(userCertPrefix)) continue;
+	    if (!f.getName().startsWith(userCertPrefix)) continue;
 	    if (!f.isDirectory()) continue;
-	    // for default cert, require key to exist
-	    if (f==path && !new File(f, "userkey.pem").exists()) continue;
 	    // make sure it doesn't exist already in this store
 	    boolean found = false;
 	    for (int j = 0; j < size(); j++) {
@@ -141,13 +153,8 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	}
     }
 
-    /**
-     * refresh the certificate list from its source and each certificate as well
-     * @throws NoSuchAlgorithmException 
-     * @throws KeyManagementException 
-     * @throws IOException 
-     */
-    public void refresh() throws KeyManagementException, NoSuchAlgorithmException, IOException, CAException {
+    /** refresh the certificate list from its source and each certificate as well */
+    public void refresh() throws GeneralSecurityException, IOException, CAException {
 	if (path == null) {
 	    logger.warning("Refresh of empty certificate store");
 	    return;
@@ -167,12 +174,9 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	load(path);
     }
 
-    /**
-     * Try to add a certificate file to this store but don't fail if an error
-     * occurs.
+    /** Try to add a certificate path to this store but don't fail if an error occurs.
      * 
-     * @param f
-     *            File to add
+     * @param f File to add
      * @return true if the certificate was succesfully added
      */
     protected boolean tryAdd(File f) {
@@ -188,7 +192,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	return true;
     }
     
-    /** Create a new subdirectory for a CertificatePair in this store.
+    /** Create a new subdirectory for a {@linkplain CertificatePair} in this store.
      *
      * @return Newly created directory name
      * @throws IOException
@@ -205,30 +209,35 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	return dst;
     }
     
-    /** Hook parent to add an ItemListener when an item is added */
+    /** Hook parent to add an {@linkplain ItemListener} when an item is added.
+     * <p>
+     * {@inheritDoc} */
     @Override
     protected void notifyAdded(int start, int end) {
 	super.notifyAdded(start, end);
 	for (int i=start; i<=end; i++)
 	    get(i).addItemListener(this);
     }
-    /** Hook parent to remove an ItemListener when an item is removed */
+    /** Hook parent to remove an {@linkplain ItemListener} when an item is removed
+     * <p>
+     * {@inheritDoc} */
     @Override
     protected void notifyRemoved(int start, int end) {
 	for (int i=start; i<=end; i++)
 	    get(i).removeItemListener(this);
 	super.notifyRemoved(start, end);
     }
-    /** ItemListener handler to catch changes in CertificatePair */
+    /** {@linkplain ItemListener} handler to catch changes in {@linkplain CertificatePair} */
     public void itemStateChanged(ItemEvent e) {
 	// and notify selection change listeners
 	notifyChanged(indexOf(e.getItem()));
     }
     
-    /** Deletes a CertificatePair from the store. This removes it permanently
-     * from disk, so be careful. In the future it may be put into an archive
-     * instead.
-     * 
+    /** Deletes a CertificatePair from the store.
+     * <p>
+     * This removes it permanently from disk, so be careful.
+     * In the future it may be put into an archive instead.
+     * <p>
      * TODO should this be called 'remove' or is that too dangerous?
      * 
      * @throws IOException 
@@ -239,7 +248,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	deletePath(cert.getPath());
 	return cert;
     }
-    /** Deletes a path on which a CertificatePair is based from disk. */
+    /** Deletes a path on which a {@linkplain CertificatePair} is based from disk. */
     protected void deletePath(File certPath) throws IOException {
 	// and from disk; subdirs are not deleted
 	File[] items = certPath.listFiles();
@@ -253,22 +262,15 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	return delete(indexOf(cert));
     }
 
-    /**
-     * Import a PKCS#12 or PEM file into the CertificateStore by creating a new
-     * CertificatePair that is saved in this store.
+    /** Import a PKCS#12 or PEM file as a new entry
+     * <p>
+     * A new {@linkplain CertificatePair} is created from the imported file, and
+     * this is added as a new entry to this store.
      * 
      * @param src File to import from
      * @return Newly created CertificatePair
-     * @throws IOException
-     * @throws NoSuchAlgorithmException 
-     * @throws PasswordCancelledException 
-     * @throws CertificateException 
-     * @throws NoSuchProviderException 
-     * @throws KeyStoreException 
-     * @throws UnrecoverableKeyException 
-     * @throws CertificateCheckException 
      */
-    public CertificatePair importFrom(File src) throws IOException, NoSuchAlgorithmException, PasswordCancelledException, UnrecoverableKeyException, KeyStoreException, NoSuchProviderException, CertificateException, CertificateCheckException {
+    public CertificatePair importFrom(File src) throws IOException,GeneralSecurityException, CertificateCheckException {
 	File dst = newItem();
 	// import
 	try {
@@ -278,19 +280,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	} catch(IOException e) {
 	    deletePath(dst);
 	    throw e;
-	} catch(NoSuchAlgorithmException e) {
-	    deletePath(dst);
-	    throw e;
-	} catch (UnrecoverableKeyException e) {
-	    deletePath(dst);
-	    throw e;
-	} catch (KeyStoreException e) {
-	    deletePath(dst);
-	    throw e;
-	} catch (NoSuchProviderException e) {
-	    deletePath(dst);
-	    throw e;
-	} catch (CertificateException e) {
+	} catch(GeneralSecurityException e) {
 	    deletePath(dst);
 	    throw e;
 	} catch (CertificateCheckException e) {
@@ -299,16 +289,12 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	}
     }
     
-    /** Create a new certificate request in the CertificateStore
+    /** Create a new certificate request
      *
-     * @param p Properties to use for generation. See CertificatePair.generateRequest()
-     * @throws SignatureException 
-     * @throws NoSuchProviderException 
-     * @throws NoSuchAlgorithmException 
-     * @throws InvalidKeyException 
-     * @throws PasswordCancelledException 
+     * @param p Properties to use for generation
+     * @see CertificatePair#generateRequest
      */
-    public CertificatePair generateRequest(Properties p) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, PasswordCancelledException {
+    public CertificatePair generateRequest(Properties p) throws IOException, GeneralSecurityException, PasswordCancelledException {
 	File dst = newItem();
 	try {
 	    CertificatePair cert = CertificatePair.generateRequest(dst, p);
@@ -319,16 +305,12 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	    throw e;
 	}
     }
-    /** Create a new certificate request in the CertificateStore with preset password
+    /** Create a new certificate request with preset password
      *
-     * @param p Properties to use for generation. See CertificatePair.generateRequest()
-     * @throws SignatureException 
-     * @throws NoSuchProviderException 
-     * @throws NoSuchAlgorithmException 
-     * @throws InvalidKeyException 
-     * @throws PasswordCancelledException 
+     * @param p Properties to use for generation
+     * @see CertificatePair#generateRequest
      */
-    public CertificatePair generateRequest(Properties p, char[] pw) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, PasswordCancelledException {
+    public CertificatePair generateRequest(Properties p, char[] pw) throws IOException, GeneralSecurityException, PasswordCancelledException {
 	File dst = newItem();
 	try {
 	    CertificatePair cert = CertificatePair.generateRequest(dst, p, pw);
@@ -343,18 +325,8 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * <p>
      * This generates a new certificate request in the store, but S/MIME
      * signs it as well.
-     * 
-     * @throws IOException 
-     * @throws PasswordCancelledException 
-     * @throws IllegalArgumentException 
-     * @throws SignatureException 
-     * @throws NoSuchProviderException 
-     * @throws NoSuchAlgorithmException 
-     * @throws InvalidKeyException 
-     * @throws MessagingException 
-     * @throws SMIMEException 
      */
-    public CertificatePair generateRenewal(CertificatePair oldCert) throws IllegalArgumentException, PasswordCancelledException, IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, MessagingException, SMIMEException {
+    public CertificatePair generateRenewal(CertificatePair oldCert) throws IOException, GeneralSecurityException, PasswordCancelledException, MessagingException, SMIMEException {
 	// ask for private key first, cancel would skip everything
 	PrivateKey oldKey = oldCert.getPrivateKey();
 	
@@ -380,88 +352,5 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	out.close();
 	
 	return newCert;
-    }
-
-    /** Return the default certificate.
-     * <p>
-     * The default certificate is the one in {@code ~/.globus}
-     * (or the platform's equivalent).
-     * <p>
-     * This can be called pretty often, so the result is cached. Updates outside
-     * of this program will not be picked up as a result while running.
-     * 
-     * @return Default CertificatePair, or null if not present or not matched. 
-     */
-    public CertificatePair getDefault() {
-	if (defaultCert==null) {
-	    // find certificate with same path as store, that's it
-	    for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {
-		CertificatePair c = it.next();
-		if (c.path == path) {
-		    defaultCert = c;
-		    break;
-		}
-	    }
-	}
-	return defaultCert;
-    }
-    
-    /** Make a {@link CertificatePair} the default certificate.
-     * <p>
-     * This is done by switching the contents of the current default certificate
-     * directory with the new default certificate directory.
-     * <p>
-     * When the supplied {@linkplain CertificatePair} is already the default,
-     * nothing happens.
-     * 
-     * @throws IOException */
-    public void setDefault(CertificatePair c) throws IOException {
-	CertificatePair oldDefault = getDefault();
-	if (oldDefault==c) return;
-	
-	// store current state
-	c.store();
-	if (oldDefault!=null) oldDefault.store();
-	
-	File defaultPath = path;
-	File certPath = c.getPath();
-	// first find a new directory to move current default files to
-	File certPathTmp = certPath;
-	while (certPathTmp.exists())
-	    certPathTmp = new File(certPathTmp.getParent(), certPathTmp.getName() + ".new.tmp");
-	certPathTmp.mkdir();
-	
-	// move old default certificate files to temporary directory
-	FileUtils.MoveFiles(FileUtils.listFilesOnly(defaultPath), certPathTmp);
-	try {
-	    // move new certificate files to default place
-	    FileUtils.MoveFiles(FileUtils.listFilesOnly(certPath), defaultPath);
-	    try {
-		// rename temporary new dir to original path, after removing old one
-		if (!certPath.delete())
-		    throw new IOException("remove "+certPath);
-		if (!certPathTmp.renameTo(certPath))
-		    throw new IOException("rename "+certPathTmp+" to "+certPath);
-	    } catch(IOException e) {
-		// restore certificate files from default place
-		FileUtils.MoveFiles(FileUtils.listFilesOnly(defaultPath), certPath);
-		throw e;
-	    }
-	    // success!
-	    c.path = path;
-	    defaultCert = c;
-	    if (oldDefault!=null) oldDefault.path = certPath;
-	    
-	} catch (IOException e) {
-	    // restore files that were moved out of the way, and cleanup
-	    FileUtils.MoveFiles(FileUtils.listFilesOnly(certPathTmp), defaultPath);
-	    certPathTmp.delete();
-	    throw new IOException("Could not set default certificate\n("+e.getMessage()+")");
-	    
-	} finally {
-	    // make sure we leave a valid status
-	    defaultCert.load(defaultCert.getPath());
-	    if (oldDefault!=null) oldDefault.load(oldDefault.getPath());
-	}
     }
 }

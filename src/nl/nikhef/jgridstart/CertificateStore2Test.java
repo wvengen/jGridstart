@@ -1,25 +1,16 @@
 package nl.nikhef.jgridstart;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Properties;
-
-import nl.nikhef.jgridstart.util.FileUtils;
-
 import org.junit.Test;
 
-import junit.framework.TestCase;
-
 /** High-level {@link CertificateStore} test cases */
-public class CertificateStore2Test extends TestCase {
+public class CertificateStore2Test extends CertificateStoreBaseTest {
     
-    protected File tmpBasePath = null;
     private String oldCAProvider = null;
 
     @Override
     public void setUp() throws Exception {
-	// create temp dir to work in
-	tmpBasePath = FileUtils.createTempDir("test-certificatestore");
+	super.setUp();
 	// use LocalCA for testing
 	oldCAProvider = System.getProperty("jgridstart.ca.provider");
 	System.setProperty("jgridstart.ca.provider", "LocalCA");
@@ -27,27 +18,12 @@ public class CertificateStore2Test extends TestCase {
     
     @Override
     public void tearDown() throws Exception {
-	// remove temp dir
-	CertificateStore1Test.recursiveDelete(tmpBasePath);
+	super.tearDown();
 	// restore CA
 	if (oldCAProvider==null)
 	    System.getProperties().remove("jgridstart.ca.provider");
 	else
 	    System.setProperty("jgridstart.ca.provider", oldCAProvider);
-    }
-    
-    /** @see CertificateStore1Test#newTestStore */
-    protected File newTestStore(int num) throws IOException {
-	File path = FileUtils.createTempDir("test-store", tmpBasePath);
-	for (int i=1; i<=num; i++) {
-	    addCopyTest("testO-0"+i, path);
-	}
-	return path;
-    }
-
-    /** @see CertificateStore1Test#addCopyTest */
-    protected static File addCopyTest(String name, File store) throws IOException {
-	return CertificateStore1Test.addCopyTest(name, store);
     }
 
     /** Simple new request run */

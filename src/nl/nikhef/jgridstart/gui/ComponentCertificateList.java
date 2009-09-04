@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart.gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.io.IOException;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
@@ -10,13 +11,13 @@ import org.bouncycastle.asn1.x509.X509Name;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.CertificateStoreWithDefault;
 import nl.nikhef.jgridstart.Organisation;
 
 /** List of certificates.
  * <p>
  * Java Swing component that contains a list of certificates. It is a view for
- * {@link CertificateStore} and optionally interfaces with a
+ * {@link CertificateStoreWithDefault} and optionally interfaces with a
  * {@link CertificateSelection}.
  * 
  * @author wvengen
@@ -29,7 +30,7 @@ public class ComponentCertificateList extends JList {
 	super();
 	initialize();
     }
-    public ComponentCertificateList(CertificateStore store, CertificateSelection selection) {
+    public ComponentCertificateList(CertificateStoreWithDefault store, CertificateSelection selection) {
 	super();
 	initialize();
 	setModel(store);
@@ -57,7 +58,10 @@ public class ComponentCertificateList extends JList {
 	    // name of person
 	    line2 += cert.getSubjectPrincipalValue(X509Name.CN);
 	    // add star to default certificate
-	    CertificatePair dflCert = ((CertificateStore)getModel()).getDefault();
+	    CertificatePair dflCert = null;
+	    try {
+		dflCert = ((CertificateStoreWithDefault)getModel()).getDefault();
+	    } catch (IOException e) { }
 	    if ( cert.equals(dflCert) )
 		dfl += "&nbsp;<b color='#ffcc00'>&#x2730</b>";
 	    // organisation

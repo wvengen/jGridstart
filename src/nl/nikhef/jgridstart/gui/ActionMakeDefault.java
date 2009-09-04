@@ -7,16 +7,16 @@ import javax.swing.KeyStroke;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.CertificateStoreWithDefault;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
 
 public class ActionMakeDefault extends CertificateAction {
     
-    protected CertificateStore store = null;
+    protected CertificateStoreWithDefault store = null;
     
-    public ActionMakeDefault(JFrame parent, CertificateStore store, CertificateSelection s) {
+    public ActionMakeDefault(JFrame parent, CertificateStoreWithDefault store, CertificateSelection s) {
 	super(parent, s);
 	this.store = store;
 	putValue(NAME, "Make default");

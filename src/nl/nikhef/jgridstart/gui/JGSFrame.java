@@ -38,7 +38,7 @@ import org.jdesktop.swingworker.SwingWorker;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
-import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.CertificateStoreWithDefault;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.util.PasswordCache;
@@ -51,7 +51,7 @@ public class JGSFrame extends JFrame {
     private TemplateButtonPanel certInfoPane = null;
     private HashMap<String, JButton> certInfoButtons = null;
 
-    private CertificateStore store = null;
+    private CertificateStoreWithDefault store = null;
     private CertificateSelection selection = null; 
     
     protected int identityIndex = -1;
@@ -76,7 +76,7 @@ public class JGSFrame extends JFrame {
      */
     private void initialize() {
 	
-	store = new CertificateStore();
+	store = new CertificateStoreWithDefault();
 	selection = new CertificateSelection(store);
 	PasswordCache.getInstance().setParent(this);
 	URLLauncherCertificate.setSelectionSource(selection);
