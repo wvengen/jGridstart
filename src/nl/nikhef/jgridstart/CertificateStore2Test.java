@@ -28,7 +28,7 @@ public class CertificateStore2Test extends TestCase {
     @Override
     public void tearDown() throws Exception {
 	// remove temp dir
-	CertificateStoreTest.recursiveDelete(tmpBasePath);
+	CertificateStore1Test.recursiveDelete(tmpBasePath);
 	// restore CA
 	if (oldCAProvider==null)
 	    System.getProperties().remove("jgridstart.ca.provider");
@@ -36,7 +36,7 @@ public class CertificateStore2Test extends TestCase {
 	    System.setProperty("jgridstart.ca.provider", oldCAProvider);
     }
     
-    /** @see CertificateStoreTest#newTestStore */
+    /** @see CertificateStore1Test#newTestStore */
     protected File newTestStore(int num) throws IOException {
 	File path = FileUtils.createTempDir("test-store", tmpBasePath);
 	for (int i=1; i<=num; i++) {
@@ -45,9 +45,9 @@ public class CertificateStore2Test extends TestCase {
 	return path;
     }
 
-    /** @see CertificateStoreTest#addCopyTest */
+    /** @see CertificateStore1Test#addCopyTest */
     protected static File addCopyTest(String name, File store) throws IOException {
-	return CertificateStoreTest.addCopyTest(name, store);
+	return CertificateStore1Test.addCopyTest(name, store);
     }
 
     /** Simple new request run */
