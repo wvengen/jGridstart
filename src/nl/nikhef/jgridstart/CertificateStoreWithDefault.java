@@ -89,6 +89,22 @@ public class CertificateStoreWithDefault extends CertificateStore {
     public CertificateStoreWithDefault(File path) {
 	super(path);
     }
+    
+    /** {@inheritDoc}
+     * <p>
+     * Also, the default certificate is loaded from the store's path when it is
+     * not found in another entry in the store.
+     */
+    @Override
+    public void load(File f) {
+	super.load(f);
+	if (new File(path, "userkey.pem").exists()) {
+	    // add default certificate if not yet in store
+	    try {
+		if (findDefaultCertificate()==null) tryAdd(path);
+	    } catch (IOException e) { /* ok */ }
+	}
+    }
 
     /** Return the default certificate.
      * <p>
@@ -102,6 +118,9 @@ public class CertificateStoreWithDefault extends CertificateStore {
      */
     public CertificatePair getDefault() throws IOException {
 	if (defaultCert==null) {
+	    // need private key for it to work
+	    // this speeds up the check when no default certificate exists
+	    if (!new File(path, "userkey.pem").exists()) return null;
 	    // find certificate with same path as store
 	    for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {
 		CertificatePair c = it.next();
@@ -151,7 +170,8 @@ public class CertificateStoreWithDefault extends CertificateStore {
 		throw e;
 	    }
 	    
-	// or else remove all files present in subdirectory present in dfl certificate too 
+	// or else remove all files present in subdirectory present
+	// from the default location as well; these are ok
 	} else if (oldDefault!=null) {
 	    // safety check: make sure contents of files is ok
 	    if (!compareDefaultCertificate(oldDefault))
@@ -162,7 +182,7 @@ public class CertificateStoreWithDefault extends CertificateStore {
 	    // then delete them
 	    File[] dflfiles = FileUtils.listFilesOnly(oldDefault.getPath());
 	    for (int i=0; i<dflfiles.length; i++)
-		dflfiles[i].delete();
+		new File(path, dflfiles[i].getName()).delete();
 	}
 	
 	// then copy files from specified CertificatePair to default location
