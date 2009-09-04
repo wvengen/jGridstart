@@ -38,7 +38,7 @@ public class DutchGridCA implements CA {
     /** CA certificate (cached) */
     protected static X509Certificate cacert = null;
 
-    /** Create new NikhefCA plugin 
+    /** Create new DutchGridCA 
      * 
      * @throws NoSuchAlgorithmException 
      * @throws KeyManagementException */
@@ -74,33 +74,21 @@ public class DutchGridCA implements CA {
 		"email_2", info.getProperty("email"),
 		"requesttext", reqWriter.toString(),
 		"Publish", "Upload Publishing Data",
-		"robot", "true"
+		"robot", "yes"
 	};
 
 	URL url = new URL(baseSubmit);
 	String answer = ConnectionUtils.pageContents(url, postdata, true);
 
-	String serial = null;
-
-	// TODO finish, what to expect?
-	try {
-	    String matchstr = "Saving request as";
-	    int index = answer.indexOf(matchstr);
-	    if (index == -1 || answer.indexOf("error:") != -1 || answer.indexOf("Error:") != -1) {
-		// means: not successful
-		logger.severe("Could not upload certification request.");
-		throw new /*UnableToUploadCertificationRequestException*/IOException(answer);
-	    }
-	    int index_end = answer.indexOf(".", index);
-	    serial = answer.substring(index+matchstr.length(), index_end).trim();
-	} catch (RuntimeException e) {
-	    logger.severe(e.getMessage());
-	    throw e;
-	}
+	// returns "200 ..." on success
+	// TODO CAException instead of IOException
+	if (!answer.startsWith("200"))
+		throw new IOException("Certificate signing request upload failed:\n"+answer);
 
 	logger.info("Uploaded certificate signing request");
 
-	return serial;
+	// ok; serial is not used here
+	return null;
     }
     
     public boolean isCertificationRequestProcessed(
@@ -140,7 +128,7 @@ public class DutchGridCA implements CA {
     
     /** {@inheritDoc}
      * <p>
-     * Test CA certificate is downloaded once each program run.
+     * CA certificate is downloaded once each program run.
      */
     public X509Certificate getCACertificate() throws IOException {
 	if (cacert==null) {
