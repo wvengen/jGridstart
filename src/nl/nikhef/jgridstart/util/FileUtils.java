@@ -200,6 +200,7 @@ public class FileUtils {
 	    buf.append(line);
 	    buf.append(s);
 	}
+	r.close();
 	return buf.toString();
     }
 
