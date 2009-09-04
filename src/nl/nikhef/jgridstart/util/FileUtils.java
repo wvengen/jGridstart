@@ -102,6 +102,29 @@ public class FileUtils {
 	});
     }
     
+    /** Copies a list of files to a directory.
+     * <p>
+     * When an error occurs, files already copied are removed again and
+     * an {@linkplain IOException} is thrown.
+     * <p>
+     * It is discouraged to have files with the same name existing
+     * already in the destination path.
+     */
+    public static void CopyFiles(File[] fromFiles, final File toPath) throws IOException {
+	EachFile(fromFiles, new FileCallback() {
+	    public void action(File f) throws IOException {
+		File toFile = new File(toPath, f.getName());
+		if (!CopyFile(f, toFile))
+		    throw new IOException("Copy failed: "+f+" -> "+toFile);
+	    }
+	    public void reverseAction(File f) throws IOException {
+		File toFile = new File(toPath, f.getName());
+		if (!toFile.delete())
+		    throw new IOException("Delete failed: "+toFile);
+	    }
+	});
+    }
+    
     /** Moves a list of files to a directory.
      * <p>
      * When an error occurs, files already moved are put back and an
@@ -110,36 +133,59 @@ public class FileUtils {
      * It is discouraged to have files with the same name
      * existing already in the destination path.
      */
-    public static void MoveFiles(File[] fromFiles, File toPath) throws IOException {
-	// construct destination file names
-	File[] toFiles = new File[fromFiles.length];
-	for (int i=0; i<fromFiles.length; i++) {
-	    toFiles[i] = new File(toPath, fromFiles[i].getName());
-	}
-	// then copy
-	try {
-	    for (int i=0; i<fromFiles.length; i++) {
-		if (!fromFiles[i].renameTo(toFiles[i]))
-		    throw new IOException("Could not set default certificate " +
-			    " (move "+fromFiles[i]+" to "+toFiles[i]+")");
+    public static void MoveFiles(File[] fromFiles, final File toPath) throws IOException {
+	EachFile(fromFiles, new FileCallback() {
+	    public void action(File f) throws IOException {
+		File toFile = new File(toPath, f.getName());
+		if (!f.renameTo(toFile))
+		    throw new IOException("Move failed: "+f+" -> "+toFile);
 	    }
-	} catch (IOException e) {
+	    public void reverseAction(File f) throws IOException {
+		File toFile = new File(toPath, f.getName());
+		if (!toFile.renameTo(f))
+		    throw new IOException("Move back failed: "+toFile+" -> "+f);
+	    }
+	});
+    }
+    
+    /** Runs a callback on each file specified.
+     * <p>
+     * Implements a rollback mechanism: when the callback throws an {@linkplain IOException},
+     * the previous operations are undone by means of the {@link FileCallback#reverseAction}
+     * method.
+     */
+    protected static void EachFile(File[] fromFiles, FileCallback callback) throws IOException {
+	// then copy or move
+	int i=0;
+	try {
+	    for (i=0; i<fromFiles.length; i++) {
+		callback.action(fromFiles[i]);
+	    }
+	} catch (IOException e1) {
 	    String extra = "";
 	    // move already moved files back
-	    for (int i=0; i<fromFiles.length; i++) {
-		if (!fromFiles[i].exists()) {
-		    if (!toFiles[i].renameTo(fromFiles[i]))
-			extra += "  "+fromFiles[i].getPath()+"\n";
+	    for (int j=0; j<i; j++) {
+		try {
+		    callback.reverseAction(fromFiles[j]);
+		} catch (IOException e2) {
+		    extra += "\n" + e2.getLocalizedMessage();
 		}
 	    }
 	    // and propagate exception
 	    if (extra=="")
-		throw e;
+		throw e1;
 	    else
-		throw new IOException(e.getMessage() +
-			"\n\nNote that the following files could NOT be restored:\n" +
+		throw new IOException(e1.getLocalizedMessage() +
+			"\n\nNote that the following errors occured on rollback(!):\n" +
 			extra);
 	}
+    }
+    /** Callback handler for {@link #EachFile} */
+    protected interface FileCallback {
+	/** Does an action on a File */
+	public void action(File f) throws IOException;
+	/** Reverses the action of {@linkplain #action} on a File */
+	public void reverseAction(File f) throws IOException;
     }
     
     /**
