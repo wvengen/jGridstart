@@ -25,6 +25,7 @@ public class AllTests {
 	suite.addTestSuite(CertificateCheckTest.class);
 	suite.addTestSuite(CertificateStore1Test.class);
 	suite.addTestSuite(CertificateStore2Test.class);
+	suite.addTestSuite(CertificateStoreWithDefaultTest.class);
 	suite.addTestSuite(BrowsersMacOSXTest.class);
 	suite.addTestSuite(TemplateDocumentTest.class);
 	suite.addTestSuite(TemplatePanelTest.class);
