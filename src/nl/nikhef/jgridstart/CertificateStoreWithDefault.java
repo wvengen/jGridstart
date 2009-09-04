@@ -185,6 +185,10 @@ public class CertificateStoreWithDefault extends CertificateStore {
 		throw new IOException(fmsg);
 	    }
 	    FileUtils.CopyFiles(files, path);
+	    // XXX remove userinfo.properties since that is changed frequenlty
+	    //     and only used by this program; not really pretty :/
+	    //     It harms the compareDefaultCertificate() test!
+	    new File(path, "userinfo.properties").delete();
 	} catch (IOException e) {
 	    // TODO rollback move of old default to new subdir
 	    throw e;
