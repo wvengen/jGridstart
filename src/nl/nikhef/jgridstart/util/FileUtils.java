@@ -15,6 +15,10 @@ import java.util.logging.Logger;
 public class FileUtils {
     static protected Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
     
+    /** cache file copy method (Windows only) */
+    static private boolean hasRobocopy = false;
+    static private boolean copyDetected = false;
+    
     /** Copy a file from one place to another. This calls an external copy
      * program on the operating system to make sure it is properly copied and
      * permissions are retained.
@@ -22,50 +26,49 @@ public class FileUtils {
     public static boolean CopyFile(File in, File out) throws IOException {
 	String[] cmd;
 	if (System.getProperty("os.name").startsWith("Windows")) {
-	    boolean hasRobocopy = false;
-	    
-	    // windows: use special copy program to retain permissions.
-	    //   on Vista, "xcopy /O" requires administrative rights, so we
-	    //   have to resort to using robocopy there.
-	    try {
-		int ret = Exec(new String[]{"robocopy.exe"});
-		if (ret==0 || ret==16) hasRobocopy = true;
-	    } catch (Exception e) { }
+	    // detect copy method once
+	    if (!copyDetected) {
+		// windows: use special copy program to retain permissions.
+		//   on Vista, "xcopy /O" requires administrative rights, so we
+		//   have to resort to using robocopy there.
+		try {
+		    int ret = Exec(new String[]{"robocopy.exe"});
+		    if (ret==0 || ret==16) hasRobocopy = true;
+		} catch (Exception e) { }
+		copyDetected = true;
+	    }
 	    
 	    if (hasRobocopy) {
 		// we have robocopy. But ... its destination filename
 		//   needs to be equal to the source filename :(
-		//   So we rename any existing file out of the way, copy
-		//   the new file, rename it to the new name, and restore
-		//   the optional original file. All this is required to
-		//   copy a file retaining its permissions.
-		// TODO proper return value handling (!)
+		// So we make a temporary subdir, create a copy of the
+		// file in there, and rename+move the file to the destination.
+		// All this is required to copy a file retaining its permissions.
 		
-		// move old file out of the way
-		File origFile = new File(out.getParentFile(), in.getName());
-		File origFileRenamed = null;
-		if (origFile.exists()) {
-		    origFileRenamed = new File(origFile.getParentFile(), origFile.getName()+".xxx_tmp");
-		    origFile.renameTo(origFileRenamed);
-		} else {
-		    origFile = null;
-		}
-		// copy file to new place
-		cmd = new String[]{"robocopy.exe",
-			    in.getParent(), out.getParent(),
-			    in.getName(),
+		// create new temp dir as subdir of new destination directory
+		File tmpdir = createTempDir(out.getName(), out.getParentFile());
+		// temporary copy
+		File tmpfile = new File(tmpdir, in.getName());
+
+		boolean success = false;
+		try {
+		    // copy file to tmpdir
+		    cmd = new String[]{"robocopy.exe",
+			    in.getParent(), tmpdir.getPath(),
+			    tmpfile.getName(),
 			    "/SEC", "/NP", "/NS", "/NC", "/NFL", "/NDL"};
-		int ret = Exec(cmd);
-		boolean success = ret < 4 && ret >= 0;
-		// rename new file
-		if (success) {
-		    new File(out.getParentFile(), in.getName()).renameTo(out);
+		    int ret = Exec(cmd);
+		    success = ret < 4 && ret >= 0;
+		    if (success) {
+			// rename new file
+			if (!tmpfile.renameTo(out))
+			    throw new IOException("Could not copy\n  "+in+"\nto\n  "+out+"\n(robocopy, phase rename)");
+		    }
+		} finally {
+		    // cleanup
+		    tmpfile.delete();
+		    tmpdir.delete();
 		}
-		
-		// move old file to original place again
-		if (origFile!=null)
-		    origFileRenamed.renameTo(origFile);
-		
 		return success;
 	    } else {
 		// use xcopy instead

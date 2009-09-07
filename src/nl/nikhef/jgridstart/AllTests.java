@@ -1,9 +1,12 @@
 package nl.nikhef.jgridstart;
 
+import java.util.logging.LogManager;
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import nl.nikhef.jgridstart.gui.Main;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanelTest;
 import nl.nikhef.jgridstart.install.BrowsersMacOSXTest;
 import nl.nikhef.jgridstart.util.FileUtilsTest;
@@ -17,6 +20,16 @@ import junit.framework.TestSuite;
 
 public class AllTests {
 
+    // setup logging
+    static {
+	try {
+	    // load configuration
+	    LogManager.getLogManager().readConfiguration(AllTests.class.getResourceAsStream("/logging.debug.properties"));
+	} catch(Exception e) {
+	    System.out.println("Warning: logging configuration could not be set");
+	}
+    }
+    
     public static Test suite() {
 	TestSuite suite = new TestSuite("Test for nl.nikhef.jgridstart");
 	//$JUnit-BEGIN$
