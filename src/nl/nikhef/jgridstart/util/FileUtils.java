@@ -73,10 +73,10 @@ public class FileUtils {
 		    in.getAbsolutePath(),
 		    out.getAbsolutePath(),
 		    "/O", "/Q", "/Y"};
-		    // If the file/ doesn't exist on copying, xcopy will ask whether you want
-		    // to create it as a directory or just copy a file, so we always
-		    // just put "F" in xcopy's stdin.
-		    return Exec(cmd, "F", null) == 1;
+		// If the file/ doesn't exist on copying, xcopy will ask whether you want
+		// to create it as a directory or just copy a file, so we always
+		// just put "F" in xcopy's stdin.
+		return Exec(cmd, "F", null) == 1;
 	    }
 	    
 	} else {
@@ -303,31 +303,8 @@ public class FileUtils {
 	return createTempDir(prefix, new File(System.getProperty("java.io.tmpdir")));
     }
     
-    /** Execute a command and return the exit code 
-     * @throws IOException */
-    public static int Exec(String[] cmd) throws IOException {
-	// Windows needs to capture input/output or application will hang
-	if (System.getProperty("os.name").startsWith("Windows")) {
-	    String foo = "";
-	    return Exec(cmd, foo);
-	}	
-	// log
-	String scmd = "";
-	for (int i=0; i<cmd.length; i++) scmd += " "+cmd[i]; 
-	logger.finest("exec"+scmd);
-	// run
-	Process p = Runtime.getRuntime().exec(cmd);
-	int ret = -1;
-	try {
-	    ret = p.waitFor();
-	} catch (InterruptedException e) {
-	    // TODO verify this is the right thing to do
-	    throw new IOException(e.getMessage());
-	}
-	// log and return
-	logger.finest("exec"+scmd+" returns "+ret);
-	return ret;
-    }
+    /** Exec invocation index, to keep track of logging lines */
+    private static int globalExecIndex = 0;
     
     /** Execute a command, enter input on stdin, and return the exit code while storing stdout and stderr.
      * <p>
@@ -341,10 +318,12 @@ public class FileUtils {
      * 
      * @throws IOException */
     public static int Exec(String[] cmd, String input, StringBuffer output) throws IOException {
+	// get current exec invocation number for stdout/stderr tracking
+	int index = globalExecIndex++;	
 	// log
 	String scmd = "";
 	for (int i=0; i<cmd.length; i++) scmd += " "+cmd[i]; 
-	logger.finest("exec"+scmd);
+	logger.finer("exec #"+index+":"+scmd);
 	// run
 	Process p = Runtime.getRuntime().exec(cmd);
 	if (input!=null) {
@@ -359,6 +338,8 @@ public class FileUtils {
 	BufferedReader stderr = new BufferedReader(
 		new InputStreamReader(p.getErrorStream()));
 	while ( (lineout=stdout.readLine()) != null || (lineerr=stderr.readLine()) != null) {
+	    if (lineout!=null) logger.finest("[stdout #"+index+"] "+lineout);
+	    if (lineerr!=null) logger.finest("[stderr #"+index+"] "+lineerr);
 	    if (lineout!=null && output!=null) output.append(lineout + s);
 	    if (lineerr!=null && output!=null) output.append(lineerr + s);
 	}
@@ -385,5 +366,11 @@ public class FileUtils {
      */
     public static int Exec(String[] cmd, String output) throws IOException {
 	return Exec(cmd, null, null);
+    }
+    
+    /** Execute a command and return the exit code 
+     * @throws IOException */
+    public static int Exec(String[] cmd) throws IOException {
+	return Exec(cmd, null);
     }
 }

@@ -84,22 +84,40 @@ public class FileUtilsTest extends TestCase {
 	return tmp;
     }
     
-    @Test public void testCopyAll1() throws Exception { copyFileTest(true, true, true, true); }
-    @Test public void testCopyAll2() throws Exception { copyFileTest(true, false, true, true); }
-    @Test public void testCopyAll3() throws Exception { copyFileTest(true, true, false, true); }
-    @Test public void testCopyAll4() throws Exception { copyFileTest(true, false, false, true); }
-    // skip tests without read permissions since copying can't be done then
+    @Test public void testCopyWorldRWX() throws Exception { copyFileTest(true, true, true, true); }
+    @Test public void testCopyWorldRX() throws Exception { copyFileTest(true, false, true, true); }
+    @Test public void testCopyWorldRW() throws Exception { copyFileTest(true, true, false, true); }
+    @Test public void testCopyWorldR() throws Exception { copyFileTest(true, false, false, true); }
+    // shouldn't be able to copy unreadable file
+    @Test public void testCopyWorldW() throws Exception {
+	try {
+	    copyFileTest(false, true, false, true);
+	} catch(IOException e) {
+	    return;
+	}
+	throw new IOException("Expected IOException on unreadable file");
+    }
     
-    @Test public void testCopyUseronly1() throws Exception { copyFileTest(true, true, true, false); }
-    @Test public void testCopyUseronly2() throws Exception { copyFileTest(true, false, true, false); }
-    @Test public void testCopyUseronly3() throws Exception { copyFileTest(true, true, false, false); }
-    @Test public void testCopyUseronly4() throws Exception { copyFileTest(true, false, false, false); }
-    // skip tests without read permissions since copying can't be done then
+    @Test public void testCopyUseronlyRWX() throws Exception { copyFileTest(true, true, true, false); }
+    @Test public void testCopyUseronlyRX() throws Exception { copyFileTest(true, false, true, false); }
+    @Test public void testCopyUseronlyRW() throws Exception { copyFileTest(true, true, false, false); }
+    @Test public void testCopyUseronlyR() throws Exception { copyFileTest(true, false, false, false); }
+    // shouldn't be able to copy unreadable file
+    @Test public void testCopyUseronlyW() throws Exception {
+	try {
+	    copyFileTest(false, true, false, false);
+	} catch(IOException e) {
+	    return;
+	}
+	throw new IOException("Expected IOException on unreadable file");
+    }
     
-    /** Windows robocopy test case where destination file name with same name as
-     * source filename is present. */
+    /* Copy method can be a little complex with renaming files and back. To make
+     * sure this is ok, we have a couple of tests cases. Especially the
+     * robocopy-based copy (Windows Vista and higher) requires thorough testing. */
+    /** Copy test: file in destination dir exists with same name as source file */
     @Test
-    public void testCopyRobocopyCheck1() throws Exception {
+    public void testCopyCheckOtherDirOrigNameExists() throws Exception {
 	File src = createDummyTempFile();
 	File tmpdir = FileUtils.createTempDir("test");
 	File tmpsrc = new File(tmpdir, src.getName());
@@ -118,15 +136,30 @@ public class FileUtilsTest extends TestCase {
 	    tmpdst.delete();
 	    tmpdir.delete();
 	}
-	
     }
-
+    /** Copy test: copy file to another dir with same name */
+    @Test
+    public void testCopyCheckOtherDirSameName() throws Exception {
+	File src = createDummyTempFile();
+	File tmpdir = FileUtils.createTempDir("test");
+	File tmpdst = new File(tmpdir, src.getName());
+	try {
+	    FileUtils.CopyFile(src, tmpdst);
+	    assertTrimmedEquals(dummyString, FileUtils.readFile(tmpdst));
+	} finally {
+	    src.delete();
+	    tmpdst.delete();
+	    tmpdir.delete();
+	}
+    }
+    
     public void copyFileTest(boolean read, boolean write, boolean exec, boolean userOnly) throws Exception  {
 	File src = createDummyTempFile();
 	File dst = new File(src.getParentFile(), src.getName()+".copy");
 	try {
 	    FileUtils.chmod(src, read, write, exec, userOnly);
-	    FileUtils.CopyFile(src, dst);
+	    if (!FileUtils.CopyFile(src, dst))
+		throw new IOException("File copy failed");
 	    // compare permissions
 	    assertPermissions(dst, read, write, exec, userOnly);
 	    // compare contents
