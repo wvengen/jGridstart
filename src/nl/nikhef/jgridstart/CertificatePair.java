@@ -389,12 +389,14 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    p.remove(key);
 	}
 	// and store with OutputStream for Java 1.5 and below
-	PrivateFileWriter writer = new PrivateFileWriter(getPropertiesFile());
-	try {
-	    p.store(writer.getOutputStream(),
-		    "jGridstart certificate properties");
-	} finally {
-	    writer.close();
+	if (p.size() > 0) {
+	    PrivateFileWriter writer = new PrivateFileWriter(getPropertiesFile());
+	    try {
+		p.store(writer.getOutputStream(),
+		    	"jGridstart certificate properties");
+	    } finally {
+		writer.close();
+	    }
 	}
     }
 
