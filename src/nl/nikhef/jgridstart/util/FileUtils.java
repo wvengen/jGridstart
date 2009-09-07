@@ -330,6 +330,9 @@ public class FileUtils {
     }
     
     /** Execute a command, enter input on stdin, and return the exit code while storing stdout and stderr.
+     * <p>
+     * The process must stop waiting for input by itself, and not rely on its stdin
+     * being closed. This doesn't work on Windows, so the process will never terminate.
      * 
      * @param cmd command to run
      * @param input String to feed to process's stdin

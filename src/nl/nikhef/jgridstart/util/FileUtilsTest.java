@@ -245,7 +245,7 @@ public class FileUtilsTest extends TestCase {
 	StringBuffer out = new StringBuffer();
 	String[] cmd = new String[]{"echo", "hi there"};
 	if (System.getProperty("os.name").startsWith("Windows"))
-	    cmd = new String[]{"cmd", "/C", "echo", "hi there"};
+	    cmd = new String[]{"cmd", "/C", "echo hi there"};
 	FileUtils.Exec(cmd, null, out);
 	assertTrimmedEquals("hi there", out.toString());
     }
