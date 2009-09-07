@@ -95,16 +95,6 @@ public class CertificateCheckTest extends TestCase {
     @Test public void testE_04() throws Exception { testE("testE-04", ""); }
     /** Empty certificate */
     @Test public void testE_05() throws Exception { testE("testE-05"); }
-    /** Unreadable certificate */
-    @Test public void testE_06() throws Exception {
-	CertificatePair cert = getCert("testE-06");
-	try {
-	    FileUtils.chmod(cert.getCertFile(), false, false, false, false);
-	    testE("testE-06");
-	} finally {
-	    FileUtils.chmod(cert.getCertFile(), true, false, false, false);
-	}
-    }
     /** Malformed certificate; random chars replaced */
     @Test public void testE_07() throws Exception { testE("testE-07", ""); }
     /** Key/certificate mismatch, both RSA */
