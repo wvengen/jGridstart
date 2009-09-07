@@ -79,7 +79,7 @@ public class FileUtils {
 		// If the file/ doesn't exist on copying, xcopy will ask whether you want
 		// to create it as a directory or just copy a file, so we always
 		// just put "F" in xcopy's stdin.
-		return Exec(cmd, "F", null) == 1;
+		return Exec(cmd, in.isDirectory()?"D":"F", null) == 1;
 	    }
 	    
 	} else {
