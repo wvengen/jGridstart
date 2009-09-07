@@ -11,11 +11,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.KeyException;
-import java.security.KeyManagementException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -25,7 +23,6 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
-import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
@@ -356,7 +353,12 @@ public class CertificatePair extends Properties implements ItemSelectable {
 
 	// read additional properties, not fatal if not present
 	if (getPropertiesFile().exists()) {
-	    super.load(new FileInputStream(getPropertiesFile()));
+	    InputStream in = new FileInputStream(getPropertiesFile());
+	    try {
+		super.load(in);
+	    } finally {
+		in.close();
+	    }
 	}
 
 	notifyChanged();
@@ -387,8 +389,13 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    p.remove(key);
 	}
 	// and store with OutputStream for Java 1.5 and below
-	p.store(new PrivateFileWriter(getPropertiesFile()).getOutputStream(),
-		"jGridstart certificate properties");
+	PrivateFileWriter writer = new PrivateFileWriter(getPropertiesFile());
+	try {
+	    p.store(writer.getOutputStream(),
+		    "jGridstart certificate properties");
+	} finally {
+	    writer.close();
+	}
     }
 
     /** Import a {@linkplain CertificatePair} from a keystore into a (new) directory.
