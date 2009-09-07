@@ -397,6 +397,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    } finally {
 		writer.close();
 	    }
+	} else {
+	    getPropertiesFile().delete();
 	}
     }
 
