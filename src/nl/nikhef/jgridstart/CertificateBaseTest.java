@@ -90,7 +90,7 @@ public abstract class CertificateBaseTest extends TestCase {
     protected CertificatePair newTestCertificate(File certPath) throws GeneralSecurityException, PasswordCancelledException, IOException, CAException, CertificateCheckException {
 	char[] pw = ("test_password-"+certIndex).toCharArray();
 	Properties p = new Properties();
-	p.setProperty("subject", "/O=dutchgrid/O=users/O=nikhef/CN=Test User #"+certIndex);
+	p.setProperty("subject", "/O=dutchgrid/O=users/O=nikhef/CN=Test User #" + certIndex++);
 	certPath.mkdirs();
 	CertificatePair cert = CertificatePair.generateRequest(certPath, p, pw);
 	assertNotNull(cert);
