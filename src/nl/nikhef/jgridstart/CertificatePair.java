@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyException;
@@ -40,6 +41,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.TooManyListenersException;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -396,16 +398,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
      *            passed later to create a new CertificatePair which is equal to
      *            the one returned by this method.
      * @return a new CertificatePair representing the newly imported pair.
-     * @throws IOException
-     * @throws NoSuchAlgorithmException 
-     * @throws PasswordCancelledException 
-     * @throws CertificateException 
-     * @throws NoSuchProviderException 
-     * @throws KeyStoreException 
-     * @throws UnrecoverableKeyException 
      */
     static public CertificatePair importFrom(File src, File dst)
-	    throws IOException, CertificateCheckException, NoSuchAlgorithmException, PasswordCancelledException, UnrecoverableKeyException, KeyStoreException, NoSuchProviderException, CertificateException {
+	    throws IOException, PasswordCancelledException, CertificateCheckException, GeneralSecurityException {
 
 	if (!src.isFile() && !src.isDirectory())
 	    throw new IOException("Need file to import from: " + src);
@@ -440,10 +435,6 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * This may possibly overwrite the current data.
      * 
      * @param src PEM file to import from
-     * 
-     * @throws IOException
-     * @throws NoSuchAlgorithmException 
-     * @throws PasswordCancelledException 
      */
     protected void importFromPEM(File src) throws IOException, CertificateCheckException, NoSuchAlgorithmException, PasswordCancelledException {
 	int count = 0;
@@ -552,14 +543,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * <p>
      * Type is detected from the filename.
      * 
-     * @param dst destination to export to
-     * @throws CertificateException 
-     * @throws NoSuchAlgorithmException 
-     * @throws NoSuchProviderException 
-     * @throws KeyStoreException 
-     * @throws PasswordCancelledException 
+     * @param dst destination to export {@link TooManyListenersException}
      */
-    public void exportTo(File dst) throws IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, PasswordCancelledException {
+    public void exportTo(File dst) throws IOException, GeneralSecurityException, PasswordCancelledException {
 	String ext = dst.getName().toLowerCase();
 	ext = ext.substring(ext.lastIndexOf('.')+1);
 	if (ext.equals("p12") || ext.equals("pfx")) {
@@ -571,14 +557,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	}
     }
     
-    /** Export the certificate and private key to a PKCS#12 file.
-     * 
-     * @throws NoSuchProviderException 
-     * @throws KeyStoreException 
-     * @throws CertificateException 
-     * @throws NoSuchAlgorithmException 
-     * @throws PasswordCancelledException */
-    protected void exportToPKCS(File dst) throws IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, PasswordCancelledException {
+    /** Export the certificate and private key to a PKCS#12 file. */
+    protected void exportToPKCS(File dst) throws IOException, GeneralSecurityException, PasswordCancelledException {
 	logger.finer("Exporting certificate '"+this+"' to PKCS#12: "+dst);
 
 	// Create certificate chain TODO do proper chain
@@ -602,8 +582,6 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * <p>
      * This is quite simple, since it just concatenates the existing
      * files from its {@code .globus} directory; no password is needed.
-     * 
-     * @throws IOException 
      */
     protected void exportToPEM(File dst) throws IOException {
 	logger.finer("Exporting certificate '"+this+"' to PEM: "+dst);
@@ -646,16 +624,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @param p Properties according to which to generate request
      * @param pw Password to use, or {@code null} to ask from user via {@link PasswordCache}
      * @return newly created CertificatePair
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeyException
-     * @throws NoSuchProviderException
-     * @throws SignatureException
-     * @throws PasswordCancelledException 
      */
     static public CertificatePair generateRequest(File dst, Properties p, final char[] pw)
-	    throws IOException, NoSuchAlgorithmException, InvalidKeyException,
-	    NoSuchProviderException, SignatureException, PasswordCancelledException {
+	    throws IOException, GeneralSecurityException, PasswordCancelledException {
 	// functionally based on
 	// org.globus.tools.GridCertRequest.genCertificateRequest()
 	
@@ -699,27 +670,13 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return cert;
     }
     /** Generate a new private key+CSR pair, request password.
-     * @throws PasswordCancelledException 
-     * @throws IOException 
-     * @throws SignatureException 
-     * @throws NoSuchProviderException 
-     * @throws NoSuchAlgorithmException 
-     * @throws InvalidKeyException 
      * @see #generateRequest(File, Properties) */
-    static public CertificatePair generateRequest(File dst, Properties p) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException, PasswordCancelledException {
+    static public CertificatePair generateRequest(File dst, Properties p) throws GeneralSecurityException, IOException, PasswordCancelledException {
 	return generateRequest(dst, p, null);
     }
     
-    /** Upload the certificate signing request to its certificate authority .
-     * 
-     * @throws SignatureException 
-     * @throws NoSuchProviderException 
-     * @throws IllegalStateException 
-     * @throws NoSuchAlgorithmException 
-     * @throws KeyException 
-     * @throws CertificateException 
-     * @throws IOException */
-    public void uploadRequest() throws CertificateException, KeyException, NoSuchAlgorithmException, IllegalStateException, NoSuchProviderException, SignatureException, IOException, CAException {
+    /** Upload the certificate signing request to its certificate authority */
+    public void uploadRequest() throws GeneralSecurityException, IOException, CAException {
 	logger.finer("Uploading certificate request for: "+this);
 	try {
 	    if (getCertificate()!=null) throw new IOException();
@@ -737,11 +694,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
     /** See if the certificate can be downloaded from the certificate authority.
      * <p>
      * Also sets the property {@code request.processed} accordingly.
-     *  
-     * @throws NoSuchAlgorithmException 
-     * @throws KeyManagementException 
-     * @throws CAException */
-    public boolean isCertificationRequestProcessed() throws KeyManagementException, NoSuchAlgorithmException, CAException {
+     */
+    public boolean isCertificationRequestProcessed() throws GeneralSecurityException, CAException {
 	boolean isProcessed;
 	try {
 	    isProcessed = getCA().isCertificationRequestProcessed(getCSR(), getProperty("request.serial"));
@@ -752,9 +706,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return isProcessed;
     }
     
-    /** Download the certificate from the certificate authority 
-     * @throws CAException */
-    public void downloadCertificate() throws IOException, CertificateCheckException, KeyManagementException, NoSuchAlgorithmException, CAException {
+    /** Download the certificate from the certificate authority  */
+    public void downloadCertificate() throws IOException, CertificateCheckException, CAException, GeneralSecurityException {
 	if (getCertificate()!=null) {
 	    logger.warning("Ignoring request to download certificate when already present: "+this);
 	    return;
@@ -774,10 +727,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
     
     /** Return the correct CA for this CertificatePair. Currently this is
      * fixed, but eventually it should be possible to have certificates with
-     * different CA's. 
-     * @throws NoSuchAlgorithmException 
-     * @throws KeyManagementException */
-    protected CA getCA() throws KeyManagementException, NoSuchAlgorithmException, CAException {
+     * different CA's.
+     */
+    protected CA getCA() throws GeneralSecurityException, CAException {
 	return CAFactory.getDefault();
     }
 
@@ -877,11 +829,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
     /** Refresh an item from disk and update its status from online sources.
      * 
      * @return whether the refresh was successful or no
-     * @throws NoSuchAlgorithmException 
-     * @throws KeyManagementException 
-     * @throws CAException 
      */
-    public boolean refresh() throws KeyManagementException, NoSuchAlgorithmException, CAException {
+    public boolean refresh() throws GeneralSecurityException, CAException {
 	// TODO should check if disk contents changed, update if so.
 	//      load(path) should not be done here, since that clears
 	//      the current state. E.g. at some point in the request-new
