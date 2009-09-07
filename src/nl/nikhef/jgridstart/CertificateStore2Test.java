@@ -42,7 +42,6 @@ public class CertificateStore2Test extends CertificateStoreBaseTest {
 	assertNotNull(cert.getCSR());
 	assertNull(cert.getCertificate());
 	assertFalse(Boolean.valueOf(cert.getProperty("request.submitted")));
-	assertEquals("nikhef", cert.getProperty("org").toLowerCase());
 	// "upload" certificate
 	cert.uploadRequest();
 	assertTrue(Boolean.valueOf(cert.getProperty("request.submitted")));
