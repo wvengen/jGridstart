@@ -91,16 +91,6 @@ public class CertificateCheckTest extends TestCase {
     @Test public void testE_01() throws Exception { testE("testE-01"); }
     /** Empty private key */
     @Test public void testE_02() throws Exception { testE("testE-02"); }
-    /** Unreadable private key */
-    @Test public void testE_03() throws Exception {
-	CertificatePair cert = getCert("testE-03");
-	try {
-	    FileUtils.chmod(cert.getKeyFile(), false, false, false, false);
-	    testE("testE-03");
-	} finally {
-	    FileUtils.chmod(cert.getKeyFile(), true, false, false, false);
-	}
-    }
     /** Malformed private key; random chars replaced */
     @Test public void testE_04() throws Exception { testE("testE-04", ""); }
     /** Empty certificate */
