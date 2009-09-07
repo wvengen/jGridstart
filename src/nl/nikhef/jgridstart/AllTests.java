@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanelTest;
 import nl.nikhef.jgridstart.install.BrowsersMacOSXTest;
 import nl.nikhef.jgridstart.util.FileUtilsTest;
+import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordCacheTest;
 import nl.nikhef.xhtmlrenderer.swing.TemplateDocumentTest;
 import nl.nikhef.xhtmlrenderer.swing.TemplatePanelTest;
@@ -19,14 +20,16 @@ import junit.framework.TestSuite;
 
 public class AllTests {
 
-    // setup logging
     static {
+	// setup logging
 	try {
 	    // load configuration
 	    LogManager.getLogManager().readConfiguration(AllTests.class.getResourceAsStream("/logging.debug.properties"));
 	} catch(Exception e) {
 	    System.out.println("Warning: logging configuration could not be set");
 	}
+	// and increase password timeout for testing
+	PasswordCache.getInstance().setTimeout(10*60);
     }
     
     public static Test suite() {
