@@ -91,9 +91,6 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     private void setRenewal(CertificatePair certParent) {
 	this.certParent = certParent;
 	setData(new Properties());
-	data().setProperty("renewal", "true");
-	data().setProperty("renewal.parent.path", certParent.getProperty("path"));
-	data().setProperty("renewal.parent.modulus", certParent.getProperty("modulus"));
     }
     
     /** Set the current step to the one that is relevant for the process. */
