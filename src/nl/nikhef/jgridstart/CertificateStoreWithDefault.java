@@ -1,10 +1,17 @@
 package nl.nikhef.jgridstart;
 
+import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Iterator;
 
+import javax.mail.MessagingException;
+
+import org.bouncycastle.mail.smime.SMIMEException;
+
 import nl.nikhef.jgridstart.util.FileUtils;
+import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 /** A {@link CertificateStore} which has the notion of a default certificate.
  * <p>
@@ -44,6 +51,7 @@ import nl.nikhef.jgridstart.util.FileUtils;
  * Please see {@link CertificateStoreWithDefault#setDefault} for the behaviour
  * when the default certificate is changed, this is directly related to this.
  * <p>
+ * <a name="scenarios"></a>
  * This behaviour satisfies the following situations:
  * <ul>
  *  <li><em>Empty</em>: the user has no {@code ~/.globus}, or it is empty.</li>
@@ -103,7 +111,19 @@ public class CertificateStoreWithDefault extends CertificateStore {
 	    } catch (IOException e) { /* ok */ }
 	}
     }
-
+    
+    /** {@inheritDoc}
+     * <p>
+     * The very first entry in the store is the default certificate.
+     */
+    @Override
+    protected File newItem() throws IOException {
+	if (getDefault()!=null)
+	    return super.newItem();
+	path.mkdirs();
+	return path;
+    }
+    
     /** Return the default certificate.
      * <p>
      * The default certificate is the one in {@code ~/.globus}
@@ -265,5 +285,28 @@ public class CertificateStoreWithDefault extends CertificateStore {
 	}
 	// no
 	return true;
+    }
+    
+    /** Catch it when a renewed certificate becomes available.
+     * <p>
+     * If the parent is the current default, make the renewed certificate
+     * the default instead. */ 
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+	CertificatePair cert = (CertificatePair)e.getItem();
+	try {
+	    // only for renewed certificates with certificate present
+	    if (Boolean.valueOf(cert.getProperty("renewal")) &&
+		    cert.cert != null &&
+		    getDefault() != null &&
+		    !cert.equals(getDefault())) {
+		// make sure parent is the current default
+		String dflModulus = getDefault().getProperty("modulus");
+		String wantedModulus = cert.getProperty("renewal.parent.modulus");
+		if (wantedModulus!=null && wantedModulus.equals(dflModulus))
+		    setDefault(cert);
+	    }
+	} catch(IOException e1) { /* leave it, too bad */ }
+	super.itemStateChanged(e);
     }
 }

@@ -308,6 +308,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     /** Create a new certificate request with preset password
      *
      * @param p Properties to use for generation
+     * @param pw password to use for new private key
      * @see CertificatePair#generateRequest
      */
     public CertificatePair generateRequest(Properties p, char[] pw) throws IOException, GeneralSecurityException, PasswordCancelledException {
@@ -321,17 +322,23 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	    throw e;
 	}
     }
-    /** Renew a certificate.
+    /** Renew a certificate with preset password
      * <p>
-     * This generates a new certificate request in the store, but S/MIME
-     * signs it as well.
+     * Generates a new certificate request in the store supplying password
+     * for new private key, and S/MIME signs it as well.
+     * 
+     * @param oldCert certificate to renew
+     * @param pw password to use for new private key
      */
-    public CertificatePair generateRenewal(CertificatePair oldCert) throws IOException, GeneralSecurityException, PasswordCancelledException, MessagingException, SMIMEException {
+    public CertificatePair generateRenewal(CertificatePair oldCert, char[] pw) throws IOException, GeneralSecurityException, PasswordCancelledException, MessagingException, SMIMEException {
 	// ask for private key first, cancel would skip everything
 	PrivateKey oldKey = oldCert.getPrivateKey();
 	
 	// generate request
-	CertificatePair newCert = generateRequest(oldCert);
+	CertificatePair newCert = generateRequest(oldCert, pw);
+	newCert.setProperty("renewal", "true");
+	newCert.setProperty("renewal.parent.path", oldCert.getProperty("path"));
+	newCert.setProperty("renewal.parent.modulus", oldCert.getProperty("modulus"));
 	
 	// create S/MIME message from it
 	MimeBodyPart data = new MimeBodyPart();
@@ -352,5 +359,13 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	out.close();
 	
 	return newCert;
+    }
+    
+    /** Renew a certificate
+     * 
+     * @see #generateRenewal(CertificatePair, char[])
+     */
+    public CertificatePair generateRenewal(CertificatePair oldCert) throws PasswordCancelledException, IOException, GeneralSecurityException, MessagingException, SMIMEException {
+	return generateRenewal(oldCert, null);
     }
 }

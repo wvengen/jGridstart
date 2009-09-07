@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.Properties;
 
 import nl.nikhef.jgridstart.util.FileUtils;
 
@@ -103,6 +104,59 @@ public class CertificateStoreWithDefaultTest extends CertificateBaseTest {
 	store.setDefault(cert1);
 	assertTrue(store.compareDefaultCertificate(cert1));
 	assertEquals(cert1, store.getDefault());
+    }
+    
+    /** Scenario test: <em>Single</em> */
+    @Test
+    public CertificateStoreWithDefault testScenarioSingle() throws Exception {
+	// new store
+	CertificateStoreWithDefault store = new CertificateStoreWithDefault(FileUtils.createTempDir("certstore", tmpBasePath));
+	assertEquals(0, store.size());
+	// generate new request
+	Properties p = new Properties();
+	p.setProperty("subject", "/O=dutchgrid/O=users/O=nikhef/O=Scenario Single");
+	CertificatePair cert = store.generateRequest(p, "footest".toCharArray());
+	// make sure output is ok and is default cert
+	assertEquals(cert, store.getDefault());
+	File[] files = store.path.listFiles();
+	for (int i=0; i < files.length; i++)
+	    assertFalse(files[i].isDirectory());
+	cert.uploadRequest();
+	cert.downloadCertificate();
+	assertEquals(cert, store.getDefault());
+	return store;
+    }
+    
+    /** Scenario test: <em>Single renewal</em> */
+    @Test
+    public void testScenarioSingleRenewal() throws Exception {
+	CertificateStoreWithDefault store = testScenarioSingle();
+	CertificatePair oldCert = store.get(0);
+	assertEquals(oldCert, store.getDefault());
+	CertificatePair newCert = store.generateRenewal(oldCert, "footest2".toCharArray());
+	// should become default only after certificate is downloaded
+	assertEquals(oldCert, store.getDefault());
+	newCert.uploadRequest();
+	assertEquals(oldCert, store.getDefault());
+	newCert.downloadCertificate();
+	assertEquals(newCert, store.getDefault());
+    }
+    
+    /** Scenario test: <em>Dual</em> */
+    @Test
+    public void testScenarioMultiple() throws Exception {
+	CertificateStoreWithDefault store = testScenarioSingle();
+	assertEquals(1, store.size());
+	// generate new request
+	Properties p = new Properties();
+	p.setProperty("subject", "/O=dutchgrid/O=users/O=cwi/O=Scenario Dual");
+	CertificatePair cert = store.generateRequest(p, "footestdual".toCharArray());
+	// make sure output is ok and is not default cert
+	assertFalse(cert == store.getDefault());
+	cert.uploadRequest();
+	assertFalse(cert == store.getDefault());
+	cert.downloadCertificate();
+	assertFalse(cert == store.getDefault());
     }
     
     // TODO more setDefault tests; at least also with new instance of CertificateStoreWithDefault
