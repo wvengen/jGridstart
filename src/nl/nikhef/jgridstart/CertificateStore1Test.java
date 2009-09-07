@@ -1,6 +1,9 @@
 package nl.nikhef.jgridstart;
 
 import java.io.File;
+
+import nl.nikhef.jgridstart.util.PasswordCache;
+
 import org.junit.Test;
 
 /** Test basic operations of a {@link CertificateStore} */
@@ -89,5 +92,47 @@ public class CertificateStore1Test extends CertificateBaseTest {
 	store.delete(store.get(2));
 	store.delete(store.get(0));
 	assertEquals(1, store.size());
+    }
+    
+    /** Test PKCS certificate export */
+    @Test
+    public void testExportImportPKCS() throws Exception {
+	CertificateStore store = new CertificateStore(newTestStore(1));
+	dotestExportImport(store, "123".toCharArray(), ".p12");
+    }
+    /** Test PKCS certificate export with a long password.
+     * Breaks when using standard Java JSSE :( */
+    @Test
+    public void testExportImportPKCSLongPassword() throws Exception {
+	CertificateStore store = new CertificateStore(newTestStore(1));
+	dotestExportImport(store, "123ksjldfhljk3342398p4O*(43hlui2#H$LIU%H:OI'opKL:MJ34jK".toCharArray(), ".p12");
+    }
+    /** Test PEM certificate export */
+    @Test
+    public void testExportImportPEM() throws Exception {
+	CertificateStore store = new CertificateStore(newTestStore(1));
+	char[] pw = PasswordCache.getInstance().getForDecrypt("", store.get(0).getKeyFile().getCanonicalPath());
+	dotestExportImport(store, pw, ".pem");
+    }
+    /** Test PEM certificate export with a long password. */
+    @Test
+    public void testExportImportPEMLongPassword() throws Exception {
+	CertificateStore store = new CertificateStore(newTestStore(1));
+	char[] pw = PasswordCache.getInstance().getForDecrypt("", store.get(0).getKeyFile().getCanonicalPath());
+	dotestExportImport(store, pw, ".pem");
+    }
+    
+    protected void dotestExportImport(CertificateStore store, char[] pw, String ext) throws Exception {
+	File exported = File.createTempFile("cert", ext);
+	try {
+	    PasswordCache.getInstance().set(exported.getCanonicalPath(), pw);
+	    store.get(0).exportTo(exported);
+	    // now import into new store
+	    CertificateStore store2 = new CertificateStore(newTestStore(0));
+	    store2.importFrom(exported, null, pw);
+	    assertEquals(store.get(0), store2.get(0));
+	} finally {
+	    exported.delete();
+	}
     }
 }

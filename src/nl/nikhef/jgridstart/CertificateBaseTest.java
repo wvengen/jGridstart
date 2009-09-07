@@ -9,6 +9,7 @@ import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.ca.CAException;
 import nl.nikhef.jgridstart.ca.LocalCA;
 import nl.nikhef.jgridstart.util.FileUtils;
+import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 import junit.framework.TestCase;
 
@@ -20,6 +21,8 @@ public abstract class CertificateBaseTest extends TestCase {
     /** original CA provider instead of LocalCA; done to be able to run tests inside
      * the program without affecting its configuration */
     private String oldCAProvider = null;
+    /** original {@linkplain PasswordCache} status if always want to ask encrypt password */
+    private boolean pwcacheAlwaysEncrypt = true;
     
     @Override
     public void setUp() throws Exception {
@@ -28,6 +31,8 @@ public abstract class CertificateBaseTest extends TestCase {
 	// use LocalCA for testing
 	oldCAProvider = System.getProperty("jgridstart.ca.provider");
 	System.setProperty("jgridstart.ca.provider", "LocalCA");
+	// don't ask passwords for testing
+	pwcacheAlwaysEncrypt = PasswordCache.getInstance().setAlwaysAskForEncrypt(false);
     }
     
     @Override
@@ -39,6 +44,8 @@ public abstract class CertificateBaseTest extends TestCase {
 	    System.getProperties().remove("jgridstart.ca.provider");
 	else
 	    System.setProperty("jgridstart.ca.provider", oldCAProvider);
+	// restore passwordcache settings
+	PasswordCache.getInstance().setAlwaysAskForEncrypt(pwcacheAlwaysEncrypt);
     }
     
     /** Helper method: remove directory recursively.
