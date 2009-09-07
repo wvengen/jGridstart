@@ -29,7 +29,7 @@ public class FileUtils {
 	    //   have to resort to using robocopy there.
 	    try {
 		int ret = Exec(new String[]{"robocopy.exe"});
-		if (ret==0 && ret==16) hasRobocopy = true;
+		if (ret==0 || ret==16) hasRobocopy = true;
 	    } catch (Exception e) { }
 	    
 	    if (hasRobocopy) {
