@@ -4,7 +4,7 @@ import java.io.File;
 import org.junit.Test;
 
 /** Test basic operations of a {@link CertificateStore} */
-public class CertificateStore1Test extends CertificateStoreBaseTest {
+public class CertificateStore1Test extends CertificateBaseTest {
     
     /** Load {@linkplain CertificateStore} from string path */
     @Test
@@ -41,7 +41,7 @@ public class CertificateStore1Test extends CertificateStoreBaseTest {
 	new File(path, "foobar.pem").createNewFile();
 	new File(path, "grix.properties").createNewFile();
 	new File(path, "certificates").mkdir();
-	File f = addCopyTest("testO-01", path);
+	File f = newTestCertificate(new File(path, "user-cert-foo")).getPath();
 	f.renameTo(new File(path, "cool"));
 	// refresh and make sure it's still ok
 	CertificateStore store = new CertificateStore(path);
@@ -53,7 +53,7 @@ public class CertificateStore1Test extends CertificateStoreBaseTest {
     public void testRefreshAdd() throws Exception {
 	CertificateStore store = new CertificateStore(newTestStore(0));
 	assertEquals(0, store.size());
-	addCopyTest("testO-05", store.path);
+	newTestCertificate(new File(store.path, "user-cert-0001"));
 	store.refresh();
 	assertEquals(1, store.size());
     }
@@ -62,7 +62,7 @@ public class CertificateStore1Test extends CertificateStoreBaseTest {
     @Test
     public void testRefreshRemove() throws Exception {
 	File path = newTestStore(0);
-	File entry = addCopyTest("testO-01", path);
+	File entry = newTestCertificate(new File(path, "user-cert-bar")).getPath();
 	CertificateStore store = new CertificateStore(path);
 	assertEquals(1, store.size());
 	recursiveDelete(entry);

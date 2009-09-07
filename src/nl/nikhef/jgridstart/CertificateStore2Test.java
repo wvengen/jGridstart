@@ -4,28 +4,8 @@ import java.util.Properties;
 import org.junit.Test;
 
 /** High-level {@link CertificateStore} test cases */
-public class CertificateStore2Test extends CertificateStoreBaseTest {
+public class CertificateStore2Test extends CertificateBaseTest {
     
-    private String oldCAProvider = null;
-
-    @Override
-    public void setUp() throws Exception {
-	super.setUp();
-	// use LocalCA for testing
-	oldCAProvider = System.getProperty("jgridstart.ca.provider");
-	System.setProperty("jgridstart.ca.provider", "LocalCA");
-    }
-    
-    @Override
-    public void tearDown() throws Exception {
-	super.tearDown();
-	// restore CA
-	if (oldCAProvider==null)
-	    System.getProperties().remove("jgridstart.ca.provider");
-	else
-	    System.setProperty("jgridstart.ca.provider", oldCAProvider);
-    }
-
     /** Simple new request run */
     @Test
     public void testRequest01() throws Exception {

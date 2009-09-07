@@ -7,13 +7,13 @@ import nl.nikhef.jgridstart.util.FileUtils;
 
 import org.junit.Test;
 
-public class CertificateStoreWithDefaultTest extends CertificateStoreBaseTest {
+public class CertificateStoreWithDefaultTest extends CertificateBaseTest {
     
     /** Test if single default cert is recognised */
     @Test
     public void testCreateDefaultStore() throws Exception {
 	File storePath = newTestStore(0);
-	File childPath = addCopyTest("testO-05", storePath);
+	File childPath = newTestCertificate(new File(storePath, "user-cert-0000")).getPath();
 	FileUtils.MoveFiles(FileUtils.listFilesOnly(childPath), storePath);
 	assertTrue(childPath.delete());
 	CertificateStoreWithDefault store = new CertificateStoreWithDefault(storePath);
@@ -25,7 +25,7 @@ public class CertificateStoreWithDefaultTest extends CertificateStoreBaseTest {
     @Test
     public void testCompareDefaultCertificate() throws Exception {
 	File storePath = newTestStore(0);
-	File childPath = addCopyTest("testO-05", storePath);
+	File childPath = newTestCertificate(new File(storePath, "user-cert-0000")).getPath();
 	FileUtils.CopyFiles(FileUtils.listFilesOnly(childPath), storePath);
 	CertificateStoreWithDefault store = new CertificateStoreWithDefault(storePath);
 	assertEquals(1, store.size());
@@ -39,7 +39,7 @@ public class CertificateStoreWithDefaultTest extends CertificateStoreBaseTest {
     @Test
     public void testCompareDefaultCertificateNotEqual() throws Exception {
 	File storePath = newTestStore(0);
-	File childPath = addCopyTest("testO-05", storePath);
+	File childPath = newTestCertificate(new File(storePath, "user-cert-0000")).getPath();
 	FileUtils.CopyFiles(FileUtils.listFilesOnly(childPath), storePath);
 	new File(storePath, "userkey.pem").delete();
 	CertificateStoreWithDefault store = new CertificateStoreWithDefault(storePath);
@@ -51,8 +51,8 @@ public class CertificateStoreWithDefaultTest extends CertificateStoreBaseTest {
     @Test
     public void testCompareDefaultCertificateOther() throws Exception {
 	File storePath = newTestStore(0);
-	File childPath1 = addCopyTest("testO-05", storePath);
-	File childPath2 = addCopyTest("testO-02", storePath);
+	File childPath1 = newTestCertificate(new File(storePath, "user-cert-0000")).getPath();
+	File childPath2 = newTestCertificate(new File(storePath, "user-cert-0001")).getPath();
 	FileUtils.CopyFiles(FileUtils.listFilesOnly(childPath1), storePath);
 	CertificateStoreWithDefault store = new CertificateStoreWithDefault(storePath);
 	assertEquals(2, store.size());
@@ -72,9 +72,9 @@ public class CertificateStoreWithDefaultTest extends CertificateStoreBaseTest {
     @Test
     public void testSetDefault() throws Exception {
 	File storePath = newTestStore(0);
-	File childPath1 = addCopyTest("testO-02", storePath);
-	File childPath2 = addCopyTest("testO-03", storePath);
-	File childPath3 = addCopyTest("testO-05", storePath);
+	File childPath1 = newTestCertificate(new File(storePath, "user-cert-0001")).getPath();
+	File childPath2 = newTestCertificate(new File(storePath, "user-cert-0002")).getPath();
+	File childPath3 = newTestCertificate(new File(storePath, "user-cert-0003")).getPath();
 	CertificateStoreWithDefault store = new CertificateStoreWithDefault(storePath);
 	assertEquals(3, store.size());
 	CertificatePair cert1 = null, cert2 = null, cert3 = null;

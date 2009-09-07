@@ -2,10 +2,8 @@ package nl.nikhef.jgridstart;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 
-import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.util.FileUtils;
 
 /** A {@link CertificateStore} which has the notion of a default certificate.
