@@ -19,10 +19,17 @@ public class FileUtils {
     static private boolean hasRobocopy = false;
     static private boolean copyDetected = false;
     
-    /** Copy a file from one place to another. This calls an external copy
-     * program on the operating system to make sure it is properly copied and
-     * permissions are retained.
-     * @throws IOException */
+    /** Copy a file from one place to another, retaining permisions.
+     * <p>
+     * This calls an external copy program on the operating system to
+     * make sure it is properly copied and permissions are retained.
+     * <p>
+     * It is strongly advised to make sure the destination file does
+     * not exist already.
+     * 
+     * @return {@code true} if file was copied, {@code false} if no files was copied
+     * @throws IOException on error, as far as it can be detected from the utilities
+     */
     public static boolean CopyFile(File in, File out) throws IOException {
 	String[] cmd;
 	if (System.getProperty("os.name").startsWith("Windows")) {
@@ -50,7 +57,7 @@ public class FileUtils {
 		// temporary copy
 		File tmpfile = new File(tmpdir, in.getName());
 
-		boolean success = false;
+		boolean copied = false;
 		try {
 		    // copy file to tmpdir
 		    cmd = new String[]{"robocopy.exe",
@@ -58,18 +65,19 @@ public class FileUtils {
 			    tmpfile.getName(),
 			    "/SEC", "/NP", "/NS", "/NC", "/NFL", "/NDL"};
 		    int ret = Exec(cmd);
-		    success = ret < 4 && ret >= 0;
-		    if (success) {
-			// rename new file
-			if (!tmpfile.renameTo(out))
-			    throw new IOException("Could not copy\n  "+in+"\nto\n  "+out+"\n(robocopy, phase rename)");
-		    }
+		    // http://support.microsoft.com/kb/954404
+		    copied = (ret&1) != 0;
+		    if (ret >= 8)
+			throw new IOException("robocopy error #"+ret);
+		    // rename new file
+		    if (!tmpfile.renameTo(out))
+			throw new IOException("Could not copy\n  "+in+"\nto\n  "+out+"\n(robocopy, phase rename)");
 		} finally {
 		    // cleanup
 		    tmpfile.delete();
 		    tmpdir.delete();
 		}
-		return success;
+		return copied;
 	    } else {
 		// use xcopy instead
 		cmd = new String[]{"xcopy.exe",
@@ -79,7 +87,13 @@ public class FileUtils {
 		// If the file/ doesn't exist on copying, xcopy will ask whether you want
 		// to create it as a directory or just copy a file, so we always
 		// just put "F" in xcopy's stdin.
-		return Exec(cmd, out.isDirectory()?"D":"F", null) == 1;
+		int ret = Exec(cmd, out.isDirectory()?"D":"F", null);
+		if (ret==0) return true;
+		if (ret==1) return false;
+		if (ret==2) throw new IOException("xcopy aborted");
+		if (ret==4) throw new IOException("xcopy initialization error");
+		if (ret==5) throw new IOException("xcopy disk write error");
+		throw new IOException("unknown xcopy return code "+ret);
 	    }
 	    
 	} else {
@@ -87,7 +101,10 @@ public class FileUtils {
 	    cmd = new String[]{"cp",
 		    "-f", "-p",
 		    in.getAbsolutePath(), out.getAbsolutePath()};
-	    return Exec(cmd) == 0;
+	    int ret = Exec(cmd);
+	    if (ret!=0)
+		throw new IOException("cp failed return code "+ret);
+	    return true;
 	}
     }
     
