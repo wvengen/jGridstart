@@ -1,12 +1,7 @@
 package nl.nikhef.jgridstart.gui;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import javax.swing.JFrame;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
@@ -14,8 +9,6 @@ import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.install.BrowserFactory;
-import nl.nikhef.jgridstart.util.PasswordCache;
-import nl.nikhef.jgridstart.util.PasswordGenerator;
 import nl.nikhef.jgridstart.util.TempFileWriter;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
@@ -43,16 +36,6 @@ public class ActionInstall extends CertificateAction {
 	    return false;
 	}
     }
-    
-    /** Generate a random password suitable for export
-     * 
-     * @throws NoSuchProviderException 
-     * @throws NoSuchAlgorithmException */
-    public static char[] generatePassword()
-    		throws NoSuchAlgorithmException, NoSuchProviderException {
-	// maximum length is 7 if no crypto upgrade package installed
-	return PasswordGenerator.generatePronouncable(7);
-    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -70,7 +53,6 @@ public class ActionInstall extends CertificateAction {
 		else if (args[i].equals("silent"))
 		    silent = true;
 	    }
-	    if (pw==null) pw = generatePassword();
 
 	    if (!silent) {
 		// explain what'll happen in password dialog or option pane
@@ -101,16 +83,8 @@ public class ActionInstall extends CertificateAction {
 	    }
 	    logger.finer("Action: "+getValue(NAME));
 	    
-	    // copy password to clipboard
-	    Transferable transPassw = new StringSelection(new String(pw));
-	    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(transPassw, null);
-
 	    pkcs = new TempFileWriter("browser", ".p12");
-	    // TODO change PasswordCache.set() to have File argument
-	    PasswordCache.getInstance().set(pkcs.getFile().getCanonicalPath(), pw);
-	    boolean oldAsk = PasswordCache.getInstance().setAlwaysAskForEncrypt(false);
 	    cert.exportTo(pkcs.getFile());
-	    PasswordCache.getInstance().setAlwaysAskForEncrypt(oldAsk);
 	    // now install and cleanup
 	    pkcs.close(); // required for Windows to avoid "being used by another process" error
 	    if (cert.getProperty("install.browser")!=null)

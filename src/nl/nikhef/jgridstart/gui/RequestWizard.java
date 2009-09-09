@@ -307,14 +307,9 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    }
 	}
 	
-	// generate installation password, update default browser
+	// update default browser
 	if (curPage==3) {
 	    try {
-		if (oldPage!=3) {
-		    // generate export password, unless it is a reload (!)
-		    data().setProperty("install.passwd", String.valueOf(ActionInstall.generatePassword()));
-		    data().setProperty("install.passwd.volatile", "true");
-		}
 		// set browser properties
 		System.setProperty("install.browser", BrowserFactory.getInstance().getDefaultBrowser());
 		String browserid = data().getProperty("install.browser");

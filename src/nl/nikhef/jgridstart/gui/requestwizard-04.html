@@ -54,13 +54,8 @@
 	    If you have set a master password, enter it in the dialog that pops up.</li>
 	
 	  <li if="${install.browser.certinst}==mozilla">
-	    In the password dialog for the <em>certificate backup</em>, enter the
-		password <tt id='passwd' c="${install.passwd}">tobaronetwothree</tt>
-		Note that this a temporary password, and that it has been copied to
-		your clipboard as well (use
-		  <span if="${os.name[0:3]}!=Mac">Ctrl-V</span>
-		  <span if="${os.name[0:3]}==Mac">Command-V</span>
-		to paste).</li>
+	    In the password dialog for the <em>certificate backup</em>, enter your
+		private key password.</li>
 
 	
 	<!--
@@ -71,11 +66,8 @@
 	    The <em>Certificate Import Wizard</em> will appear, press <em>Next</em> twice.</li>
 
 	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Win">
-	    In the password field, enter the password
-	    <tt id='passwd' c="${install.passwd}">tobaronetwothree</tt>
-		Note that this a temporary password, and that it has been copied to
-		your clipboard as well (use Ctrl-V to paste).<br/>
-		It is advised to <em>enable strong private key protection</em>
+	    In the password field, enter your private key password.
+		Please do <strong>enable strong private key protection</strong>
 		for increased security.</li>
 	
 	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Win">
@@ -96,8 +88,7 @@
 		
 	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Mac">
 	    When the password of the PKCS#12 file to import is asked,
-	    enter <tt id='passwd' c="${install.passwd}">tobaronetwothree</tt>
-		Note that this a temporary password.</li>
+	    enter your private key password.</li>
 
 	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Mac">
 	  	If you have set a password for your keychain, enter it in the next
@@ -112,12 +103,7 @@
 
 	  <li if="${install.browser.certinst}==browser">
 	    When the password of the PKCS#12 file to import is asked,
-	    enter <tt id='passwd' c="${install.passwd}">tobaronetwothree</tt>
-		Note that this a temporary password, and that it has been copied to
-		your clipboard as well (use 
-		  <span if="${os.name[0:3]}!=Mac">Ctrl-V</span>
-		  <span if="${os.name[0:3]}==Mac">Command-V</span>
-		to paste).</li>
+	    enter your private key password.</li>
 		
 	<li if="${install.browser.certinst}==browser and ${install.browser}==konqueror">
 		In the konqueror window that appears, press the <em>Import All</em> button.</li>
