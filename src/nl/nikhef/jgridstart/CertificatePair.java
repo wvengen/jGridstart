@@ -50,6 +50,7 @@ import nl.nikhef.jgridstart.util.CryptoUtils;
 import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PEMReader;
 import nl.nikhef.jgridstart.util.PEMWriter;
+import nl.nikhef.jgridstart.util.PKCS12KeyStoreUnlimited;
 import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PrivateFileWriter;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
@@ -506,26 +507,31 @@ public class CertificatePair extends Properties implements ItemSelectable {
     		throws IOException, PasswordCancelledException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 	PasswordCache pwcache = PasswordCache.getInstance();
 	String storename = "PKCS#12 store " + src.getName();
-	KeyStore store = KeyStore.getInstance("PKCS12", "BC");
+	KeyStore store = PKCS12KeyStoreUnlimited.getInstance();
 	// set source password if given
 	if (srcpw!=null)
 	    PasswordCache.getInstance().set(src.getCanonicalPath(), srcpw);
 	// now try until success or cancel
-	char[] pw = null;
-	while (pw==null) {
-	    pw = pwcache.getForDecrypt(storename, src.getCanonicalPath());
+	boolean loaded = false;
+	for (int i=0; i<3; i++) {
+	    FileInputStream in = new FileInputStream(src);
 	    try {
-		store.load(new FileInputStream(src), pw);
+		char[] pw = pwcache.getForDecrypt(storename, src.getCanonicalPath());
+		store.load(in, pw);
+		loaded = true;
 	    } catch(IOException e) {
 		if (e.getLocalizedMessage().contains("wrong password")) {
 		    // if bad password, invalidate and ask again
-		    pw = null;
 		    pwcache.invalidate(src.getCanonicalPath());
-		}
+		} else throw e;
+	    } finally {
+		in.close();
 	    }
 	}
+	if (!loaded)
+	    throw new IOException("Number of password attempts exceeded for PKCS#12 file: " + src);
 
-	if (store.size() == 0)
+	if (!loaded || store.size() == 0)
 	    throw new IOException("Not a PKCS#12 file: " + src);
 
 	logger.finer("Importing certificate from PKCS#12 file: "+src);
@@ -607,7 +613,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	X509Certificate[] certchain = {getCertificate()}; // TODO include chain?
 	
 	// Create PKCS12 keystore with password
-	KeyStore store = KeyStore.getInstance("PKCS12", "BC");
+	KeyStore store = PKCS12KeyStoreUnlimited.getInstance();
 	store.load(null, null);
 	store.setKeyEntry("Grid certificate", getPrivateKey(), null, certchain); // TODO proper alias
 	

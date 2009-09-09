@@ -112,6 +112,7 @@ public class CertificateStore1Test extends CertificateBaseTest {
     public void testExportImportPEM() throws Exception {
 	CertificateStore store = new CertificateStore(newTestStore(1));
 	char[] pw = PasswordCache.getInstance().getForDecrypt("", store.get(0).getKeyFile().getCanonicalPath());
+	assertNotNull(pw);
 	dotestExportImport(store, pw, ".pem");
     }
     /** Test PEM certificate export with a long password. */
@@ -119,6 +120,7 @@ public class CertificateStore1Test extends CertificateBaseTest {
     public void testExportImportPEMLongPassword() throws Exception {
 	CertificateStore store = new CertificateStore(newTestStore(1));
 	char[] pw = PasswordCache.getInstance().getForDecrypt("", store.get(0).getKeyFile().getCanonicalPath());
+	assertNotNull(pw);
 	dotestExportImport(store, pw, ".pem");
     }
     
