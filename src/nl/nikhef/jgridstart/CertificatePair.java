@@ -471,6 +471,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	// set source password if given
 	if (srcpw!=null)
 	    PasswordCache.getInstance().set(src.getCanonicalPath(), srcpw);
+	if (dstpw!=null)
+	    PasswordCache.getInstance().set(getKeyFile().getCanonicalPath(), dstpw);
 	// process all items in the file
 	PEMReader r = new PEMReader(src, "private key in PEM file "+src.getName());
 	while (r.ready()) {
@@ -481,10 +483,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		// Extract and write private key
 		if (((KeyPair) o).getPrivate() != null) {
 		    PrivateKey privKey = ((KeyPair) o).getPrivate();
-		    if (dstpw!=null)
-			PEMWriter.writeObject(getKeyFile(), privKey, dstpw);
-		    else
-			PEMWriter.writeObject(getKeyFile(), privKey, "private key for "+getPath().getName());
+		    PEMWriter.writeObject(getKeyFile(), privKey, "private key for "+getPath().getName());
 		}
 	    } else if (o instanceof X509Certificate) {
 		// Extract and write certificate
@@ -592,21 +591,47 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * Type is detected from the filename.
      * 
      * @param dst destination to export {@link TooManyListenersException}
+     * @param pw password to encrypt exported key with, or {@code null} to use private key password
      */
-    public void exportTo(File dst) throws IOException, GeneralSecurityException, PasswordCancelledException {
+    public void exportTo(File dst, char[] pw) throws IOException, GeneralSecurityException {
 	String ext = dst.getName().toLowerCase();
 	ext = ext.substring(ext.lastIndexOf('.')+1);
+	
 	if (ext.equals("p12") || ext.equals("pfx")) {
-	    exportToPKCS(dst);
+	    // need password
+	    if (pw==null) {
+		// ask for it using standard way
+		getPrivateKey();
+		// and retrieve
+		boolean oldAsk = PasswordCache.getInstance().setAlwaysAskForEncrypt(false);
+		try {
+		    pw = PasswordCache.getInstance().getForEncrypt("private key", getKeyFile().getCanonicalPath());
+		} finally {
+		    PasswordCache.getInstance().setAlwaysAskForEncrypt(oldAsk);
+		}
+	    }
+	    exportToPKCS(dst, pw);
 	} else if (ext.equals("pem")) {
-	    exportToPEM(dst);
+	    // password can be null
+	    exportToPEM(dst, pw);
 	} else {
 	    throw new IOException("Cannot determine format to export to, unknown file extension: "+ext);
 	}
     }
     
+    /** Export the certificate and private key to a file using private key password.
+     * <p>
+     * Type is detected from the filename, password is taken from private key when
+     * required.
+     * 
+     * @param dst destination to export {@link TooManyListenersException}
+     */
+    public void exportTo(File dst) throws PasswordCancelledException, IOException, GeneralSecurityException {
+	exportTo(dst, null);
+    }
+    
     /** Export the certificate and private key to a PKCS#12 file. */
-    protected void exportToPKCS(File dst) throws IOException, GeneralSecurityException, PasswordCancelledException {
+    protected void exportToPKCS(File dst, char[] pw) throws IOException, GeneralSecurityException, PasswordCancelledException {
 	logger.finer("Exporting certificate '"+this+"' to PKCS#12: "+dst);
 
 	// Create certificate chain TODO do proper chain
@@ -618,9 +643,6 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	store.setKeyEntry("Grid certificate", getPrivateKey(), null, certchain); // TODO proper alias
 	
 	// write file with password
-	PasswordCache pwcache = PasswordCache.getInstance();
-	String storename = "PKCS#12 store " + dst.getName();
-	char[] pw = pwcache.getForEncrypt(storename, dst.getCanonicalPath());
 	FileOutputStream out = new FileOutputStream(dst);
 	store.store(out, pw);
 	out.close();
@@ -631,10 +653,10 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * This is quite simple, since it just concatenates the existing
      * files from its {@code .globus} directory; no password is needed.
      */
-    protected void exportToPEM(File dst) throws IOException {
+    protected void exportToPEM(File dst, char[] pw) throws IOException {
 	logger.finer("Exporting certificate '"+this+"' to PEM: "+dst);
 	
-	BufferedWriter out = new BufferedWriter(new PrivateFileWriter(dst));
+	PEMWriter out = new PEMWriter(dst);
 	try {
 	    String s = System.getProperty("line.separator");
 	    File[] files = new File[] {
@@ -642,8 +664,15 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		    getCSRFile(),
 		    getCertFile()
 	    };
+	    // private must be decrypted and encrypted if password given
+	    if (pw!=null) {
+		files[0] = null;
+		out.writeObject(getPrivateKey());
+	    }
+	    // rest of the files can just be copied literally
 	    for (int i=0; i<files.length; i++) {
 		if (files[i]==null) continue;
+		if (!files[i].exists()) continue;
 		BufferedReader in = new BufferedReader(new FileReader(files[i]));
 		while (in.ready()) {
 		    out.write(in.readLine() + s);
@@ -653,7 +682,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	} catch(IOException e) {
 	    throw e;
 	} finally {
-	    out.close();
+	    if (out!=null) out.close();
 	}
     }
 
