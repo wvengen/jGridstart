@@ -2,7 +2,7 @@
 JAVA=java
 BASE=`dirname $0`
 LIB="$BASE/thirdparty"
-CLASSPATH="$LIB/bouncycastle/bcprov-jdk14-143.jar:$LIB/bouncycastle/mail-1.4.1.jar:$LIB/commons/commons-lang-2.4.jar:$LIB/commons/commons-cli-1.2.jar:$LIB/flyingsaucer/core-renderer-minimal.jar:$LIB/flyingsaucer/iText-2.0.8.jar:$LIB/swingworker/swing-worker-1.2.jar:$BASE/bin"
+CLASSPATH="$LIB/bouncycastle/bcprov-jdk14-143.jar:$LIB/bouncycastle/bcmail-jdk14-143.jar:$LIB/bouncycastle/mail-1.4.1.jar:$LIB/commons/commons-lang-2.4.jar:$LIB/commons/commons-cli-1.2.jar:$LIB/flyingsaucer/core-renderer-minimal.jar:$LIB/flyingsaucer/iText-2.0.8.jar:$LIB/swingworker/swing-worker-1.2.jar:$BASE/bin"
 INVOKED_PROGRAM="$0"
 export BASE CLASSPATH INVOKED_PROGRAM
 
