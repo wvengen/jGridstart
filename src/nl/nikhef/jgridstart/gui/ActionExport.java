@@ -1,15 +1,34 @@
 package nl.nikhef.jgridstart.gui;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
+import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 /** Export selected certificate to PKCS#12/PEM file */
@@ -26,30 +45,110 @@ public class ActionExport extends CertificateAction {
     @Override
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
-	JFileChooser chooser = new CertificateFileChooser(false);
-	chooser.setDialogTitle("Export the currently selected certificate");
-	chooser.setApproveButtonText("Export");
-	chooser.setApproveButtonMnemonic('E');
-	int result = chooser.showDialog(findWindow(e.getSource()), null);
-	if (result == JFileChooser.APPROVE_OPTION) {
-	    doExport(e, chooser.getSelectedFile());
-	}
+	final JFileChooser chooser = new CertificateFileChooser(false);
+	
+	// embed in frame with password selection fields
+	final JDialog dlg = new JDialog(parent,
+		"Export the currently selected certificate");
+
+	final JPanel hpane = new JPanel();
+	hpane.setLayout(new BoxLayout(hpane, BoxLayout.X_AXIS));
+	final JCheckBox check = new JCheckBox("Use private key password for the exported file");
+	check.setMnemonic('p');
+	check.setSelected(true);
+	hpane.add(check);
+	hpane.add(Box.createHorizontalGlue());
+	
+	JPanel pane = customFileChooser(dlg, chooser,
+		new AbstractAction("Export") {
+        	    public void actionPerformed(ActionEvent e) {
+        		try {
+        		    File f = chooser.getSelectedFile();
+        		    char[] pw = null;
+        		    // request password if wanted
+        		    if (!check.isSelected()) {
+        			pw = PasswordCache.getInstance().getForEncrypt(
+        				"PKCS#12 key password for "+f.getName(),
+        				f.getCanonicalPath());
+        		    }
+        		    doExport(e, f, pw);
+        		} catch (PasswordCancelledException e1) {
+        		    /* do nothing */
+        		} catch (IOException e1) {
+        		    ErrorMessage.error(parent, "Export error", e1);
+        		}
+        		dlg.dispose();
+        	    }
+		}
+	);
+	pane.add(hpane);
+	
+	dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	dlg.pack();
+	dlg.setVisible(true);
     }
     
     /** Export the current certificate to a file
      * 
+     * @param e originating event
      * @param f File to export to
+     * @param pw password to use, or {@code null} to use private key passwqord
      */
-    public void doExport(ActionEvent e, File f) {
+    public void doExport(ActionEvent e, File f, char[] pw) {
 	CertificatePair cert = getCertificatePair();
 	logger.info("Exporting certificate "+cert+" to: "+f);
 	try {
-	    cert.exportTo(f);
+	    cert.exportTo(f, pw);
 	} catch (PasswordCancelledException e1) {
 	    // do nothing
 	} catch (Exception e1) {
 	    logger.severe("Error exporting certificate "+f+": "+e1);
 	    ErrorMessage.error(findWindow(e.getSource()), "Export failed", e1);
 	}
+    }
+    
+    protected JPanel customFileChooser(final JDialog dlg, final JFileChooser chooser, final Action action) {
+	Insets insets = ((EmptyBorder)chooser.getBorder()).getBorderInsets();
+	// disable buttons because we'll roll our own
+	chooser.setControlButtonsAreShown(false);
+	chooser.setApproveButtonText((String)action.getValue(Action.NAME));
+	// dialog panel with chooser on top
+	JPanel panel = new JPanel();
+	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+	panel.add(chooser);
+	// then container panel for our extra elements
+	JPanel contentpane = new JPanel();
+	contentpane.setLayout(new BoxLayout(contentpane, BoxLayout.Y_AXIS));
+	contentpane.setBorder(BorderFactory.createEmptyBorder(0, insets.left, 0, insets.right));
+	panel.add(contentpane);
+	// and the bottom buttons
+	JPanel btns = new JPanel();
+	btns.setBorder(BorderFactory.createEmptyBorder(insets.top, insets.left, insets.bottom, insets.right));
+	btns.add(Box.createHorizontalGlue());
+	btns.setLayout(new BoxLayout(btns, BoxLayout.X_AXIS));
+	JButton activate = new JButton(action);
+	btns.add(activate);
+	btns.add(new JButton(new AbstractAction("Cancel") {
+	    public void actionPerformed(ActionEvent e) {
+		dlg.dispose();
+	    }
+	}));
+	panel.add(btns);
+
+	dlg.getContentPane().add(panel);
+	dlg.getRootPane().setDefaultButton(activate);
+	dlg.setModal(true);
+	
+	// hook filechooser actions to our own actions
+	chooser.addActionListener(new ActionListener() {
+	    public void actionPerformed(ActionEvent e) {
+		if (JFileChooser.APPROVE_SELECTION.equals(e.getActionCommand()))
+		    action.actionPerformed(e);
+		else if (JFileChooser.CANCEL_SELECTION.equals(e.getActionCommand()))
+		    dlg.dispose();
+	    }
+	});
+	
+	return contentpane;
     }
 }
