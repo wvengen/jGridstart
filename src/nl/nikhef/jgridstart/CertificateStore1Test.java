@@ -1,7 +1,11 @@
 package nl.nikhef.jgridstart;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
 
+import nl.nikhef.jgridstart.util.PKCS12KeyStoreUnlimited;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
 import org.junit.Test;
@@ -131,5 +135,32 @@ public class CertificateStore1Test extends CertificateBaseTest {
 	} finally {
 	    exported.delete();
 	}
+    }
+    
+    /** Test PKCS#12 certificate which has a certificate chain as well */
+    @Test
+    public void testImportCertificateChain() throws Exception {
+	CertificateStore certstore = new CertificateStore(newTestStore(1));
+	CertificatePair cert = certstore.get(0);
+	char[] pw = "one2t".toCharArray();
+	File dst = File.createTempFile("certexport", ".p12", cert.getPath());
+	
+	// Create certificate chain
+	X509Certificate[] certchain = {cert.getCertificate(), cert.getCA().getCACertificate()};
+	
+	// Create PKCS12 keystore with password
+	KeyStore store = PKCS12KeyStoreUnlimited.getInstance();
+	store.load(null, null);
+	store.setKeyEntry("Grid certificate", cert.getPrivateKey(), null, certchain);
+	
+	// write file with password
+	FileOutputStream out = new FileOutputStream(dst);
+	store.store(out, pw);
+	out.close();
+	
+	// now try to import
+	CertificateStore certstore2 = new CertificateStore(newTestStore(0));
+	CertificatePair cert2 = certstore2.importFrom(dst, pw, pw);
+	assertEquals(cert2, cert);
     }
 }

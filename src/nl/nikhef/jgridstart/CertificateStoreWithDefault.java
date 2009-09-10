@@ -3,15 +3,9 @@ package nl.nikhef.jgridstart;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.Iterator;
 
-import javax.mail.MessagingException;
-
-import org.bouncycastle.mail.smime.SMIMEException;
-
 import nl.nikhef.jgridstart.util.FileUtils;
-import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 /** A {@link CertificateStore} which has the notion of a default certificate.
  * <p>

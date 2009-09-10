@@ -502,6 +502,15 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    throw new IOException("not a PEM file: " + src);
     }
 
+    /** Import from PKCS.
+     * <p>
+     * If multiple key/certificate entries are found, only the first one is
+     * imported.
+     * 
+     * @param src
+     * @param srcpw
+     * @param dstpw
+     */
     protected void importFromPKCS(File src, char[] srcpw, char[] dstpw)
     		throws IOException, PasswordCancelledException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 	PasswordCache pwcache = PasswordCache.getInstance();
@@ -535,34 +544,30 @@ public class CertificatePair extends Properties implements ItemSelectable {
 
 	logger.finer("Importing certificate from PKCS#12 file: "+src);
 
-	Certificate c = null;
-	int i = 1;
-	for (Enumeration<String> it = store.aliases(); it.hasMoreElements(); i++) {
+	for (Enumeration<String> it = store.aliases(); it.hasMoreElements(); ) {
 	    String alias = it.nextElement();
 	    if (store.isKeyEntry(alias)) {
-		// TODO warn against multiple keys
 		// TODO check it is a private key
 		/*
 		 * This could be done but passwords on entries aren't
 		 * very common and it would be a hassle to ask the user
 		 * again.
-		 * 
-		 * TODO more general framework that just tries all stored
-		 *      passwords if we have the keys in software but is
-		 *     careful for hardware devices
 		 */
 		Key key = store.getKey(alias, null);
 		if (dstpw!=null)
 		    PEMWriter.writeObject(getKeyFile(), key, dstpw);
 		else
 		    PEMWriter.writeObject(getKeyFile(), key, "imported private key");
-	    }
-	    if ((c = store.getCertificate(alias)) != null) {
-		// TODO warn against multiple certificates
-		// TODO we want only lowest certificate for this key ...
-		// TODO check it really is an instance of X509Certificate
-		cert = (X509Certificate) c;
-		PEMWriter.writeObject(getCertFile(), cert);
+		
+		Certificate[] chain = store.getCertificateChain(alias);
+		if (chain != null) {
+		    // we want only the user certificate, which is the first one
+		    // TODO check it really is an X509Certificate
+		    cert = (X509Certificate) chain[0];
+		    PEMWriter.writeObject(getCertFile(), cert);
+		    // we're done!
+		    return;
+		}
 	    }
 	}
     }
