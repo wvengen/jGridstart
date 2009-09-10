@@ -78,9 +78,6 @@
 	     to avoid ProGuard Warnings (which are fatal); so we need it for
 	     lower versions. This is a little trick with ProGuard's jarfilter -->
 	<property name="dep.activation" location="${dir.thirdparty}/bouncycastle/activation.jar"/>
-	<condition property="dep.activation.proguardfilter" value="(!**)">
-		<available classname="javax.activation.DataHandler"/>
-  	</condition>
 	<path id="path.dependencies">
 		<!-- TODO use jdk13 library versions and test -->
 		<pathelement location="${dep.bouncycastle}"/>
@@ -130,8 +127,7 @@
 		<!-- iText needs some org.bouncycastle.cms classes but some other classes in this
 		     package reference javax.mail which we don't want to include as well (so that
 		     ProGuard can resolve them). Solution: only include part of the smime package.
-		     In addition to this, certificate renewal also requires S/MIME mail stuff.
-		     The activation framework doesn't appear to be needed during run -->
+		     In addition to this, certificate renewal also requires S/MIME mail stuff. -->
 		<zipfileset src="${dep.bouncycastle.smime}">
 			<include name="org/bouncycastle/cms/**"/>
 			<include name="org/bouncycastle/mail/smime/*.class/"/>
@@ -139,6 +135,7 @@
 		</zipfileset>
 		<zipfileset src="${dep.bouncycastle.tsp}" includes="**/*.class"/>
 		<zipfileset src="${dep.javamail}" includes="**/*.class"/>
+		<zipfileset src="${dep.activation}" includes="**/*.class"/>
 	</resources>
 	
 
@@ -234,7 +231,6 @@
 			<libraryjar file="${dep.bouncycastle}"/>
 			<libraryjar file="${dep.junit}"/>
 			<libraryjar file="${dep.abbot}"/>
-			<libraryjar file="${dep.activation}" jarfilter="${dep.activation.proguardfilter}" />
 			<keepclasseswithmembers access="public">
 				<method access="public static" type="void"
 					name="main" parameters="java.lang.String[]"/>
