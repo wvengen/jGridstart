@@ -48,7 +48,7 @@ public class DutchGridCA implements CA {
 	if (baseQuery==null)
 	    baseQuery = "http://ca.dutchgrid.nl/medium/query/";
 	if (baseCaCert==null)
-	    baseCaCert = "https://ca.dutchgrid.nl/medium/cacert.pem";
+	    baseCaCert = "https://ca.dutchgrid.nl/cgi-bin/nikhef-ms?certder";
     }
 
     /** Uploads a user certificate signing request onto the DutchGrid CA
