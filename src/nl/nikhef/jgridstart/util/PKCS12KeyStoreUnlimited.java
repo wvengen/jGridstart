@@ -7,7 +7,6 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Provider;
@@ -16,7 +15,6 @@ import java.security.spec.AlgorithmParameterSpec;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherSpi;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -39,7 +37,20 @@ import org.bouncycastle.jce.provider.JDKPKCS12KeyStore;
  * <p>
  * This class requires intricate knowledge of JCE and BouncyCastle internals. When
  * these change, this class needs to be updated appropriately.
+ * <p>
+ * This also means that it may be required (when using Java Web Start, for example)
+ * to explicitely permit accessing private members using a policy file, e.g.:
+ * <pre><code>
+ * grant {
+ *    // allow access to JCE internals to bypass keysize restrictions
+ *    // as implemented by PKCS12KeyStoreUnlimited
+ *    permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+ *    permission java.lang.RuntimePermission "accessDeclaredMembers";
+ * } 
+ * </code></pre>
+ * <p>
  * TODO describe tested configurations 
+ * 
  * 
  * @author wvengen
  */
@@ -268,9 +279,6 @@ public class PKCS12KeyStoreUnlimited extends JDKPKCS12KeyStore {
         	new Class<?>[] { int.class, Key.class, AlgorithmParameterSpec.class, SecureRandom.class });
         spiInit.setAccessible(true);
         spiInit.invoke(spi, new Object[] { opmode, key, defParams, random  });
-        // set Cipher as initialized
-        Field initializedField = cipherFindField(cipher, "initialized", Boolean.class);
-        initializedField.setBoolean(cipher, true);
         return spi;
     }
     
@@ -281,7 +289,8 @@ public class PKCS12KeyStoreUnlimited extends JDKPKCS12KeyStore {
      * same type. Cipher is not very complex, so this should be ok. Just make
      * sure that you'll have just one match!
      * <p>
-     * The field is set accessible before it is returned.
+     * The field is set accessible before it is returned. Please see class
+     * comments for granting permissions.
      *  
      * @param cipher instance to look at
      * @param name original name of the field, is attempted first

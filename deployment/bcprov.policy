@@ -11,4 +11,8 @@ grant {
  permission java.security.SecurityPermission "putProviderProperty.BC";
  // allow access to BouncyCastle properties
  permission java.util.PropertyPermission "org.bouncycastle.*","read";
+ // allow access to JCE internals to bypass keysize restrictions
+ // as implemented by PKCS12KeyStoreUnlimited
+ permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+ permission java.lang.RuntimePermission "accessDeclaredMembers";
 };
