@@ -9,7 +9,7 @@
 <div class="wizard-contents" c="${wizard.contents.html}"/>
 
 <div class="wizard-page">
-
+	
 <div if="!${cert}">
 
   <div if="!${request.submitted}">
@@ -36,6 +36,12 @@
 <p if="${cert}">
   Your certificate is present already, it is not necessary to submit a request.
 </p>
+
+<a class="helpbutton" href="action:toggle(wizard.show.more1)">(more)</a>
+<div class="help" if="${wizard.show.more1}">
+	This key <span if="${request}">and request</span> <span if="${cert}">and certificate</span>
+	are located on your disk in <tt c="${path}"/>
+</div>
 
 </div>
 

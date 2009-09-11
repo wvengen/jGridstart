@@ -191,3 +191,7 @@ form table td.legend:first-child {
 	font-size: 110%;
 	font-weight: bold;
 }
+
+.phone {
+	white-space: nowrap;
+}

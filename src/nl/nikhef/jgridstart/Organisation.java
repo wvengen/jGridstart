@@ -397,6 +397,8 @@ public class Organisation extends Properties {
 			"&#x279d;</a>";
 		} catch (UnsupportedEncodingException e) { }
 	    }
+	    if (containsKey("phone"))
+		details += ", phone <span class='phone'>" + getProperty("phone") + "</span>";
 	    return details;
 	}
     };
