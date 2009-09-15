@@ -228,6 +228,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 			"Bad email address", JOptionPane.ERROR_MESSAGE);
 		return false;
 	    }
+	    
 	    // Not needed for renewal, since it may be that the level wasn't
 	    //   specified because the parent hadn't set the level explictely
 	    //   after an import, for example.
@@ -279,6 +280,17 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    worker = null;
 	}
 	
+	// lock password fields on first page when key is present
+	if (curPage==0 && cert!=null && cert.getKeyFile().exists()) {
+	    data().setProperty("password1.lock", "true");
+	    data().setProperty("password1.lock.volatile", "true");
+	    data().setProperty("password2.lock", "true");
+	    data().setProperty("password2.lock.volatile", "true");
+	}
+	if (curPage==0 && cert!=null && Boolean.valueOf(cert.getProperty("request.submitted"))) {
+	    data().setProperty("agreecps.lock", "true");
+	}
+	
 	// say "Close" when a certificate is present because everything is done by then
 	// TODO this won't work for renewals
 	try {
@@ -293,7 +305,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    //  that triggers this again. We don't want to get stuck in
 	    //  an update loop, do we.
 	    worker = new GenerateWorker(curPage);
-	    worker.useErrorDialog(curPage==1);
+	    worker.useErrorDialog(curPage!=1);
 	    worker.execute();
 	}
 	// stop wizard when no certificate yet before install step
@@ -467,7 +479,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		if (key.equals("state.cancelled")) {
 		    if (e!=null) {
 			if (useErrordlg) {
-			    ErrorMessage.error(getParent(), "Error during request", e);
+			    ErrorMessage.error(RequestWizard.this, "Error during request", e);
 			    setStepRelative(-1);
 			} else {
 			    data().setProperty("wizard.error", e.getLocalizedMessage());

@@ -766,7 +766,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    logger.warning("Ignoring request to upload CSR since certificate is present: "+this);
 	    return;
 	}
-	setProperty("request.serial", getCA().uploadCertificationRequest(getCSR(), this));
+	String serial = getCA().uploadCertificationRequest(getCSR(), this);
+	if (serial!=null) setProperty("request.serial", serial);
 	setProperty("request.submitted", "true");
 	logger.finer("Got certificate request serial "+getProperty("request.serial")+" for: "+this);
 	notifyChanged();

@@ -19,8 +19,11 @@
     <p if="!${wizard.error}">Please wait while your request is being submitted...</p>
 
 	<p if="${wizard.error}" class="info-bad">Submission failed.</p>
+	<p if="${wizard.error} and ${wizard.error[102:132]}=='You need to agree to the privacy policy'">
+		You need to agree to the privacy policy. Please go back, mark the checkbox, and try again.
+	</p>
 	<p if="${wizard.error}" class="info-detail" c="${wizard.error}"/>
-	<p if="${wizard.error}">When the problem is solved, you will need to
+	<p if="${wizard.error}">When the issue is solved, you will need to
 	  submit your request again. In the meantime, feel free to continue with
 	  the next step.</p>
 	

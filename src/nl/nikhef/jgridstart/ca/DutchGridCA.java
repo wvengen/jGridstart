@@ -51,10 +51,15 @@ public class DutchGridCA implements CA {
 	    baseCaCert = "https://ca.dutchgrid.nl/cgi-bin/nikhef-ms?certder";
     }
 
-    /** Uploads a user certificate signing request onto the DutchGrid CA
+    /** Uploads a user certificate signing request onto the DutchGrid CA.
+     * <p>
+     * The field {@code email} is used to supply the user's email address to the CA
+     * for notifying the user when the request is processed, and the field {@code agreecps}
+     * must be {@code true} to succeed; the latter corresponds to the "I agree to the
+     * privacy policy" checkbox on the website.
      * 
      * @param req {@inheritDoc}
-     * @param info {@inheritDoc}; only "email" is used here.
+     * @param info {@inheritDoc}; only {@code email} and {@code agreecps} are used here.
      * @return {@inheritDoc}
      */
     public String uploadCertificationRequest(
@@ -74,16 +79,23 @@ public class DutchGridCA implements CA {
 		"email_2", info.getProperty("email"),
 		"requesttext", reqWriter.toString(),
 		"Publish", "Upload Publishing Data",
-		"robot", "yes"
+		"robot", "yes",
+		"dummy", "dummy"
 	};
+	if (Boolean.valueOf(info.getProperty("agreecps"))) {
+	    postdata[postdata.length-2] = "confirm-submit";
+	    postdata[postdata.length-1] = "ja";
+	}
 
 	URL url = new URL(baseSubmit);
 	String answer = ConnectionUtils.pageContents(url, postdata, true);
 
 	// returns "200 ..." on success
 	// TODO CAException instead of IOException
-	if (!answer.startsWith("200"))
-		throw new IOException("Certificate signing request upload failed:\n"+answer);
+	if (!answer.startsWith("200")) {
+	    logger.warning("Certificate signing request upload failed:" +answer);
+	    throw new IOException("Certificate signing request upload failed:\n"+answer);
+	}
 
 	logger.info("Uploaded certificate signing request");
 

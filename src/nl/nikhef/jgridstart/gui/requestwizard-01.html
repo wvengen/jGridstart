@@ -58,6 +58,12 @@
 		<td><input id="password1" name="password1" type="password" size="25"/><br/>
 		    <input id="password2" name="password2" type="password" size="25"/></td>
 	</tr>
+	<tr if="${jgridstart.ca.provider}==DutchGridCA or ${jgridstart.ca.provider}==nl.nikhef.jgridstart.ca.DutchGridCA">
+		<th></th>
+		<td><input type="checkbox" name="agreecps" id="agreecps"/>
+		    <label for="agreecps">I agree to the
+			<a href="http://ca.dutchgrid.nl/privacy">privacy policy</a> of the DutchGrid CA</label></td>
+	</tr>
 	</table>
 
 	<!-- TODO: enable when dynamic update is implemented
@@ -73,4 +79,3 @@
 
 </body>
 </html>
-
