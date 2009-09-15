@@ -8,7 +8,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogManager;
@@ -44,8 +46,16 @@ public class Main {
     /** command-line interface entry point */
     public static void main(String[] args) {
 	// load system properties, not fatal if it fails
+	// load system properties if not yet set, not fatal if it fails
 	try {
-	    System.getProperties().load(Main.class.getResourceAsStream("/resources/conf/global.properties"));
+	    Properties sysp = System.getProperties();
+	    Properties p = new Properties();
+	    p.load(Main.class.getResourceAsStream("/resources/conf/global.properties"));
+	    for (Enumeration<?> e = p.keys(); e.hasMoreElements(); ) {
+		String key = (String)e.nextElement();
+		if (sysp.getProperty(key)==null)
+		    sysp.setProperty(key, p.getProperty(key));
+	    }
 	} catch (IOException e) { }
 
 	// parse command-line arguments

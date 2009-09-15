@@ -1,6 +1,8 @@
 package nl.nikhef.jgridstart.gui;
 
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.logging.LogManager;
 
@@ -24,9 +26,16 @@ public class Main {
     public static void main(String[] args) {
 	logger.addHandler(LogWindowHandler.getInstance());
 	logger.fine("main starting");
-	// load system properties, not fatal if it fails
+	// load system properties if not yet set, not fatal if it fails
 	try {
-	    System.getProperties().load(Main.class.getResourceAsStream("/resources/conf/global.properties"));
+	    Properties sysp = System.getProperties();
+	    Properties p = new Properties();
+	    p.load(Main.class.getResourceAsStream("/resources/conf/global.properties"));
+	    for (Enumeration<?> e = p.keys(); e.hasMoreElements(); ) {
+		String key = (String)e.nextElement();
+		if (sysp.getProperty(key)==null)
+		    sysp.setProperty(key, p.getProperty(key));
+	    }
 	} catch (IOException e) { }
 	// Schedule a job for the event-dispatching thread:
 	// creating and showing this application's GUI.
