@@ -708,7 +708,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @return newly created CertificatePair
      */
     static public CertificatePair generateRequest(File dst, Properties p, final char[] pw)
-	    throws IOException, GeneralSecurityException, PasswordCancelledException {
+	    throws IOException, GeneralSecurityException, PasswordCancelledException, CAException {
 	// functionally based on
 	// org.globus.tools.GridCertRequest.genCertificateRequest()
 	
@@ -739,7 +739,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		sigAlgName, name, pubKey, derSet, privKey);
 
 	// Save certificate request
-	PEMWriter.writeObject(cert.getCSRFile(), cert.req);
+	FileUtils.writeFile(cert.getCSRFile(),
+			cert.getCA().encodeCertificationRequest(cert.req, cert));
+
 	// Save private key; permissions are ok by default
 	if (pw==null)
 	    PEMWriter.writeObject(cert.getKeyFile(), privKey, "new certificate's private key");
@@ -753,7 +755,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
     }
     /** Generate a new private key+CSR pair, request password.
      * @see #generateRequest(File, Properties) */
-    static public CertificatePair generateRequest(File dst, Properties p) throws GeneralSecurityException, IOException, PasswordCancelledException {
+    static public CertificatePair generateRequest(File dst, Properties p) throws GeneralSecurityException, IOException, PasswordCancelledException, CAException {
 	return generateRequest(dst, p, null);
     }
     
@@ -766,10 +768,11 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    logger.warning("Ignoring request to upload CSR since certificate is present: "+this);
 	    return;
 	}
-	String serial = getCA().uploadCertificationRequest(getCSR(), this);
-	if (serial!=null) setProperty("request.serial", serial);
+	String csrData = FileUtils.readFile(getCSRFile());
+	getCA().uploadCertificationRequest(csrData, this);
 	setProperty("request.submitted", "true");
-	logger.finer("Got certificate request serial "+getProperty("request.serial")+" for: "+this);
+	if (getProperty("request.serial")!=null)
+	    logger.finer("Got certificate request serial "+getProperty("request.serial")+" for: "+this);
 	notifyChanged();
 	store();
     }
@@ -781,7 +784,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
     public boolean isCertificationRequestProcessed() throws GeneralSecurityException, CAException {
 	boolean isProcessed;
 	try {
-	    isProcessed = getCA().isCertificationRequestProcessed(getCSR(), getProperty("request.serial"));
+	    isProcessed = getCA().isCertificationRequestProcessed(getCSR(), this);
 	    setProperty("request.processed", Boolean.toString(isProcessed));
 	} catch (IOException e) {
 	    return false;
@@ -798,7 +801,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	
 	logger.finer("Downloading certificate: "+this);
 	
-	cert = getCA().downloadCertificate(getCSR(), getProperty("request.serial"));
+	cert = getCA().downloadCertificate(getCSR(), this);
 	if (cert!=null) {
 	    setProperty("request.processed", Boolean.toString(true));
 	    PEMWriter.writeObject(getCertFile(), cert);

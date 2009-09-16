@@ -306,7 +306,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * @param p Properties to use for generation
      * @see CertificatePair#generateRequest
      */
-    public CertificatePair generateRequest(Properties p) throws IOException, GeneralSecurityException, PasswordCancelledException {
+    public CertificatePair generateRequest(Properties p) throws IOException, GeneralSecurityException, PasswordCancelledException, CAException {
 	File dst = newItem();
 	try {
 	    CertificatePair cert = CertificatePair.generateRequest(dst, p);
@@ -323,7 +323,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * @param pw password to use for new private key
      * @see CertificatePair#generateRequest
      */
-    public CertificatePair generateRequest(Properties p, char[] pw) throws IOException, GeneralSecurityException, PasswordCancelledException {
+    public CertificatePair generateRequest(Properties p, char[] pw) throws IOException, GeneralSecurityException, PasswordCancelledException, CAException {
 	File dst = newItem();
 	try {
 	    CertificatePair cert = CertificatePair.generateRequest(dst, p, pw);
@@ -337,12 +337,12 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     /** Renew a certificate with preset password
      * <p>
      * Generates a new certificate request in the store supplying password
-     * for new private key, and S/MIME signs it as well.
+     * for new private key as a renewal from an existing certificate.
      * 
      * @param oldCert certificate to renew
      * @param pw password to use for new private key
      */
-    public CertificatePair generateRenewal(CertificatePair oldCert, char[] pw) throws IOException, GeneralSecurityException, PasswordCancelledException, MessagingException, SMIMEException {
+    public CertificatePair generateRenewal(CertificatePair oldCert, char[] pw) throws IOException, GeneralSecurityException, PasswordCancelledException, CAException {
 	// ask for private key first, cancel would skip everything
 	PrivateKey oldKey = oldCert.getPrivateKey();
 	
@@ -352,6 +352,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	newCert.setProperty("renewal.parent.path", oldCert.getProperty("path"));
 	newCert.setProperty("renewal.parent.modulus", oldCert.getProperty("modulus"));
 	
+	/*
 	// create S/MIME message from it
 	MimeBodyPart data = new MimeBodyPart();
 	data.setText(FileUtils.readFile(newCert.getCSRFile()));
@@ -364,11 +365,12 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	MimeMessage msg = new MimeMessage(Session.getDefaultInstance(System.getProperties()));
 	msg.setContent(multipart, multipart.getContentType());
 	msg.saveChanges();
+	*/
 	
 	// and store it as new CSR
-	FileOutputStream out = new FileOutputStream(newCert.getCSRFile());
-	msg.writeTo(out);
-	out.close();
+	FileUtils.writeFile(newCert.getCSRFile(),
+		newCert.getCA().signCertificationRequest(newCert.getCSR(), newCert,
+			oldKey, oldCert.getCertificate()));
 	
 	return newCert;
     }
@@ -377,7 +379,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * 
      * @see #generateRenewal(CertificatePair, char[])
      */
-    public CertificatePair generateRenewal(CertificatePair oldCert) throws PasswordCancelledException, IOException, GeneralSecurityException, MessagingException, SMIMEException {
+    public CertificatePair generateRenewal(CertificatePair oldCert) throws PasswordCancelledException, IOException, GeneralSecurityException, CAException {
 	return generateRenewal(oldCert, null);
     }
 }

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
@@ -222,6 +223,15 @@ public class FileUtils {
 	}
 	r.close();
 	return buf.toString();
+    }
+    
+    /**
+     * Write a String to a text file, possibly overwriting it.
+     */
+    public static void writeFile(File file, String data) throws IOException {
+	FileWriter writer = new FileWriter(file);
+	writer.write(data);
+	writer.close();
     }
 
     /**

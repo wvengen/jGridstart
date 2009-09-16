@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 import nl.nikhef.jgridstart.util.ConnectionUtils;
@@ -41,28 +42,36 @@ public class TestCA implements CA {
 	if (base==null)
 	    base = "http://www.nikhef.nl/~wvengen/testca/";
     }
-
+    
+    /** Just returns the PEM encoded version of the request. */
+    public String encodeCertificationRequest(
+	    PKCS10CertificationRequest req, Properties info) throws IOException {
+	StringWriter out = new StringWriter();
+	PEMWriter writer = new PEMWriter(out);
+	writer.writeObject(req);
+	writer.close();
+	return out.toString();
+    }
+    
+    /** TestCA does not handle renewals differently than ordinary requests. */
+    public String signCertificationRequest(
+	    PKCS10CertificationRequest req, Properties info,
+	    PrivateKey oldKey, X509Certificate oldCert) throws IOException {
+	return encodeCertificationRequest(req, info);
+    }
+    
     /** Uploads a user certificate signing request onto the Test CA
      * 
-     * @param req {@inheritDoc}
-     * @param info {@inheritDoc}; only "email" is used here.
+     * @param req {@inheritDoc} request returned by encode/sign
+     * @param info {@inheritDoc}; {@code email} and {@code fullname} are used here
      * @return {@inheritDoc}
      */
-    public String uploadCertificationRequest(
-	    PKCS10CertificationRequest req, Properties info) throws IOException {
-	
-	String name = req.getCertificationRequestInfo().getSubject().getValues(X509Principal.CN).get(0).toString();
-	
-	StringWriter reqWriter = new StringWriter();
-	PEMWriter w = new PEMWriter(reqWriter);
-	w.writeObject(req);
-	w.close();
-	
+    public void uploadCertificationRequest(String req, Properties info) throws IOException {
 	String[] postdata = {
 		"action", "submit",
-		"fullname", name,
+		"fullname", info.getProperty("request.fullname"),
 		"email", info.getProperty("email"),
-		"request", reqWriter.toString(),
+		"request", req,
 		"submit", "Submit request"
 	};
 
@@ -89,23 +98,23 @@ public class TestCA implements CA {
 
 	logger.info("Uploaded certificate signing request with serial "+serial);
 
-	return serial;
+	info.setProperty("request.serial", serial);
     }
     
     public boolean isCertificationRequestProcessed(
-	    PKCS10CertificationRequest req, String reqserial) throws IOException {
-	return downloadCertificate(req, reqserial) != null;
+	    PKCS10CertificationRequest req, Properties info) throws IOException {
+	return downloadCertificate(req, info) != null;
     }
 
     /** Download a certificate from the Test CA
      * 
-     * @param req {@inheritDoc} (not used by NikhefCA)
-     * @param reqserial {@inheritDoc} 
+     * @param req {@inheritDoc} (not used by TestCA)
      * @return {@inheritDoc}
      */
     public X509Certificate downloadCertificate(
-	    PKCS10CertificationRequest req, String reqserial) throws IOException {
+	    PKCS10CertificationRequest req, Properties info) throws IOException {
 	
+	String reqserial = info.getProperty("request.serial");
 	if (reqserial==null || reqserial.equals(""))
 	    throw new IOException("Cannot download certificate without request serial number");
 

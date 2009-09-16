@@ -1,6 +1,7 @@
 package nl.nikhef.jgridstart.ca;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Properties;
@@ -25,6 +26,7 @@ import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
@@ -54,16 +56,6 @@ public class LocalCA implements CA {
     /**
      * Creates a new LocalCA and generates a self-signed certificate to
      * sign with. It is valid for an hour only.
-     * 
-     * @throws NoSuchAlgorithmException 
-     * @throws SignatureException 
-     * @throws NoSuchProviderException 
-     * @throws IllegalStateException 
-     * @throws SignatureException 
-     * @throws NoSuchProviderException 
-     * @throws IllegalStateException 
-     * @throws InvalidKeyException 
-     * 
      */
     public LocalCA() throws CertificateException, KeyException, NoSuchAlgorithmException, IllegalStateException, NoSuchProviderException, SignatureException {
 	logger.fine("Generating self-signed LocalCA certificate");
@@ -88,33 +80,43 @@ public class LocalCA implements CA {
 	cacert = certGen.generate(cakey, "BC");
     }
     
-    /** {@inheritDoc}
-     * <p>
-     * This is a dummy method for LocalCA.
-     */
-    public String uploadCertificationRequest(
+    /** Just returns the PEM encoded version of the request. */
+    public String encodeCertificationRequest(
 	    PKCS10CertificationRequest req, Properties info) throws IOException {
+	StringWriter out = new StringWriter();
+	PEMWriter writer = new PEMWriter(out);
+	writer.writeObject(req);
+	writer.close();
+	return out.toString();
+    }
+    
+    /** LocalCA does no renewals, so this is equal to {@code #encodeCertificationRequest} */
+    public String signCertificationRequest(
+	    PKCS10CertificationRequest req, Properties info,
+	    PrivateKey oldKey, X509Certificate oldCert) throws IOException {
+	return encodeCertificationRequest(req, info);
+    }
+    
+    /** Obtain a new serial number for the certificate signing request / certificate */
+    public void uploadCertificationRequest(String req, Properties info) throws IOException {
 	serial++;
-	return Integer.toString(serial);
+	info.setProperty("request.serial", Integer.toString(serial));
     }
 
-    /** {@inheritDoc}
-     * <p>
-     * This local CA always processes a certificate on the fly, so it returns always true.
-     */
+    /** This local CA always processes a certificate on the fly, so it returns always true. */
     public boolean isCertificationRequestProcessed(
-	    PKCS10CertificationRequest req, String reqserial) throws IOException {
+	    PKCS10CertificationRequest req, Properties info) throws IOException {
 	return true;
     }
 
-    /** {@inheritDoc}
-     * <p>
-     * Note that in the current implementation most attributes aren't copied.
-     */
+    /** Creates and returns a certificate for the request. */
     public X509Certificate downloadCertificate(
-	    PKCS10CertificationRequest req, String reqserial) throws IOException {
+	    PKCS10CertificationRequest req, Properties info) throws IOException {
 	X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
 	X509Certificate cert = null;
+	String reqserial = info.getProperty("request.serial");
+	if (reqserial==null)
+	    throw new IOException("Request has no serial number!");
 	
 	try {
 	    certGen.setSerialNumber(BigInteger.valueOf(Integer.valueOf(reqserial)));

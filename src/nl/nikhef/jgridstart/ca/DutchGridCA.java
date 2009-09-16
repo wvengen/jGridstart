@@ -50,6 +50,16 @@ public class DutchGridCA implements CA {
 	if (baseCaCert==null)
 	    baseCaCert = "https://ca.dutchgrid.nl/cgi-bin/nikhef-ms?certder";
     }
+    
+    /** Just returns the PEM encoded version of the request. */
+    public String encodeCertificationRequest(
+	    PKCS10CertificationRequest req, Properties info) throws IOException {
+	StringWriter out = new StringWriter();
+	PEMWriter writer = new PEMWriter(out);
+	writer.writeObject(req);
+	writer.close();
+	return out.toString();
+    }
 
     /** Uploads a user certificate signing request onto the DutchGrid CA.
      * <p>
