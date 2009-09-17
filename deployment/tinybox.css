@@ -1,0 +1,37 @@
+/* see tinybox.js */
+#tinybox {
+	position:absolute;
+	display:none;
+	padding:10px;
+	background:#fff;
+	border:3px solid #e3e3e3;
+	z-index:2000;
+}
+#tinymask {
+	position:absolute;
+	display:none;
+	top:0; left:0;
+	height:100%; width:100%;
+	background:#000;
+	z-index:1500;
+}
+#tinycontent {
+	background:#fff;
+	text-align: center;
+}
+
+#tinycontent h2 {
+	margin: 0;
+	font-size: 110%;
+}
+#tinycontent .runanyway {
+	color: #555;
+	font-size: 80%;
+}
+#tinycontent .runanyway a[href] {
+	color: #55f;
+}
+
+a img {
+	border: none;
+}
