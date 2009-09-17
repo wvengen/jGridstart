@@ -92,6 +92,10 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	this.certParent = certParent;
 	setData(new Properties());
     }
+    /** Return whether we have a renewal or not */
+    protected boolean isRenewal() {
+	return certParent != null;
+    }
     
     /** Set the current step to the one that is relevant for the process. */
     public void setStepDetect() {
@@ -169,7 +173,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	// initialize properties when new request / renewal
 	if (cert==null) {
 	    // help the user by prefilling some elements
-	    if (certParent==null) {
+	    if (!isRenewal()) {
 		CertificateRequest.preFillData(p, certParent);
 	    	data().setProperty("wizard.title", "Request a new certificate");
 	    } else {
@@ -232,7 +236,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    // Not needed for renewal, since it may be that the level wasn't
 	    //   specified because the parent hadn't set the level explictely
 	    //   after an import, for example.
-	    if (certParent==null) {
+	    if (!isRenewal()) {
 		// and a level was chosen
 		if (data().getProperty("level")==null) {
 		    JOptionPane.showMessageDialog(this,
@@ -410,14 +414,16 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    try {
 		// generate request when no key or certificate
 		if (cert==null) {
-		    // generate subject, or copy from parent if renewal
-		    if (certParent==null)
-			CertificateRequest.postFillData(p);
-		    else
-			p.setProperty("subject", certParent.getProperty("subject"));
-		    // generate request!
+		    // generate request
 		    // TODO check thread safety ... :/
-		    CertificatePair newCert = store.generateRequest(p, p.getProperty("password1").toCharArray());
+		    CertificatePair newCert = null;
+		    if (!isRenewal()) {
+			CertificateRequest.postFillData(p);
+			 newCert = store.generateRequest(p, p.getProperty("password1").toCharArray());
+		    } else {
+			p.setProperty("subject", certParent.getProperty("subject"));
+			newCert = store.generateRenewal(certParent, p.getProperty("password1").toCharArray());
+		    }
 		    // clear password
 		    p.remove("password1");
 		    p.remove("password1.volatile");

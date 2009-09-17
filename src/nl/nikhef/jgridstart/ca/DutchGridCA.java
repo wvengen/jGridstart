@@ -1,9 +1,13 @@
 package nl.nikhef.jgridstart.ca;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -11,6 +15,8 @@ import java.security.GeneralSecurityException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.cert.CertStore;
+import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 
@@ -22,11 +28,21 @@ import javax.mail.internet.MimeMultipart;
 
 import nl.nikhef.jgridstart.util.ConnectionUtils;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
+import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.mail.smime.SMIMEException;
 import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.util.Strings;
+import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.x509.NoSuchStoreException;
+import org.bouncycastle.x509.X509CollectionStoreParameters;
+import org.bouncycastle.x509.X509Store;
+
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.StringStack;
 
 /**
  * This class is used interface with the DutchGrid production CA
@@ -70,7 +86,10 @@ public class DutchGridCA implements CA {
 	return out.toString();
     }
     
-    /** PEM-encodes request and puts it in a S/MIME signed form */
+    /** PEM-encodes request and puts it in a S/MIME signed form.
+     * <p>
+     * Sets the property {@code renewal} to {@code true}.
+     */
     public String signCertificationRequest(
 	    PKCS10CertificationRequest req, Properties info,
 	    PrivateKey oldKey, X509Certificate oldCert) throws IOException {
@@ -84,14 +103,22 @@ public class DutchGridCA implements CA {
 	    // add signature
 	    SMIMESignedGenerator gen = new SMIMESignedGenerator();
 	    gen.addSigner(oldKey, oldCert, SMIMESignedGenerator.DIGEST_SHA1);
-	    // TODO gen.addCertificates() ?
+	    CertStore certStore = CertStore.getInstance("Collection",
+		    new CollectionCertStoreParameters(Arrays.asList(oldCert)), "BC");
+	    gen.addCertificatesAndCRLs(certStore);
 	    MimeMultipart multipart = gen.generate(data, "BC");
 
 	    MimeMessage msg = new MimeMessage(Session.getDefaultInstance(System.getProperties()));
 	    msg.setContent(multipart, multipart.getContentType());
 	    msg.saveChanges();
 	    
-	    return msg.toString();
+	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    msg.writeTo(out);
+	    out.close();
+
+	    info.setProperty("renewal", Boolean.toString(true));
+	    
+	    return out.toString();
 	    
 	} catch(MessagingException e) {
 	    throw new IOException(e.getMessage());
@@ -111,21 +138,27 @@ public class DutchGridCA implements CA {
      * 
      * @param req {@inheritDoc}
      * @param info {@inheritDoc}; {@code email}, {@code fullname} and {@code agreecps} are used here.
-     * @return {@inheritDoc}
      */
     public void uploadCertificationRequest(String req, Properties info) throws IOException {
 	
-	StringWriter reqWriter = new StringWriter();
-	PEMWriter w = new PEMWriter(reqWriter);
-	w.writeObject(req);
-	w.close();
+	// renewal needs to be packed in a base64 encoded renewal blob
+	String sendreq = req;
+	if (Boolean.valueOf(info.getProperty("renewal"))) {
+	    sendreq =
+		"===== BEGIN DUTCHGRID RENEWAL BLOB =====\n" +
+		WordUtils.wrap(new String(Base64.encode(req.getBytes())), 64, "\n", true) + "\n" +
+		"===== END DUTCHGRID RENEWAL BLOB =====\n";
+		logger.finest("Submitting DutchGrid renewal blob:\n" + sendreq);
+	} else {
+	    logger.finest("Submitting request:\n" + req);
+	}
 	
 	String[] postdata = {
 		"action", "submit",
 		"fullname", info.getProperty("fullname"),
 		"email_1", info.getProperty("email"),
 		"email_2", info.getProperty("email"),
-		"requesttext", reqWriter.toString(),
+		"requesttext", sendreq,
 		"Publish", "Upload Publishing Data",
 		"robot", "yes",
 		"dummy", "dummy"
