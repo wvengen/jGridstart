@@ -7,15 +7,24 @@ import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import java.security.GeneralSecurityException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
+
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import nl.nikhef.jgridstart.util.ConnectionUtils;
 
 import org.bouncycastle.jce.PKCS10CertificationRequest;
-import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.mail.smime.SMIMEException;
+import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
 
@@ -60,6 +69,38 @@ public class DutchGridCA implements CA {
 	writer.close();
 	return out.toString();
     }
+    
+    /** PEM-encodes request and puts it in a S/MIME signed form */
+    public String signCertificationRequest(
+	    PKCS10CertificationRequest req, Properties info,
+	    PrivateKey oldKey, X509Certificate oldCert) throws IOException {
+	
+	String reqstring = encodeCertificationRequest(req, info);
+	
+	try {
+	    // create S/MIME message from it
+	    MimeBodyPart data = new MimeBodyPart();
+	    data.setText(reqstring);
+	    // add signature
+	    SMIMESignedGenerator gen = new SMIMESignedGenerator();
+	    gen.addSigner(oldKey, oldCert, SMIMESignedGenerator.DIGEST_SHA1);
+	    // TODO gen.addCertificates() ?
+	    MimeMultipart multipart = gen.generate(data, "BC");
+
+	    MimeMessage msg = new MimeMessage(Session.getDefaultInstance(System.getProperties()));
+	    msg.setContent(multipart, multipart.getContentType());
+	    msg.saveChanges();
+	    
+	    return msg.toString();
+	    
+	} catch(MessagingException e) {
+	    throw new IOException(e.getMessage());
+	} catch (GeneralSecurityException e) {
+	    throw new IOException(e.getMessage());
+	} catch (SMIMEException e) {
+	    throw new IOException(e.getMessage());
+	}
+    }
 
     /** Uploads a user certificate signing request onto the DutchGrid CA.
      * <p>
@@ -69,13 +110,10 @@ public class DutchGridCA implements CA {
      * privacy policy" checkbox on the website.
      * 
      * @param req {@inheritDoc}
-     * @param info {@inheritDoc}; only {@code email} and {@code agreecps} are used here.
+     * @param info {@inheritDoc}; {@code email}, {@code fullname} and {@code agreecps} are used here.
      * @return {@inheritDoc}
      */
-    public String uploadCertificationRequest(
-	    PKCS10CertificationRequest req, Properties info) throws IOException {
-	
-	String name = req.getCertificationRequestInfo().getSubject().getValues(X509Principal.CN).get(0).toString();
+    public void uploadCertificationRequest(String req, Properties info) throws IOException {
 	
 	StringWriter reqWriter = new StringWriter();
 	PEMWriter w = new PEMWriter(reqWriter);
@@ -84,7 +122,7 @@ public class DutchGridCA implements CA {
 	
 	String[] postdata = {
 		"action", "submit",
-		"fullname", name,
+		"fullname", info.getProperty("fullname"),
 		"email_1", info.getProperty("email"),
 		"email_2", info.getProperty("email"),
 		"requesttext", reqWriter.toString(),
@@ -108,24 +146,21 @@ public class DutchGridCA implements CA {
 	}
 
 	logger.info("Uploaded certificate signing request");
-
-	// ok; serial is not used here
-	return null;
     }
     
     public boolean isCertificationRequestProcessed(
-	    PKCS10CertificationRequest req, String reqserial) throws IOException {
-	return downloadCertificate(req, reqserial) != null;
+	    PKCS10CertificationRequest req, Properties info) throws IOException {
+	return downloadCertificate(req, info) != null;
     }
 
     /** Download a certificate from the DutchGrid CA
      * 
      * @param req {@inheritDoc}
-     * @param reqserial {@inheritDoc} (not used by DutchGridCA)
+     * @param info {@inheritDoc} (not used by DutchGridCA)
      * @return {@inheritDoc}
      */
     public X509Certificate downloadCertificate(
-	    PKCS10CertificationRequest req, String reqserial) throws IOException {
+	    PKCS10CertificationRequest req, Properties info) throws IOException {
 	
 	// return certificate by serial
 	URL url = new URL(baseQuery);

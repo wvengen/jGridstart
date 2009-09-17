@@ -352,21 +352,6 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	newCert.setProperty("renewal.parent.path", oldCert.getProperty("path"));
 	newCert.setProperty("renewal.parent.modulus", oldCert.getProperty("modulus"));
 	
-	/*
-	// create S/MIME message from it
-	MimeBodyPart data = new MimeBodyPart();
-	data.setText(FileUtils.readFile(newCert.getCSRFile()));
-	// add signature
-	SMIMESignedGenerator gen = new SMIMESignedGenerator();
-	gen.addSigner(oldKey, oldCert.getCertificate(), SMIMESignedGenerator.DIGEST_SHA1);
-	// TODO gen.addCertificates() ?
-	MimeMultipart multipart = gen.generate(data, "BC");
-	
-	MimeMessage msg = new MimeMessage(Session.getDefaultInstance(System.getProperties()));
-	msg.setContent(multipart, multipart.getContentType());
-	msg.saveChanges();
-	*/
-	
 	// and store it as new CSR
 	FileUtils.writeFile(newCert.getCSRFile(),
 		newCert.getCA().signCertificationRequest(newCert.getCSR(), newCert,
