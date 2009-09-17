@@ -118,7 +118,7 @@ public class DutchGridCA implements CA {
 
 	    info.setProperty("renewal", Boolean.toString(true));
 	    
-	    return out.toString();
+	    return out.toString().replace("Content-Type: application/pkcs7-signature", "Content-Type: application/x-pkcs7-signature");
 	    
 	} catch(MessagingException e) {
 	    throw new IOException(e.getMessage());
