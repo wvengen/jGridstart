@@ -293,6 +293,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	}
 	if (curPage==0 && cert!=null && Boolean.valueOf(cert.getProperty("request.submitted"))) {
 	    data().setProperty("agreecps.lock", "true");
+	    data().setProperty("email.lock", "true");
 	}
 	
 	// say "Close" when a certificate is present because everything is done by then
