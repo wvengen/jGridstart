@@ -86,7 +86,7 @@ public class JGSFrame extends JFrame {
 	this.setMinimumSize(new Dimension(400, 150));
 	this.setPreferredSize(new Dimension(650, 350));
 	this.setContentPane(getJContentPane());
-	this.setTitle("jGridStart (development version)");
+	this.setTitle("jGridstart "+System.getProperty("jgridstart.version"));
 
 	// create actions; they register themselves
 	new ActionRequest(this, store, selection);
