@@ -26,6 +26,15 @@ public class Main {
     public static void main(String[] args) {
 	logger.addHandler(LogWindowHandler.getInstance());
 	logger.fine("main starting");
+	// log system info
+	logger.info("Platform: "+System.getProperty("os.name")+" "+System.getProperty("os.arch")+" " +
+		"version "+System.getProperty("sys.version"));
+	logger.info("JRE: "+System.getProperty("java.vendor")+" version "+System.getProperty("java.version") +
+		" JIT "+System.getProperty("java.compiler") + "; " +
+		"installed in "+System.getProperty("java.home"));
+	logger.info("  classpath="+System.getProperty("java.class.path"));
+	
+	
 	// load system properties if not yet set, not fatal if it fails
 	try {
 	    Properties sysp = System.getProperties();

@@ -12,6 +12,9 @@ import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+
 /** Some file-related utilities */
 public class FileUtils {
     static protected Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
@@ -351,9 +354,7 @@ public class FileUtils {
 	// get current exec invocation number for stdout/stderr tracking
 	int index = globalExecIndex++;	
 	// log
-	String scmd = "";
-	for (int i=0; i<cmd.length; i++) scmd += " "+cmd[i]; 
-	logger.finer("exec #"+index+":"+scmd);
+	logger.finer("[  exec #"+index+"] cmd: "+StringUtils.join(cmd, ' '));
 	// run
 	Process p = Runtime.getRuntime().exec(cmd);
 	if (input!=null) {
@@ -382,7 +383,7 @@ public class FileUtils {
 	    // TODO verify this is the right thing to do
 	    throw new IOException(e.getMessage());
 	}
-	logger.finest("exec"+scmd+" returns "+ret);
+	logger.finest("[  exec #"+index+"] returns "+ret);
 	return ret;
     }
     

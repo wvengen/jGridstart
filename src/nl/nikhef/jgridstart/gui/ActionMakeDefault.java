@@ -38,6 +38,7 @@ public class ActionMakeDefault extends CertificateAction {
     @Override
     public void actionPerformed(ActionEvent e) {
 	CertificatePair cert = selection.getCertificatePair();
+	logger.finer("Action: "+getValue(NAME)+" of "+cert);
 	try {
 	    store.setDefault(cert);
 	} catch (IOException e1) {
