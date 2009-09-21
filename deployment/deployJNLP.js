@@ -21,7 +21,7 @@ var deployJNLP = {
 				var msg = 
 					"<h2>Java required</h2>"
 					+ "<p>You need to install Java before you can run jGridstart.</p>"
-					+ "<div><a href='javascript:deployJava.installLatestJRE()'><img src='javabutton.png' alt='Install Java'/></a></div"
+					+ "<div><a href='javascript:deployJava.installLatestJRE()'><img src='javabutton.png' alt='Install Java'/></a></div>"
 					+ "<div class='runanyway'>If you do have Java installed, you can still "
 					+ "<a href='javascript:deployJNLP.launch()'>launch jGridstart</a>.</div>";
 				TINY.box.show(msg, false, 0, 0, false);
