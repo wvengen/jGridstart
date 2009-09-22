@@ -8,7 +8,7 @@ var deployJNLP = {
 		
 		// do launch it, even if java isn't installed
 		launch: function() {
-			deployJava.launch(this.jnlp);
+			deployJava.launch(this.getJNLP());
 		},
 		
 		// launch jnlp, but show an install window when no jvm was detected
@@ -44,7 +44,7 @@ var deployJNLP = {
 		
 		// returns an absolute JNLP url from the jnlp property
 		getJNLP: function() {
-			return toAbsURL(this.jnlp);
+			return this.toAbsURL(this.jnlp);
 		},
 		
 		// absolutize a url (required for getJNLP() and IE)
