@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -318,24 +319,20 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
     
     /** Returns a {@linkplain Document} for a {@linkplain URL}.
      * <p>
-     * Uses {@link Class#getResource} when possible to avoid network
-     * transfer in case the {@linkplain URL} was obtained by using
-     * {@linkplain Class#getResource}.
+     * This version explicitly allows the use of default caches to enable
+     * resource caching from URLs obtained with {@link Class#getResource}. 
      */
     protected Document retrieveDocument(URL url) throws SAXException, IOException, ParserConfigurationException {
 	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	Document src = null;
-	// detect getResource()-obtained urls
-	final String pkgurl = getClass().getResource("/").toExternalForm();
-	String surl = url.toExternalForm();
-	if (surl.startsWith(pkgurl)) {
-	    String rsc = surl.substring(pkgurl.length()-1);
-	    src = factory.newDocumentBuilder().parse(getClass().getResourceAsStream(rsc));
-	} else {
-	    // ordinary url
-	    src = factory.newDocumentBuilder().parse(url.toExternalForm());
+	
+	URLConnection conn = url.openConnection();
+	conn.setDefaultUseCaches(true);
+	InputStream in = conn.getInputStream();
+	try {
+	    return factory.newDocumentBuilder().parse(in);
+	} finally {
+	    in.close();
 	}
-	return src;
     }
 
     @Override
