@@ -104,8 +104,7 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	while (docs.size() <= i) docs.add(null);
 	if (docs.get(i)==null || !docs.get(i).getDocumentURI().equals(pages.get(i).toExternalForm()) ) {
 	    try {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		Document src = factory.newDocumentBuilder().parse(pages.get(i).toExternalForm());
+		Document src = retrieveDocument(pages.get(i));
 		TemplateDocument doc = new TemplateDocument(src, data());
 		doc.setDocumentURI(pages.get(i).toExternalForm());
 		docs.set(i, doc);
@@ -317,6 +316,27 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	void pageEnter(TemplateWizard w, int prevPage, int curPage);
     }
     
+    /** Returns a {@linkplain Document} for a {@linkplain URL}.
+     * <p>
+     * Uses {@link Class#getResource} when possible to avoid network
+     * transfer in case the {@linkplain URL} was obtained by using
+     * {@linkplain Class#getResource}.
+     */
+    protected Document retrieveDocument(URL url) throws SAXException, IOException, ParserConfigurationException {
+	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	Document src = null;
+	// detect getResource()-obtained urls
+	final String pkgurl = getClass().getResource("/").toExternalForm();
+	String surl = url.toExternalForm();
+	if (surl.startsWith(pkgurl)) {
+	    String rsc = surl.substring(pkgurl.length()-1);
+	    src = factory.newDocumentBuilder().parse(getClass().getResourceAsStream(rsc));
+	} else {
+	    // ordinary url
+	    src = factory.newDocumentBuilder().parse(url.toExternalForm());
+	}
+	return src;
+    }
 
     @Override
     public void setBackground(Color c) {
