@@ -328,6 +328,10 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	if (curPage==3) {
 	    try {
 		// set browser properties
+		// First set system property from defaults, then retrieve data() property.
+		// data().getProperty() falls back to System if not defined, so the result
+		// is that if install.browser is set, the one specified is used, and if not,
+		// the default browser is used.
 		System.setProperty("install.browser", BrowserFactory.getInstance().getDefaultBrowser());
 		String browserid = data().getProperty("install.browser");
 		if (browserid==null) browserid = System.getProperty("install.browser");
@@ -347,8 +351,9 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    } catch (IOException e) {
 		// no browser info, handled in html by !${install.browser*}
 	    } catch (BrowserNotAvailableException e) {
-		// should not happen as we query default browser
-		ErrorMessage.internal(this, e);
+		// may happen when default browser is not recognised (though behaviour can
+		// be different for different platforms). This is no problem, since the
+		// case is handled by the html template.
 	    } catch (Exception e) {
 		ErrorMessage.error(this, "Certificate installation failed", e);
 	    }
