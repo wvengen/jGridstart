@@ -39,7 +39,8 @@ class BrowsersWindows extends BrowsersCommon {
 
 	    // try to find the executable: registry, PATH, subdir of "Program Files"
 	    String path = null;
-	    path=findBrowserRegistry(exe);
+	    path=findBrowserRegistry1(exe);
+	    if (path==null) path = findBrowserRegistry2(exe);
 	    if (path==null) path = findBrowserPath(exe);
 	    //TODO if (path==null) path = findBrowserProgramFiles(exe);
 	    // not found, remove
@@ -120,12 +121,15 @@ class BrowsersWindows extends BrowsersCommon {
 	}
     }
     
-    /** Find a browser in the registry's list of executables
+    /** Find a browser in the registry's list of executables, version 1.
+     * <p>
+     * {@literal HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\App Paths}
+     * is being looked in for full application paths.
      * 
      * @param exename name of executable, case-insensitive, without ".exe"
      * @return full path if found, null if not found.
      */
-    private String findBrowserRegistry(String exename) {
+    private String findBrowserRegistry1(String exename) {
 	try {
 	    String canonExename = exename.toLowerCase()+".exe";
 	    final Key root = Regor.HKEY_LOCAL_MACHINE;
@@ -147,6 +151,18 @@ class BrowsersWindows extends BrowsersCommon {
 	} catch (RegistryErrorException e) { }
 	// failed
 	return null;
+    }
+    /** Find a browser in the registry's list of executables, version 2.
+     * <p>
+     * {@literal HKEY_CLASSES_ROOT\Applications}
+     * is being looked in for open commands.
+     * 
+     * @param exename name of executable, case-insensitive, without ".exe"
+     * @return full path if found, null if not found.
+     */
+    private String findBrowserRegistry2(String exename) {
+	String canonExename = exename.toLowerCase()+".exe";
+	return findRegistryClassesRoot("Applications\\"+canonExename);
     }
     
     /** Find a browser in the current PATH
@@ -180,17 +196,17 @@ class BrowsersWindows extends BrowsersCommon {
      */
     private String findDefaultBrowserRegistry() {
 	String b;
-	if ( (b=findDefaultBrowserRegistry("https")) !=null ) return b;
-	if ( (b=findDefaultBrowserRegistry("http")) !=null ) return b;
+	if ( (b=findRegistryClassesRoot("https")) !=null ) return b;
+	if ( (b=findRegistryClassesRoot("http")) !=null ) return b;
 	// failed
 	return null;
     }
-    /** Find the the default browser from the registry for a protocol. */
-    private String findDefaultBrowserRegistry(String proto) {
+    /** Return browser from the registry for {@literal HKEY_CLASSES_ROOT} entry. */
+    private String findRegistryClassesRoot(String path) {
 	try {
 	    final Key root = Regor.HKEY_CLASSES_ROOT;
 	    final String subPath = "shell\\open\\command";
-	    Key key = getRegor().openKey(root, proto+"\\"+subPath, Regor.KEY_READ);
+	    Key key = getRegor().openKey(root, path+"\\"+subPath, Regor.KEY_READ);
 	    if (key==null) return null;
 	    byte[] value = getRegor().readValue(key, null);
 	    getRegor().closeKey(key);
