@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 
+import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PKCS12KeyStoreUnlimited;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
@@ -54,7 +55,7 @@ public class CertificateStore1Test extends CertificateBaseTest {
 	CertificateStore store = new CertificateStore(path);
 	assertEquals(1, store.size());
     }
-
+    
     /** Test if refresh picks up newly added item */
     @Test
     public void testRefreshAdd() throws Exception {
@@ -72,9 +73,26 @@ public class CertificateStore1Test extends CertificateBaseTest {
 	File entry = newTestCertificate(new File(path, "user-cert-bar")).getPath();
 	CertificateStore store = new CertificateStore(path);
 	assertEquals(1, store.size());
-	recursiveDelete(entry);
+	FileUtils.recursiveDelete(entry);
 	store.refresh();
 	assertEquals(0, store.size());
+    }
+
+    /** Test if refresh picks up certificate state change */
+    @Test
+    public void testRefreshState() throws Exception {
+	System.setProperty("jgridstart.ca.local.hold", "true");
+	CertificateStore store = new CertificateStore(newTestStore(0));
+	assertEquals(0, store.size());
+	CertificatePair cert = newTestRequest(new File(store.path, "user-cert-0001"));
+	assertNull(cert.getCertificate());
+	store.refresh();
+	assertEquals(1, store.size());
+	assertFalse(cert.isCertificationRequestProcessed());
+	System.setProperty("jgridstart.ca.local.hold", "false");
+	store.refresh();
+	assertTrue(cert.isCertificationRequestProcessed());
+	System.getProperties().remove("jgridstart.ca.local.hold");
     }
     
     /** Test removal by index */

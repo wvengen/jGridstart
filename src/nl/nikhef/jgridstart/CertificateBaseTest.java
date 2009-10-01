@@ -38,7 +38,7 @@ public abstract class CertificateBaseTest extends TestCase {
     @Override
     public void tearDown() throws Exception {
 	// remove temp dir
-	recursiveDelete(tmpBasePath);
+	FileUtils.recursiveDelete(tmpBasePath);
 	// restore CA
 	if (oldCAProvider==null)
 	    System.getProperties().remove("jgridstart.ca.provider");
@@ -46,23 +46,6 @@ public abstract class CertificateBaseTest extends TestCase {
 	    System.setProperty("jgridstart.ca.provider", oldCAProvider);
 	// restore passwordcache settings
 	PasswordCache.getInstance().setAlwaysAskForEncrypt(pwcacheAlwaysEncrypt);
-    }
-    
-    /** Helper method: remove directory recursively.
-     * <p>
-     * Beware, symlinks might traverse into unwanted territory!
-     */
-    protected static void recursiveDelete(File what) {
-	File[] children = what.listFiles();
-	for (int i=0; i<children.length; i++) {
-	    File c = children[i];
-	    // make sure we can read/write it so traversal and deletion are possible
-	    FileUtils.chmod(c, true, true, c.isDirectory(), true);
-	    if (c.isDirectory())
-		recursiveDelete(c);
-	    c.delete();
-	}
-	what.delete();
     }
     
     /** Helper method: create new certificate store directory in temp space.
@@ -86,15 +69,14 @@ public abstract class CertificateBaseTest extends TestCase {
     /** certificate index, used to issue new test certificates */
     private static int certIndex = 0;
     
-    /** Generate test certificate.
+    /** Generate test request.
      * <p>
-     * New key and CSR are generated and the certificate is signed using
-     * {@link LocalCA}. 
+     * New key and CSR are generated, and the latter is uploaded using {@link LocalCA}.
      * 
      * @param certPath
      * @return newly created {@linkplain CertificatePair}
      */
-    protected CertificatePair newTestCertificate(File certPath) throws GeneralSecurityException, PasswordCancelledException, IOException, CAException, CertificateCheckException {
+    protected CertificatePair newTestRequest(File certPath) throws PasswordCancelledException, IOException, GeneralSecurityException, CAException {
 	char[] pw = ("test_password-"+certIndex).toCharArray();
 	Properties p = new Properties();
 	p.setProperty("subject", "/O=dutchgrid/O=users/O=nikhef/CN=Test User #" + certIndex++);
@@ -105,6 +87,18 @@ public abstract class CertificateBaseTest extends TestCase {
 	assertNotNull(cert.getCSR());
 	assertNull(cert.getCertificate());
 	cert.uploadRequest();
+	return cert;
+    }
+    
+    /** Generate test certificate.
+     * <p>
+     * New key and CSR are generated and the certificate is signed using {@link LocalCA}. 
+     * 
+     * @param certPath
+     * @return newly created {@linkplain CertificatePair}
+     */
+    protected CertificatePair newTestCertificate(File certPath) throws GeneralSecurityException, PasswordCancelledException, IOException, CAException, CertificateCheckException {
+	CertificatePair cert = newTestRequest(certPath);
 	cert.downloadCertificate();
 	assertNotNull(cert.getCertificate());
 	return cert;

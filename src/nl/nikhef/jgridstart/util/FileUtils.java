@@ -171,6 +171,23 @@ public class FileUtils {
 	    }
 	});
     }
+
+    /** Helper method: remove directory recursively.
+     * <p>
+     * Beware, symlinks might traverse into unwanted territory!
+     */
+    public static void recursiveDelete(File what) {
+	File[] children = what.listFiles();
+	for (int i=0; i<children.length; i++) {
+	    File c = children[i];
+	    // make sure we can read/write it so traversal and deletion are possible
+	    chmod(c, true, true, c.isDirectory(), true);
+	    if (c.isDirectory())
+		recursiveDelete(c);
+	    c.delete();
+	}
+	what.delete();
+    }
     
     /** Runs a callback on each file specified.
      * <p>

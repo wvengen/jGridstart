@@ -33,7 +33,17 @@ import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 
 /**
  * A certificate authority that runs locally and signs using a
- * generated certificate. Ideal for testing. 
+ * generated certificate.
+ * <p>
+ * This implementation is meant for testing.
+ * <p>
+ * System properties used:
+ * <ul>
+ *   <li><tt>jgridstart.ca.local.dn</tt> - distinguished name of CA certificate
+ *   <li><tt>jgridstart.ca.local.valid</tt> - number of seconds the certificates are valid
+ *   <li><tt>jgridstart.ca.local.hold</tt> - if <i>true</i>, {@linkplain #isCertificationRequestProcessed}
+ *     returns false; this can be used to test the situation where a certificate isn't signed yet.
+ * </ul>
  * 
  * @author wvengen
  * 
@@ -49,15 +59,25 @@ public class LocalCA implements CA {
     /** serial number of last generated certificate */
     static protected int serial = 1;
     /** DN of local CA */
-    final protected String caDN = "CN=LocalCA Test Certificate";
+    static protected String caDN = System.getProperty("jgridstart.ca.local.dn");
     /** number of seconds into the future generated certificates are valid */
-    final protected int validtime = 60 * 60; 
+    static protected int validtime = 60 * 60; 
     
     /**
      * Creates a new LocalCA and generates a self-signed certificate to
      * sign with. It is valid for an hour only.
      */
     public LocalCA() throws CertificateException, KeyException, NoSuchAlgorithmException, IllegalStateException, NoSuchProviderException, SignatureException {
+	// set defaults
+	if (caDN==null)
+	    caDN = "CN=LocalCA Test Certificate";
+	String validstr = System.getProperty("jgridstart.ca.local.valid");
+	if (validstr!=null) {
+	    try { validtime = Integer.parseInt(validstr);
+	    } catch(NumberFormatException e) { }
+	}
+	
+	// create CA certificate
 	logger.fine("Generating self-signed LocalCA certificate");
 	KeyPairGenerator keygen = KeyPairGenerator.getInstance("RSA");
 	keygen.initialize(1024);
@@ -106,12 +126,18 @@ public class LocalCA implements CA {
     /** This local CA always processes a certificate on the fly, so it returns always true. */
     public boolean isCertificationRequestProcessed(
 	    PKCS10CertificationRequest req, Properties info) throws IOException {
-	return true;
+	String hold = System.getProperty("jgridstart.ca.local.hold");
+	if (hold==null) return true;
+	return !Boolean.valueOf(hold);
     }
 
     /** Creates and returns a certificate for the request. */
     public X509Certificate downloadCertificate(
 	    PKCS10CertificationRequest req, Properties info) throws IOException {
+	
+	if (!isCertificationRequestProcessed(req, info))
+	    return null;
+	
 	X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
 	X509Certificate cert = null;
 	String reqserial = info.getProperty("request.serial");

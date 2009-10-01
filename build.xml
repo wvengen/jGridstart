@@ -31,6 +31,9 @@
 	<property name="dir.javadoc" location="doc"/>
 	<!-- location of junit test output -->
 	<property name="dir.testreports" location="testreports"/>
+	<!-- location of screenshot output -->
+	<property name="dir.screenshots" location="screenshots"/>
+	<property name="screenshots.main" value="nl.nikhef.jgridstart.gui.util.GUIScreenshotsTest"/>
 
 	<!-- extra tool definitions -->
 	<property name="browsertool.target.name" value="browsertool"/>
@@ -378,4 +381,14 @@
 			<classpath path="${dir.build}"/>
 		</junit>
 	</target>
+	
+	<!-- generate screenshots for documentation -->
+	<target name="screenshots" depends="compile">
+		<java classname="${screenshots.main}" fork="yes">
+			<arg value="${dir.screenshots}"/>
+			<classpath refid="path.dependencies"/>
+			<classpath path="${dir.build}"/>
+		</java>
+	</target>
+	
 </project>

@@ -164,7 +164,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	// refresh each existing item and remove old ones
 	for (int i = 0; i < size(); i++) {
 	    CertificatePair c = get(i);
-	    if (files.contains(c.getPath()))
+	    if (c.getPath() == path || files.contains(c.getPath()))
 		c.refresh();
 	    else
 		removals.add(c);
