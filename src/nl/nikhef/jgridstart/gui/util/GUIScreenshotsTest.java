@@ -38,6 +38,7 @@ public class GUIScreenshotsTest {
 	}
 	File shotdir = new File(args[0]);
 	shotdir.mkdirs();
+	String prefix = "jgridstart-screenshot-";
 	// setup temporary environment
 	File tmphome = FileUtils.createTempDir("jgridstart-home");
 	try {
@@ -54,11 +55,11 @@ public class GUIScreenshotsTest {
 	     * Request new
 	     */
 	    // start screen
-	    saveScreenshot(new File(shotdir, "newrequest01.png"));
+	    saveScreenshot(new File(shotdir, prefix+"newrequest01.png"));
 	    // new request wizard
 	    guiSleep(); tester.key(new Integer('N'), InputEvent.CTRL_MASK);
 	    guiSleep();
-	    saveScreenshot(new File(shotdir, "newrequest02.png"));
+	    saveScreenshot(new File(shotdir, prefix+"newrequest02.png"));
 	    // enter details
 	    guiSleep();
 	    tester.keyString("John\t");
@@ -71,14 +72,14 @@ public class GUIScreenshotsTest {
 	    // wait for submission
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
 	    guiSleep();
-	    saveScreenshot(new File(shotdir, "newrequest03.png"));
+	    saveScreenshot(new File(shotdir, prefix+"newrequest03.png"));
 	    Thread.sleep(6000);
 	    // verification form
 	    System.setProperty("wizard.show.help1", "true"); // simulate help btn1 pressed
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
 	    guiSleep();
 	    guiSleep();
-	    saveScreenshot(new File(shotdir, "newrequest04.png"));
+	    saveScreenshot(new File(shotdir, prefix+"newrequest04.png"));
 	    // form display
 	    JButton btn = (JButton) new BasicFinder().find(new Matcher() {
 		public boolean matches(Component c) {
@@ -88,36 +89,40 @@ public class GUIScreenshotsTest {
 	    btn.doClick();
 	    Thread.sleep(1000);
 	    guiSleep();
-	    saveScreenshot(new File(shotdir, "newrequest05.png"));
+	    saveScreenshot(new File(shotdir, prefix+"newrequest05.png"));
 	    tester.key(new Integer('C'), InputEvent.ALT_MASK);
 	    // close wizard
 	    guiSleep();
 	    tester.key(new Integer('C'), InputEvent.ALT_MASK);
 	    guiSleep();
-	    saveScreenshot(new File(shotdir, "newrequest06.png"));
+	    saveScreenshot(new File(shotdir, prefix+"newrequest06.png"));
 	    // enable certificate in LocalCA and refresh pane
 	    System.setProperty("jgridstart.ca.local.hold", "false");
 	    tester.key(KeyEvent.VK_F5);
 	    Thread.sleep(1000);
 	    guiSleep();
-	    saveScreenshot(new File(shotdir, "newrequest07.png"));
+	    saveScreenshot(new File(shotdir, prefix+"newrequest07.png"));
 	    // show request wizard again
 	    tester.key(new Integer('A'), InputEvent.ALT_MASK);
 	    tester.key('R');
 	    Thread.sleep(2500);
 	    guiSleep();
-	    saveScreenshot(new File(shotdir, "newrequest08.png"));
+	    saveScreenshot(new File(shotdir, prefix+"newrequest08.png"));
 	    // install step
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
 	    Thread.sleep(1000);
 	    guiSleep();
-	    saveScreenshot(new File(shotdir, "newrequest09.png"));
+	    saveScreenshot(new File(shotdir, prefix+"newrequest09.png"));
 	    // show final screen
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
 	    guiSleep();
-	    saveScreenshot(new File(shotdir, "newrequest10.png"));
+	    saveScreenshot(new File(shotdir, prefix+"newrequest10.png"));
 	    // exit wizard
 	    tester.key(new Integer('C'), InputEvent.ALT_MASK);
+	    // save final screenshot
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"newrequest11.png"));
+	    guiSleep();
 	} finally {
 	    FileUtils.recursiveDelete(tmphome);
 	}
@@ -141,6 +146,7 @@ public class GUIScreenshotsTest {
 			new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
 		    // take image
 		    BufferedImage img = robot.createScreenCapture(captureSize);
+		    img.flush();
 		    ImageIO.write(img, "png", dst);
 		} catch(IOException e) {
 		    System.err.println(e);
