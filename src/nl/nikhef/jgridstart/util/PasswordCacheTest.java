@@ -45,6 +45,8 @@ public class PasswordCacheTest extends TestCase {
     public void testClear() throws PasswordCancelledException {
 	cache.set("foobar", "faosdifj".toCharArray());
 	cache.set("barfoo", "asduiofs".toCharArray());
+	Assert.assertNotNull(cache.getForDecrypt("", "foobar"));
+	Assert.assertNotNull(cache.getForDecrypt("", "barfoo"));
 	cache.clear();
 	Assert.assertNull(cache.getForDecrypt("", "foobar"));
 	Assert.assertNull(cache.getForDecrypt("", "barfoo"));
