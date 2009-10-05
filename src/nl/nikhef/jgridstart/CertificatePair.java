@@ -416,6 +416,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
     static public CertificatePair importFrom(File src, char[] srcpw, File dst, char[] dstpw)
 	    throws IOException, PasswordCancelledException, CertificateCheckException, GeneralSecurityException {
 
+	if (src==null || src.getName()==null)
+	    throw new NullPointerException("Please supply a filename to import from");
 	if (!src.isFile() && !src.isDirectory())
 	    throw new IOException("Need file to import from: " + src);
 	if (!src.canRead())
@@ -599,6 +601,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @param pw password to encrypt exported key with, or {@code null} to use private key password
      */
     public void exportTo(File dst, char[] pw) throws IOException, GeneralSecurityException {
+	if (dst==null || dst.getName()==null)
+	    throw new NullPointerException("Please supply a filename to export to");
 	String ext = dst.getName().toLowerCase();
 	ext = ext.substring(ext.lastIndexOf('.')+1);
 	

@@ -74,7 +74,7 @@ public class ActionExport extends CertificateAction {
         		    doExport(e, f, pw);
         		} catch (PasswordCancelledException e1) {
         		    /* do nothing */
-        		} catch (IOException e1) {
+        		} catch (Exception e1) {
         		    ErrorMessage.error(parent, "Export error", e1);
         		}
         		dlg.dispose();
