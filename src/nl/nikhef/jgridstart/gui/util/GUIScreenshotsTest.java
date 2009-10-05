@@ -16,6 +16,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JButton;
 
 import nl.nikhef.jgridstart.util.FileUtils;
+import nl.nikhef.jgridstart.util.PasswordCache;
 
 import abbot.finder.BasicFinder;
 import abbot.finder.Matcher;
@@ -123,6 +124,70 @@ public class GUIScreenshotsTest {
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"newrequest11.png"));
 	    guiSleep();
+	    
+	    /*
+	     * Renewal
+	     */
+	    System.setProperty("jgridstart.ca.local.hold", "true");
+	    // forget password so we certainly get the password dialog
+	    PasswordCache.getInstance().clear();
+	    // start screen
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"renew01.png"));
+	    // personal details
+	    tester.key(new Integer('A'), InputEvent.ALT_MASK);
+	    tester.key('W');
+	    Thread.sleep(2500);
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"renew02.png"));
+	    tester.keyString("\t");
+	    tester.keyString(password+"\t");
+	    tester.keyString(password+"\t");
+	    // wait for submission screen
+	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
+	    // password dialog
+	    Thread.sleep(2000);
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"renew03.png"));
+	    tester.keyString("\t\t"); // update when passwordcache dialog focuses proper field
+	    tester.keyString(password+"\n");
+	    // submit page
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"renew04.png"));
+	    Thread.sleep(3000);
+	    // wait for approval page
+	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"renew05.png"));
+	    // close wizard
+	    guiSleep();
+	    tester.key(new Integer('C'), InputEvent.ALT_MASK);
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"renew06.png"));
+	    // enable certificate in LocalCA and refresh pane
+	    System.setProperty("jgridstart.ca.local.hold", "false");
+	    tester.key(KeyEvent.VK_F5);
+	    Thread.sleep(1000);
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"renew07.png"));
+	    // show request wizard again
+	    tester.key(new Integer('A'), InputEvent.ALT_MASK);
+	    tester.key('R');
+	    Thread.sleep(2500);
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"renew08.png"));
+	    // install step
+	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
+	    Thread.sleep(1000);
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"renew09.png"));
+	    // exit wizard
+	    tester.key(new Integer('C'), InputEvent.ALT_MASK);
+	    // save final screenshot
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"renew11.png"));
+	    guiSleep();
+	    
 	} finally {
 	    FileUtils.recursiveDelete(tmphome);
 	}
