@@ -185,10 +185,62 @@ public class GUIScreenshotsTest {
 	    tester.key(new Integer('C'), InputEvent.ALT_MASK);
 	    // save final screenshot
 	    guiSleep();
-	    saveScreenshot(new File(shotdir, prefix+"renew11.png"));
+	    saveScreenshot(new File(shotdir, prefix+"renew10.png"));
 	    guiSleep();
 	    
+	    /*
+	     * Import/export
+	     */
+	    // forget password so we certainly get the password dialog
+	    PasswordCache.getInstance().clear();
+	    // starting screenshot (multiple certificates)
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"importexport01.png"));
+	    // export dialog
+	    tester.key(new Integer('E'), InputEvent.CTRL_MASK);
+	    Thread.sleep(1000);
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"importexport02.png"));
+	    // enter name and do export
+	    tester.keyString("my_certificate.p12\n");
+	    Thread.sleep(1000);
+	    saveScreenshot(new File(shotdir, prefix+"importexport03.png"));
+	    tester.keyString("\t\t"); // update when passwordcache dialog focuses proper field
+	    tester.keyString(password+"\n");
+	    guiSleep();
+	    
+	    // forget password so we certainly get the password dialog
+	    PasswordCache.getInstance().clear();
+	    
+	    // import dialog
+	    tester.key(new Integer('I'), InputEvent.CTRL_MASK);
+	    Thread.sleep(1000);
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"importexport04.png"));
+	    guiSleep();
+	    // enter name and do import
+	    tester.keyString("my_certificate.p12\n");
+	    Thread.sleep(1000);
+	    saveScreenshot(new File(shotdir, prefix+"importexport05.png"));
+	    tester.keyString("\t\t"); // update when passwordcache dialog focuses proper field
+	    tester.keyString(password+"\n");
+	    guiSleep();
+
+	    /*
+	     * Certificate details
+	     */
+	    // certificate details view
+	    Window jgwnd = AWT.getActiveWindow();
+	    jgwnd.setSize(750, 420);
+	    System.setProperty("view.showdetails", "true");
+	    URLLauncherCertificate.performAction("viewlist(false)", tester.findFocusOwner());
+	    tester.key(KeyEvent.VK_F5);
+	    Thread.sleep(500);
+	    guiSleep();
+	    saveScreenshot(new File(shotdir, prefix+"viewdetails01.png"));
+	    
 	} finally {
+	    guiSleep(); Thread.sleep(500); // for screenshot to complete ...
 	    FileUtils.recursiveDelete(tmphome);
 	}
 	// exit!
@@ -224,9 +276,12 @@ public class GUIScreenshotsTest {
     protected static void guiSleep() throws AWTException {
 	// process gui events
 	try {
+	    tester.waitForIdle();
+	    /*
 	    java.awt.EventQueue.invokeAndWait(new Runnable() {
 	        public void run() { }
 	    });
+	    */
 	} catch (Exception e) { throw new AWTException(e.toString()); }
     }
 }
