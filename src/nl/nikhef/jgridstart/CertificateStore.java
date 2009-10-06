@@ -268,15 +268,15 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * this is added as a new entry to this store.
      * 
      * @param src File to import from
-     * @param srcpw password for import, or {@code null} to ask the user
-     * @param dstpw password to use for private key storage, or {@code null} to ask the user
+     * @param dstpw password to use for private key storage, or {@code null} to use the
+     *          same password as the import password
      * @return Newly created CertificatePair
      */
-    public CertificatePair importFrom(File src, char[] srcpw, char[] dstpw) throws IOException, GeneralSecurityException, CertificateCheckException {
+    public CertificatePair importFrom(File src, char[] dstpw) throws IOException, GeneralSecurityException, CertificateCheckException {
 	File dst = newItem();
 	// import
 	try {
-	    CertificatePair cert = CertificatePair.importFrom(src, srcpw, dst, dstpw);
+	    CertificatePair cert = CertificatePair.importFrom(src, dst, dstpw);
 	    add(cert);
 	    return cert;
 	} catch(IOException e) {
@@ -294,10 +294,10 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     /** Import a PKCS#12 or PEM file as a new entry
      * 
      * @param src File to import from
-     * @see #importFrom(File, char[], char[])
+     * @see #importFrom(File, char[])
      */
     public CertificatePair importFrom(File src) throws IOException, GeneralSecurityException, CertificateCheckException {
-	return importFrom(src, null, null);
+	return importFrom(src, null);
     }
 
     

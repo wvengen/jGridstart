@@ -148,7 +148,8 @@ public class CertificateStore1Test extends CertificateBaseTest {
 	    store.get(0).exportTo(exported, pw);
 	    // now import into new store
 	    CertificateStore store2 = new CertificateStore(newTestStore(0));
-	    store2.importFrom(exported, pw, "LKAJHlkjhH(".toCharArray());
+	    PasswordCache.getInstance().set(exported.getCanonicalPath(), pw);
+	    store2.importFrom(exported, "LKAJHlkjhH(".toCharArray());
 	    assertEquals(store.get(0), store2.get(0));
 	} finally {
 	    exported.delete();
@@ -178,7 +179,8 @@ public class CertificateStore1Test extends CertificateBaseTest {
 	
 	// now try to import
 	CertificateStore certstore2 = new CertificateStore(newTestStore(0));
-	CertificatePair cert2 = certstore2.importFrom(dst, pw, pw);
+	PasswordCache.getInstance().set(dst.getCanonicalPath(), pw);
+	CertificatePair cert2 = certstore2.importFrom(dst, null);
 	assertEquals(cert2, cert);
     }
 }

@@ -92,7 +92,7 @@ public class ActionExport extends CertificateAction {
      * 
      * @param e originating event
      * @param f File to export to
-     * @param pw password to use, or {@code null} to use private key passwqord
+     * @param pw password to use, or {@code null} to use private key password
      */
     public void doExport(ActionEvent e, File f, char[] pw) {
 	CertificatePair cert = getCertificatePair();
@@ -107,7 +107,7 @@ public class ActionExport extends CertificateAction {
 	}
     }
     
-    protected JPanel customFileChooser(final JDialog dlg, final JFileChooser chooser, final Action action) {
+    protected static JPanel customFileChooser(final JDialog dlg, final JFileChooser chooser, final Action action) {
 	Insets insets = ((EmptyBorder)chooser.getBorder()).getBorderInsets();
 	// disable buttons because we'll roll our own
 	chooser.setControlButtonsAreShown(false);

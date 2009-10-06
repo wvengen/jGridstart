@@ -406,14 +406,14 @@ public class CertificatePair extends Properties implements ItemSelectable {
     /** Import a {@linkplain CertificatePair} from a keystore into a (new) directory.
      * 
      * @param src File to import from
-     * @param srcpw password for import, or {@code null} to ask the user
      * @param dst Directory to import into. On success, this directory could be
      *            passed later to create a new CertificatePair which is equal to
      *            the one returned by this method.
-     * @param dstpw password to use for private key storage, or {@code null} to ask the user
+     * @param dstpw password to use for private key storage, or {@code null} to use
+     *            same password as import password
      * @return a new CertificatePair representing the newly imported pair.
      */
-    static public CertificatePair importFrom(File src, char[] srcpw, File dst, char[] dstpw)
+    static public CertificatePair importFrom(File src, File dst, char[] dstpw)
 	    throws IOException, PasswordCancelledException, CertificateCheckException, GeneralSecurityException {
 
 	if (src==null || src.getName()==null)
@@ -434,10 +434,10 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    cert.importFromDirectory(src);
 	    cert.check(false); // private key is not decrypted here
 	} else 	if (ext.equals("p12") || ext.equals("pfx")) {
-	    cert.importFromPKCS(src, srcpw, dstpw);
+	    cert.importFromPKCS(src, dstpw);
 	    cert.check(true); // needed password at import, so check privkey as well
 	} else if (ext.equals("pem")) {
-	    cert.importFromPEM(src, srcpw, dstpw);
+	    cert.importFromPEM(src, dstpw);
 	    cert.check(true); // as above
 	} else {
 	    throw new IOException("Cannot determine format to import from, unknown file extension: "+ext);
@@ -457,7 +457,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      */
     static public CertificatePair importFrom(File src, File dst)
     	     throws IOException, PasswordCancelledException, CertificateCheckException, GeneralSecurityException {
-	return importFrom(src, null, dst, null);
+	return importFrom(src,dst, null);
     }
     
     /** Import key and certificate from a PEM file.
@@ -466,13 +466,11 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * 
      * @param src PEM file to import from
      */
-    protected void importFromPEM(File src, char[] srcpw, char[] dstpw)
+    protected void importFromPEM(File src, char[] dstpw)
     		throws IOException, CertificateCheckException, NoSuchAlgorithmException, PasswordCancelledException {
 	int count = 0;
 	logger.finer("Trying to import certificate from PEM file: "+src);
-	// set source password if given
-	if (srcpw!=null)
-	    PasswordCache.getInstance().set(src.getCanonicalPath(), srcpw);
+	// set destination password if given
 	if (dstpw!=null)
 	    PasswordCache.getInstance().set(getKeyFile().getCanonicalPath(), dstpw);
 	// process all items in the file
@@ -485,7 +483,14 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		// Extract and write private key
 		if (((KeyPair) o).getPrivate() != null) {
 		    PrivateKey privKey = ((KeyPair) o).getPrivate();
-		    PEMWriter.writeObject(getKeyFile(), privKey, "private key for "+getPath().getName());
+		    // now import file private key password was got, so we can use that for export
+		    // when required
+		    String msg = "private key for "+getPath().getName();
+		    if (dstpw==null)
+			PasswordCache.getInstance().set(getKeyFile().getCanonicalPath(),
+				PasswordCache.getInstance().getForDecrypt(msg, src.getCanonicalPath()));
+		    // and write private key
+		    PEMWriter.writeObject(getKeyFile(), privKey, msg);
 		}
 	    } else if (o instanceof X509Certificate) {
 		// Extract and write certificate
@@ -509,18 +514,14 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * If multiple key/certificate entries are found, only the first one is
      * imported.
      * 
-     * @param src
-     * @param srcpw
-     * @param dstpw
+     * @param src file to import from
+     * @param dstpw password for new private keym or {@code null} to use same as import password
      */
-    protected void importFromPKCS(File src, char[] srcpw, char[] dstpw)
+    protected void importFromPKCS(File src, char[] dstpw)
     		throws IOException, PasswordCancelledException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 	PasswordCache pwcache = PasswordCache.getInstance();
 	String storename = "PKCS#12 store " + src.getName();
 	KeyStore store = PKCS12KeyStoreUnlimited.getInstance();
-	// set source password if given
-	if (srcpw!=null)
-	    PasswordCache.getInstance().set(src.getCanonicalPath(), srcpw);
 	// now try until success or cancel
 	boolean loaded = false;
 	for (int i=0; i<3; i++) {
@@ -529,6 +530,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		char[] pw = pwcache.getForDecrypt(storename, src.getCanonicalPath());
 		store.load(in, pw);
 		loaded = true;
+		if (dstpw==null) dstpw = pw;
 	    } catch(IOException e) {
 		if (e.getLocalizedMessage().contains("wrong password")) {
 		    // if bad password, invalidate and ask again
@@ -543,7 +545,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 
 	if (!loaded || store.size() == 0)
 	    throw new IOException("Not a PKCS#12 file: " + src);
-
+	
 	logger.finer("Importing certificate from PKCS#12 file: "+src);
 
 	for (Enumeration<String> it = store.aliases(); it.hasMoreElements(); ) {
