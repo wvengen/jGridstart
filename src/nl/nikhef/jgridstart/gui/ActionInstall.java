@@ -45,12 +45,9 @@ public class ActionInstall extends CertificateAction {
 	try {
 	    // parse arguments
 	    boolean silent = false;	// whether to silently install or inform user
-	    char[] pw = null;		// password to use
 	    String[] args = e.getActionCommand().split(",\\s*");
 	    for (int i=0; i<args.length; i++) {
-		if (args[i].startsWith("password="))
-		    pw = args[i].substring(9).toCharArray();
-		else if (args[i].equals("silent"))
+		if (args[i].equals("silent"))
 		    silent = true;
 	    }
 

@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -28,21 +26,13 @@ import javax.mail.internet.MimeMultipart;
 
 import nl.nikhef.jgridstart.util.ConnectionUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
-import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.mail.smime.SMIMEException;
 import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
-import org.bouncycastle.util.Strings;
 import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.x509.NoSuchStoreException;
-import org.bouncycastle.x509.X509CollectionStoreParameters;
-import org.bouncycastle.x509.X509Store;
-
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.StringStack;
 
 /**
  * This class is used interface with the DutchGrid production CA

@@ -67,7 +67,7 @@ public interface CA {
      * is stored for reference later (and uploading later in case of a
      * connection problem!), the signed request needs to be stored. That is
      * why a string is returned, which is the signed certificate request.
-     * This is passed later to {@link #uploadCertificationRequest(String, info)}.
+     * This is passed later to {@link #uploadCertificationRequest}.
      * <p>
      * Note that it is only called in case of a certificate renewal, otherwise
      * it should be omitted.
@@ -93,7 +93,7 @@ public interface CA {
      * 
      * @param req certification signing request
      * @param info extra information that may be sent with the request (implementation-dependant)
-     * @return certificate signing request serial number
+     * @returns certificate signing request serial number
      * @throws IOException 
      */
     public void uploadCertificationRequest(String req, Properties info) throws IOException;

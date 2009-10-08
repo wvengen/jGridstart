@@ -9,7 +9,6 @@ import org.junit.Test;
 import junit.framework.TestCase;
 
 import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
-import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
 public class CertificateCheckTest extends TestCase {

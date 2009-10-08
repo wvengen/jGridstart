@@ -15,7 +15,6 @@ import java.security.cert.X509Certificate;
 import nl.nikhef.jgridstart.util.ConnectionUtils;
 
 import org.bouncycastle.jce.PKCS10CertificationRequest;
-import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
 
@@ -64,7 +63,7 @@ public class TestCA implements CA {
      * 
      * @param req {@inheritDoc} request returned by encode/sign
      * @param info {@inheritDoc}; {@code email} and {@code fullname} are used here
-     * @return {@inheritDoc}
+     * @returns {@inheritDoc}
      */
     public void uploadCertificationRequest(String req, Properties info) throws IOException {
 	String[] postdata = {

@@ -9,7 +9,6 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
 import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
