@@ -193,6 +193,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	    if (key.equals("cert"))
 		if (getCertificate()==null) return null;
 		else return "true";
+	    if (key.equals("cert.serial"))
+		if (getCertificate()==null) return null;
+		else return getCertificate().getSerialNumber().toString();
 	    if (key.equals("request"))
 		if (!getCSRFile().exists()) return null;
 		else return "true";

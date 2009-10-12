@@ -42,9 +42,9 @@
 			<th class="issuer"><label>Issuer</label></th>
 			<td class="issuer" c="${issuer.cn}"></td>
 		</tr>
-		<tr if="${cert.sn}">
+		<tr if="${cert.serial}">
 			<th class="serial"><label>Serial</label></th>
-			<td class="serial"><a href="https://ca.dutchgrid.nl/medium/query/?id=${cert.sn}" c="${cert.sn}"></a></td>
+			<td class="serial" c="${cert.serial}"></td>
 		</tr>
 		<tr>
 			<th class="validity"><label>Valid</label></th>
