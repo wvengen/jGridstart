@@ -46,10 +46,18 @@ public class ActionViewCertificateList extends AbstractAction {
     
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
-	if (e.getActionCommand()!=null)
-	    isSelected = Boolean.valueOf(e.getActionCommand());
-	else
-	    isSelected = !isSelected;
+	boolean localIsSelected = !isSelected;
+	// parse argument, if any
+	if (e.getActionCommand()!=null) {
+	    String[] args = e.getActionCommand().split(",\\s*");
+	    for (int i=0; i<args.length; i++) {
+		if (args[i].equals("true"))
+		    localIsSelected = true;
+		if (args[i].equals("false"))
+		    localIsSelected = false;
+	    }
+	}
+	isSelected = localIsSelected;
 	c.setVisible(isSelected);
 	// need to relayout
 	parent.validate();
