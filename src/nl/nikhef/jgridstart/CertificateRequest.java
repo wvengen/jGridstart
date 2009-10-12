@@ -130,5 +130,10 @@ public class CertificateRequest {
 	    p.setProperty("fullname", p.getProperty("subject.cn"));
 	    p.setProperty("fullname.lock", "true");
 	}
+	
+	// make sure we have an organisation defined
+	// since properties can be copied later, it needs to
+	// be explicitely defined to renewals
+	p.setProperty("org", p.getProperty("org"));
     }
 }
