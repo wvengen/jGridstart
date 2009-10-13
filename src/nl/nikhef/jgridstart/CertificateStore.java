@@ -196,6 +196,10 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	if (dst.exists())
 	    throw new IOException("Maximum number of certificates reached"); // very unlikely
 	dst.mkdirs();
+	if (!dst.exists())
+	    throw new IOException("Could not create new certificate directory: " +
+		    dst + ".\n" +
+		    "Please check permissions, disk space and quota.");
 	return dst;
     }
     
@@ -244,9 +248,13 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	File[] items = certPath.listFiles();
 	for (int i=0; i<items.length; i++)
 	    if (!items[i].delete())
-		throw new IOException("Could not remove file: "+items[i]);
+		throw new IOException("Could not remove file: " +
+			items[i] + ".\n" +
+			"Please check permissions, disk space and quota.");
 	if (!certPath.delete())
-	    throw new IOException("Could not remove certificate directory "+certPath); 
+	    throw new IOException("Could not remove certificate directory " + 
+		    certPath + ".\n" +
+		    "Please check permissions, disk space and quota."); 
     }
     public CertificatePair delete(CertificatePair cert) throws IOException {
 	return delete(indexOf(cert));
