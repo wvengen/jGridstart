@@ -134,7 +134,8 @@ public class PasswordCache {
 	    JOptionPane pane = new JOptionPane();
 	    pane.setMessageType(JOptionPane.PLAIN_MESSAGE);
 	    pane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
-	    JLabel lbl = new JLabel("Enter password to unlock "+msg);
+	    msg = msg.replace("\n", "<br>");
+	    JLabel lbl = new JLabel("<html><body>Enter password to unlock "+msg+"</body></html>");
 	    final JPasswordField pass = new JPasswordField(25);
 	    pane.setMessage(new Object[] {lbl, pass});
 	    JDialog dialog = pane.createDialog(parent, "Enter password");
@@ -188,7 +189,8 @@ public class PasswordCache {
 	JOptionPane pane = new JOptionPane();
 	pane.setMessageType(JOptionPane.PLAIN_MESSAGE);
 	pane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
-	JLabel lbl1 = new JLabel("Enter password for saving "+msg+".");
+	msg = msg.replace("\n", "<br>");
+	JLabel lbl1 = new JLabel("<html><body>Enter password for saving "+msg+".</body></html>");
 	JLabel lbl2 = new JLabel("Please enter the same password and avoid mistakes.");
 	JLabel lbl3 = new JLabel("<html><body><i>passwords don't match, try again.</i></body></html>");
 	final JPasswordField pass1 = new JPasswordField(25);
@@ -348,8 +350,10 @@ public class PasswordCache {
 	// Since readPEM "throws IOException" the specific information
 	// that it might have been a PasswordException is lost :(
 	// So now I have to parse the message string ...
-	return e.getMessage().contains("org.bouncycastle.openssl.PasswordException") &&
-	       e.getMessage().contains("wrong password");
+	return ( e.getMessage().contains("org.bouncycastle.openssl.PasswordException") &&
+	         e.getMessage().contains("wrong password")) ||
+	       ( e.getMessage().contains("org.bouncycastle.openssl.EncryptionException") &&
+		 e.getMessage().contains("check password") );
     }
     /** TODO document */
     public static boolean isPasswordNotSuppliedException(Exception e) {
