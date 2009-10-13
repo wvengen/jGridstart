@@ -318,6 +318,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    data().setProperty("password1.lock", "true");
 	    data().setProperty("password2.lock.volatile", "true");
 	    data().setProperty("password2.lock", "true");
+	    data().setProperty("wizard.parentpass.lock.volatile", "true");
+	    data().setProperty("wizard.parentpass.lock", "true");
 	}
 	if (curPage==0 && cert!=null && Boolean.valueOf(cert.getProperty("request.submitted"))) {
 	    data().setProperty("agreecps.lock", "true");
