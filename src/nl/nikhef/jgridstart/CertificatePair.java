@@ -62,6 +62,7 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PasswordFinder;
 
 /** Class containing everything related to a grid certificate.
  * <p>
@@ -882,12 +883,30 @@ public class CertificatePair extends Properties implements ItemSelectable {
     /** Return the decrypted private key.
      * <p>
      * The decryption password is requested from the user when required
-     * using {@link PasswordCache}. 
+     * using {@link PasswordCache}. When the password is incorrect, the user is
+     * asked the password up to three times, after which a exception is thrown. 
      * 
      * @throws IOException 
      * @throws PasswordCancelledException */
     protected PrivateKey getPrivateKey() throws IOException, PasswordCancelledException {
-	return ((KeyPair)PEMReader.readObject(getKeyFile(), KeyPair.class, "private key")).getPrivate();
+	PrivateKey key = null;
+	final String srcmsg = "private key";
+	String msg = srcmsg;
+	
+	while(key == null) {
+	    try {
+		key = ((KeyPair)PEMReader.readObject(getKeyFile(), KeyPair.class, msg)).getPrivate();
+	    } catch (IOException e) {
+		if (!PasswordCache.isPasswordWrongException(e))
+		    throw e;
+		// invalidate old entry if error is wrong password
+		PasswordCache.getInstance().invalidate(getKeyFile().getCanonicalPath());
+		msg = srcmsg + ", please try again.\n" +
+		      "(there is a small chance that the data is corrupted)";
+	    }
+	}
+
+	return key;
     }
     
     /** Return the certificate.
