@@ -38,7 +38,7 @@ public class PasswordGenerator {
     public static char[] generateRandom(int length)
     		throws NoSuchAlgorithmException, NoSuchProviderException {
 	init();
-	char[] pw = new char[7]; // TODO Illegal key size exception if larger password :(
+	char[] pw = new char[length];
 	for (int i=0; i<pw.length; i++) pw[i] = (char)(ran.nextInt(128-32)+32);
 	return pw;
     }
