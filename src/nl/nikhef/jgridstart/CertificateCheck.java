@@ -164,7 +164,6 @@ public class CertificateCheck {
     protected void checkPrivateKeyDecryptValid() throws CertificateCheckException {
 	try {
 	    cert.getPrivateKey();
-	} catch (PasswordCancelledException e) {
 	} catch (IOException e) {
 	    throw new CertificateCheckException(e);
 	}

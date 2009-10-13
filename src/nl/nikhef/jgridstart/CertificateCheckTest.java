@@ -13,6 +13,11 @@ import nl.nikhef.jgridstart.util.PasswordCache;
 
 public class CertificateCheckTest extends TestCase {
     
+    @Override
+    public void setUp() {
+	PasswordCache.getInstance().setUI(PasswordCache.UI_NONE);
+    }
+    
     /** Helper method: get {@linkplain File} for test number */
     protected static File getResourceFile(String name) throws IOException {
 	try {
@@ -41,7 +46,7 @@ public class CertificateCheckTest extends TestCase {
 	    check.checkPrivate();
 	}
 	// private key check with random password should fail
-	SecureRandom random;
+	final SecureRandom random;
 	try {
 	    random = SecureRandom.getInstance("SHA1PRNG", "SUN");
 	} catch (Exception e) { throw new IOException(e.getLocalizedMessage()); }
