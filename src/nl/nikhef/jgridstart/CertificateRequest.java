@@ -40,6 +40,8 @@ public class CertificateRequest {
 		if (!p.containsKey(name))
 		    p.setProperty(name, value);
 	    }
+	    // this is a renewal
+	    p.setProperty("renewal", Boolean.toString(true));
 	}
 	// read defaults from system properties
 	for (Enumeration<?> it = System.getProperties().propertyNames(); it.hasMoreElements(); ) {

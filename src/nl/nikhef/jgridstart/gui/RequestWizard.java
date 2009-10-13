@@ -1,5 +1,6 @@
 package nl.nikhef.jgridstart.gui;
 
+import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -28,6 +29,7 @@ import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.install.BrowserFactory;
 import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
+import nl.nikhef.jgridstart.util.PEMReader;
 import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
@@ -202,6 +204,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	// make sure to keep the password safe
 	data().setProperty("password1.volatile", "true");
 	data().setProperty("password2.volatile", "true");
+	data().setProperty("wizard.parentpass.volatile", "true");
 	data().setProperty("wizard.privkeypass.volatile", "true");
     }
     
@@ -252,6 +255,29 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    return false;
 		}
 	    }
+	    
+	    // for renewal make sure private key password is ok
+	    if (isRenewal()) {
+		// try to read private key and decrypt
+		Cursor oldCursor = getCursor();
+		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		try {
+		    PasswordCache.getInstance().set(
+			certParent.getKeyFile().getCanonicalPath(), 
+			data().getProperty("wizard.parentpass").toCharArray());
+		    PEMReader.readObject(certParent.getKeyFile(), "private key");
+		    setCursor(oldCursor);
+		} catch (Exception e) {
+		    setCursor(oldCursor);
+		    if (PasswordCache.isPasswordWrongException(e)) {
+			JOptionPane.showMessageDialog(this,
+				"Please correct the password of your current certificate key.",
+				"Wrong key password", JOptionPane.ERROR_MESSAGE);
+			return false;
+		    }
+		    ErrorMessage.error(this, "Couldn't read private key", e);
+		}
+	    }
 	}
 	
 	// set organisation info if not present
@@ -267,6 +293,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    data().remove("wizard.error.volatile");
 	    data().remove("wizard.privkeypass");
 	    data().remove("wizard.privkeypass.volatile");
+	    data().remove("wizard.parentpass");
+	    data().remove("wizard.parentpass.volatile");
 	}
 	
 	// ok!
@@ -286,10 +314,10 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	
 	// lock password fields on first page when key is present
 	if (curPage==0 && cert!=null && cert.getKeyFile().exists()) {
-	    data().setProperty("password1.lock", "true");
 	    data().setProperty("password1.lock.volatile", "true");
-	    data().setProperty("password2.lock", "true");
+	    data().setProperty("password1.lock", "true");
 	    data().setProperty("password2.lock.volatile", "true");
+	    data().setProperty("password2.lock", "true");
 	}
 	if (curPage==0 && cert!=null && Boolean.valueOf(cert.getProperty("request.submitted"))) {
 	    data().setProperty("agreecps.lock", "true");
@@ -345,8 +373,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		Properties p = BrowserFactory.getInstance().getBrowserProperties(browserid);
 		for (Enumeration<?> en = p.propertyNames(); en.hasMoreElements(); ) {
 		    String key = (String)en.nextElement();
-		    data().setProperty("install.browser."+key, p.getProperty(key));
 		    data().setProperty("install.browser."+key+".volatile", "true");
+		    data().setProperty("install.browser."+key, p.getProperty(key));
 		}
 	    } catch (IOException e) {
 		// no browser info, handled in html by !${install.browser*}

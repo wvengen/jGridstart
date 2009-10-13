@@ -45,9 +45,18 @@
 		    <input id="level-demo" name="level" value="demo" type="radio"/>
 					<label for="level-demo">Demo</label></td>
 	</tr>
+	<tr if="${renewal}">
+		<td colspan="2" class="legend">
+			Please enter the password of your current certificate key.
+		</td>
+	</tr>
+	<tr if="${renewal}">
+		<th><label for="parentpass">Password</label></th>
+		<td><input id="parentpass" name="wizard.parentpass" type="password" size="25"/></td>
+	</tr>
 	<tr>
 		<td colspan="2" class="legend">
-			<span if="${renewal}">You need to choose a password for your new key.<br/></span>
+			<span if="${renewal}">You need to choose a password for your new key.</span>
 			Your personal key is generated together with the request, and needs
 			to remain private to you only. Please choose your password carefully; it must not 
 			be easy to guess, but you need to remember it.
