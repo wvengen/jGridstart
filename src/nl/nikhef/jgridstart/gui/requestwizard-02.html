@@ -19,13 +19,11 @@
     <p if="!${wizard.error}">Please wait while your request is being submitted...</p>
 
 	<p if="${wizard.error}" class="info-bad">Submission failed.</p>
-	<p if="${wizard.error} and ${wizard.error[102:132]}=='You need to agree to the privacy policy'">
-		You need to agree to the privacy policy. Please go back, mark the checkbox, and try again.
-	</p>
 	<p if="${wizard.error}" class="info-detail" c="${wizard.error}"/>
-	<p if="${wizard.error}">When the issue is solved, you will need to
-	  submit your request again. In the meantime, feel free to continue with
-	  the next step.</p>
+	<p if="${wizard.error}">When the issue is solved, you will need to go back and
+	  submit your request again.
+	  <span if="!${renewal}">In the meantime, feel free to continue with the next step.</span>
+	</p>
 	
   </div>
 
@@ -40,10 +38,12 @@
   Your certificate is present already, it is not necessary to submit a request.
 </p>
 
-<a class="helpbutton" href="action:toggle(wizard.show.more1)">(more)</a>
-<div class="help" if="${wizard.show.more1}">
-	This key <span if="${request}">and request</span> <span if="${cert}">and certificate</span>
-	are located on your disk in <tt c="${path}"/>
+<div if="${path}">
+	<a class="helpbutton" href="action:toggle(wizard.show.more1)">(more)</a>
+	<div class="help" if="${wizard.show.more1}">
+		This key <span if="${request}">and request</span> <span if="${cert}">and certificate</span>
+		are located on your disk in <tt c="${path}"/>
+	</div>
 </div>
 
 </div>

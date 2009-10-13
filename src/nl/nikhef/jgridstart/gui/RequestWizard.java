@@ -96,7 +96,11 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     }
     /** Return whether we have a renewal or not */
     protected boolean isRenewal() {
-	return certParent != null;
+	// fastest,
+	if (certParent!=null)
+	    return true;
+	// but certParent not available if request of renewal is shown, so fallback here
+	return Boolean.valueOf(data().getProperty("renewal"));
     }
     
     /** Set the current step to the one that is relevant for the process. */
@@ -327,10 +331,12 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	}
 	
 	// say "Close" when a certificate is present because everything is done by then
-	// TODO this won't work for renewals
 	try {
 	    if (cert!=null && cert.getCertificate()!=null)
 		cancelAction.putValue(AbstractAction.NAME, "Close");
+	    // renewal requires this step; worker enables it again	    
+	    else if (curPage==1 && isRenewal() && !Boolean.valueOf(""))
+		nextAction.setEnabled(false);
 	} catch (IOException e) { }
 
 	if ((curPage==1 || curPage==3) && curPage!=oldPage) {
@@ -484,7 +490,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    }
 		}
 		// make sure gui is updated and user can continue
-		if (step==1) publish("state.cancontinue");
+		if (step==1 && (!isRenewal() || Boolean.valueOf(cert.getProperty("request.submitted"))))
+		    publish("state.cancontinue");
 		// update downloadable status
 		if (!Boolean.valueOf(cert.getProperty("request.processed"))) {
 		    cert.isCertificationRequestProcessed();
@@ -519,15 +526,25 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		if (key==null) continue;
 		// process cancel
 		if (key.equals("state.cancelled")) {
-		    if (e!=null) {
-			if (useErrordlg) {
-			    ErrorMessage.error(RequestWizard.this, "Error during request", e);
-			    setStepRelative(-1);
-			} else {
-			    data().setProperty("wizard.error", e.getLocalizedMessage());
-			    data().setProperty("wizard.error.volatile", "true");
-			    refresh();
-			}
+		    // if user cancelled, go back one step
+		    if (e==null || PasswordCache.isPasswordCancelledException(e)) {
+			setStepRelative(-1);
+			
+		    } else {
+			// we need an exception
+			Exception localexp = e;
+			if (localexp.getMessage()==null)
+			    localexp = new Exception("Unknown error. Please go back and try again.");
+
+			// either show with dialog or error message in pane
+		    	if (useErrordlg) {
+		    	    ErrorMessage.error(RequestWizard.this, "Error during request", localexp);
+		    	    setStepRelative(-1);
+		    	} else {
+		    	    data().setProperty("wizard.error", localexp.getLocalizedMessage());
+		    	    data().setProperty("wizard.error.volatile", "true");
+		    	    refresh();
+		    	}
 		    }
 		    return;
 		}

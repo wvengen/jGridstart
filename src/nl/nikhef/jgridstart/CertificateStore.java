@@ -322,6 +322,12 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	} catch(IOException e) {
 	    deletePath(dst);
 	    throw e;
+	} catch(GeneralSecurityException e) {
+	    deletePath(dst);
+	    throw e;
+	} catch(CAException e) {
+	    deletePath(dst);
+	    throw e;
 	}
     }
     /** Renew a certificate with preset password
@@ -338,14 +344,21 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	
 	// generate request
 	CertificatePair newCert = generateRequest(oldCert, pw);
-	newCert.setProperty("renewal", "true");
-	newCert.setProperty("renewal.parent.path", oldCert.getProperty("path"));
-	newCert.setProperty("renewal.parent.modulus", oldCert.getProperty("modulus"));
-	
-	// and store it as new CSR
-	FileUtils.writeFile(newCert.getCSRFile(),
-		newCert.getCA().signCertificationRequest(newCert.getCSR(), newCert,
-			oldKey, oldCert.getCertificate()));
+	try {
+	    newCert.setProperty("renewal", "true");
+	    newCert.setProperty("renewal.parent.path", oldCert.getProperty("path"));
+	    newCert.setProperty("renewal.parent.modulus", oldCert.getProperty("modulus"));
+
+	    // and store it as new CSR
+	    FileUtils.writeFile(newCert.getCSRFile(),
+		    newCert.getCA().signCertificationRequest(newCert.getCSR(), newCert,
+			    oldKey, oldCert.getCertificate()));
+
+	} catch (IOException e) {
+	    remove(newCert);
+	    deletePath(newCert.path);
+	    throw e;
+	}
 	
 	return newCert;
     }
