@@ -893,7 +893,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	final String srcmsg = "private key";
 	String msg = srcmsg;
 	
-	while(key == null) {
+	for (int i=0; i<3 && key==null; i++) {
 	    try {
 		key = ((KeyPair)PEMReader.readObject(getKeyFile(), KeyPair.class, msg)).getPrivate();
 	    } catch (IOException e) {
