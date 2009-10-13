@@ -143,14 +143,10 @@ public class GUIScreenshotsTest {
 	    tester.keyString("\t");
 	    tester.keyString(password+"\t");
 	    tester.keyString(password+"\t");
+	    tester.keyString(password+"\t");
 	    // wait for submission screen
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
-	    // password dialog
-	    Thread.sleep(2000);
-	    guiSleep();
-	    saveScreenshot(new File(shotdir, prefix+"renew03.png"));
-	    tester.keyString("\t\t"); // update when passwordcache dialog focuses proper field
-	    tester.keyString(password+"\n");
+	    // renew03.png used to be a password dialog, which was removed
 	    // submit page
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew04.png"));
