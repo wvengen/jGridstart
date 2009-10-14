@@ -155,7 +155,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		if (uri.startsWith("action:"))
 		    selection.setSelection(cert);
 		// hook for install step to set private key password from form before action
-		if (data().getProperty("wizard.privkeypass")!=null) {
+		if (uri.startsWith("action:install") && data().getProperty("wizard.privkeypass")!=null) {
 		    char[] pw = data().getProperty("wizard.privkeypass").toCharArray();
 		    assert(cert!=null);
 		    // check that password is ok to avoid confusion for user
