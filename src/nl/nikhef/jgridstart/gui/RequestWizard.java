@@ -156,12 +156,24 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    selection.setSelection(cert);
 		// hook for install step to set private key password from form before action
 		if (data().getProperty("wizard.privkeypass")!=null) {
+		    char[] pw = data().getProperty("wizard.privkeypass").toCharArray();
 		    assert(cert!=null);
+		    // check that password is ok to avoid confusion for user
+		    Cursor oldCursor = getCursor();
+		    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		    try {
-			PasswordCache.getInstance().set(cert.getKeyFile().getCanonicalPath(),
-			    data().getProperty("wizard.privkeypass").toCharArray());
-		    } catch (IOException e) {
-			ErrorMessage.internal(getParent(), e);
+			PasswordCache.getInstance().set(cert.getKeyFile().getCanonicalPath(), pw);
+			PEMReader.readObject(cert.getKeyFile(), "private key");
+			setCursor(oldCursor);
+		    } catch (Exception e) {
+			setCursor(oldCursor);
+			if (PasswordCache.isPasswordWrongException(e)) {
+			    JOptionPane.showMessageDialog(RequestWizard.this,
+				    "Please correct your private key password.",
+				    "Wrong key password", JOptionPane.ERROR_MESSAGE);
+			    return;
+			}
+			ErrorMessage.error(RequestWizard.this, "Couldn't read private key", e);
 		    }
 		}
 		// go!
@@ -335,7 +347,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    if (cert!=null && cert.getCertificate()!=null)
 		cancelAction.putValue(AbstractAction.NAME, "Close");
 	    // renewal requires this step; worker enables it again	    
-	    else if (curPage==1 && isRenewal() && !Boolean.valueOf(""))
+	    else if (curPage==1 && isRenewal())
 		nextAction.setEnabled(false);
 	} catch (IOException e) { }
 

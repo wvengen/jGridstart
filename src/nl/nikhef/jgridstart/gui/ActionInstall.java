@@ -57,15 +57,15 @@ public class ActionInstall extends CertificateAction {
 		URLLauncher.performAction("viewrequest(3)", findWindow(e.getSource()));
 		return;
 		
-		// An alternative implementation would be, though the explanation is
-		// a little brief.
+		// An alternative implementation would be (though the explanation is
+		// a little brief):
 		/*
 		String message = 
 		    "You are about to install the selected certificate into your\n" +
 		    "web browser, so that you can access protected websites.\n\n" +
 		    "The installation procedure will ask you for your master password\n" +
 		    "if you have set any. The additional password for importing this\n" +
-		    "certificate is "+String.valueOf(pw)+" and will be copied to the clipboard.";
+		    "certificate is your private key password.";
 		Object [] options = { "Install", "Cancel" };
 		int ret = JOptionPane.showOptionDialog(findWindow(e.getSource()),
 			message,
