@@ -444,7 +444,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     protected class GenerateWorker extends SwingWorker<Void, String> {
 	protected Properties p;
 	/** exception from background thread */
-	protected Exception e = null;
+	protected Throwable e = null;
 	/** current step */
 	protected int step = -1;
 	
@@ -521,7 +521,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    } catch (PasswordCancelledException e) {
 		// special state to go to the previous page
 		publish("state.cancelled");
-	    } catch (Exception e) {
+	    } catch (Throwable e) {
 		// store exception so it can be shown to the user
 		this.e = e;
 		publish("state.cancelled");
@@ -547,7 +547,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 			
 		    } else {
 			// we need an exception
-			Exception localexp = e;
+			Throwable localexp = e;
 			if (localexp.getMessage()==null)
 			    localexp = new Exception("Unknown error. Please go back and try again.");
 
@@ -556,6 +556,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    	    ErrorMessage.error(RequestWizard.this, "Error during request", localexp);
 		    	    setStepRelative(-1);
 		    	} else {
+		    	    ErrorMessage.logException(localexp);
 		    	    data().setProperty("wizard.error", localexp.getLocalizedMessage());
 		    	    data().setProperty("wizard.error.volatile", "true");
 		    	    refresh();

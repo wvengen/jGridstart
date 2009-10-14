@@ -345,7 +345,7 @@ public class PasswordCache {
     }
     
     /** TODO document */
-    public static boolean isPasswordWrongException(Exception e) {
+    public static boolean isPasswordWrongException(Throwable e) {
 	if (e.getMessage()==null) return false;
 	// Since readPEM "throws IOException" the specific information
 	// that it might have been a PasswordException is lost :(
@@ -356,13 +356,13 @@ public class PasswordCache {
 		 e.getMessage().contains("check password") );
     }
     /** TODO document */
-    public static boolean isPasswordNotSuppliedException(Exception e) {
+    public static boolean isPasswordNotSuppliedException(Throwable e) {
 	if (e.getMessage()==null) return false;
 	return e.getMessage().contains("org.bouncycastle.openssl.PasswordException") &&
 	       e.getMessage().contains("No password finder specified, but a password is required");
     }
     /** TODO document */
-    public static boolean isPasswordCancelledException(Exception e) {
+    public static boolean isPasswordCancelledException(Throwable e) {
 	if (e.getMessage()==null) return false;
 	return e.getMessage().contains("Password is null");
     }
