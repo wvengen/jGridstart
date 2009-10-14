@@ -201,6 +201,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		// cannot edit fields for renewal; except email!!!
 		CertificateRequest.postFillDataLock(data());
 		data().setProperty("email.lock", Boolean.toString(false));
+		data().setProperty("agreecps.lock", Boolean.toString(false));
     	    	data().setProperty("wizard.title", "Renew a certificate");
 	    }
 	} else {
@@ -337,7 +338,9 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    data().setProperty("wizard.parentpass.lock.volatile", "true");
 	    data().setProperty("wizard.parentpass.lock", "true");
 	}
-	if (curPage==0 && cert!=null && Boolean.valueOf(cert.getProperty("request.submitted"))) {
+	if (curPage==0 && cert!=null &&
+		(Boolean.valueOf(cert.getProperty("request.submitted")) ||
+		 Boolean.valueOf(cert.getProperty("cert"))) ) {
 	    data().setProperty("agreecps.lock", "true");
 	    data().setProperty("email.lock", "true");
 	}
