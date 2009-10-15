@@ -92,6 +92,10 @@ public class PasswordCache {
     public void setUI(int ui) {
 	this.ui = ui;
     }
+    /** Return the current user-interface backend. */
+    public int getUI() {
+	return this.ui;
+    }
     
     /** Invalidate a cache entry */
     public void invalidate(String loc) {

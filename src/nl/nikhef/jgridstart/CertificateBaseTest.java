@@ -23,6 +23,10 @@ public abstract class CertificateBaseTest extends TestCase {
     private String oldCAProvider = null;
     /** original {@linkplain PasswordCache} status if always want to ask encrypt password */
     private boolean pwcacheAlwaysEncrypt = true;
+    /** original {@linkplain PasswordCache} user-interface provider */
+    int pwcacheOldUI = -1;
+    /** original crypto configuration */
+    String[] oldCryptoConf = null;
     
     @Override
     public void setUp() throws Exception {
@@ -33,6 +37,14 @@ public abstract class CertificateBaseTest extends TestCase {
 	System.setProperty("jgridstart.ca.provider", "LocalCA");
 	// don't ask passwords for testing
 	pwcacheAlwaysEncrypt = PasswordCache.getInstance().setAlwaysAskForEncrypt(false);
+	pwcacheOldUI = PasswordCache.getInstance().getUI();
+	PasswordCache.getInstance().setUI(PasswordCache.UI_NONE);
+	// store crypto configuration
+	oldCryptoConf = new String[] {
+	    System.getProperty("jgridstart.keyalgname"),
+	    System.getProperty("jgridstart.keysize"),
+	    System.getProperty("jgridstart.sigalgname")
+	};
     }
     
     @Override
@@ -46,6 +58,11 @@ public abstract class CertificateBaseTest extends TestCase {
 	    System.setProperty("jgridstart.ca.provider", oldCAProvider);
 	// restore passwordcache settings
 	PasswordCache.getInstance().setAlwaysAskForEncrypt(pwcacheAlwaysEncrypt);
+	PasswordCache.getInstance().setUI(pwcacheOldUI);
+	// restore crypto configuration
+	try { System.setProperty("jgridstart.keyalgname", oldCryptoConf[0]); } catch(NullPointerException e) { }
+	try { System.setProperty("jgridstart.keysize", oldCryptoConf[1]); } catch(NullPointerException e) { }
+	try { System.setProperty("jgridstart.sigalgname", oldCryptoConf[2]); } catch(NullPointerException e) { }
     }
     
     /** Helper method: create new certificate store directory in temp space.
@@ -74,22 +91,50 @@ public abstract class CertificateBaseTest extends TestCase {
      * New key and CSR are generated, and the latter is uploaded using {@link LocalCA}.
      * 
      * @param certPath
+     * @param pw password for new private key
      * @return newly created {@linkplain CertificatePair}
      */
-    protected CertificatePair newTestRequest(File certPath) throws PasswordCancelledException, IOException, GeneralSecurityException, CAException {
-	char[] pw = ("test_password-"+certIndex).toCharArray();
+    protected CertificatePair newTestRequest(File certPath, String pw) throws PasswordCancelledException, IOException, GeneralSecurityException, CAException {
+	if (pw==null)
+	    pw = "test_password-"+certIndex;
 	Properties p = new Properties();
 	p.setProperty("subject", "/O=dutchgrid/O=users/O=nikhef/CN=Test User #" + certIndex++);
 	certPath.mkdirs();
-	CertificatePair cert = CertificatePair.generateRequest(certPath, p, pw);
+	CertificatePair cert = CertificatePair.generateRequest(certPath, p, pw.toCharArray());
 	assertNotNull(cert);
 	assertNotNull(cert.getPrivateKey());
 	assertNotNull(cert.getCSR());
 	assertNull(cert.getCertificate());
 	cert.uploadRequest();
 	return cert;
+    
+    }
+    /** Generate test request, generate password.
+     *
+     *  @see #newTestRequest(File, String)
+     */
+    protected CertificatePair newTestRequest(File certPath) throws PasswordCancelledException, IOException, GeneralSecurityException, CAException {
+	return newTestRequest(certPath, null);
     }
     
+    /** Set the certificate algorithm for new certificates.
+     * 
+     * @param alg Algorithm, either "RSA" or "DSA"
+     */
+    protected void setAlgorithm(String alg) throws GeneralSecurityException {
+	if (alg=="RSA") {
+	    System.setProperty("jgridstart.keyalgname", "RSA");
+	    System.setProperty("jgridstart.keysize", "1024");
+	    System.setProperty("jgridstart.sigalgname", "SHA1WithRSA");
+	} else if (alg=="DSA") {
+	    System.setProperty("jgridstart.keyalgname", "DSA");
+	    System.setProperty("jgridstart.keysize", "1024");
+	    System.setProperty("jgridstart.sigalgname", "SHA1WithDSA");
+	} else {
+	    throw new GeneralSecurityException("Invalid algorithm requested: "+alg);
+	}
+    }
+
     /** Generate test certificate.
      * <p>
      * New key and CSR are generated and the certificate is signed using {@link LocalCA}. 
@@ -97,10 +142,17 @@ public abstract class CertificateBaseTest extends TestCase {
      * @param certPath
      * @return newly created {@linkplain CertificatePair}
      */
-    protected CertificatePair newTestCertificate(File certPath) throws GeneralSecurityException, PasswordCancelledException, IOException, CAException, CertificateCheckException {
-	CertificatePair cert = newTestRequest(certPath);
+    protected CertificatePair newTestCertificate(File certPath, String pw) throws GeneralSecurityException, PasswordCancelledException, IOException, CAException, CertificateCheckException {
+	CertificatePair cert = newTestRequest(certPath, pw);
 	cert.downloadCertificate();
 	assertNotNull(cert.getCertificate());
 	return cert;
     }
+    /** Generate test certificate, generate password.
+    *
+    *  @see #newTestCertificate(File, String)
+    */
+   protected CertificatePair newTestCertificate(File certPath) throws GeneralSecurityException, PasswordCancelledException, IOException, CAException, CertificateCheckException {
+	return newTestCertificate(certPath, null);
+   }
 }

@@ -727,8 +727,14 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	CertificatePair cert = new CertificatePair();
 	cert.path = dst;
 
-	String sigAlgName = "SHA1WithRSA";
-	String keyAlgName = "RSA";
+	String sigAlgName = System.getProperty("jgridstart.sigalgname");
+	if (sigAlgName==null) sigAlgName = "SHA1WithRSA";
+	String keyAlgName = System.getProperty("jgridstart.keyalgname");
+	if (keyAlgName==null) keyAlgName = "RSA";
+	
+	int keysize = 1024;
+	if (System.getProperty("jgridstart.keysize")!=null)
+	    keysize = Integer.valueOf(System.getProperty("jgridstart.keysize"));
 
 	// needs comma-notation, so convert if slash-notation
 	if (subject.trim().startsWith("/"))
@@ -737,7 +743,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 
 	// Generate new key pair
 	KeyPairGenerator keygen = KeyPairGenerator.getInstance(keyAlgName);
-	keygen.initialize(1024);
+	keygen.initialize(keysize);
 	KeyPair keyPair = keygen.genKeyPair();
 	PrivateKey privKey = keyPair.getPrivate();
 	PublicKey pubKey = keyPair.getPublic();
