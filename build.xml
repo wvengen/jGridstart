@@ -117,7 +117,7 @@
 		<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
 		<zipfileset src="${dep.xhtmlrenderer}">
 			<include name="**/*.class"/>
-				<exclude name="**/tool/**"/>
+			<exclude name="**/tool/**"/>
 			<exclude name="**/swt/**"/>
 			<exclude name="**/SWT**"/>
 		</zipfileset>
@@ -127,18 +127,15 @@
 			<exclude name="**/tools/**"/>
 		</zipfileset>
 		<zipfileset src="${dep.winregistry}" includes="**/*.class"/>
-		<!-- iText needs some org.bouncycastle.cms classes but some other classes in this
-		     package reference javax.mail which we don't want to include as well (so that
-		     ProGuard can resolve them). Solution: only include part of the smime package.
-		     In addition to this, certificate renewal also requires S/MIME mail stuff. -->
-		<zipfileset src="${dep.bouncycastle.smime}">
-			<include name="org/bouncycastle/cms/**"/>
-			<include name="org/bouncycastle/mail/smime/*.class/"/>
-			<include name="org/bouncycastle/mail/smime/util/*.class/"/>
-			<include name="org/bouncycastle/mail/smime/handlers/*.class/"/>
-		</zipfileset>
+		<zipfileset src="${dep.bouncycastle.smime}" includes="**/*.class"/>
 		<zipfileset src="${dep.bouncycastle.tsp}" includes="**/*.class"/>
-		<zipfileset src="${dep.javamail}" includes="**/*.class"/>
+		<zipfileset src="${dep.javamail}">
+			<include name="com/sun/mail/handlers/**.class"/>
+			<include name="com/sun/mail/iap/**.class"/>
+			<include name="com/sun/mail/util/**.class"/>
+			<include name="javax/mail/*.class"/>
+			<include name="javax/mail/**/*.class"/>
+		</zipfileset>
 		<zipfileset src="${dep.activation}" includes="**/*.class"/>
 	</resources>
 	
@@ -226,7 +223,7 @@
 	  -->
 	<target name="jar.small" depends="jar.large">
 		<!-- minimize jar file; skipnonpubliclibraryclasses needed for java1.6 -->
-		<proguard obfuscate="false" skipnonpubliclibraryclasses="false">
+		<proguard obfuscate="false" skipnonpubliclibraryclasses="false" verbose="true">
 			<injar file="${dir.dist}/${target.name}.large.jar"/>
 			<outjar file="${dir.dist}/${target.name}.small.jar"/>
 			<libraryjar file="${java.home}/lib/rt.jar"/>
@@ -241,32 +238,31 @@
 			</keepclasseswithmembers>
 			<!-- Somehow xhtmlrenderer classes are stripped too much, this is a workaround. Error e.g.
 			     "Invalid index 2 in LocalVariableTable in class file org/xhtmlrenderer/render/Box" -->
-			<keepclasseswithmembers name="org.xhtmlrenderer.render.Box">
-				<method name="*"/>
-			</keepclasseswithmembers>
-			<keepclasseswithmembers name="org.xhtmlrenderer.swing.NaiveUserAgent">
-				<method name="*"/>
-			</keepclasseswithmembers>
-			<keepclasseswithmembers name="org.xhtmlrenderer.css.**">
-				<method name="*"/>
-			</keepclasseswithmembers>
-			<keepclasseswithmembers name="org.xhtmlrenderer.newtable.**">
-				<method name="*"/>
-			</keepclasseswithmembers>
-			<keepclasseswithmembers name="org.xhtmlrenderer.resource.XMLResource**">
-				<method name="*"/>
-			</keepclasseswithmembers>
+			<keepclasseswithmembers name="org.xhtmlrenderer.render.Box"> <method name="*"/></keepclasseswithmembers>
+			<keepclasseswithmembers name="org.xhtmlrenderer.swing.NaiveUserAgent"> <method name="*"/></keepclasseswithmembers>
+			<keepclasseswithmembers name="org.xhtmlrenderer.css.**"> <method name="*"/></keepclasseswithmembers>
+			<keepclasseswithmembers name="org.xhtmlrenderer.newtable.**"> <method name="*"/></keepclasseswithmembers>
+			<keepclasseswithmembers name="org.xhtmlrenderer.resource.XMLResource**"> <method name="*"/></keepclasseswithmembers>
+			<!-- xhtmlrenderer descriptor classes that proguard warns about otherwise -->
+			<keepclasseswithmembers name="org.xhtmlrenderer.render.**"> <method name="*"/></keepclasseswithmembers>
+			<keepclasseswithmembers name="org.xhtmlrenderer.layout.**"> <method name="*"/></keepclasseswithmembers>
+			<keepclasseswithmembers name="org.xhtmlrenderer.extend.OutputDevice"> <method name="*"/></keepclasseswithmembers>
+			<keepclasseswithmembers name="org.xhtmlrenderer.extend.FontContext"> <method name="*"/></keepclasseswithmembers>
 			<!-- logging is dynamically configured -->
-			<keepclasseswithmembers access="public" name="org.xhtmlrenderer.util.XRSimpleLogFormatter">
-				<method name="*"/>
-			</keepclasseswithmembers>
-			<keepclasseswithmembers access="public" name="org.xhtmlrenderer.util.Configuration">
-				<method name="*"/>
-			</keepclasseswithmembers>
+			<keepclasseswithmembers access="public" name="org.xhtmlrenderer.util.XRSimpleLogFormatter"> <method name="*"/></keepclasseswithmembers>
+			<keepclasseswithmembers access="public" name="org.xhtmlrenderer.util.Configuration"> <method name="*"/></keepclasseswithmembers>
 			<!-- CA class used is set in configfile -->
-			<keepclasseswithmembers name="nl.nikhef.jgridstart.ca.**">
-				<method name="*"/>
-			</keepclasseswithmembers>
+			<keepclasseswithmembers name="nl.nikhef.jgridstart.ca.**"> <method name="*"/></keepclasseswithmembers>
+			<!-- S/MIME does some dynamic loading as well, and the "Invalid index 2 in LocalVariableTable"
+			     error can appear again; disable some optimisations to solve the latter. -->
+			<optimizations filter="!code/simplification/variable,!method/marking/static"/>
+			<keepclasseswithmembers name="com.sun.mail.handlers.**"> <method name="*"/></keepclasseswithmembers>
+			<keepclasseswithmembers name="org.bouncycastle.mail.smime.handlers.**"> <method name="*"/></keepclasseswithmembers>
+			<!-- S/MIME descriptor classes that proguard warns about otherwise -->
+			<keepclasseswithmembers name="javax.activation.DataSource"><method name="*"/></keepclasseswithmembers>
+			<keepclasseswithmembers name="javax.mail.internet.MimePart"> <method name="*"/></keepclasseswithmembers>
+			<keepclasseswithmembers name="javax.mail.internet.MimeBodyPart"> <method name="*"/></keepclasseswithmembers>
+			<keepclasseswithmembers name="javax.activation.ActivationDataFlavor"> <method name="*"/></keepclasseswithmembers>
 		</proguard>
 	</target>
 
@@ -321,6 +317,7 @@
 				<include name="nl/nikhef/jgridstart/install/**"/>
 				<include name="nl/nikhef/jgridstart/util/**"/>
 			</fileset>
+			<zipfileset src="${dep.commons-lang}" includes="**/*.class"/>
 			<zipfileset src="${dep.commons-cli}" includes="**/*.class"/>
 			<zipfileset src="${dep.winregistry}" includes="**/*.class"/>
 		</jar>
