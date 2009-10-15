@@ -355,15 +355,27 @@ public class PasswordCache {
 	       ( e.getMessage().contains("org.bouncycastle.openssl.EncryptionException") &&
 		 e.getMessage().contains("check password") );
     }
+    /** @see #isPasswordWrongException(Throwable) */
+    public static boolean isPasswordWrongException(Exception e) {
+	return isPasswordWrongException((Throwable)e);
+    }
     /** TODO document */
     public static boolean isPasswordNotSuppliedException(Throwable e) {
 	if (e.getMessage()==null) return false;
 	return e.getMessage().contains("org.bouncycastle.openssl.PasswordException") &&
 	       e.getMessage().contains("No password finder specified, but a password is required");
     }
+    /** @see #isPasswordNotSuppliedException(Throwable) */
+    public static boolean isPasswordNotSuppliedException(Exception e) {
+	return isPasswordNotSuppliedException((Throwable)e);
+    }
     /** TODO document */
     public static boolean isPasswordCancelledException(Throwable e) {
 	if (e.getMessage()==null) return false;
 	return e.getMessage().contains("Password is null");
+    }
+    /** @see #isPasswordCancelledException(Throwable) */
+    public static boolean isPasswordCancelledException(Exception e) {
+	return isPasswordCancelledException((Throwable)e);
     }
 }

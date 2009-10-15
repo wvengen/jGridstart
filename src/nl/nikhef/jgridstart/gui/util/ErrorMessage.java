@@ -27,7 +27,7 @@ public class ErrorMessage {
     }
     /** @see #internal(Component, Exception) */
     public static void error(Component parent, String title, Exception e) {
-	error(parent, title, e);
+	error(parent, title, (Throwable)e);
     }
     
     /** show an error to the user. This method is for errors that should
@@ -43,7 +43,7 @@ public class ErrorMessage {
     }
     /** @see #internal(Component, Throwable) */
     public static void internal(Component parent, Exception e) {
-	internal(parent, e);
+	internal(parent, (Throwable)e);
     }
 
     /** show an error to the user. This method is for errors that should
