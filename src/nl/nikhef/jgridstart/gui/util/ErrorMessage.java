@@ -5,8 +5,9 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-/*
- * Small class to present an error message to the user
+/** Uniform way to handle error messages.
+ * <p>
+ * This shows an error dialog to the user, and logs the exception, if any.
  */
 public class ErrorMessage {
     
@@ -24,6 +25,10 @@ public class ErrorMessage {
 	JOptionPane.showMessageDialog(parent, e.getLocalizedMessage(),
 		title, JOptionPane.ERROR_MESSAGE);
     }
+    /** @see #internal(Component, Exception) */
+    public static void error(Component parent, String title, Exception e) {
+	error(parent, title, e);
+    }
     
     /** show an error to the user. This method is for errors that should
      * not occur; the dialog indicates that the user can contact
@@ -33,7 +38,12 @@ public class ErrorMessage {
      * @param e Exception to get information from
      */
     public static void internal(Component parent, Throwable e) {
+	logException(e);
 	internal(parent, e.getLocalizedMessage());
+    }
+    /** @see #internal(Component, Throwable) */
+    public static void internal(Component parent, Exception e) {
+	internal(parent, e);
     }
 
     /** show an error to the user. This method is for errors that should
