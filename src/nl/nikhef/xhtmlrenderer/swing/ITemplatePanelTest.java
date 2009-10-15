@@ -271,12 +271,15 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	Element e = (Element)TemplateDocumentTest.getBody(panel.getDocument()).getFirstChild();
 	assertEquals( FSRGBColor.RED, panel.getSharedContext().getStyle(e).getBackgroundColor());	
     }
-    /** Test if loading a page from a jar works including stylesheet
+    /** Test if loading a page from a jar works including stylesheet.
+     * <p>
+     * Test is skipped if we're run from a jar already.
      * 
      * TODO make sure no exception is thrown down in xhtmlrenderer that is caught internally */
     @Test
     public void testLoadFromJar() throws Exception {
 	String url = getResourceURI("testData6.jar");
+	if (url.startsWith("jar:")) return;
 	url = "jar:"+url+"!/some/path/testData.html";
 	panel = createPanel();
 	panel.setDocument(url);
