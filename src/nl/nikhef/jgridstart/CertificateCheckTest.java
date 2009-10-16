@@ -64,7 +64,8 @@ public class CertificateCheckTest extends CertificateBaseTest {
     /** Helper method: replace random bits in PEM file */
     protected void confusePEM(File f) throws IOException {
 	byte[] pem = FileUtils.readFile(f).getBytes();
-	int startpos = pem.toString().indexOf("\n\n")+2;
+	String sep = System.getProperty("line.separator");
+	int startpos = pem.toString().indexOf(sep+sep)+2;
 	int endpos = pem.toString().indexOf("-----END");
 	for (int i=startpos; i<endpos; i+=18)
 	    if (pem[i]>'A' && pem[i]<'z') pem[i]++;
