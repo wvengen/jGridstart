@@ -138,6 +138,7 @@ public class CertificateCheckTest extends CertificateBaseTest {
 	File tmp2 = new File(tmpBasePath, "testE08-2");
 	File cert1 = newTestCertificate(tmp1, "yayayayayay").getCertFile();
 	File cert2 = newTestCertificate(tmp2, "yayayayayay").getCertFile();
+	cert2.delete(); // for windows
 	cert1.renameTo(cert2);
 	testE(tmp2, "yayayayayay");
     }
@@ -149,6 +150,7 @@ public class CertificateCheckTest extends CertificateBaseTest {
 	File cert1 = newTestCertificate(tmp1, "yayayayayay2").getCertFile();
 	setAlgorithm("RSA");
 	File cert2 = newTestCertificate(tmp2, "yayayayayay2").getCertFile();
+	cert1.delete();
 	cert2.renameTo(cert1);
 	testE(tmp1, "yayayayayay2");
     }
@@ -160,6 +162,7 @@ public class CertificateCheckTest extends CertificateBaseTest {
 	File cert1 = newTestCertificate(tmp1, "yayayayayay3").getCertFile();
 	setAlgorithm("RSA");
 	File cert2 = newTestCertificate(tmp2, "yayayayayay3").getCertFile();
+	cert2.delete();
 	cert1.renameTo(cert2);
 	testE(tmp2, "yayayayayay3");
     }
@@ -170,6 +173,7 @@ public class CertificateCheckTest extends CertificateBaseTest {
 	setAlgorithm("DSA");
 	File cert1 = newTestCertificate(tmp1, "huphup12839218").getCertFile();
 	File cert2 = newTestCertificate(tmp2, "huphup12839218").getCertFile();
+	cert2.delete();
 	cert1.renameTo(cert2);
 	setAlgorithm("RSA");
 	testE(tmp2, "huphup12839218");
