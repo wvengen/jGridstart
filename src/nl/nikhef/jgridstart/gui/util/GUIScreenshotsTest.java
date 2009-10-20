@@ -29,7 +29,7 @@ public class GUIScreenshotsTest {
     protected static ComponentTester tester = new ComponentTester();
     
     /** password used for test certificate */
-    protected static String password = "test123_pass#";
+    protected static String password = "test123pass";
     
     public static void main(String[] args) throws Exception {
 	// screenshot output directory
