@@ -22,8 +22,9 @@ public class ErrorMessage {
      */
     public static void error(Component parent, String title, Throwable e) {
 	logException(e);
-	JOptionPane.showMessageDialog(parent, e.getLocalizedMessage(),
-		title, JOptionPane.ERROR_MESSAGE);
+	String msg = e.getLocalizedMessage();
+	if (msg==null || msg=="") msg = "Unknown error";
+	JOptionPane.showMessageDialog(parent, msg, title, JOptionPane.ERROR_MESSAGE);
     }
     /** @see #internal(Component, Exception) */
     public static void error(Component parent, String title, Exception e) {
