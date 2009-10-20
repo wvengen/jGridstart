@@ -23,6 +23,8 @@ public abstract class CertificateBaseTest extends TestCase {
     private String oldCAProvider = null;
     /** original {@linkplain PasswordCache} status if always want to ask encrypt password */
     private boolean pwcacheAlwaysEncrypt = true;
+    /** original {@linkplain PasswordCache} password timeout */
+    private int pwcacheOldTimeout = -1;
     /** original {@linkplain PasswordCache} user-interface provider */
     int pwcacheOldUI = -1;
     /** original crypto configuration */
@@ -36,6 +38,8 @@ public abstract class CertificateBaseTest extends TestCase {
 	oldCAProvider = System.getProperty("jgridstart.ca.provider");
 	System.setProperty("jgridstart.ca.provider", "LocalCA");
 	// don't ask passwords for testing
+	pwcacheOldTimeout = PasswordCache.getInstance().getTimeout(); 
+	PasswordCache.getInstance().setTimeout(-1);
 	pwcacheAlwaysEncrypt = PasswordCache.getInstance().setAlwaysAskForEncrypt(false);
 	pwcacheOldUI = PasswordCache.getInstance().getUI();
 	PasswordCache.getInstance().setUI(PasswordCache.UI_NONE);
@@ -57,6 +61,7 @@ public abstract class CertificateBaseTest extends TestCase {
 	else
 	    System.setProperty("jgridstart.ca.provider", oldCAProvider);
 	// restore passwordcache settings
+	PasswordCache.getInstance().setTimeout(pwcacheOldTimeout);
 	PasswordCache.getInstance().setAlwaysAskForEncrypt(pwcacheAlwaysEncrypt);
 	PasswordCache.getInstance().setUI(pwcacheOldUI);
 	// restore crypto configuration

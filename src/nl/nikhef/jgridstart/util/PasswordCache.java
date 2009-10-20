@@ -76,7 +76,7 @@ public class PasswordCache {
      * <p>
      * Also updates timeout of currently stored passwords.
      * 
-     * @param s timeout in number of seconds
+     * @param s timeout in number of seconds, or <0 to keep forever
      */
     public void setTimeout(int s) {
 	this.timeout = s;
@@ -85,6 +85,12 @@ public class PasswordCache {
 	    touch(it.next());
 	}
     }
+    /** Return the current password timeout.
+     * @see #setTimeout */
+    public int getTimeout() {
+	return this.timeout;
+    }
+
     /** Set the user-interface backend.
      * 
      * @param ui One of UI_NONE, UI_GUI and UI_CLI
@@ -255,7 +261,7 @@ public class PasswordCache {
 	    timers.get(loc).cancel();
 	    timers.remove(loc);
 	}
-	new ForgetTask(loc);
+	if (timeout>0) new ForgetTask(loc);
     }
     
     /** Set whether or not to always ask a password for encryption. Usually
