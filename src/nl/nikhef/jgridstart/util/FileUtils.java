@@ -86,16 +86,21 @@ public class FileUtils {
 		cmd = new String[]{"xcopy.exe",
 		    in.getAbsolutePath(),
 		    out.getAbsolutePath(),
-		    "/O", "/Q", "/Y"};
+		    "/O", // copy file ownership and ACL information
+		    "/Q", // be quiet
+		    "/H", // copy hidden and system files also
+		    "/K", // copy attributes, normally xcopy will reset readonly attr
+		    "/Y"};// suppress confirm prompts
 		// If the file/ doesn't exist on copying, xcopy will ask whether you want
 		// to create it as a directory or just copy a file, so we always
 		// just put "F" in xcopy's stdin.
-		int ret = Exec(cmd, out.isDirectory()?"D":"F", null);
+		StringBuffer output = new StringBuffer();
+		int ret = Exec(cmd, out.isDirectory()?"D":"F", output);
 		if (ret==0) return true;
 		if (ret==1) return false;
-		if (ret==2) throw new IOException("xcopy aborted");
-		if (ret==4) throw new IOException("xcopy initialization error");
-		if (ret==5) throw new IOException("xcopy disk write error");
+		if (ret==2) throw new IOException("xcopy aborted: "+output.toString());
+		if (ret==4) throw new IOException("xcopy initialization error: "+output.toString());
+		if (ret==5) throw new IOException("xcopy disk write error: "+output.toString());
 		throw new IOException("unknown xcopy return code "+ret);
 	    }
 	    

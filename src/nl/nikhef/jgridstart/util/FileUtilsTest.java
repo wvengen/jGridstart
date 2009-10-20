@@ -73,7 +73,7 @@ public class FileUtilsTest extends TestCase {
     }
     
     /** contents of dummy temp file of {@link #createDummyTempFile} */
-    protected String dummyString = "foo bar test"+System.getProperty("line.separator");
+    protected final String dummyString = "foo bar test"+System.getProperty("line.separator");
     /** create dummy temp file containing {@link #dummyString} */
     protected File createDummyTempFile() throws IOException {
 	File tmp = File.createTempFile("test", ".tmp");
@@ -81,6 +81,7 @@ public class FileUtilsTest extends TestCase {
 	FileWriter writer = new FileWriter(tmp);
 	writer.append(dummyString);
 	writer.close();
+	assertTrue(tmp.exists());
 	return tmp;
     }
     
