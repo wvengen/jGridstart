@@ -82,7 +82,6 @@ public class JGSFrame extends JFrame {
 	URLLauncherCertificate.setSelectionSource(selection);
 	
 	// setup gui
-	this.setSize(550, 350);
 	this.setMinimumSize(new Dimension(400, 150));
 	this.setPreferredSize(new Dimension(650, 350));
 	this.setContentPane(getJContentPane());
@@ -267,6 +266,7 @@ public class JGSFrame extends JFrame {
     private JPanel getJPanel() {
 	if (certInfoPane == null) {
 	    certInfoPane = new TemplateButtonPanel();
+	    certInfoPane.setPreferredSize(new Dimension(500, 300));
 	    certInfoPane.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 	    
 	    // use SwingUtilities.invokeLater() to update the gui because

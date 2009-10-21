@@ -23,13 +23,14 @@ import nl.nikhef.jgridstart.Organisation;
  * @author wvengen
  */
 public class ComponentCertificateList extends JList {
+    
+    /** maximum length of name to display; any longer gets an ellipsis */
+    final static int maxNameLen = 22;
 
+    /** currently selected item */
     protected CertificateSelection selection = null;
     
-    public ComponentCertificateList() {
-	super();
-	initialize();
-    }
+    /** Create a new certificate list */
     public ComponentCertificateList(CertificateStoreWithDefault store, CertificateSelection selection) {
 	super();
 	initialize();
@@ -38,13 +39,15 @@ public class ComponentCertificateList extends JList {
 	setCellRenderer(new CertificateCellRenderer());
     }
 
-    /**
-     * Initialize this component, create its gui. Should be called only once.
+    /** Initialize this component, create its gui.
+     * <p>
+     * Should be called only once, from the constructor.
      */
     protected void initialize() {
 	setMaximumSize(new Dimension(200, Integer.MAX_VALUE));
     }
     
+    /** Rendering of cells in this list */
     class CertificateCellRenderer extends DefaultListCellRenderer {
 	@Override
 	public Component getListCellRendererComponent(JList list, Object value,
@@ -56,7 +59,9 @@ public class ComponentCertificateList extends JList {
 	    String line1 = "", line2 = "";
 	    String dfl = "";
 	    // name of person
-	    line2 += cert.getSubjectPrincipalValue(X509Name.CN);
+	    String name = cert.getSubjectPrincipalValue(X509Name.CN);
+	    if (name.length() > maxNameLen) name = name.substring(0, maxNameLen-2)+"&#x2026;";
+	    line2 += name;
 	    // add star to default certificate
 	    CertificatePair dflCert = null;
 	    try {
@@ -67,15 +72,18 @@ public class ComponentCertificateList extends JList {
 	    // organisation
 	    Organisation org = Organisation.getFromCertificate(cert);
 	    if (org!=null) line1 += org.getProperty("name.full"); // TODO full name, incl. O if OU
+	    // add serial number to 3rd line, if any
+	    String serial = cert.getProperty("cert.serial");
+	    if (serial!=null) line2 += " <span color='#888888'>(#"+serial+ ")</span>";
 	    // set html contents
 	    String s =
 		"<html><body width='100%'>" +
 	    	"<table border='0' cellpadding='2' cellspacing='0'>" +
 	    	"  <tr>" +
-	    	"    <td width='19' rowspan='2' align='center'>" + cert.getProperty("state.icon.html") + "</td>" +
+	    	"    <td width='19' align='center'>" + cert.getProperty("state.icon.html") + "</td>" +
 	    	"    <td>" +
-	    	       line1 + dfl + "<br>" +
-	    	"      <small>" + line2 + "</small>" +
+	    	"      "+ line1 + dfl + "<br>" +
+	    	"      <small>" + line2 + "</small>" + "<br>" +
 	    	"    </td>" +
 	    	"  </tr>" +
 	    	"</html></body>";
