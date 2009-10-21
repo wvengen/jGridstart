@@ -35,6 +35,10 @@ public class FileUtils {
      */
     public static boolean CopyFile(File in, File out) throws IOException {
 	String[] cmd;
+	
+	if (!in.canRead())
+	    throw new IOException("source file unreadable: "+in);
+	
 	if (System.getProperty("os.name").startsWith("Windows")) {
 	    // detect copy method once
 	    if (!copyDetected) {
@@ -91,16 +95,30 @@ public class FileUtils {
 		    "/H", // copy hidden and system files also
 		    "/K", // copy attributes, normally xcopy will reset readonly attr
 		    "/Y"};// suppress confirm prompts
-		// If the file/ doesn't exist on copying, xcopy will ask whether you want
+		// If the file doesn't exist on copying, xcopy will ask whether you want
 		// to create it as a directory or just copy a file, so we always
-		// just put "F" in xcopy's stdin.
+		// just put an answer in xcopy's stdin.
 		StringBuffer output = new StringBuffer();
 		int ret = Exec(cmd, out.isDirectory()?"D":"F", output);
 		if (ret==0) return true;
 		if (ret==1) return false;
-		if (ret==2) throw new IOException("xcopy aborted: "+output.toString());
-		if (ret==4) throw new IOException("xcopy initialization error: "+output.toString());
-		if (ret==5) throw new IOException("xcopy disk write error: "+output.toString());
+		// Catch xcopy bug; if the user has no access to one of the parent
+		//  directories, xcopy will fail using "File not found - [source filename]".
+		//  We'll have to resort to copying without keeping permissions ... we want
+		//  the software to work, right.
+		//  TODO ask user or find another way
+		if (ret==4 && output.toString().contains("File not found")) {
+		    logger.warning("xcopy bug triggered, copying without retaining permissions (!) - "+in);
+		    cmd = new String[]{"cmd", "/C",
+			    "copy /B /Y \""+in.getAbsolutePath()+"\" \""+out.getAbsolutePath()+"\""};
+		    ret = Exec(cmd);
+		    if (ret==0) return true;
+		    throw new IOException("copy failed, return code "+ret+"\n(after xcopy bug was triggered)");
+		}
+		// handle return value
+		if (ret==2) throw new IOException("xcopy aborted\n"+output.toString());
+		if (ret==4) throw new IOException("xcopy initialization error\n"+output.toString());
+		if (ret==5) throw new IOException("xcopy disk write error\n"+output.toString());
 		throw new IOException("unknown xcopy return code "+ret);
 	    }
 	    
@@ -111,7 +129,7 @@ public class FileUtils {
 		    in.getAbsolutePath(), out.getAbsolutePath()};
 	    int ret = Exec(cmd);
 	    if (ret!=0)
-		throw new IOException("cp failed return code "+ret);
+		throw new IOException("cp failed, return code "+ret);
 	    return true;
 	}
     }
