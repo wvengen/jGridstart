@@ -383,7 +383,9 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		// data().getProperty() falls back to System if not defined, so the result
 		// is that if install.browser is set, the one specified is used, and if not,
 		// the default browser is used.
-		System.setProperty("install.browser", BrowserFactory.getInstance().getDefaultBrowser());
+		String dflBrowser = BrowserFactory.getInstance().getDefaultBrowser();
+		if (dflBrowser!=null)
+		    System.setProperty("install.browser", dflBrowser);
 		String browserid = data().getProperty("install.browser");
 		if (browserid==null) browserid = System.getProperty("install.browser");
 		// remove the old browser Properties
