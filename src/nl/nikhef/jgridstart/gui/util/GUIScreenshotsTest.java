@@ -11,9 +11,12 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
 
 import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PasswordCache;
@@ -30,6 +33,9 @@ public class GUIScreenshotsTest {
     
     /** password used for test certificate */
     protected static String password = "test123pass";
+    
+    /** replacement characters for {@link #keyString} */
+    protected static HashMap<Character, Character> replacemap = null;
     
     public static void main(String[] args) throws Exception {
 	// screenshot output directory
@@ -63,13 +69,13 @@ public class GUIScreenshotsTest {
 	    saveScreenshot(new File(shotdir, prefix+"newrequest02.png"));
 	    // enter details
 	    guiSleep();
-	    tester.keyString("John\t");
-	    tester.keyString("Doe\t");
-	    tester.keyString("john.doe@example.com\t");
-	    tester.keyString("N\t");
-	    tester.keyString(" \t\t");
-	    tester.keyString(password+"\t");
-	    tester.keyString(password+"\t");
+	    keyString("John\t");
+	    keyString("Doe\t");
+	    keyString("john.doe@example.com\t");
+	    keyString("N\t");
+	    keyString(" \t\t");
+	    keyString(password+"\t");
+	    keyString(password+"\t");
 	    // wait for submission
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
 	    guiSleep();
@@ -140,10 +146,10 @@ public class GUIScreenshotsTest {
 	    Thread.sleep(2500);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew02.png"));
-	    tester.keyString("\t");
-	    tester.keyString(password+"\t");
-	    tester.keyString(password+"\t");
-	    tester.keyString(password+"\t");
+	    keyString("\t");
+	    keyString(password+"\t");
+	    keyString(password+"\t");
+	    keyString(password+"\t");
 	    // wait for submission screen
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
 	    // renew03.png used to be a password dialog, which was removed
@@ -218,8 +224,8 @@ public class GUIScreenshotsTest {
 	    tester.keyString("my_certificate.p12\n");
 	    Thread.sleep(1000);
 	    saveScreenshot(new File(shotdir, prefix+"importexport05.png"));
-	    tester.keyString("\t\t"); // update when passwordcache dialog focuses proper field
-	    tester.keyString(password+"\n");
+	    keyString("\t\t"); // update when passwordcache dialog focuses proper field
+	    keyString(password+"\n");
 	    guiSleep();
 
 	    /*
@@ -279,5 +285,49 @@ public class GUIScreenshotsTest {
 	    });
 	    */
 	} catch (Exception e) { throw new AWTException(e.toString()); }
+    }
+    
+    /** Like {@link ComponentTester#keyString}, but correcting some characters.
+     * <p>
+     * While Abbot has features to deal with different locales, I have experienced
+     * problems where at {@code @} appeared to be typed as {@code "}. This can result,
+     * for example, in an invalid email address. This method tries to work around the
+     * blocking issues I've encountered here (very crude method though).
+     */
+    protected static void keyString(String s) throws AWTException {
+	char[] c = s.toCharArray();
+	// initialize when needed
+	if (replacemap==null) {
+	    replacemap = new HashMap<Character, Character>();
+	    // create textbox, type in each character, store result
+	    final String chars = "1234567890";
+	    JFrame frame = new JFrame("Detecting key mapping (don't type yourself!)");
+	    JTextField field = new JTextField("", 10);
+	    frame.add(field);
+	    frame.setSize(200, 100);
+	    frame.setVisible(true);
+	    for (int i=0; i<chars.length(); i++) {
+		try {
+		    field.setText("");
+		    tester.setModifiers(InputEvent.SHIFT_MASK, true);
+		    tester.keyStroke(chars.charAt(i));
+		    tester.setModifiers(InputEvent.SHIFT_MASK, false);
+		    guiSleep();
+		    replacemap.put(field.getText().charAt(0), chars.charAt(i));
+		} catch (Exception e) { }
+	    }
+	    frame.setVisible(false);
+	    frame.dispose();
+	}
+	
+	for (int i=0; i<c.length; i++) {
+	    if (replacemap.containsKey(c[i])) {
+		tester.setModifiers(InputEvent.SHIFT_MASK, true);
+		tester.keyStroke(replacemap.get(c[i]));
+		tester.setModifiers(InputEvent.SHIFT_MASK, false);
+	    } else {
+		tester.keyStroke(c[i]);
+	    }
+	}
     }
 }
