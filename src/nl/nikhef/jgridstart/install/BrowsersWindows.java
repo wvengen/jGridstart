@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
+
 import at.jta.Key;
 import at.jta.RegistryErrorException;
 import at.jta.Regor;
@@ -49,17 +50,22 @@ class BrowsersWindows extends BrowsersCommon {
 		continue;
 	    }
 	    // set path to full executable
-	    p.setProperty("exe", path);
+	    p.setProperty("exe", new File(path).getCanonicalPath());
+
+	    logger.fine("found browser "+exe+" at: "+path);
 	}
 	
 	// get default browser from registry
 	String defaultExe = findDefaultBrowserRegistry();
 	if (defaultExe!=null) {
+	    defaultExe = new File(defaultExe).getCanonicalPath();
+	    logger.fine("default browser path: "+defaultBrowser);
 	    for (Iterator<Entry<String, Properties>> it = availableBrowsers.entrySet().iterator(); it.hasNext(); ) {
 		Entry<String, Properties> e = it.next();
 		Properties p = e.getValue();
 		if (defaultExe.toLowerCase().equals(p.getProperty("exe").toLowerCase())) {
 		    defaultBrowser = e.getKey();
+		    logger.fine("default browser name: "+defaultBrowser);
 		    break;
 		}
 	    }

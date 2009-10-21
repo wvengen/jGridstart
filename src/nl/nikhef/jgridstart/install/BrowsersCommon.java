@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
 import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
@@ -26,6 +27,8 @@ import nl.nikhef.jgridstart.util.PrivateFileWriter;
  * 
  */
 abstract class BrowsersCommon implements IBrowsers {
+
+    static protected Logger logger = Logger.getLogger("nl.nikhef.jgridstart.install");
     
     /** List of known browsers parsed from {@literal browsers.properties} */
     protected HashMap<String, Properties> knownBrowsers = new HashMap<String, Properties>();
