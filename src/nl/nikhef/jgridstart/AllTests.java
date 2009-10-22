@@ -47,6 +47,7 @@ public class AllTests {
 	TestSuite suite = new TestSuite("Test for nl.nikhef.jgridstart");
 	//$JUnit-BEGIN$
 	suite.addTestSuite(FileUtilsTest.class);
+	/*
 	suite.addTestSuite(PasswordCacheTest.class);
 	suite.addTestSuite(CertificateCheckTest.class);
 	suite.addTestSuite(CertificateStore1Test.class);
@@ -56,6 +57,7 @@ public class AllTests {
 	suite.addTestSuite(TemplateDocumentTest.class);
 	suite.addTestSuite(TemplatePanelTest.class);
 	suite.addTestSuite(TemplateButtonPanelTest.class);
+	*/
 	//$JUnit-END$
 	return suite;
     }
@@ -207,6 +209,8 @@ public class AllTests {
 				new URL(url),
 				new String[] { "testresult", txt },
 				true);
+			if (ret.charAt(0) == 'E')
+			    throw new Exception("Upload server error: "+ret.substring(1));
 			SwingUtilities.invokeLater(new Runnable() {
 			    public void run() {
 				outputpane.append(ret+linesep);
