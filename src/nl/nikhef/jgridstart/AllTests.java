@@ -47,7 +47,6 @@ public class AllTests {
 	TestSuite suite = new TestSuite("Test for nl.nikhef.jgridstart");
 	//$JUnit-BEGIN$
 	suite.addTestSuite(FileUtilsTest.class);
-	/*
 	suite.addTestSuite(PasswordCacheTest.class);
 	suite.addTestSuite(CertificateCheckTest.class);
 	suite.addTestSuite(CertificateStore1Test.class);
@@ -57,7 +56,6 @@ public class AllTests {
 	suite.addTestSuite(TemplateDocumentTest.class);
 	suite.addTestSuite(TemplatePanelTest.class);
 	suite.addTestSuite(TemplateButtonPanelTest.class);
-	*/
 	//$JUnit-END$
 	return suite;
     }
