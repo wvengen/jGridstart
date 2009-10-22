@@ -413,7 +413,8 @@ public class FileUtils {
 	    if (lineout!=null && output!=null) output.append(lineout + s);
 	    if (lineerr!=null && output!=null) output.append(lineerr + s);
 	}
-	stdout.close();	
+	stdout.close();
+	stderr.close();
 	// log and return
 	int ret = -1;
 	try {
