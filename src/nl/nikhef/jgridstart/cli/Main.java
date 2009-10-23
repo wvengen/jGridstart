@@ -28,6 +28,7 @@ import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.logging.LogHelper;
+import nl.nikhef.jgridstart.util.GeneralUtils;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 public class Main {
@@ -42,16 +43,8 @@ public class Main {
     /** command-line interface entry point */
     public static void main(String[] args) {
 	// load system properties, not fatal if it fails
-	// load system properties if not yet set, not fatal if it fails
 	try {
-	    Properties sysp = System.getProperties();
-	    Properties p = new Properties();
-	    p.load(Main.class.getResourceAsStream("/resources/conf/global.properties"));
-	    for (Enumeration<?> e = p.keys(); e.hasMoreElements(); ) {
-		String key = (String)e.nextElement();
-		if (sysp.getProperty(key)==null)
-		    sysp.setProperty(key, p.getProperty(key));
-	    }
+	    GeneralUtils.loadConfig();
 	} catch (IOException e) { }
 
 	// parse command-line arguments
