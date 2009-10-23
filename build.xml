@@ -347,7 +347,7 @@
 		</jar>
 	</target>
 	<!-- user test runner -->
-	<target name="jar.testgui" depends="jar.tests">
+	<target name="jar.testgui" depends="jar.tests,keystore">
 		<!-- create file with jar names -->
 		<echo file="${dir.build}/nl/nikhef/jgridstart/logging/testjars.txt">
 			${tests.target.name}.jar
