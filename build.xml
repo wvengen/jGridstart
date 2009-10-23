@@ -269,21 +269,26 @@
 	<!--
 	  - Distribution creation target
 	  -->
-	<target name="dist" depends="keystore,jar.small">
+	<target name="dist" depends="keystore,jar.small,jar.tests">
 		<!-- copy large/small jar to distribution -->
 		<copy file="${dir.dist}/${target.name}.small.jar" tofile="${dir.dist}/${target.name}.jar"/>
-		<!-- sign it, required for java web start -->
+		<!-- sign, required for java web start -->
 		<signjar keystore="${keystore.file}" jar="${dir.dist}/${target.name}.jar"
+			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
+		<signjar keystore="${keystore.file}" jar="${dir.dist}/${tests.target.name}.jar"
 			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
 		<delete file="${keystore.tempfile}" quiet="true"/>
 		<!-- substitute variables in java web start files -->
 		<copy file="${dir.dist}/${target.name}.jnlp.in" tofile="${dir.dist}/${target.name}.jnlp" />
+		<copy file="${dir.dist}/${tests.target.name}.jnlp.in" tofile="${dir.dist}/${tests.target.name}.jnlp" />
 		<copy file="${dir.dist}/bcprov.jnlp.in" tofile="${dir.dist}/bcprov.jnlp" />
 		<replace dir="${dir.dist}">
 			<include name="${target.name}.jnlp"/>
+			<include name="${tests.target.name}.jnlp"/>
 			<include name="bcprov.jnlp"/>
 			<replacefilter token="@wwwbase@" value="${wwwbase}"/>
 			<replacefilter token="@main@" value="${target.main}"/>
+			<replacefilter token="@tests.main@" value="${tests.target.main}"/>
 		</replace>
 		<!-- copy bouncycastle jar to deployment area -->
 		<copy file="${dep.bouncycastle}" todir="${dir.dist}"/>
