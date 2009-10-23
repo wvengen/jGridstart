@@ -41,6 +41,8 @@
 	
 	<property name="tests.target.name" value="tests"/>
 	<property name="tests.target.main" value="nl.nikhef.jgridstart.AllTests"/>
+	<property name="tests.guitarget.name" value="testgui"/>
+	<property name="tests.guitarget.main" value="nl.nikhef.jgridstart.logging.UserTestRunner"/>
 
 	<!-- reference to property file defining the properties
 	  -     keystore.file      java keystore file
@@ -275,20 +277,19 @@
 		<!-- sign, required for java web start -->
 		<signjar keystore="${keystore.file}" jar="${dir.dist}/${target.name}.jar"
 			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
-		<signjar keystore="${keystore.file}" jar="${dir.dist}/${tests.target.name}.jar"
-			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
 		<delete file="${keystore.tempfile}" quiet="true"/>
 		<!-- substitute variables in java web start files -->
 		<copy file="${dir.dist}/${target.name}.jnlp.in" tofile="${dir.dist}/${target.name}.jnlp" />
-		<copy file="${dir.dist}/${tests.target.name}.jnlp.in" tofile="${dir.dist}/${tests.target.name}.jnlp" />
+		<copy file="${dir.dist}/${tests.guitarget.name}.jnlp.in" tofile="${dir.dist}/${tests.guitarget.name}.jnlp" />
 		<copy file="${dir.dist}/bcprov.jnlp.in" tofile="${dir.dist}/bcprov.jnlp" />
 		<replace dir="${dir.dist}">
 			<include name="${target.name}.jnlp"/>
-			<include name="${tests.target.name}.jnlp"/>
+			<include name="${tests.guitarget.name}.jnlp"/>
 			<include name="bcprov.jnlp"/>
 			<replacefilter token="@wwwbase@" value="${wwwbase}"/>
 			<replacefilter token="@main@" value="${target.main}"/>
-			<replacefilter token="@tests.main@" value="${tests.target.main}"/>
+			<replacefilter token="@tests.main@" value="${tests.guitarget.main}"/>
+			<replacefilter token="@tests.name@" value="${tests.guitarget.name}"/>
 		</replace>
 		<!-- copy bouncycastle jar to deployment area -->
 		<copy file="${dep.bouncycastle}" todir="${dir.dist}"/>
@@ -344,6 +345,34 @@
 			<zipfileset src="${dep.junit}" excludes="LICENSE.txt"/>
 			<zipfileset src="${dep.abbot}"/>
 		</jar>
+	</target>
+	<!-- user test runner -->
+	<target name="jar.testgui" depends="jar.tests">
+		<!-- create file with jar names -->
+		<echo file="${dir.build}/nl/nikhef/jgridstart/logging/testjars.txt">
+			${tests.target.name}.jar
+			${dep.bouncycastle.basename}
+		</echo>
+		<!-- and build jars -->
+		<jar jarfile="${dir.dist}/${tests.guitarget.name}.jar">
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+				<attribute name="Main-Class" value="${tests.guitarget.main}"/>
+			</manifest>
+			<!-- the files for the runner -->
+			<fileset dir="${dir.build}">
+				<include name="nl/nikhef/jgridstart/logging/UserTestRunner*.class"/>
+				<include name="nl/nikhef/jgridstart/util/ConnectionUtils*.class"/>
+				<include name="nl/nikhef/jgridstart/util/FileUtils*.class"/>
+				<include name="nl/nikhef/jgridstart/logging/testjars.txt"/>
+			</fileset>
+			<zipfileset src="${dep.commons-lang}" includes="org/**"/>
+			<!-- and jars with all stuff that will be unpacked later -->
+			<fileset file="${dir.dist}/${tests.target.name}.jar"/>
+			<fileset file="${dep.bouncycastle}"/>
+		</jar>
+		<signjar keystore="${keystore.file}" jar="${dir.dist}/${tests.guitarget.name}.jar"
+			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
 	</target>
 
 	<!-- javadoc with APIviz, needs graphviz >= 2.20 -->

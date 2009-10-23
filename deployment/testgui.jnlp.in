@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="1.0+" href="tests.jnlp" codebase="@wwwbase@">
+<jnlp spec="1.0+" href="testsgui.jnlp" codebase="@wwwbase@">
  <information>
   <title>jGridstart Tests</title>
   <vendor>Nikhef</vendor>
@@ -11,7 +11,7 @@
  </security>
  <resources>
   <j2se href="http://java.sun.com/products/autodl/j2se" version="1.5+"/>
-  <jar href="tests.jar"/>
+  <jar href="@tests.name@.jar"/>
   <extension name="BouncyCastle cryptography library" href="bcprov.jnlp"/>
   <property name="java.security.policy" value="@wwwbase@bcprov.policy"/>
  </resources>
