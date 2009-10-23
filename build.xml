@@ -10,7 +10,7 @@
 	<!-- internal name -->
 	<property name="target.name" value="${ant.project.name}"/>
 	<!-- the program's version -->
-	<property name="target.version" value="1.0beta4"/>
+	<property name="target.version" value="1.0beta5"/>
 	<!-- main class to execute -->
 	<property name="target.main" value="nl.nikhef.jgridstart.gui.Main"/>
 	<!-- java virtual machine version to compile for -->
@@ -69,7 +69,7 @@
 	<property name="dep.javamail" location="${dir.thirdparty}/bouncycastle/mail-1.4.1.jar"/>
 	<property name="dep.commons-cli" location="${dir.thirdparty}/commons/commons-cli-1.2.jar"/>
 	<property name="dep.commons-lang" location="${dir.thirdparty}/commons/commons-lang-2.4.jar"/>
-	<property name="dep.junit" location="${dir.thirdparty}/junit/junit-4.5.jar"/>
+	<property name="dep.junit" location="${dir.thirdparty}/junit/junit-4.7.jar"/>
 	<property name="dep.abbot" location="${dir.thirdparty}/junit/abbot.jar"/>
 	<property name="dep.swingworker" location="${dir.thirdparty}/swingworker/swing-worker-1.2.jar"/>
 	<property name="dep.xhtmlrenderer" location="${dir.thirdparty}/flyingsaucer/core-renderer-minimal.jar"/>
@@ -360,7 +360,7 @@
 			<link href="http://bouncycastle.org/docs/mdocs1.4/"/>
 			<link href="http://commons.apache.org/lang/api-release/"/>
 			<link href="http://commons.apache.org/cli/api-1.2/"/>
-			<link href="http://junit.org/junit/javadoc/4.5/"/>
+			<link href="http://junit.org/apidocs/"/>
 			<link href="http://abbot.sourceforge.net/doc/api/"/>
 			<link href="https://swingworker.dev.java.net/nonav/javadoc/"/>
 			<link href="http://pigeonholdings.com/projects/flyingsaucer/R8/javadoc/user/"/>
