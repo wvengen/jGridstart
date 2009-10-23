@@ -17,7 +17,8 @@ if [ "$1" = "test" ]; then
 	echo
 	CLASSPATH="$CLASSPATH:$LIB/junit/junit-4.5.jar:$LIB/junit/abbot.jar"
 	export CLASSPATH
-	$JAVA org.junit.runner.JUnitCore nl.nikhef.jgridstart.AllTests
+	#$JAVA org.junit.runner.JUnitCore nl.nikhef.jgridstart.AllTests
+	$JAVA nl.nikhef.jgridstart.AllTests
 elif [ "$1" = "cli" ]; then
 	shift
 	$JAVA nl.nikhef.jgridstart.cli.Main $@
