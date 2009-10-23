@@ -271,7 +271,7 @@
 	<!--
 	  - Distribution creation target
 	  -->
-	<target name="dist" depends="keystore,jar.small,jar.tests">
+	<target name="dist" depends="keystore,jar.small,jar.guitest">
 		<!-- copy large/small jar to distribution -->
 		<copy file="${dir.dist}/${target.name}.small.jar" tofile="${dir.dist}/${target.name}.jar"/>
 		<!-- sign, required for java web start -->
@@ -347,7 +347,7 @@
 		</jar>
 	</target>
 	<!-- user test runner -->
-	<target name="jar.testgui" depends="jar.tests">
+	<target name="jar.guitest" depends="jar.tests">
 		<!-- create file with jar names -->
 		<echo file="${dir.build}/nl/nikhef/jgridstart/logging/testjars.txt">
 			${tests.target.name}.jar
