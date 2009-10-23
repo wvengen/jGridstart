@@ -10,13 +10,20 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
+
+import junit.framework.TestCase;
+
+import org.bouncycastle.util.encoders.Base64;
+import org.junit.Test;
 
 import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PasswordCache;
@@ -27,8 +34,9 @@ import abbot.tester.ComponentTester;
 import abbot.util.AWT;
 
 /** Generate screenshots the for documentation of jGridstart */
-public class GUIScreenshotsTest {
+public class GUIScreenshotsTest extends TestCase {
     
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui.util");
     protected static ComponentTester tester = new ComponentTester();
     
     /** password used for test certificate */
@@ -37,17 +45,45 @@ public class GUIScreenshotsTest {
     /** replacement characters for {@link #keyString} */
     protected static HashMap<Character, Character> replacemap = null;
     
+    /** last screenshot taken */
+    protected static File lastScreenshot = null; 
+    
+    /** Make screenshot taking part of unit tests */
+    @Test
+    public static void testScreenshots() throws Exception {
+	File ssdir = FileUtils.createTempDir("jgridstart-screenshots-");
+	try {
+	    main(new String[]{ssdir.getPath()});
+	} catch(Exception e) {
+	    // on error, output last screenshot as base64 on debug log
+	    if (lastScreenshot!=null) {
+		FileInputStream in = new FileInputStream(lastScreenshot);
+		StringBuffer base64 = new StringBuffer();
+		byte[] c = new byte[100];
+		while (in.read(c)>0) base64.append(new String(Base64.encode(c)));
+		logger.finest("Interactive UI testing failed, last screenshot:");
+		logger.finest("[IMG "+lastScreenshot.getName()+"] "+base64.toString());
+	    }
+	    throw e;
+    	} finally {
+	    // remove screenshot directory again
+    	    FileUtils.recursiveDelete(ssdir);
+	}
+    }
+    
+    /** User-callable screenshot taking program */
     public static void main(String[] args) throws Exception {
 	// screenshot output directory
 	if (args.length!=1) {
 	    System.err.println("please give screenshot dir as argument");
-	    System.exit(1);
+	    return;
 	}
 	File shotdir = new File(args[0]);
 	shotdir.mkdirs();
 	String prefix = "jgridstart-screenshot-";
 	// setup temporary environment
 	File tmphome = FileUtils.createTempDir("jgridstart-home");
+	Window mainwnd = null;
 	try {
 	    System.setProperty("jgridstart.ca.provider", "LocalCA");
 	    System.setProperty("jgridstart.ca.local.hold", "true");
@@ -56,7 +92,10 @@ public class GUIScreenshotsTest {
 	    nl.nikhef.jgridstart.gui.Main.main(new String[]{});
 	    // move mouse here since closing window may give up focus later
 	    Thread.sleep(1000); guiSleep();
-	    tester.mouseMove(AWT.getActiveWindow().getComponents()[0]);
+	    mainwnd = AWT.getActiveWindow();
+	    assertNotNull(mainwnd);
+	    tester.mouseMove(mainwnd.getComponents()[0]);
+	    assertWindowname("jgridstart-main-window");
 
 	    /*
 	     * Request new
@@ -69,6 +108,7 @@ public class GUIScreenshotsTest {
 	    saveScreenshot(new File(shotdir, prefix+"newrequest02.png"));
 	    // enter details
 	    guiSleep();
+	    assertWindowname("jgridstart-requestwizard-0");
 	    keyString("John\t");
 	    keyString("Doe\t");
 	    keyString("john.doe@example.com\t");
@@ -80,6 +120,7 @@ public class GUIScreenshotsTest {
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"newrequest03.png"));
+	    assertWindowname("jgridstart-requestwizard-1");
 	    Thread.sleep(6000);
 	    // verification form
 	    System.setProperty("wizard.show.help1", "true"); // simulate help btn1 pressed
@@ -87,6 +128,7 @@ public class GUIScreenshotsTest {
 	    guiSleep();
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"newrequest04.png"));
+	    assertWindowname("jgridstart-requestwizard-2");
 	    // form display
 	    JButton btn = (JButton) new BasicFinder().find(new Matcher() {
 		public boolean matches(Component c) {
@@ -97,38 +139,46 @@ public class GUIScreenshotsTest {
 	    Thread.sleep(1000);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"newrequest05.png"));
+	    assertWindowname("jgridstart-verification-form");
 	    tester.key(new Integer('C'), InputEvent.ALT_MASK);
 	    // close wizard
 	    guiSleep();
+	    assertWindowname("jgridstart-requestwizard-2");
 	    tester.key(new Integer('C'), InputEvent.ALT_MASK);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"newrequest06.png"));
+	    assertWindowname("jgridstart-main-window");
 	    // enable certificate in LocalCA and refresh pane
 	    System.setProperty("jgridstart.ca.local.hold", "false");
 	    tester.key(KeyEvent.VK_F5);
 	    Thread.sleep(1000);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"newrequest07.png"));
+	    assertWindowname("jgridstart-main-window");
 	    // show request wizard again
 	    tester.key(new Integer('A'), InputEvent.ALT_MASK);
 	    tester.key('R');
 	    Thread.sleep(2500);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"newrequest08.png"));
+	    assertWindowname("jgridstart-requestwizard-2");
 	    // install step
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
 	    Thread.sleep(1000);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"newrequest09.png"));
+	    assertWindowname("jgridstart-requestwizard-3");
 	    // show final screen
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"newrequest10.png"));
+	    assertWindowname("jgridstart-requestwizard-4");
 	    // exit wizard
 	    tester.key(new Integer('C'), InputEvent.ALT_MASK);
 	    // save final screenshot
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"newrequest11.png"));
+	    assertWindowname("jgridstart-main-window");
 	    guiSleep();
 	    
 	    /*
@@ -140,12 +190,14 @@ public class GUIScreenshotsTest {
 	    // start screen
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew01.png"));
+	    assertWindowname("jgridstart-main-window");
 	    // personal details
 	    tester.key(new Integer('A'), InputEvent.ALT_MASK);
 	    tester.key('W');
 	    Thread.sleep(2500);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew02.png"));
+	    assertWindowname("jgridstart-requestwizard-0");
 	    keyString("\t");
 	    keyString(password+"\t");
 	    keyString(password+"\t");
@@ -156,38 +208,45 @@ public class GUIScreenshotsTest {
 	    // submit page
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew04.png"));
-	    Thread.sleep(3000);
+	    assertWindowname("jgridstart-requestwizard-1");
+	    Thread.sleep(3500);
 	    // wait for approval page
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew05.png"));
+	    assertWindowname("jgridstart-requestwizard-2");
 	    // close wizard
 	    guiSleep();
 	    tester.key(new Integer('C'), InputEvent.ALT_MASK);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew06.png"));
+	    assertWindowname("jgridstart-main-window");
 	    // enable certificate in LocalCA and refresh pane
 	    System.setProperty("jgridstart.ca.local.hold", "false");
 	    tester.key(KeyEvent.VK_F5);
 	    Thread.sleep(1000);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew07.png"));
+	    assertWindowname("jgridstart-main-window");
 	    // show request wizard again
 	    tester.key(new Integer('A'), InputEvent.ALT_MASK);
 	    tester.key('R');
 	    Thread.sleep(2500);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew08.png"));
+	    assertWindowname("jgridstart-requestwizard-3");
 	    // install step
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
 	    Thread.sleep(1000);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew09.png"));
+	    assertWindowname("jgridstart-requestwizard-4");
 	    // exit wizard
 	    tester.key(new Integer('C'), InputEvent.ALT_MASK);
 	    // save final screenshot
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew10.png"));
+	    assertWindowname("jgridstart-main-window");
 	    guiSleep();
 	    
 	    /*
@@ -198,15 +257,18 @@ public class GUIScreenshotsTest {
 	    // starting screenshot (multiple certificates)
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"importexport01.png"));
+	    assertWindowname("jgridstart-main-window");
 	    // export dialog
 	    tester.key(new Integer('E'), InputEvent.CTRL_MASK);
 	    Thread.sleep(1000);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"importexport02.png"));
+	    assertWindowname("jgridstart-import-file-dialog");
 	    // enter name and do export
 	    tester.keyString("my_certificate.p12\n");
 	    Thread.sleep(1000);
 	    saveScreenshot(new File(shotdir, prefix+"importexport03.png"));
+	    assertWindowname("jgridstart-password-entry-decrypt");
 	    tester.keyString("\t\t"); // update when passwordcache dialog focuses proper field
 	    tester.keyString(password+"\n");
 	    guiSleep();
@@ -219,11 +281,13 @@ public class GUIScreenshotsTest {
 	    Thread.sleep(1000);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"importexport04.png"));
+	    assertWindowname("jgridstart-export-file-dialog");
 	    guiSleep();
 	    // enter name and do import
 	    tester.keyString("my_certificate.p12\n");
 	    Thread.sleep(1000);
 	    saveScreenshot(new File(shotdir, prefix+"importexport05.png"));
+	    assertWindowname("jgridstart-password-entry-decrypt");
 	    keyString("\t\t"); // update when passwordcache dialog focuses proper field
 	    keyString(password+"\n");
 	    guiSleep();
@@ -232,21 +296,27 @@ public class GUIScreenshotsTest {
 	     * Certificate details
 	     */
 	    // certificate details view
-	    Window jgwnd = AWT.getActiveWindow();
-	    jgwnd.setSize(750, 420);
+	    mainwnd.setSize(750, 480);
 	    System.setProperty("view.showdetails", "true");
 	    URLLauncherCertificate.performAction("viewlist(false)", tester.findFocusOwner());
 	    tester.key(KeyEvent.VK_F5);
 	    Thread.sleep(500);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"viewdetails01.png"));
+	    assertWindowname("jgridstart-main-window");
+	    
+	    /*
+	     * Exit!
+	     */
+	    tester.key(new Integer('Q'), InputEvent.CTRL_MASK);
 	    
 	} finally {
 	    guiSleep(); Thread.sleep(500); // for screenshot to complete ...
 	    FileUtils.recursiveDelete(tmphome);
+	    if (mainwnd!=null) mainwnd.dispose();
 	}
 	// exit!
-	System.exit(0);
+	return;
     }
     
     /** Write screenshot of current screen to specified file as png.
@@ -267,9 +337,9 @@ public class GUIScreenshotsTest {
 		    BufferedImage img = robot.createScreenCapture(captureSize);
 		    img.flush();
 		    ImageIO.write(img, "png", dst);
+		    lastScreenshot = dst;
 		} catch(IOException e) {
 		    System.err.println(e);
-		    System.exit(2);
 		}
 	    }
 	});
@@ -329,5 +399,10 @@ public class GUIScreenshotsTest {
 		tester.keyStroke(c[i]);
 	    }
 	}
+    }
+    
+    /** Assert the currently active window has the specified name */
+    protected static void assertWindowname(String name) {
+	assertEquals(name, AWT.getActiveWindow().getName());
     }
 }

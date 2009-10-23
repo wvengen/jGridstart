@@ -73,6 +73,7 @@ public class ActionViewVerificationForm extends CertificateAction {
 	}
 	
 	private void initialize(Properties data) {
+	    setName("jgridstart-verification-form");
 	    try {
 		form = new TemplateButtonPanel(getClass().getResource("verification_form.html").toExternalForm());
 		form.setData(data);

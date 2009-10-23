@@ -81,6 +81,7 @@ public class ActionImport extends AbstractAction {
 	);
 	pane.add(hpane);
 	
+	dlg.setName("jgridstart-import-file-dialog");
 	dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	dlg.pack();
 	dlg.setVisible(true);

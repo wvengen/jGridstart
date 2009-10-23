@@ -76,6 +76,8 @@ public class JGSFrame extends JFrame {
      */
     private void initialize() {
 	
+	setName("jgridstart-main-window");
+	
 	store = new CertificateStoreWithDefault();
 	selection = new CertificateSelection(store);
 	PasswordCache.getInstance().setParent(this);

@@ -155,6 +155,7 @@ public class PasswordCache {
 		    pass.requestFocusInWindow();
 		}
 	    });
+	    dialog.setName("jgridstart-password-entry-decrypt");
 	    dialog.setVisible(true);
 	    if (((Integer)pane.getValue()) != JOptionPane.OK_OPTION) {
 		logger.fine("Dencryption password request cancelled for "+loc);
@@ -215,6 +216,7 @@ public class PasswordCache {
 		    pass1.requestFocusInWindow();
 		}
 	    });
+	    dialog.setName("jgridstart-password-entry-encrypt");
 	    dialog.setVisible(true);
 	    // handle cancel
 	    if ( ((Integer)pane.getValue()) != JOptionPane.OK_OPTION ) {

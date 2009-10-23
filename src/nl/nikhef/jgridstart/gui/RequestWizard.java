@@ -322,6 +322,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     public void pageEnter(TemplateWizard w, int oldPage, int curPage) {
 	// custom window title
 	setTitle(data().getProperty("wizard.title") + " - " + getDocumentTitle(curPage));
+	setName("jgridstart-requestwizard-"+Integer.valueOf(curPage));
 	
 	// stop worker on page change when needed
 	if (worker!=null) {

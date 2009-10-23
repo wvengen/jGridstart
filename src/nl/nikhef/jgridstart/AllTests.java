@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+import nl.nikhef.jgridstart.gui.util.GUIScreenshotsTest;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanelTest;
 import nl.nikhef.jgridstart.install.BrowsersMacOSXTest;
 import nl.nikhef.jgridstart.logging.LogHelper;
@@ -61,6 +62,7 @@ public class AllTests {
 	suite.addTestSuite(TemplateDocumentTest.class);
 	suite.addTestSuite(TemplatePanelTest.class);
 	suite.addTestSuite(TemplateButtonPanelTest.class);
+	suite.addTestSuite(GUIScreenshotsTest.class);
 	//$JUnit-END$
 	return suite;
     }

@@ -77,6 +77,7 @@ public class ActionExport extends CertificateAction {
 	);
 	pane.add(hpane);
 	
+	dlg.setName("jgridstart-export-file-dialog");
 	dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	dlg.pack();
 	dlg.setVisible(true);
