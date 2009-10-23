@@ -155,6 +155,7 @@
 		<property name="keystore.passwd" value="xyz12345"/>
 		<genkey alias="${keystore.alias}" storepass="${keystore.passwd}" keystore="${keystore.file}"
 			validity="1" dname="CN=Test, OU=Test, O=Test, C=Test"/>
+		<property name="keystore.available" value="true"/>
 	</target>
 
 	<!-- proguard -->
