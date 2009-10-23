@@ -20,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 import org.bouncycastle.util.encoders.Base64;
@@ -54,7 +55,7 @@ public class GUIScreenshotsTest extends TestCase {
 	File ssdir = FileUtils.createTempDir("jgridstart-screenshots-");
 	try {
 	    main(new String[]{ssdir.getPath()});
-	} catch(Exception e) {
+	} catch(Throwable e) {
 	    // on error, output last screenshot as base64 on debug log
 	    if (lastScreenshot!=null) {
 		FileInputStream in = new FileInputStream(lastScreenshot);
@@ -64,7 +65,9 @@ public class GUIScreenshotsTest extends TestCase {
 		logger.finest("Interactive UI testing failed, last screenshot:");
 		logger.finest("[IMG "+lastScreenshot.getName()+"] "+base64.toString());
 	    }
-	    throw e;
+	    if (e instanceof Exception) throw (Exception)e;
+	    else if (e instanceof Error) throw (Error)e;
+	    else throw new Exception("Unknown throwable: ", e);
     	} finally {
 	    // remove screenshot directory again
     	    FileUtils.recursiveDelete(ssdir);
@@ -91,7 +94,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    // create standard gui
 	    nl.nikhef.jgridstart.gui.Main.main(new String[]{});
 	    // move mouse here since closing window may give up focus later
-	    Thread.sleep(1000); guiSleep();
+	    Thread.sleep(2000); guiSleep();
 	    mainwnd = AWT.getActiveWindow();
 	    assertNotNull(mainwnd);
 	    tester.mouseMove(mainwnd.getComponents()[0]);
@@ -234,13 +237,13 @@ public class GUIScreenshotsTest extends TestCase {
 	    Thread.sleep(2500);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew08.png"));
-	    assertWindowname("jgridstart-requestwizard-3");
+	    assertWindowname("jgridstart-requestwizard-2");
 	    // install step
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
 	    Thread.sleep(1000);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew09.png"));
-	    assertWindowname("jgridstart-requestwizard-4");
+	    assertWindowname("jgridstart-requestwizard-3");
 	    // exit wizard
 	    tester.key(new Integer('C'), InputEvent.ALT_MASK);
 	    // save final screenshot
@@ -263,7 +266,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    Thread.sleep(1000);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"importexport02.png"));
-	    assertWindowname("jgridstart-import-file-dialog");
+	    assertWindowname("jgridstart-export-file-dialog");
 	    // enter name and do export
 	    tester.keyString("my_certificate.p12\n");
 	    Thread.sleep(1000);
@@ -281,7 +284,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    Thread.sleep(1000);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"importexport04.png"));
-	    assertWindowname("jgridstart-export-file-dialog");
+	    assertWindowname("jgridstart-import-file-dialog");
 	    guiSleep();
 	    // enter name and do import
 	    tester.keyString("my_certificate.p12\n");
