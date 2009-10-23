@@ -52,6 +52,8 @@ public class UserTestRunner {
 	/** Where to post test result data to */
 	final String url = "http://jgridstart.nikhef.nl/tests/upload.php";
 	
+	/** tempdir for jars */
+	File tmpdir = null;
 	/** Frame title */
 	final String title = "jGridstart Testing Program";
 	/** Label with user message */
@@ -110,6 +112,7 @@ public class UserTestRunner {
 	    quitAction = new AbstractAction("Quit") {
 		public void actionPerformed(ActionEvent event) {
 		    if (proc!=null) proc.destroy();
+		    if (tmpdir!=null) FileUtils.recursiveDelete(tmpdir);
 		    System.exit(0);
 		}
 	    };
@@ -135,7 +138,6 @@ public class UserTestRunner {
 	void runTests() {
 	    if (proc!=null) return;
 	    
-	    File tmpdir = null;
 	    try {
 		setMessage("Please <i>don't touch</i> your mouse or keyboard while the tests are running...\n" +
 			   "(the graphical user-interface tests require this to function)");
@@ -165,10 +167,10 @@ public class UserTestRunner {
 			jarout.close();
 			jarin.close();
 			classpath += jaroutfile.getAbsolutePath() + System.getProperty("path.separator");
-			System.out.println("classpath="+classpath);
 		    }
 		    // remove trailing ':'
-		    classpath = classpath.substring(0, classpath.length()-1-System.getProperty("path.separator").length());
+		    classpath = classpath.substring(0, classpath.length()-System.getProperty("path.separator").length());
+		    tmpdir.deleteOnExit();
 		}
 		// run!
 		String[] cmd = new String[] {
@@ -186,8 +188,6 @@ public class UserTestRunner {
 		
 	    } catch (Exception e) {
 		e.printStackTrace(); // TODO finish
-	    } finally {
-		if (tmpdir!=null) FileUtils.recursiveDelete(tmpdir);
 	    }
 	}
 
