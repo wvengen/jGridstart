@@ -307,6 +307,8 @@
 		<delete file="${dir.dist}/${dep.bouncycastle.basename}"/>
 		<delete file="${dir.dist}/${browsertool.target.name}.jar"/>
 		<delete file="${dir.dist}/${tests.target.name}.jar"/>
+		<delete file="${dir.dist}/${tests.guitarget.name}.jnlp"/>
+		<delete file="${dir.dist}/${tests.guitarget.name}.jar"/>
 	</target>
 
 	<!--
