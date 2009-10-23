@@ -4,47 +4,29 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.logging.LogManager;
 
 import javax.swing.UIManager;
 
+import nl.nikhef.jgridstart.logging.LogHelper;
 import nl.nikhef.jgridstart.logging.LogWindowHandler;
+import nl.nikhef.jgridstart.util.GeneralUtils;
 
 public class Main {
 
     // setup logging
     static {
-	try {
-	    LogManager.getLogManager().readConfiguration(Main.class.getResourceAsStream("/logging.properties"));
-	} catch(Exception e) {
-	    System.out.println("Warning: logging configuration could not be set");
-	}
+	LogHelper.setupLogging(false);
     }
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart");
 
     /** graphical user-interface entry point */
     public static void main(String[] args) {
 	logger.addHandler(LogWindowHandler.getInstance());
-	logger.fine("main starting");
-	// log system info
-	logger.info("Platform: "+System.getProperty("os.name")+" "+System.getProperty("os.arch")+" " +
-		"version "+System.getProperty("sys.version"));
-	logger.info("JRE: "+System.getProperty("java.vendor")+" version "+System.getProperty("java.version") +
-		" JIT "+System.getProperty("java.compiler") + "; " +
-		"installed in "+System.getProperty("java.home"));
-	logger.info("  classpath="+System.getProperty("java.class.path"));
-	
+	logger.fine("main starting");	
 	
 	// load system properties if not yet set, not fatal if it fails
 	try {
-	    Properties sysp = System.getProperties();
-	    Properties p = new Properties();
-	    p.load(Main.class.getResourceAsStream("/resources/conf/global.properties"));
-	    for (Enumeration<?> e = p.keys(); e.hasMoreElements(); ) {
-		String key = (String)e.nextElement();
-		if (sysp.getProperty(key)==null)
-		    sysp.setProperty(key, p.getProperty(key));
-	    }
+	    GeneralUtils.loadConfig();
 	} catch (IOException e) { }
 	// Schedule a job for the event-dispatching thread:
 	// creating and showing this application's GUI.

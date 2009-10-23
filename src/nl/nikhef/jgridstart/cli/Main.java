@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.LogManager;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -28,17 +27,14 @@ import org.apache.commons.cli.ParseException;
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
+import nl.nikhef.jgridstart.logging.LogHelper;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 public class Main {
 
     // setup logging
     static {
-	try {
-	    LogManager.getLogManager().readConfiguration(Main.class.getResourceAsStream("/logging.properties"));
-	} catch(Exception e) {
-	    System.out.println("Warning: logging configuration could not be set");
-	}
+	LogHelper.setupLogging(false);
     }
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart");
     static private CertificateStore store = null;
