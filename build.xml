@@ -341,8 +341,8 @@
 			</manifest>
 			<fileset dir="${dir.build}"/>
 			<resources refid="depfiles"/>
-			<zipfileset src="${dep.junit}" includes="**/*.class"/>
-			<zipfileset src="${dep.abbot}" includes="abbot/**, junit/**"/>
+			<zipfileset src="${dep.junit}" excludes="LICENSE.txt"/>
+			<zipfileset src="${dep.abbot}"/>
 		</jar>
 	</target>
 
