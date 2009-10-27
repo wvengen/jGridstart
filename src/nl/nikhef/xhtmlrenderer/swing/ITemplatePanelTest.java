@@ -88,12 +88,15 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
      * This show the frame, creating one when needed. 
      */
     protected Window showFrame(ITemplatePanel panel) {
+	Window wnd = null;
 	if (panel instanceof Window) {
 	    showWindow((Window)panel);
-	    return ((Window)panel);
+	    wnd = (Window)panel;
 	} else {
-	    return showFrame((Component)panel);
+	    wnd = showFrame((Component)panel);
 	}
+	wnd.toFront();
+	return wnd;
     }
     
     /** Helper method: create template panel from a html body
