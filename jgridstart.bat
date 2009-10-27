@@ -19,7 +19,7 @@ if not "%1"=="test" goto :notest
 	echo.
 	set CLASSPATH=%CLASSPATH%;%LIB%\junit\junit-4.7.jar;%LIB%\junit\abbot.jar
 	rem java org.junit.runner.JUnitCore nl.nikhef.jgridstart.AllTests
-	java nl.nikhef.jgridstart.AllTests
+	java nl.nikhef.jgridstart.logging.UserTestRunner
 	goto :end
 
 :notest
