@@ -180,7 +180,7 @@
 	<target name="compile" depends="init">
 		<mkdir dir="${dir.build}"/>
 		<!-- compile java sources -->
-		<javac srcdir="${dir.src}" destdir="${dir.build}" target="${target.jvmversion}">
+		<javac srcdir="${dir.src}" destdir="${dir.build}" target="${target.jvmversion}" debug="on">
 			<classpath refid="path.dependencies" />
 		</javac>
 		<!-- copy resources; skip VCS dirs (and other hidden .*)  -->
