@@ -51,6 +51,8 @@ public class GUIScreenshotsTest extends TestCase {
     
     /** replacement characters for {@link #keyString} */
     protected static HashMap<Character, Character> replacemap = null;
+    /** whether to sleep between special keys or not */
+    protected static boolean replaceDoSleep = false;
     
     /** last screenshot taken */
     protected static File lastScreenshot = null; 
@@ -367,12 +369,18 @@ public class GUIScreenshotsTest extends TestCase {
      * problems where at {@code @} appeared to be typed as {@code "}. This can result,
      * for example, in an invalid email address. This method tries to work around the
      * blocking issues I've encountered here (very crude method though).
+     * @throws InterruptedException 
      */
-    protected static void keyString(String s) throws AWTException {
+    protected static void keyString(String s) throws AWTException, InterruptedException {
 	char[] c = s.toCharArray();
 	// initialize when needed
 	if (replacemap==null) {
 	    replacemap = new HashMap<Character, Character>();
+	    // workaround "XTestFakeKeyEvent broken in Xvfb" (java 5 only though)
+	    // http://lists.freedesktop.org/archives/xorg/2005-October/010388.html
+	    if (!System.getProperty("os.name").startsWith("Win") &&
+		    System.getProperty("java.version").charAt(0) <= '5')
+		replaceDoSleep = true;	    
 	    // create textbox, type in each character, store result
 	    final String chars = "1234567890";
 	    JFrame frame = new JFrame("Detecting key mapping (don't type yourself!)");
@@ -388,6 +396,7 @@ public class GUIScreenshotsTest extends TestCase {
 		    tester.setModifiers(InputEvent.SHIFT_MASK, false);
 		    guiSleep();
 		    replacemap.put(field.getText().charAt(0), chars.charAt(i));
+		    if (replaceDoSleep) Thread.sleep(200);
 		} catch (Exception e) { }
 	    }
 	    frame.setVisible(false);
@@ -399,6 +408,7 @@ public class GUIScreenshotsTest extends TestCase {
 		tester.setModifiers(InputEvent.SHIFT_MASK, true);
 		tester.keyStroke(replacemap.get(c[i]));
 		tester.setModifiers(InputEvent.SHIFT_MASK, false);
+		if (replaceDoSleep) Thread.sleep(200);
 	    } else {
 		tester.keyStroke(c[i]);
 	    }
