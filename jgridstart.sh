@@ -15,7 +15,7 @@ if [ "$1" = "test" ]; then
 	echo
 	echo "Running jGridstart tests"
 	echo
-	CLASSPATH="$CLASSPATH:$LIB/junit/junit-4.5.jar:$LIB/junit/abbot.jar"
+	CLASSPATH="$CLASSPATH:$LIB/junit/junit-4.7.jar:$LIB/junit/abbot.jar"
 	export CLASSPATH
 	#$JAVA org.junit.runner.JUnitCore nl.nikhef.jgridstart.AllTests
 	$JAVA nl.nikhef.jgridstart.AllTests
