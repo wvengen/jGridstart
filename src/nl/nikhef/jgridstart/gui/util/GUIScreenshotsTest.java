@@ -51,8 +51,6 @@ public class GUIScreenshotsTest extends TestCase {
     
     /** replacement characters for {@link #keyString} */
     protected static HashMap<Character, Character> replacemap = null;
-    /** whether to sleep between special keys or not */
-    protected static boolean replaceDoSleep = false;
     
     /** last screenshot taken */
     protected static File lastScreenshot = null; 
@@ -376,11 +374,6 @@ public class GUIScreenshotsTest extends TestCase {
 	// initialize when needed
 	if (replacemap==null) {
 	    replacemap = new HashMap<Character, Character>();
-	    // workaround "XTestFakeKeyEvent broken in Xvfb" (java 5 only though)
-	    // http://lists.freedesktop.org/archives/xorg/2005-October/010388.html
-	    if (!System.getProperty("os.name").startsWith("Win") &&
-		    System.getProperty("java.version").charAt(0) <= '5')
-		replaceDoSleep = true;	    
 	    // create textbox, type in each character, store result
 	    final String chars = "1234567890";
 	    JFrame frame = new JFrame("Detecting key mapping (don't type yourself!)");
@@ -396,7 +389,6 @@ public class GUIScreenshotsTest extends TestCase {
 		    tester.setModifiers(InputEvent.SHIFT_MASK, false);
 		    guiSleep();
 		    replacemap.put(field.getText().charAt(0), chars.charAt(i));
-		    if (replaceDoSleep) Thread.sleep(200);
 		} catch (Exception e) { }
 	    }
 	    frame.setVisible(false);
@@ -408,7 +400,6 @@ public class GUIScreenshotsTest extends TestCase {
 		tester.setModifiers(InputEvent.SHIFT_MASK, true);
 		tester.keyStroke(replacemap.get(c[i]));
 		tester.setModifiers(InputEvent.SHIFT_MASK, false);
-		if (replaceDoSleep) Thread.sleep(200);
 	    } else {
 		tester.keyStroke(c[i]);
 	    }
