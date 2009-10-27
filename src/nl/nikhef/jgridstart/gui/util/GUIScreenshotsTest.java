@@ -18,19 +18,25 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
+import org.xhtmlrenderer.util.LoggerUtil;
 
+import nl.nikhef.jgridstart.logging.LogHelper;
 import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
 import abbot.finder.BasicFinder;
+import abbot.finder.ComponentNotFoundException;
 import abbot.finder.Matcher;
+import abbot.finder.MultipleComponentsFoundException;
 import abbot.tester.ComponentTester;
 import abbot.util.AWT;
 
@@ -81,6 +87,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    System.err.println("please give screenshot dir as argument");
 	    return;
 	}
+	LogHelper.setupLogging(true);
 	File shotdir = new File(args[0]);
 	shotdir.mkdirs();
 	String prefix = "jgridstart-screenshot-";
@@ -124,7 +131,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"newrequest03.png"));
 	    assertWindowname("jgridstart-requestwizard-1");
-	    Thread.sleep(6000);
+	    waitEnabled(JButton.class, "Next");
 	    // verification form
 	    System.setProperty("wizard.show.help1", "true"); // simulate help btn1 pressed
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
@@ -139,7 +146,7 @@ public class GUIScreenshotsTest extends TestCase {
 		}
 	    });
 	    btn.doClick();
-	    Thread.sleep(1000);
+	    waitEnabled(JButton.class, "Close");
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"newrequest05.png"));
 	    assertWindowname("jgridstart-verification-form");
@@ -161,7 +168,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    // show request wizard again
 	    tester.key(new Integer('A'), InputEvent.ALT_MASK);
 	    tester.key('R');
-	    Thread.sleep(2500);
+	    guiSleep();
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"newrequest08.png"));
 	    assertWindowname("jgridstart-requestwizard-2");
@@ -197,7 +204,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    // personal details
 	    tester.key(new Integer('A'), InputEvent.ALT_MASK);
 	    tester.key('W');
-	    Thread.sleep(2500);
+	    guiSleep();
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew02.png"));
 	    assertWindowname("jgridstart-requestwizard-0");
@@ -212,7 +219,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew04.png"));
 	    assertWindowname("jgridstart-requestwizard-1");
-	    Thread.sleep(3500);
+	    waitEnabled(JButton.class, "Next");
 	    // wait for approval page
 	    tester.key(new Integer('N'), InputEvent.ALT_MASK);
 	    guiSleep();
@@ -234,7 +241,8 @@ public class GUIScreenshotsTest extends TestCase {
 	    // show request wizard again
 	    tester.key(new Integer('A'), InputEvent.ALT_MASK);
 	    tester.key('R');
-	    Thread.sleep(2500);
+	    waitEnabled(JButton.class, "Next");
+	    Thread.sleep(500);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew08.png"));
 	    assertWindowname("jgridstart-requestwizard-2");
@@ -263,7 +271,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    assertWindowname("jgridstart-main-window");
 	    // export dialog
 	    tester.key(new Integer('E'), InputEvent.CTRL_MASK);
-	    Thread.sleep(1000);
+	    waitEnabled(JButton.class, "Export");
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"importexport02.png"));
 	    assertWindowname("jgridstart-export-file-dialog");
@@ -281,7 +289,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    
 	    // import dialog
 	    tester.key(new Integer('I'), InputEvent.CTRL_MASK);
-	    Thread.sleep(1000);
+	    waitEnabled(JButton.class, "Import");
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"importexport04.png"));
 	    assertWindowname("jgridstart-import-file-dialog");
@@ -348,16 +356,9 @@ public class GUIScreenshotsTest extends TestCase {
 	});
     }
     
-    protected static void guiSleep() throws AWTException {
+    protected static void guiSleep() {
 	// process gui events
-	try {
-	    tester.waitForIdle();
-	    /*
-	    java.awt.EventQueue.invokeAndWait(new Runnable() {
-	        public void run() { }
-	    });
-	    */
-	} catch (Exception e) { throw new AWTException(e.toString()); }
+	tester.waitForIdle();
     }
     
     /** Like {@link ComponentTester#keyString}, but correcting some characters.
@@ -407,5 +408,44 @@ public class GUIScreenshotsTest extends TestCase {
     /** Assert the currently active window has the specified name */
     protected static void assertWindowname(String name) {
 	assertEquals(name, AWT.getActiveWindow().getName());
+    }
+    
+    /** Wait for a component to be present and enabled.
+     * <p>
+     * @param klass Component descendant, like {@linkplain JLabel}
+     * @param text What text the component contains, or {@code null} for any
+     */
+    protected static void waitEnabled(final Class<?> klass, final String text) throws MultipleComponentsFoundException, InterruptedException, ComponentNotFoundException {
+	final long maxwaitms = 30000;
+	final long sleepms = 200;
+	Component c = null;
+	for (long i=0; i<maxwaitms/sleepms; i++) {
+	    try {
+		c = (Component)new BasicFinder().find(new Matcher() {
+		public boolean matches(Component c) {
+		    return klass.isInstance(c) && (text==null || text.equals(getComponentText(c))) && c.isEnabled();
+		}
+		});
+		return;
+	    } catch (ComponentNotFoundException e) { }
+	    guiSleep();
+	    Thread.sleep(sleepms);
+	}
+	if (c==null)
+	    throw new ComponentNotFoundException("Component not found");
+	else
+	    throw new ComponentNotFoundException("Component not enabled within timeout");
+    }
+    
+    /** Return the text of a component, or {@code null} if not supported. */
+    protected static String getComponentText(final Component c) {
+	if (c instanceof JButton)
+	    return ((JButton)c).getText();
+	if (c instanceof JLabel)
+	    return ((JLabel)c).getText();
+	if (c instanceof JTextComponent)
+	    return ((JTextComponent)c).getText();
+	// TODO when needed, add others
+	return null;
     }
 }

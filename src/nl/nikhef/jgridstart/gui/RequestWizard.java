@@ -351,8 +351,12 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    if (cert!=null && cert.getCertificate()!=null)
 		cancelAction.putValue(AbstractAction.NAME, "Close");
 	    // renewal requires this step; worker enables it again	    
-	    else if (curPage==1 && isRenewal() && !Boolean.valueOf(data().getProperty("request.submitted")))
+	    else if (curPage==1 && (
+		    	 cert==null ||
+		    	(isRenewal() && !Boolean.valueOf(data().getProperty("request.submitted")))
+		     )) {
 		nextAction.setEnabled(false);
+	    }
 	} catch (IOException e) { }
 
 	if ((curPage==1 || curPage==3) && curPage!=oldPage) {
