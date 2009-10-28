@@ -397,7 +397,10 @@ public class PasswordCache {
 	return isPasswordCancelledException((Throwable)e);
     }
     
-    /** Helper method to set the focus component of a {@linkplain JOptionPane} */
+    /** Helper method to set the focus component of a {@linkplain JOptionPane}.
+     * <p>
+     * Thank you, <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5018574">Java bug 5018574</a>.
+     */
     protected void optionPaneSetFocus(JComponent c) {
 	c.addHierarchyListener(new HierarchyListener() {
 	    public void hierarchyChanged(HierarchyEvent e) {
