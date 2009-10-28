@@ -331,6 +331,7 @@ public class TemplatePanel extends XHTMLPanel implements ITemplatePanel {
 		}
 	    }
 	    if (name==null) return;
+	    c.setName(name);
 	    String value = data.getProperty(name);
 	    // we care about content controls, not scrollpanes
 	    if (c instanceof JScrollPane) c = (JComponent)((JScrollPane)c).getViewport().getView();

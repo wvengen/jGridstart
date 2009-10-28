@@ -22,12 +22,10 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
-import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
-import org.xhtmlrenderer.util.LoggerUtil;
 
 import nl.nikhef.jgridstart.logging.LogHelper;
 import nl.nikhef.jgridstart.util.FileUtils;
@@ -60,7 +58,7 @@ public class GUIScreenshotsTest extends TestCase {
     public static void testScreenshots() throws Exception {
 	File ssdir = FileUtils.createTempDir("jgridstart-screenshots-");
 	try {
-	    main(new String[]{ssdir.getPath()});
+	    doScreenshots(ssdir);
 	} catch(Throwable e) {
 	    // on error, output last screenshot as base64 on debug log
 	    if (lastScreenshot!=null) {
@@ -87,8 +85,12 @@ public class GUIScreenshotsTest extends TestCase {
 	    System.err.println("please give screenshot dir as argument");
 	    return;
 	}
+	doScreenshots(new File(args[0]));
+	System.exit(0);
+    }
+    
+    public static void doScreenshots(File shotdir) throws Exception {
 	LogHelper.setupLogging(true);
-	File shotdir = new File(args[0]);
 	shotdir.mkdirs();
 	String prefix = "jgridstart-screenshot-";
 	// setup temporary environment
@@ -119,6 +121,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    // enter details
 	    guiSleep();
 	    assertWindowname("jgridstart-requestwizard-0");
+	    findByName("givenname").requestFocus(); guiSleep(); // until focus works on all configurations 
 	    keyString("John\t");
 	    keyString("Doe\t");
 	    keyString("john.doe@example.com\t");
@@ -208,6 +211,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew02.png"));
 	    assertWindowname("jgridstart-requestwizard-0");
+	    findByName("email").requestFocus(); guiSleep(); // until focus works on all configurations
 	    keyString("\t");
 	    keyString(password+"\t");
 	    keyString(password+"\t");
@@ -277,10 +281,9 @@ public class GUIScreenshotsTest extends TestCase {
 	    assertWindowname("jgridstart-export-file-dialog");
 	    // enter name and do export
 	    tester.keyString("my_certificate.p12\n");
-	    Thread.sleep(1000);
+	    Thread.sleep(2000);
 	    saveScreenshot(new File(shotdir, prefix+"importexport03.png"));
 	    assertWindowname("jgridstart-password-entry-decrypt");
-	    tester.keyString("\t\t"); // update when passwordcache dialog focuses proper field
 	    tester.keyString(password+"\n");
 	    guiSleep();
 	    
@@ -299,7 +302,6 @@ public class GUIScreenshotsTest extends TestCase {
 	    Thread.sleep(1000);
 	    saveScreenshot(new File(shotdir, prefix+"importexport05.png"));
 	    assertWindowname("jgridstart-password-entry-decrypt");
-	    keyString("\t\t"); // update when passwordcache dialog focuses proper field
 	    keyString(password+"\n");
 	    guiSleep();
 
@@ -428,7 +430,7 @@ public class GUIScreenshotsTest extends TestCase {
 		}
 		});
 		return;
-	    } catch (ComponentNotFoundException e) { }
+	    } catch (Exception e) { }
 	    guiSleep();
 	    Thread.sleep(sleepms);
 	}
@@ -448,5 +450,14 @@ public class GUIScreenshotsTest extends TestCase {
 	    return ((JTextComponent)c).getText();
 	// TODO when needed, add others
 	return null;
+    }
+    
+    /** Finds a {@linkplain Component} by its name */
+    protected static Component findByName(final String name) throws ComponentNotFoundException, MultipleComponentsFoundException {
+	return new BasicFinder().find(new Matcher() {
+		public boolean matches(Component c) {
+		    return name.equals(c.getName());
+		}
+	});
     }
 }
