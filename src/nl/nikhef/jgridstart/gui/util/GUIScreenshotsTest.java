@@ -420,7 +420,9 @@ public class GUIScreenshotsTest extends TestCase {
      */
     protected static void waitEnabled(final Class<?> klass, final String text) throws MultipleComponentsFoundException, InterruptedException, ComponentNotFoundException {
 	Component c = null;
-	for (long i=0; i<10; i++) {
+	long timeout = 40000;
+	long start = System.currentTimeMillis();
+	while ( System.currentTimeMillis() - start < timeout ) {
 	    try {
 		c = (Component)new BasicFinder().find(new Matcher() {
 		    public boolean matches(Component c) {
