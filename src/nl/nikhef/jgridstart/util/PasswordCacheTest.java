@@ -11,12 +11,22 @@ import junit.framework.TestCase;
 
 public class PasswordCacheTest extends TestCase {
     
-    private PasswordCache cache = null;
+    private PasswordCache cache;
+    private int oldUI;
+    private int oldTimeout;
     
     @Override
     public void setUp() {
 	cache = PasswordCache.getInstance();
+	oldUI = cache.getUI();
 	cache.setUI(PasswordCache.UI_NONE);
+	oldTimeout = cache.getTimeout();
+    }
+    
+    @Override
+    public void tearDown() {
+	cache.setUI(oldUI);
+	cache.setTimeout(oldTimeout);
     }
     
     public void testGetInstance() {
