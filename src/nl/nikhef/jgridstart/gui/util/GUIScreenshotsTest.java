@@ -419,25 +419,19 @@ public class GUIScreenshotsTest extends TestCase {
      * @param text What text the component contains, or {@code null} for any
      */
     protected static void waitEnabled(final Class<?> klass, final String text) throws MultipleComponentsFoundException, InterruptedException, ComponentNotFoundException {
-	final long maxwaitms = 30000;
-	final long sleepms = 200;
 	Component c = null;
-	for (long i=0; i<maxwaitms/sleepms; i++) {
+	for (long i=0; i<10; i++) {
 	    try {
 		c = (Component)new BasicFinder().find(new Matcher() {
-		public boolean matches(Component c) {
-		    return klass.isInstance(c) && (text==null || text.equals(getComponentText(c))) && c.isEnabled();
-		}
+		    public boolean matches(Component c) {
+			return klass.isInstance(c) && (text==null || text.equals(getComponentText(c))) && c.isEnabled();
+		    }
 		});
 		return;
 	    } catch (Exception e) { }
 	    guiSleep();
-	    Thread.sleep(sleepms);
 	}
-	if (c==null)
-	    throw new ComponentNotFoundException("Component not found");
-	else
-	    throw new ComponentNotFoundException("Component not enabled within timeout");
+	if (c==null) throw new ComponentNotFoundException("Component not found or enabled");
     }
     
     /** Return the text of a component, or {@code null} if not supported. */
