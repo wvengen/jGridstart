@@ -103,7 +103,9 @@ public class ActionExport extends CertificateAction {
     }
     
     protected static JPanel customFileChooser(final JDialog dlg, final JFileChooser chooser, final Action action) {
-	Insets insets = ((EmptyBorder)chooser.getBorder()).getBorderInsets();
+	Insets insets = null;
+	if (chooser.getBorder() instanceof EmptyBorder)
+	    insets = ((EmptyBorder)chooser.getBorder()).getBorderInsets();
 	// disable buttons because we'll roll our own
 	chooser.setControlButtonsAreShown(false);
 	chooser.setApproveButtonText((String)action.getValue(Action.NAME));
@@ -114,11 +116,11 @@ public class ActionExport extends CertificateAction {
 	// then container panel for our extra elements
 	JPanel contentpane = new JPanel();
 	contentpane.setLayout(new BoxLayout(contentpane, BoxLayout.Y_AXIS));
-	contentpane.setBorder(BorderFactory.createEmptyBorder(0, insets.left, 0, insets.right));
+	if (insets!=null) contentpane.setBorder(BorderFactory.createEmptyBorder(0, insets.left, 0, insets.right));
 	panel.add(contentpane);
 	// and the bottom buttons
 	JPanel btns = new JPanel();
-	btns.setBorder(BorderFactory.createEmptyBorder(insets.top, insets.left, insets.bottom, insets.right));
+	if (insets!=null) btns.setBorder(BorderFactory.createEmptyBorder(insets.top, insets.left, insets.bottom, insets.right));
 	btns.add(Box.createHorizontalGlue());
 	btns.setLayout(new BoxLayout(btns, BoxLayout.X_AXIS));
 	JButton activate = new JButton(action);
