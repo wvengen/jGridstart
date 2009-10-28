@@ -69,6 +69,10 @@ public class GUIScreenshotsTest extends TestCase {
 		logger.finest("Interactive UI testing failed, last screenshot:");
 		logger.finest("[IMG "+lastScreenshot.getName()+"] "+base64.toString());
 	    }
+	    // destroy window
+	    Window mainwnd = AWT.getActiveWindow();
+	    if (mainwnd!=null && mainwnd.isVisible()) mainwnd.dispose();
+	    // pass on error
 	    if (e instanceof Exception) throw (Exception)e;
 	    else if (e instanceof Error) throw (Error)e;
 	    else throw new Exception("Unknown throwable: ", e);
@@ -90,7 +94,6 @@ public class GUIScreenshotsTest extends TestCase {
     }
     
     public static void doScreenshots(File shotdir) throws Exception {
-	LogHelper.setupLogging(true);
 	shotdir.mkdirs();
 	String prefix = "jgridstart-screenshot-";
 	// setup temporary environment
@@ -326,7 +329,6 @@ public class GUIScreenshotsTest extends TestCase {
 	} finally {
 	    guiSleep(); Thread.sleep(500); // for screenshot to complete ...
 	    FileUtils.recursiveDelete(tmphome);
-	    if (mainwnd!=null) mainwnd.dispose();
 	}
 	// exit!
 	return;
@@ -399,9 +401,11 @@ public class GUIScreenshotsTest extends TestCase {
 	
 	for (int i=0; i<c.length; i++) {
 	    if (replacemap.containsKey(c[i])) {
+		guiSleep();
 		tester.setModifiers(InputEvent.SHIFT_MASK, true);
 		tester.keyStroke(replacemap.get(c[i]));
 		tester.setModifiers(InputEvent.SHIFT_MASK, false);
+		guiSleep();
 	    } else {
 		tester.keyStroke(c[i]);
 	    }
