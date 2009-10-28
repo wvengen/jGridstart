@@ -1,5 +1,14 @@
 package nl.nikhef.jgridstart.util;
 
+import java.awt.Component;
+import java.awt.Window;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,11 +19,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
+import javax.swing.SwingUtilities;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 import org.bouncycastle.openssl.PasswordFinder;
 
@@ -150,12 +163,8 @@ public class PasswordCache {
 	    pane.setMessage(new Object[] {lbl, pass});
 	    JDialog dialog = pane.createDialog(parent, "Enter password");
 	    logger.fine("Requesting decryption password for "+loc);
-	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    pass.requestFocusInWindow();
-		}
-	    });
 	    dialog.setName("jgridstart-password-entry-decrypt");
+	    optionPaneSetFocus(pass);
 	    dialog.setVisible(true);
 	    if (((Integer)pane.getValue()) != JOptionPane.OK_OPTION) {
 		logger.fine("Dencryption password request cancelled for "+loc);
@@ -197,7 +206,7 @@ public class PasswordCache {
 	    return passwords.get(loc);
 	}
 	// TODO focus is moved from password entry to ok button!!!
-	JOptionPane pane = new JOptionPane();
+	final JOptionPane pane = new JOptionPane();
 	pane.setMessageType(JOptionPane.PLAIN_MESSAGE);
 	pane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
 	msg = msg.replace("\n", "<br>");
@@ -207,16 +216,13 @@ public class PasswordCache {
 	final JPasswordField pass1 = new JPasswordField(25);
 	final JPasswordField pass2 = new JPasswordField(25);
 	lbl3.setVisible(false);
+	optionPaneSetFocus(pass1);
 	do {
+	    logger.fine("Requesting encryption password for "+loc);
 	    pane.setMessage(new Object[] {lbl1, lbl2, lbl3, pass1, pass2});
 	    JDialog dialog = pane.createDialog(parent, "Enter password");
-	    logger.fine("Requesting encryption password for "+loc);
-	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    pass1.requestFocusInWindow();
-		}
-	    });
 	    dialog.setName("jgridstart-password-entry-encrypt");
+	    dialog.pack();
 	    dialog.setVisible(true);
 	    // handle cancel
 	    if ( ((Integer)pane.getValue()) != JOptionPane.OK_OPTION ) {
@@ -389,5 +395,23 @@ public class PasswordCache {
     /** @see #isPasswordCancelledException(Throwable) */
     public static boolean isPasswordCancelledException(Exception e) {
 	return isPasswordCancelledException((Throwable)e);
+    }
+    
+    /** Helper method to set the focus component of a {@linkplain JOptionPane} */
+    protected void optionPaneSetFocus(JComponent c) {
+	c.addHierarchyListener(new HierarchyListener() {
+	    public void hierarchyChanged(HierarchyEvent e) {
+		final Component c = e.getComponent();
+		if (c.isShowing() && (e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+		    Window toplevel = SwingUtilities.getWindowAncestor(c);
+		    toplevel.addWindowFocusListener(new WindowAdapter() {
+			@Override
+			public void windowGainedFocus(WindowEvent e) {
+			    c.requestFocus();
+			}
+		    });
+		}
+	    }
+	});    
     }
 }
