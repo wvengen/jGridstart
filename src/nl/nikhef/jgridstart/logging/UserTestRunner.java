@@ -85,6 +85,14 @@ public class UserTestRunner {
 	    setTitle(title);
 	    setSize(new Dimension(650, 400));
 	    setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+	    addWindowListener(new WindowAdapter() {
+		@Override
+		public void windowClosed(WindowEvent e) {
+		    if (proc!=null) proc.destroy();
+		    if (tmpdir!=null) FileUtils.recursiveDelete(tmpdir);
+		    System.exit(0);
+		}
+	    });
 	    JPanel panel = new JPanel();
 	    panel.setLayout(new BorderLayout(2, 2));
 	    panel.add((msg = new JLabel()), BorderLayout.NORTH);
@@ -118,14 +126,6 @@ public class UserTestRunner {
 	    };
 	    btnpanel.add(new JButton(quitAction));
 	    panel.add(btnpanel, BorderLayout.SOUTH);
-	    addWindowListener(new WindowAdapter() {
-		@Override
-		public void windowClosed(WindowEvent e) {
-		    if (proc!=null) proc.destroy();
-		    if (tmpdir!=null) FileUtils.recursiveDelete(tmpdir);
-		    System.exit(0);
-		}
-	    });
 	    setContentPane(panel);
 	    setMessage("Thank you for running the jGridstart testing program. Your cooperation enables us to " +
 		       "improve the software. Please press the button 'Run tests' below, then wait while the " +
