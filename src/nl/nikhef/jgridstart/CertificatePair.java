@@ -33,6 +33,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -1139,7 +1140,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
     /*
      * ItemListener interface
      */
-    private ArrayList<ItemListener> itemListeners = new ArrayList<ItemListener>();
+    private List<ItemListener> itemListeners = Collections.synchronizedList(new ArrayList<ItemListener>());
     /** @see java.awt.ItemSelectable#addItemListener(java.awt.event.ItemListener) */
     public void addItemListener(ItemListener l) {
 	itemListeners.add(l);
