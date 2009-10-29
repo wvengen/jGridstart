@@ -559,7 +559,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    	    setStepRelative(-1);
 		    	} else {
 		    	    ErrorMessage.logException(e);
-		    	    if (e.getLocalizedMessage()!=null && !e.getLocalizedMessage().equals(""))
+		    	    if (e.getLocalizedMessage()!=null && !e.getLocalizedMessage().equals("") && !e.getLocalizedMessage().equals("null"))
 		    		data().setProperty("wizard.error", e.getLocalizedMessage());
 		    	    else
 		    		data().setProperty("wizard.error", "Unknown error. Please go back and try again.");

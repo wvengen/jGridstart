@@ -97,6 +97,7 @@ public class GUIScreenshotsTest extends TestCase {
 	shotdir.mkdirs();
 	String prefix = "jgridstart-screenshot-";
 	// setup temporary environment
+	logger.info("Setting up jGridstart interactive screenshot and testing environment");
 	File tmphome = FileUtils.createTempDir("jgridstart-home");
 	Window mainwnd = null;
 	try {
@@ -105,6 +106,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    System.setProperty("user.home", tmphome.getCanonicalPath());
 	    // create standard gui
 	    nl.nikhef.jgridstart.gui.Main.main(new String[]{});
+	    LogHelper.setupLogging(true);
 	    // move mouse here since closing window may give up focus later
 	    Thread.sleep(2000); guiSleep();
 	    mainwnd = AWT.getActiveWindow();
@@ -115,6 +117,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    /*
 	     * Request new
 	     */
+	    logger.info("Interactive testing scenario: Request New");
 	    // start screen
 	    saveScreenshot(new File(shotdir, prefix+"newrequest01.png"));
 	    // new request wizard
@@ -200,6 +203,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    /*
 	     * Renewal
 	     */
+	    logger.info("Interactive testing scenario: Renewal");
 	    System.setProperty("jgridstart.ca.local.hold", "true");
 	    // forget password so we certainly get the password dialog
 	    PasswordCache.getInstance().clear();
@@ -270,6 +274,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    /*
 	     * Import/export
 	     */
+	    logger.info("Interactive testing scenario: Import/Export");
 	    // forget password so we certainly get the password dialog
 	    PasswordCache.getInstance().clear();
 	    // starting screenshot (multiple certificates)
@@ -312,6 +317,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    /*
 	     * Certificate details
 	     */
+	    logger.info("Interactive testing scenario: Certificate details");
 	    // certificate details view
 	    mainwnd.setSize(750, 480);
 	    System.setProperty("view.showdetails", "true");
@@ -325,6 +331,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    /*
 	     * Exit!
 	     */
+	    logger.info("Interactive testing finished");
 	    tester.key(new Integer('Q'), InputEvent.CTRL_MASK);
 	    
 	} finally {
@@ -344,6 +351,7 @@ public class GUIScreenshotsTest extends TestCase {
 	// capture screen
 	javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	    public void run() {
+		logger.info("Saving screenshot: "+dst);
 		try {
 		    // find active window area, or full desktop if that fails
 		    Window w = AWT.getActiveWindow();
@@ -378,6 +386,7 @@ public class GUIScreenshotsTest extends TestCase {
 	char[] c = s.toCharArray();
 	// initialize when needed
 	if (replacemap==null) {
+	    logger.fine("Detecting robot keymapping");
 	    replacemap = new HashMap<Character, Character>();
 	    // create textbox, type in each character, store result
 	    final String chars = "1234567890";
@@ -415,6 +424,7 @@ public class GUIScreenshotsTest extends TestCase {
     
     /** Assert the currently active window has the specified name */
     protected static void assertWindowname(String name) {
+	logger.fine("Expecting window name: "+name);
 	assertEquals(name, AWT.getActiveWindow().getName());
     }
     
