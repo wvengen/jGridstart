@@ -553,18 +553,16 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 			setStepRelative(-1);
 			
 		    } else {
-			// we need an exception
-			Throwable localexp = e;
-			if (localexp.getMessage()==null)
-			    localexp = new Exception("Unknown error. Please go back and try again.");
-
 			// either show with dialog or error message in pane
 		    	if (useErrordlg) {
-		    	    ErrorMessage.error(RequestWizard.this, "Error during request", localexp);
+		    	    ErrorMessage.error(RequestWizard.this, "Error during request", e);
 		    	    setStepRelative(-1);
 		    	} else {
-		    	    ErrorMessage.logException(localexp);
-		    	    data().setProperty("wizard.error", localexp.getLocalizedMessage());
+		    	    ErrorMessage.logException(e);
+		    	    if (e.getLocalizedMessage()!=null && !e.getLocalizedMessage().equals(""))
+		    		data().setProperty("wizard.error", e.getLocalizedMessage());
+		    	    else
+		    		data().setProperty("wizard.error", "Unknown error. Please go back and try again.");
 		    	    data().setProperty("wizard.error.volatile", "true");
 		    	    refresh();
 		    	}

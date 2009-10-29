@@ -289,6 +289,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    assertWindowname("jgridstart-password-entry-decrypt");
 	    tester.keyString(password+"\n");
 	    guiSleep();
+	    assertWindowname("jgridstart-main-window");
 	    
 	    // forget password so we certainly get the password dialog
 	    PasswordCache.getInstance().clear();
