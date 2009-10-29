@@ -127,7 +127,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    // enter details
 	    guiSleep();
 	    assertWindowname("jgridstart-requestwizard-0");
-	    findByName("givenname").requestFocus(); guiSleep(); // until focus works on all configurations 
+	    focusByName("givenname"); 
 	    keyString("John\t");
 	    keyString("Doe\t");
 	    keyString("john.doe@example.com\t");
@@ -214,11 +214,11 @@ public class GUIScreenshotsTest extends TestCase {
 	    // personal details
 	    tester.key(new Integer('A'), InputEvent.ALT_MASK);
 	    tester.key('W');
-	    guiSleep();
+	    Thread.sleep(500);
 	    guiSleep();
 	    saveScreenshot(new File(shotdir, prefix+"renew02.png"));
 	    assertWindowname("jgridstart-requestwizard-0");
-	    findByName("email").requestFocus(); guiSleep(); // until focus works on all configurations
+	    focusByName("email");
 	    keyString("\t");
 	    keyString(password+"\t");
 	    keyString(password+"\t");
@@ -461,6 +461,19 @@ public class GUIScreenshotsTest extends TestCase {
 	    return ((JTextComponent)c).getText();
 	// TODO when needed, add others
 	return null;
+    }
+    
+    /** Gives focus to a {@linkplain Component} by its name */
+    protected static boolean focusByName(final String name) throws ComponentNotFoundException, MultipleComponentsFoundException {
+	Component c = findByName(name);
+	if (c.hasFocus()) return true;
+	if (!c.requestFocusInWindow()) {
+	    logger.warning("Could not give focus to component: "+name);
+	    // hope for the best
+	    return false;
+	}
+	while (!c.hasFocus()) guiSleep();
+	return true;
     }
     
     /** Finds a {@linkplain Component} by its name */

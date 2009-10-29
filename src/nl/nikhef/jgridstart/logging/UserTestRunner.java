@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -82,7 +84,7 @@ public class UserTestRunner {
 	public TesterFrame() {
 	    setTitle(title);
 	    setSize(new Dimension(650, 400));
-	    setDefaultCloseOperation(EXIT_ON_CLOSE);
+	    setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	    JPanel panel = new JPanel();
 	    panel.setLayout(new BorderLayout(2, 2));
 	    panel.add((msg = new JLabel()), BorderLayout.NORTH);
@@ -111,13 +113,19 @@ public class UserTestRunner {
 	    btnpanel.add(Box.createHorizontalStrut(5));
 	    quitAction = new AbstractAction("Quit") {
 		public void actionPerformed(ActionEvent event) {
-		    if (proc!=null) proc.destroy();
-		    if (tmpdir!=null) FileUtils.recursiveDelete(tmpdir);
-		    System.exit(0);
+		    dispose();
 		}
 	    };
 	    btnpanel.add(new JButton(quitAction));
 	    panel.add(btnpanel, BorderLayout.SOUTH);
+	    addWindowListener(new WindowAdapter() {
+		@Override
+		public void windowClosed(WindowEvent e) {
+		    if (proc!=null) proc.destroy();
+		    if (tmpdir!=null) FileUtils.recursiveDelete(tmpdir);
+		    System.exit(0);
+		}
+	    });
 	    setContentPane(panel);
 	    setMessage("Thank you for running the jGridstart testing program. Your cooperation enables us to " +
 		       "improve the software. Please press the button 'Run tests' below, then wait while the " +
@@ -178,7 +186,8 @@ public class UserTestRunner {
 			"-cp",
 			classpath,
 			"org.junit.runner.JUnitCore",
-			testclass
+			testclass,
+			"logtestlistenerevents=true"
 		};
 		System.out.println(StringUtils.join(cmd, " "));
 		proc = Runtime.getRuntime().exec(cmd);

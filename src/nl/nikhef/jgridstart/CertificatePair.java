@@ -912,6 +912,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		      "(there is a small chance that the data is corrupted)";
 	    }
 	}
+	
+	if (key==null)
+	    throw new IOException("Wrong private key password (or malformed key)");
 
 	return key;
     }
