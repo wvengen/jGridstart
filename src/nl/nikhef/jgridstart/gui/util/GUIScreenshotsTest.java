@@ -9,9 +9,14 @@ import java.awt.Window;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -24,6 +29,8 @@ import javax.swing.text.JTextComponent;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.WordUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 
@@ -50,25 +57,34 @@ public class GUIScreenshotsTest extends TestCase {
     /** replacement characters for {@link #keyString} */
     protected static HashMap<Character, Character> replacemap = null;
     
-    /** last screenshot taken */
-    protected static File lastScreenshot = null; 
-    
     /** Make screenshot taking part of unit tests */
     @Test
     public static void testScreenshots() throws Exception {
-	File ssdir = FileUtils.createTempDir("jgridstart-screenshots-");
+	File shotdir = FileUtils.createTempDir("jgridstart-screenshots-");
 	try {
-	    doScreenshots(ssdir);
+	    doScreenshots(shotdir);
 	} catch(Throwable e) {
-	    // on error, output last screenshot as base64 on debug log
-	    if (lastScreenshot!=null) {
-		FileInputStream in = new FileInputStream(lastScreenshot);
-		StringBuffer base64 = new StringBuffer();
-		byte[] c = new byte[100];
-		while (in.read(c)>0) base64.append(new String(Base64.encode(c)));
-		logger.finest("Interactive UI testing failed, last screenshot:");
-		logger.finest("[IMG "+lastScreenshot.getName()+"] "+base64.toString());
+	    // on error, output final screenshot as base64 on debug log
+	    File errorshot = new File(shotdir, "error.png");
+	    saveScreenshot(errorshot);
+	    Thread.sleep(500);
+	    FileInputStream in = new FileInputStream(errorshot);
+	    byte[] data = new byte[(int)errorshot.length()];
+	    in.read(data, 0, data.length);
+	    // need to log in chunks because logger doesn't seem to be able to support >4096 
+	    String basedata = new String(Base64.encode(data));
+	    logger.finest("Interactive UI testing failed, last screenshot (base64 encoded):");
+	    logger.finest("=== BEGIN PNG ===");
+	    int pos = 0;
+	    while (pos < basedata.length()) {
+		int len = 64;
+		if (pos+len < basedata.length())
+		    logger.finest(basedata.substring(pos, pos+len));
+		else 
+		    logger.finest(basedata.substring(pos));
+		pos += len;
 	    }
+	    logger.finest("=== END PNG ===");
 	    // destroy window
 	    Window mainwnd = AWT.getActiveWindow();
 	    if (mainwnd!=null && mainwnd.isVisible()) mainwnd.dispose();
@@ -78,7 +94,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    else throw new Exception("Unknown throwable: ", e);
     	} finally {
 	    // remove screenshot directory again
-    	    FileUtils.recursiveDelete(ssdir);
+    	    FileUtils.recursiveDelete(shotdir);
 	}
     }
     
@@ -120,6 +136,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    logger.info("Interactive testing scenario: Request New");
 	    // start screen
 	    saveScreenshot(new File(shotdir, prefix+"newrequest01.png"));
+int i = 5/0;
 	    // new request wizard
 	    guiSleep(); tester.key(new Integer('N'), InputEvent.CTRL_MASK);
 	    guiSleep();
@@ -342,14 +359,14 @@ public class GUIScreenshotsTest extends TestCase {
 	return;
     }
     
-    /** Write screenshot of current screen to specified file as png.
+    /** Write screenshot of current window to specified file as png.
      * <p>
      * Assumes a single screen. */
-    protected static void saveScreenshot(final File dst) throws AWTException, IOException {
+    protected static void saveScreenshot(final File dst) throws AWTException, IOException, InterruptedException, InvocationTargetException {
 	final Robot robot = new Robot();
 	guiSleep(); guiSleep(); guiSleep();
 	// capture screen
-	javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
 	    public void run() {
 		logger.info("Saving screenshot: "+dst);
 		try {
@@ -361,7 +378,6 @@ public class GUIScreenshotsTest extends TestCase {
 		    BufferedImage img = robot.createScreenCapture(captureSize);
 		    img.flush();
 		    ImageIO.write(img, "png", dst);
-		    lastScreenshot = dst;
 		} catch(IOException e) {
 		    System.err.println(e);
 		}
