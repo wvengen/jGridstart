@@ -1156,8 +1156,10 @@ public class CertificatePair extends Properties implements ItemSelectable {
     /** notify itemlisteners that the item was changed */
     protected void notifyChanged() {
 	ItemEvent e = new ItemEvent(CertificatePair.this, ItemEvent.ITEM_STATE_CHANGED, CertificatePair.this, 0);
-	for (Iterator<ItemListener> it = itemListeners.iterator(); it.hasNext(); ) {
-	    it.next().itemStateChanged(e);
+	synchronized(itemListeners) {
+	    for (Iterator<ItemListener> it = itemListeners.iterator(); it.hasNext(); ) {
+		it.next().itemStateChanged(e);
+	    }
 	}
     }
 }
