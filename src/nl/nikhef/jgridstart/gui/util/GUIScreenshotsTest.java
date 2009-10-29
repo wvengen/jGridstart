@@ -136,7 +136,6 @@ public class GUIScreenshotsTest extends TestCase {
 	    logger.info("Interactive testing scenario: Request New");
 	    // start screen
 	    saveScreenshot(new File(shotdir, prefix+"newrequest01.png"));
-int i = 5/0;
 	    // new request wizard
 	    guiSleep(); tester.key(new Integer('N'), InputEvent.CTRL_MASK);
 	    guiSleep();
