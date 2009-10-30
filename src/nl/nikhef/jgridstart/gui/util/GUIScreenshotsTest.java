@@ -439,7 +439,7 @@ public class GUIScreenshotsTest extends TestCase {
     }
     
     /** Assert the currently active window has the specified name */
-    protected static void assertWindowname(String name) throws InterruptedException {
+    protected static void assertWindowname(String name) throws InterruptedException, ComponentNotFoundException {
 	logger.fine("Expecting window name: "+name);
 	Window w = null;
 	for (int i=0; i<10; i++) {
@@ -449,7 +449,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    if (name.equals(w.getName())) return;
 	    Thread.sleep(100);
 	}
-	throw new AssertionFailedError("Window name not found: "+name + (w!=null ? (" (currently focused: "+w.getName()+")") : ""));
+	throw new ComponentNotFoundException("Window name not found: "+name + (w!=null ? (" (currently focused: "+w.getName()+")") : ""));
     }
     
     /** Wait for a component to be present and enabled.
