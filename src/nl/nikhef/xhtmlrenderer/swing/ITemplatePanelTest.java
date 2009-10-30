@@ -90,11 +90,12 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
      */
     protected Window showFrame(ITemplatePanel panel) {
 	Window wnd = null;
+	Dimension dim = new Dimension(300, 120);
 	if (panel instanceof Window) {
-	    showWindow((Window)panel);
+	    showWindow((Window)panel, dim);
 	    wnd = (Window)panel;
 	} else {
-	    wnd = showFrame((Component)panel);
+	    wnd = showFrame((Component)panel, dim);
 	}
 	wnd.toFront();
 	return wnd;
@@ -112,7 +113,6 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	if (p!=null)
 	    panel.setData(p);
 	frame = showFrame(panel);
-	frame.setMinimumSize(new Dimension(200, 100));
 	waitForWindow(frame, true);
 	// On Mac OS X I have seen the first test fail because the window wasn't
 	// realised fully even when showFrame returned (It couldn't find any
@@ -176,18 +176,10 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
     protected boolean bodyEquals(ITemplatePanel panel, String body) throws SAXException, IOException, ParserConfigurationException {
 	return TemplateDocumentTest.bodyEquals(panel.getDocument(), body);
     }
-    /** Helper method: wait for AWT queue to finish.
-     * <p>
-     * This is done a couple of times to really make it work ... :/ 
-     */
+    /** Helper method: wait for AWT queue to finish. */
     protected void guiSleep() throws InterruptedException, InvocationTargetException, AWTException {
-	guiSleep(3);
-    }
-    private static java.awt.Robot robot = null;
-    protected void guiSleep(int times) throws InterruptedException, InvocationTargetException, AWTException {
-	if (robot==null) robot = new java.awt.Robot();
-	robot.delay(50);
-	robot.waitForIdle();
+	tester.delay(50);
+	tester.waitForIdle();
     }
     /** Get resource from class. Look in Class's space first for overriding
      * by child classes, fallback to the package this class is in. */
