@@ -1,5 +1,6 @@
 package nl.nikhef.xhtmlrenderer.swing;
 
+import java.awt.AWTException;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Window;
@@ -162,12 +163,8 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
      * <p>
      * This convenience method allows customization or working around bugs
      * in find().
-     * 
-     * @throws MultipleComponentsFoundException 
-     * @throws ComponentNotFoundException 
-     * @throws InvocationTargetException 
-     * @throws InterruptedException */
-    protected Component find(Matcher m) throws MultipleComponentsFoundException, ComponentNotFoundException, InterruptedException, InvocationTargetException {
+     */
+    protected Component find(Matcher m) throws MultipleComponentsFoundException, ComponentNotFoundException, InterruptedException, InvocationTargetException, AWTException {
 	guiSleep();
 	// only then look it up
 	return getFinder().find(m);
@@ -181,19 +178,16 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
     }
     /** Helper method: wait for AWT queue to finish.
      * <p>
-     * This is done a couple of times to really make it work ... :/ */
-    protected void guiSleep() throws InterruptedException, InvocationTargetException {
+     * This is done a couple of times to really make it work ... :/ 
+     */
+    protected void guiSleep() throws InterruptedException, InvocationTargetException, AWTException {
 	guiSleep(3);
     }
-    protected void guiSleep(int times) throws InterruptedException, InvocationTargetException {
-	// invoke and wait for an event in the gui thread, so that really
-	// all events are handled
-	for (int i=0; i<times; i++) {
-	    java.awt.EventQueue.invokeAndWait(new Runnable() {
-		public void run() { }
-	    });
-	    sleep();
-	}
+    private static java.awt.Robot robot = null;
+    protected void guiSleep(int times) throws InterruptedException, InvocationTargetException, AWTException {
+	if (robot==null) robot = new java.awt.Robot();
+	robot.delay(50);
+	robot.waitForIdle();
     }
     /** Get resource from class. Look in Class's space first for overriding
      * by child classes, fallback to the package this class is in. */
