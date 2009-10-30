@@ -72,13 +72,13 @@ public class GUIScreenshotsTest extends TestCase {
 	    FileInputStream in = new FileInputStream(errorshot);
 	    byte[] data = new byte[(int)errorshot.length()];
 	    in.read(data, 0, data.length);
-	    // need to log in chunks because logger doesn't seem to be able to support >4096 
+	    // need to log in chunks because logger doesn't seem to be able to support >4096 chars 
 	    String basedata = new String(Base64.encode(data));
 	    logger.finest("Interactive UI testing failed, last screenshot (base64 encoded):");
 	    logger.finest("=== BEGIN PNG ===");
 	    int pos = 0;
 	    while (pos < basedata.length()) {
-		int len = 64;
+		int len = 1024;
 		if (pos+len < basedata.length())
 		    logger.finest(basedata.substring(pos, pos+len));
 		else 
@@ -441,14 +441,15 @@ public class GUIScreenshotsTest extends TestCase {
     /** Assert the currently active window has the specified name */
     protected static void assertWindowname(String name) throws InterruptedException {
 	logger.fine("Expecting window name: "+name);
+	Window w = null;
 	for (int i=0; i<10; i++) {
 	    guiSleep();
-	    Window w = AWT.getActiveWindow();
+	    w = AWT.getActiveWindow();
 	    if (w==null) continue;
 	    if (name.equals(w.getName())) return;
 	    Thread.sleep(100);
 	}
-	throw new AssertionFailedError("Window name not found: "+name);
+	throw new AssertionFailedError("Window name not found: "+name + (w!=null ? (" (currently focused: "+w.getName()+")") : ""));
     }
     
     /** Wait for a component to be present and enabled.
@@ -471,7 +472,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    } catch (Exception e) { }
 	    guiSleep();
 	}
-	if (c==null) throw new ComponentNotFoundException("Component not found or enabled");
+	if (c==null) throw new ComponentNotFoundException("Component not found or enabled: "+text);
     }
     
     /** Return the text of a component, or {@code null} if not supported. */
@@ -496,10 +497,10 @@ public class GUIScreenshotsTest extends TestCase {
 	    return true;
 	}
 	// press tab until we have the correct focus
-	Window w = AWT.getActiveWindow();
-	for (int i=0; i<w.getOwnedWindows().length; i++) {
-	    w.transferFocus();
-	    if (name.equals(w.getFocusOwner().getName())) return true;
+	for (int i=0; i<25 /* TODO proper number */; i++) {
+	    tester.keyStroke('\t');
+	    guiSleep();
+	    if (name.equals(AWT.getActiveWindow().getFocusOwner().getName())) return true;
 	}
 	// failed ...
 	logger.warning("Could not give focus to component: "+name);
