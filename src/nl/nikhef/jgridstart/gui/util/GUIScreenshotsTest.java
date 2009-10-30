@@ -27,6 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -438,9 +439,16 @@ public class GUIScreenshotsTest extends TestCase {
     }
     
     /** Assert the currently active window has the specified name */
-    protected static void assertWindowname(String name) {
+    protected static void assertWindowname(String name) throws InterruptedException {
 	logger.fine("Expecting window name: "+name);
-	assertEquals(name, AWT.getActiveWindow().getName());
+	for (int i=0; i<10; i++) {
+	    guiSleep();
+	    Window w = AWT.getActiveWindow();
+	    if (w==null) continue;
+	    if (name.equals(w.getName())) return;
+	    Thread.sleep(100);
+	}
+	throw new AssertionFailedError("Window name not found: "+name);
     }
     
     /** Wait for a component to be present and enabled.
@@ -482,12 +490,19 @@ public class GUIScreenshotsTest extends TestCase {
     protected static boolean focusByName(final String name) throws ComponentNotFoundException, MultipleComponentsFoundException {
 	Component c = findByName(name);
 	if (c.hasFocus()) return true;
-	if (!c.requestFocusInWindow()) {
-	    logger.warning("Could not give focus to component: "+name);
-	    // hope for the best
-	    return false;
+	// try ordinary method
+	if (c.requestFocusInWindow()) {
+	    while (!c.hasFocus()) guiSleep();
+	    return true;
 	}
-	while (!c.hasFocus()) guiSleep();
+	// press tab until we have the correct focus
+	Window w = AWT.getActiveWindow();
+	for (int i=0; i<w.getOwnedWindows().length; i++) {
+	    w.transferFocus();
+	    if (name.equals(w.getFocusOwner().getName())) return true;
+	}
+	// failed ...
+	logger.warning("Could not give focus to component: "+name);
 	return true;
     }
     
