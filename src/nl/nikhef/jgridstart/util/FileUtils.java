@@ -21,6 +21,7 @@ public class FileUtils {
     /** cache file copy method (Windows only) */
     static private boolean hasRobocopy = false;
     static private boolean copyDetected = false;
+    static private String xcopyInput = null;
     
     /** Copy a file from one place to another, retaining permisions.
      * <p>
@@ -96,10 +97,14 @@ public class FileUtils {
 		    "/K", // copy attributes, normally xcopy will reset readonly attr
 		    "/Y"};// suppress confirm prompts
 		// If the file doesn't exist on copying, xcopy will ask whether you want
-		// to create it as a directory or just copy a file, so we always
-		// just put an answer in xcopy's stdin.
+		// to create it as a directory or just copy a file. The input required is
+		// locale-dependant (sigh), so we need to detect that first.
 		StringBuffer output = new StringBuffer();
-		int ret = Exec(cmd, out.isDirectory()?"D":"F", output);
+		if (xcopyInput==null) {
+		    // TODO implement this
+		    xcopyInput = "F";
+		}
+		int ret = Exec(cmd, xcopyInput, output);
 		if (ret==0) return true;
 		if (ret==1) return false;
 		// Catch xcopy bug; if the user has no access to one of the parent
