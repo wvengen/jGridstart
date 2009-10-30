@@ -9,14 +9,10 @@ import java.awt.Window;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -27,11 +23,8 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
-import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.WordUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 
@@ -349,7 +342,12 @@ public class GUIScreenshotsTest extends TestCase {
 	     * Exit!
 	     */
 	    logger.info("Interactive testing finished");
-	    tester.key(new Integer('Q'), InputEvent.CTRL_MASK);
+	    /* Quit does a {@link System.exit}, which JUnit doesn't like. The
+	     * error it gives is something like:
+	     *   [junit] Test <testclass> FAILED (crashed)
+	     * So we leave it to the calling function to dispose of the window.
+	     */
+	    //tester.key(new Integer('Q'), InputEvent.CTRL_MASK);
 	    
 	} finally {
 	    guiSleep(); Thread.sleep(500); // for screenshot to complete ...
