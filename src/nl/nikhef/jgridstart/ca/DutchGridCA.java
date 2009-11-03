@@ -124,7 +124,8 @@ public class DutchGridCA implements CA {
      * The field {@code email} is used to supply the user's email address to the CA
      * for notifying the user when the request is processed, and the field {@code agreecps}
      * must be {@code true} to succeed; the latter corresponds to the "I agree to the
-     * privacy policy" checkbox on the website.
+     * privacy policy" checkbox on the website. The field {@code fullname} should contain
+     * the user's full name.
      * 
      * @param req {@inheritDoc}
      * @param info {@inheritDoc}; {@code email}, {@code fullname} and {@code agreecps} are used here.

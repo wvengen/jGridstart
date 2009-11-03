@@ -92,8 +92,10 @@ public class CertificateRequest {
 	for (int i=1; i<orgs.length; i++)
 	    subject += ", OU=" + orgs[i];
 	
-	subject += ", CN=" + p.getProperty("givenname").trim() +
-			" " + p.getProperty("surname").trim();
+	p.setProperty("fullname", p.getProperty("givenname").trim() +
+		" " + p.getProperty("surname").trim());
+	p.setProperty("fullname.lock", "true");
+	subject += ", CN=" + p.getProperty("fullname");;
 	// simulate x-full propery from certificate to generate request
 	p.setProperty("subject", subject);
 	p.setProperty("subject.volatile", "true");
