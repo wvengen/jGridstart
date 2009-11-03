@@ -60,8 +60,8 @@ public class ComponentCertificateList extends JList {
 	    String dfl = "";
 	    // name of person
 	    String name = cert.getSubjectPrincipalValue(X509Name.CN);
+	    if (name!=null && name.length() > maxNameLen) name = name.substring(0, maxNameLen-2)+"&#x2026;";
 	    if (name==null) name="<i>(Unknown)</i>";
-	    if (name.length() > maxNameLen) name = name.substring(0, maxNameLen-2)+"&#x2026;";
 	    line2 += name;
 	    // add star to default certificate
 	    CertificatePair dflCert = null;
