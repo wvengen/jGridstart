@@ -186,8 +186,7 @@ public class UserTestRunner {
 			"-cp",
 			classpath,
 			"org.junit.runner.JUnitCore",
-			testclass,
-			"logtestlistenerevents=true"
+			testclass
 		};
 		System.out.println(StringUtils.join(cmd, " "));
 		proc = Runtime.getRuntime().exec(cmd);
