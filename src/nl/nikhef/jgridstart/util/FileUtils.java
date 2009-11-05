@@ -23,7 +23,8 @@ public class FileUtils {
     /** cache file copy method (Windows only) */
     static private boolean hasRobocopy = false;
     static private boolean copyDetected = false;
-    static private String xcopyInput = null;
+    static final private String xcopyInputDfl = "\n"; /* just need something not interfering */
+    static private String xcopyInput = xcopyInputDfl;
     
     /** Copy a file from one place to another, retaining permisions.
      * <p>
@@ -104,7 +105,7 @@ public class FileUtils {
 		StringBuffer output = new StringBuffer();
 		int ret = Exec(cmd, xcopyInput, output);
 		// check if aborted due to missing xcopyInput
-		if (ret==2 && xcopyInput==null) {
+		if (ret==2 && xcopyInputDfl.equals(xcopyInput)) {
 		    Matcher m = Pattern.compile("\\(\\s*(.)\\s*=.*?,\\s*(.)\\s*=.*?\\)").matcher(output);
 		    if (m.find()) {
 			// store and try again; first match means file copy
