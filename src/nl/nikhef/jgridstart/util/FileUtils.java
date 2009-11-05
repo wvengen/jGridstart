@@ -11,6 +11,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -98,13 +100,18 @@ public class FileUtils {
 		    "/Y"};// suppress confirm prompts
 		// If the file doesn't exist on copying, xcopy will ask whether you want
 		// to create it as a directory or just copy a file. The input required is
-		// locale-dependant (sigh), so we need to detect that first.
+		// locale-dependant (sigh), so we need to detect that first if aborted.
 		StringBuffer output = new StringBuffer();
-		if (xcopyInput==null) {
-		    // TODO implement this
-		    xcopyInput = "F";
-		}
 		int ret = Exec(cmd, xcopyInput, output);
+		// check if aborted due to missing xcopyInput
+		if (ret==2 && xcopyInput==null) {
+		    Matcher m = Pattern.compile("\\(\\s*(.)\\s*=.*?,\\s*(.)\\s*=.*?\\)").matcher(output);
+		    if (m.find()) {
+			// store and try again; first match means file copy
+			xcopyInput = m.group(1);
+			return CopyFile(in, out);
+		    }
+		}
 		if (ret==0) return true;
 		if (ret==1) return false;
 		// Catch xcopy bug; if the user has no access to one of the parent
