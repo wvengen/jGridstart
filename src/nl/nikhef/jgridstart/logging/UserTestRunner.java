@@ -213,11 +213,11 @@ public class UserTestRunner {
 	}
 	    
 	public void onProcessComplete(int exitValue) {
-	    outputpane.append("\n(testing exited with "+exitValue+")\n");
+	    outputpane.append("\n(testing exited successfully with "+exitValue+")\n");
 	    signalTestsDone();
 	}
 	public void onProcessFailed(ExecuteException e) {
-	    outputpane.append("\n(testing failed: "+e+")\n");
+	    outputpane.append("\n(testing exited: "+e+")\n");
 	    signalTestsDone();
 	}
 	
