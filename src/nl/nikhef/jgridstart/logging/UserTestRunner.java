@@ -213,11 +213,11 @@ public class UserTestRunner {
 	}
 	    
 	public void onProcessComplete(int exitValue) {
-	    outputpane.append("\n(testing exited successfully with "+exitValue+")\n");
+	    outputpane.append(linesep+"(testing exited successfully with "+exitValue+")"+linesep);
 	    signalTestsDone();
 	}
 	public void onProcessFailed(ExecuteException e) {
-	    outputpane.append("\n(testing exited: "+e+")\n");
+	    outputpane.append(linesep+"(testing exited: "+e+")"+linesep);
 	    signalTestsDone();
 	}
 	
@@ -250,6 +250,8 @@ public class UserTestRunner {
 			    public void run() {
 				outputpane.append("-- Submission of test results failed"+linesep);
 				outputpane.append(e.getLocalizedMessage()+linesep);
+				for (int i=0; i<e.getStackTrace().length; i++) 
+				    outputpane.append(e.getStackTrace()[i]+linesep);
 				setMessage("Submission of test results failed, sorry.");
 				uploadAction.setEnabled(true);
 			    }
