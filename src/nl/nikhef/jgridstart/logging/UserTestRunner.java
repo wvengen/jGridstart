@@ -9,9 +9,10 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URL;
 
 import javax.swing.AbstractAction;
@@ -29,6 +30,14 @@ import javax.swing.SwingUtilities;
 import nl.nikhef.jgridstart.util.ConnectionUtils;
 import nl.nikhef.jgridstart.util.FileUtils;
 
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.ExecuteResultHandler;
+import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.exec.ShutdownHookProcessDestroyer;
+import org.apache.commons.exec.StreamPumper;
 import org.apache.commons.lang.StringUtils;
 
 /** GUI test program that runs a command and uploads the output */
@@ -75,7 +84,7 @@ public class UserTestRunner {
 	/** Upload action */
 	Action uploadAction;
 	/** Testing process */
-	Process proc = null;
+	Executor exec = null;
 	/** Testing output */
 	StringBuffer output;
 	
@@ -88,7 +97,6 @@ public class UserTestRunner {
 	    addWindowListener(new WindowAdapter() {
 		@Override
 		public void windowClosed(WindowEvent e) {
-		    if (proc!=null) proc.destroy();
 		    if (tmpdir!=null) FileUtils.recursiveDelete(tmpdir);
 		    System.exit(0);
 		}
@@ -144,7 +152,7 @@ public class UserTestRunner {
 	
 	/** Start the tests */
 	void runTests() {
-	    if (proc!=null) return;
+	    if (exec!=null) return;
 	    
 	    try {
 		setMessage("Please <i>don't touch</i> your mouse or keyboard while the tests are running...\n" +
@@ -180,19 +188,17 @@ public class UserTestRunner {
 		    classpath = classpath.substring(0, classpath.length()-System.getProperty("path.separator").length());
 		    tmpdir.deleteOnExit();
 		}
-		// run!
-		String[] cmd = new String[] {
-			java,
-			"-cp",
-			classpath,
-			"org.junit.runner.JUnitCore",
-			testclass
-		};
-		System.out.println(StringUtils.join(cmd, " "));
-		proc = Runtime.getRuntime().exec(cmd);
-		
-		new CaptureThread(proc.getInputStream()).start();
-		new CaptureThread(proc.getErrorStream()).start();
+		CommandLine cmdline = new CommandLine(java);
+		cmdline.addArgument("-cp");
+		cmdline.addArgument(classpath);
+		cmdline.addArgument("org.junit.runner.JUnitCore");
+		cmdline.addArgument(testclass);
+		DefaultExecutor exec = new DefaultExecutor();
+		TextareaOutputStream outputstream = new TextareaOutputStream(outputpane);
+		exec.setStreamHandler(new PumpStreamHandler(outputstream));
+		exec.setProcessDestroyer(new ShutdownHookProcessDestroyer());
+		System.out.println(cmdline);
+		exec.execute(cmdline, outputstream);
 		
 	    } catch (Exception e) {
 		e.printStackTrace(); // TODO finish
@@ -251,44 +257,46 @@ public class UserTestRunner {
 		       "You can now close this window.");
 	}
 	
-	/** Thread to capture an {@linkplain InputStream} and put it in the textarea */
-	class CaptureThread extends Thread {
-	    BufferedReader reader;
-	    public CaptureThread(InputStream r) {
-		reader = new BufferedReader(new InputStreamReader(r));
+	protected static class TextareaOutputStream extends OutputStream implements ExecuteResultHandler {
+	    private final JTextArea area;
+	    private final StringBuffer buf = new StringBuffer(128);
+	    public TextareaOutputStream(final JTextArea area) {
+		this.area = area;
 	    }
 	    @Override
-	    public void run() {
-		final StringBuffer buf = new StringBuffer(128);
-		final char sc = linesep.charAt(linesep.length()-1);
-		try {
-		    while (true) {
-			int c = reader.read();
-			// handle eof
-			if (c < 0) break;
-			// append character
-			buf.append((char)c);
-			// and newline appends to textarea
-			if ( sc == (char)c && buf.toString().endsWith(linesep)) {
-			    SwingUtilities.invokeLater(new Runnable() {
-				String str = buf.toString();
-				public void run() {
-				    outputpane.append(str);
-				}
-			    });
-			    buf.setLength(0);
-			}
+	    public void write(int c) throws IOException {
+		// append character to buffer
+		buf.append((char)c);
+		// and newline appends to textarea
+		if ( c=='\n' ) flush();
+	    }
+	    @Override
+	    public void close() {
+		flush();
+	    }	   
+	    @Override
+	    public void flush() {
+		SwingUtilities.invokeLater(new Runnable() {
+		    String str = buf.toString();
+		    public void run() {
+			area.append(str);
 		    }
-		} catch (Exception e) {
-		    e.printStackTrace();
-		} finally {
-		    try { reader.close(); } catch (Exception e) { }
-		    SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-			    signalTestsDone();
-			}
-		    });
-		}
+		});
+		buf.setLength(0);
+	    }
+	    
+	    public void message(String msg) {
+		if (buf.charAt(buf.length()-1) != '\n') buf.append('\n');
+		buf.append(msg);
+		buf.append('\n');
+		flush();
+	    }
+	    
+	    public void onProcessComplete(int exitValue) {
+		message("(exited with "+exitValue+")");
+	    }
+	    public void onProcessFailed(ExecuteException e) {
+		message("(terminated with "+e+")");
 	    }
 	}
     }

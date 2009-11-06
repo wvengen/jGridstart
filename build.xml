@@ -71,6 +71,7 @@
 	<property name="dep.javamail" location="${dir.thirdparty}/bouncycastle/mail-1.4.1.jar"/>
 	<property name="dep.commons-cli" location="${dir.thirdparty}/commons/commons-cli-1.2.jar"/>
 	<property name="dep.commons-lang" location="${dir.thirdparty}/commons/commons-lang-2.4.jar"/>
+	<property name="dep.commons-exec" location="${dir.thirdparty}/commons/commons-exec-1.0.jar"/>
 	<property name="dep.junit" location="${dir.thirdparty}/junit/junit-4.7.jar"/>
 	<property name="dep.abbot" location="${dir.thirdparty}/junit/abbot.jar"/>
 	<property name="dep.swingworker" location="${dir.thirdparty}/swingworker/swing-worker-1.2.jar"/>
@@ -90,6 +91,7 @@
 			<pathelement location="${dep.javamail}"/>
 		<pathelement location="${dep.commons-lang}"/>
 		<pathelement location="${dep.commons-cli}"/>
+		<pathelement location="${dep.commons-exec}"/>
 		<pathelement location="${dep.junit}"/>
 		<pathelement location="${dep.abbot}"/>
 		<pathelement location="${dep.swingworker}"/> <!-- for java1.5 and below -->
@@ -116,6 +118,7 @@
 	<resources id="depfiles">
 		<zipfileset src="${dep.commons-lang}" includes="**/*.class"/>
 		<zipfileset src="${dep.commons-cli}" includes="**/*.class"/>
+		<zipfileset src="${dep.commons-exec}" includes="**/*.class"/>
 		<zipfileset src="${dep.swingworker}" includes="**/*.class"/>
 		<zipfileset src="${dep.xhtmlrenderer}">
 			<include name="**/*.class"/>
@@ -328,6 +331,7 @@
 			</fileset>
 			<zipfileset src="${dep.commons-lang}" includes="**/*.class"/>
 			<zipfileset src="${dep.commons-cli}" includes="**/*.class"/>
+			<zipfileset src="${dep.commons-exec}" includes="**/*.class"/>
 			<zipfileset src="${dep.winregistry}" includes="**/*.class"/>
 		</jar>
 		<!-- sign it, required for java web start -->
@@ -370,6 +374,7 @@
 				<include name="nl/nikhef/jgridstart/logging/testjars.txt"/>
 			</fileset>
 			<zipfileset src="${dep.commons-lang}" includes="org/**"/>
+			<zipfileset src="${dep.commons-exec}" includes="**/*.class"/>
 			<!-- and jars with all stuff that will be unpacked later -->
 			<fileset file="${dir.dist}/${tests.target.name}.jar"/>
 			<fileset file="${dep.bouncycastle}"/>
