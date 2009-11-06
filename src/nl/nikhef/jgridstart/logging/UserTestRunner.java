@@ -57,7 +57,7 @@ public class UserTestRunner {
      * 
      * @author wvengen
      */
-    static class TesterFrame extends JFrame {
+    static class TesterFrame extends JFrame implements ExecuteResultHandler {
 	/** JUnit suite to run */
 	final String testclass = "nl.nikhef.jgridstart.AllTests";
 	/** Where to post test result data to */
@@ -189,16 +189,19 @@ public class UserTestRunner {
 		    tmpdir.deleteOnExit();
 		}
 		CommandLine cmdline = new CommandLine(java);
+		/*
 		cmdline.addArgument("-cp");
 		cmdline.addArgument(classpath);
 		cmdline.addArgument("org.junit.runner.JUnitCore");
 		cmdline.addArgument(testclass);
+		*/
+		cmdline.addArgument("-version");
 		DefaultExecutor exec = new DefaultExecutor();
 		TextareaOutputStream outputstream = new TextareaOutputStream(outputpane);
 		exec.setStreamHandler(new PumpStreamHandler(outputstream));
 		exec.setProcessDestroyer(new ShutdownHookProcessDestroyer());
 		System.out.println(cmdline);
-		exec.execute(cmdline, outputstream);
+		exec.execute(cmdline, this);
 		
 	    } catch (Exception e) {
 		e.printStackTrace(); // TODO finish
@@ -210,6 +213,15 @@ public class UserTestRunner {
 	    setMessage("The tests have finished.");
 	    actionBtn.setAction(uploadAction);
 	    if (uploadCheck.isSelected()) doUpload();
+	}
+	    
+	public void onProcessComplete(int exitValue) {
+	    outputpane.append("\n(testing exited with "+exitValue+")\n");
+	    signalTestsDone();
+	}
+	public void onProcessFailed(ExecuteException e) {
+	    outputpane.append("\n(testing failed: "+e+")\n");
+	    signalTestsDone();
 	}
 	
 	/** Upload test results */
@@ -257,7 +269,7 @@ public class UserTestRunner {
 		       "You can now close this window.");
 	}
 	
-	protected static class TextareaOutputStream extends OutputStream implements ExecuteResultHandler {
+	protected class TextareaOutputStream extends OutputStream {
 	    private final JTextArea area;
 	    private final StringBuffer buf = new StringBuffer(128);
 	    public TextareaOutputStream(final JTextArea area) {
@@ -290,13 +302,6 @@ public class UserTestRunner {
 		buf.append(msg);
 		buf.append('\n');
 		flush();
-	    }
-	    
-	    public void onProcessComplete(int exitValue) {
-		message("(exited with "+exitValue+")");
-	    }
-	    public void onProcessFailed(ExecuteException e) {
-		message("(terminated with "+e+")");
 	    }
 	}
     }
