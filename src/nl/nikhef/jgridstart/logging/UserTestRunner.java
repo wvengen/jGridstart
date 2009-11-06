@@ -189,13 +189,10 @@ public class UserTestRunner {
 		    tmpdir.deleteOnExit();
 		}
 		CommandLine cmdline = new CommandLine(java);
-		/*
 		cmdline.addArgument("-cp");
 		cmdline.addArgument(classpath);
 		cmdline.addArgument("org.junit.runner.JUnitCore");
 		cmdline.addArgument(testclass);
-		*/
-		cmdline.addArgument("-version");
 		DefaultExecutor exec = new DefaultExecutor();
 		TextareaOutputStream outputstream = new TextareaOutputStream(outputpane);
 		exec.setStreamHandler(new PumpStreamHandler(outputstream));
