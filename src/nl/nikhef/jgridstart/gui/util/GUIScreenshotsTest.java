@@ -440,7 +440,7 @@ public class GUIScreenshotsTest extends TestCase {
     protected static void assertWindowname(String name) throws InterruptedException, ComponentNotFoundException {
 	logger.fine("Expecting window name: "+name);
 	Window w = null;
-	for (int i=0; i<10; i++) {
+	for (int i=0; i<100; i++) {
 	    guiSleep();
 	    w = AWT.getActiveWindow();
 	    if (w==null) continue;
