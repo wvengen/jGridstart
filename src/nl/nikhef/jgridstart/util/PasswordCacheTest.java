@@ -76,7 +76,7 @@ public class PasswordCacheTest extends TestCase {
 	cache.setTimeout(timeout);
 	cache.set("blah", "test".toCharArray());
 	Assert.assertNotNull(cache.getForDecrypt("", "blah"));
-	Thread.sleep(timeout*1000 + 10);
+	Thread.sleep((timeout+1)*1000);
 	Assert.assertNull(cache.getForDecrypt("", "blah"));
     }
 
