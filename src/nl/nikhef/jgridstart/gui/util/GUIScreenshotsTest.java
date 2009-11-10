@@ -331,7 +331,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    // certificate details view
 	    mainwnd.setSize(750, 480);
 	    System.setProperty("view.showdetails", "true");
-	    URLLauncherCertificate.performAction("viewlist(false)", tester.findFocusOwner());
+	    URLLauncherCertificate.performAction("viewlist(false)", mainwnd);
 	    tester.key(KeyEvent.VK_F5);
 	    Thread.sleep(500);
 	    guiSleep();
