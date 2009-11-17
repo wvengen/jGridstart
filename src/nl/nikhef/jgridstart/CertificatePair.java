@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -55,10 +56,15 @@ import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PrivateFileWriter;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
+import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.X509DefaultEntryConverter;
 import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.asn1.x509.X509NameEntryConverter;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
@@ -737,10 +743,21 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	if (System.getProperty("jgridstart.keysize")!=null)
 	    keysize = Integer.valueOf(System.getProperty("jgridstart.keysize"));
 
-	// needs comma-notation, so convert if slash-notation
+	// need comma-notation, so convert if slash-notation
 	if (subject.trim().startsWith("/"))
 	    subject = subject.substring(1).replace('/', ',');
-	X509Name name = new X509Name(subject);
+	// Make sure OIDs are PRINTABLESTRING and not UTF8STRING.
+	// some certificate software requires this to function correctly (e.g. mkproxy)
+	X509Name name = new X509Name(subject, new X509DefaultEntryConverter() {
+	    @Override
+	    public DERObject getConvertedValue(DERObjectIdentifier oid,  String val) {
+		DERObject obj = super.getConvertedValue(oid, val);
+		if (obj instanceof DERUTF8String)
+		    return new DERPrintableString(val);
+		else
+		    return obj;
+	    }
+	});
 
 	// Generate new key pair
 	KeyPairGenerator keygen = KeyPairGenerator.getInstance(keyAlgName);
