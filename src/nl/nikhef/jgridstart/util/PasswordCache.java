@@ -368,10 +368,14 @@ public class PasswordCache {
 	// Since readPEM "throws IOException" the specific information
 	// that it might have been a PasswordException is lost :(
 	// So now I have to parse the message string ...
+	// In addition to this, some weird errors can occur with wrong passwords. These
+	// have been found by experience, and if they have high enough a probability to
+	// occur when the password is wrong, they're added here.
 	return ( e.getMessage().contains("org.bouncycastle.openssl.PasswordException") &&
 	         e.getMessage().contains("wrong password")) ||
 	       ( e.getMessage().contains("org.bouncycastle.openssl.EncryptionException") &&
-		 e.getMessage().contains("check password") );
+		 e.getMessage().contains("check password")  ||
+	       ( e.getMessage().contains("java.lang.String cannot be cast to java.lang.Integer")) );
     }
     /** @see #isPasswordWrongException(Throwable) */
     public static boolean isPasswordWrongException(Exception e) {
