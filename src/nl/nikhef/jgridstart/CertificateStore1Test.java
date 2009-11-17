@@ -4,11 +4,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.Vector;
 
 import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PKCS12KeyStoreUnlimited;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.jce.PrincipalUtil;
+import org.bouncycastle.jce.X509Principal;
 import org.junit.Test;
 
 /** Test basic operations of a {@link CertificateStore} */
@@ -183,4 +190,35 @@ public class CertificateStore1Test extends CertificateBaseTest {
 	CertificatePair cert2 = certstore2.importFrom(dst, null);
 	assertEquals(cert2, cert);
     }
+    
+    /** Verify that subject is a PRINTABLESTRING (and not UTF8STRING).
+     * <p>
+     * This is required for some grid software to work properly (mkproxy).
+     */
+    @Test
+    public void testPrintablestring() throws Exception {
+	CertificateStore store = new CertificateStore(newTestStore(1));
+	CertificatePair cert = store.get(0);
+	assertNotNull(cert);
+	X509Certificate x509 = cert.getCertificate();
+	assertNotNull(x509);
+	X509Principal subject = PrincipalUtil.getSubjectX509Principal(x509);
+	verifyNoUtf8(subject.getDERObject());
+    }
+    
+    /** Helper function: make sure ASN1 object contains no DERUTF8STRING,
+     * either itself or one of its children. */
+    protected void verifyNoUtf8(DERObject o) {
+	assertFalse(o instanceof DERUTF8String);
+	if (o instanceof ASN1Sequence) {
+	    ASN1Sequence seq = (ASN1Sequence)o;
+	    for (int i=0; i<seq.size(); i++)
+		verifyNoUtf8(seq.getObjectAt(i).getDERObject());
+	} else if (o instanceof ASN1Set) {
+	    ASN1Set seq = (ASN1Set)o;
+	    for (int i=0; i<seq.size(); i++)
+		verifyNoUtf8(seq.getObjectAt(i).getDERObject());
+	}
+    }
+    
 }
