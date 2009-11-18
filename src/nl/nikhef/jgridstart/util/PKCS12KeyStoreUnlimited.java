@@ -30,12 +30,26 @@ import org.bouncycastle.jce.provider.JDKPKCS12KeyStore;
 
 /** Access a PKCS12 keystore without policy restrictions.
  * <p>
+ * Default Java installations have restrictions on the use of strong
+ * cryptograhpy. This can be solved by installing java policy files, but
+ * it often is undesirable to require the a user to go through this. This
+ * class provides a workaround that circumvent the Java policy restrictions
+ * and allows opening PKCS#12 keystores with passwords longer than 7 characters. 
+ * <p>
  * You should use {@code BCPKCS12KeyStore.getInstance()} instead of
  * {@code KeyStore.getInstance("PKCS12", "BC")}. Now {@link KeyStore#load} and
  * {@link KeyStore#store} will work with passwords longer than seven characters
  * without the unlimited strength policy files installed.
  * <p>
- * This class requires intricate knowledge of JCE and BouncyCastle internals. When
+ * To illustrate, here is some code to read a certificate from a PKCS#12 file.
+ * <pre><code>
+ *   FileInputStream in = new FileInputStream("test.p12");
+ *   KeyStore store = PKCS12KeyStoreUnlimited.getInstance();
+ *   store.load(in, "thisismylongpassworduhoh".toCharArray());
+ *   Certificate cert = store.getCertificate("certificate alias");
+ * </code></pre>
+ * <p>
+ * This class has intricate knowledge of JCE and BouncyCastle internals. When
  * these change, this class needs to be updated appropriately.
  * <p>
  * This also means that it may be required (when using Java Web Start, for example)
