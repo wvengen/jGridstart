@@ -82,7 +82,7 @@ import org.xml.sax.SAXException;
  * attribute <code>name="<i>something</i>"</code> is present, its readonly attribute
  * will be set automatically. Its use is explained in {@link TemplatePanel}.
  * <p>
- * When a propery cannot be found, it is looked with {@link System#getProperty}. If
+ * When a propery cannot be found, it is looked up with {@link System#getProperty}. If
  * that fails, {@code null} is assumed as its value.
  * 
  * @author wvengen
