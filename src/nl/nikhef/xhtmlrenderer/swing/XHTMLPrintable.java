@@ -12,10 +12,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xhtmlrenderer.simple.Graphics2DRenderer;
 import org.xhtmlrenderer.simple.XHTMLPanel;
-import org.xhtmlrenderer.simple.XHTMLPrintable;
 
 /**
- * Fix for XHTMLPrintable to set document margins to the printer's margins.
+ * Fix for {@link org.xhtmlrenderer.simple.XHTMLPrintable} to set document margins to the printer's margins.
  * <p>
  * Seems to work nicely on Windows, not yet so much on Linux.
  * <p>
@@ -27,17 +26,19 @@ import org.xhtmlrenderer.simple.XHTMLPrintable;
  * on xhtmlrenderer's users mailing list.
  * 
  * <p>
- * TODO test more and finish
+ * TODO This code is not completely finished but seems to work for me;
+ *      be sure to test for your case.
  */
-public class TemplatePrintable extends XHTMLPrintable {
+public class XHTMLPrintable extends org.xhtmlrenderer.simple.XHTMLPrintable {
     
-    public TemplatePrintable(XHTMLPanel panel) {
+    public XHTMLPrintable(XHTMLPanel panel) {
 	super(panel);
     }
 
     /** {@inheritDoc}
      * <p>
-     * This method fixes the margins just before layouting.
+     * This method fixes the margins just before layouting, and converts form
+     * elements to text items using {@link #translateFormElements}.
      */
     @Override
     public int print(Graphics g, PageFormat pf, int page) {
@@ -61,11 +62,19 @@ public class TemplatePrintable extends XHTMLPrintable {
     
     /** Replace form elements with text.
      * <p>
-     * Translates form elements to ordinary DIV's so one doesn't
-     * see the form elements on printout:
+     * Translates form elements to ordinary {@code div}'s so one doesn't
+     * see the form elements on printout. Currently only converts {@code input}
+     * and {@code button}. For example
+     * <code><pre>
+     * &lt;input type="text" name="foo" value="<i>form element value</i>" /&gt;
+     * </pre></code>
+     * will be replaced with
      * <code><pre>
      * &lt;span class="replaced-form-element"&gt;<i>form element value</i>&lt;/span&gt;
      * </pre></code>
+     * <p>
+     * On success, a new document with replaced elements is returned.
+     * If an error occurs, the unmodified document is returned.
      */
     public static Document translateFormElements(Document origDoc) {
 	// clone the document

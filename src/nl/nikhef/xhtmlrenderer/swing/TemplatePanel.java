@@ -54,7 +54,7 @@ import org.xhtmlrenderer.swing.SwingReplacedElementFactory;
 import org.xhtmlrenderer.util.Configuration;
 
 
-/** An enhanced version of XHTMLPanel
+/** An XHTMLPanel with support for templates
  * <p>
  * Additional features:<ul>
  *  <li><em>Template</em> functionality (see below)</li>

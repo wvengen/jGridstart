@@ -26,7 +26,7 @@ public class DocumentDelegate implements Document {
 	public DocumentDelegate(Document doc) {
 	    setDocument(doc);
 	}
-	/** returns whether this delegate has a valid document, or if it is null.
+	/** returns whether this delegate has a valid document, or if it is {@literal null}.
 	 * <p>
 	 * When this method returns false, one should not call any other method
 	 * before running {@link #setDocument}.

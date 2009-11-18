@@ -78,10 +78,10 @@ public class XHTMLPanel extends org.xhtmlrenderer.simple.XHTMLPanel implements I
 	format.setPaper(paper);
 	format = printJob.validatePage(format);
 	// print with dialog
-        printJob.setPrintable(new TemplatePrintable(this), format);
+        printJob.setPrintable(new XHTMLPrintable(this), format);
         if (printJob.printDialog()) {
             format = printJob.validatePage(format);
-            printJob.setPrintable(new TemplatePrintable(this), format);
+            printJob.setPrintable(new XHTMLPrintable(this), format);
             printJob.print();
         }
 	return true;
