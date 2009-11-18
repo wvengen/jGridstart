@@ -26,7 +26,7 @@ import nl.nikhef.jgridstart.gui.util.FileFilterSuffix;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
-import nl.nikhef.xhtmlrenderer.swing.TemplatePrintable;
+import nl.nikhef.xhtmlrenderer.swing.XHTMLPrintable;
 
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -166,7 +166,7 @@ public class ActionViewVerificationForm extends CertificateAction {
 	    try {
 		panel.refresh(); // to update changed fields in document
 		ITextRenderer r = new ITextRenderer();
-		r.setDocument(TemplatePrintable.translateFormElements(panel.getDocument()),
+		r.setDocument(XHTMLPrintable.translateFormElements(panel.getDocument()),
 			panel.getDocument().getDocumentURI());
 		OutputStream os;
 		os = new FileOutputStream(dest);
