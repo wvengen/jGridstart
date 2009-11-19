@@ -1,7 +1,9 @@
 package nl.nikhef.jgridstart;
 
+import java.security.InvalidKeyException;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import nl.nikhef.xhtmlrenderer.swing.TemplateDocument;
 
@@ -139,5 +141,41 @@ public class CertificateRequest {
 	// since properties can be copied later, it needs to
 	// be explicitely defined to renewals
 	p.setProperty("org", p.getProperty("org"));
+    }
+    
+    /** Verifies that password is according to policy.
+     * <p>
+     * Throws an {@linkplain InvalidKeyException} if the policy is violated.
+     * Requirements are configured through the system properties;
+     * please see {@literal code.properties}.
+     * Properties used:
+     * <ul>
+     *   <li><tt>jgridstart.password.minlength</tt> -
+     *       minimum password length</li>
+     *   <li><tt>jgridstart.password.regexp</tt> -
+     *       regular expression that should return {@code true}</li>
+     * </ul>
+     * If any property is not specified, it is not checked for.
+     */
+    static public void validatePassword(String pw) throws InvalidKeyException {
+	// minimum length
+	String minlen = System.getProperty("jgridstart.password.minlength");
+	if (minlen!=null && pw.length() < Integer.valueOf(minlen))
+	    throw new InvalidKeyException("Password must be at least "+minlen+" characters long.");
+	// regular expression
+	String regex = System.getProperty("jgridstart.password.regexp");
+	if (regex!=null && !Pattern.matches(regex, pw)) {
+	    String msg = System.getProperty("jgridstart.password.explanation");
+	    if (msg==null) msg = "Password must validate regular expression: "+regex;
+	    throw new InvalidKeyException(msg);
+	}
+    }
+    /** Verifies that password is according to policy.
+     * <p>
+     * Accepts {@code char} array as parameter for future compatibility.
+     * 
+     * @see #validatePassword(String) */
+    static public void validatePassword(char[] pw) throws InvalidKeyException {
+	validatePassword(new String(pw));
     }
 }

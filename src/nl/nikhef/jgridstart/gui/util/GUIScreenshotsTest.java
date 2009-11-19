@@ -46,7 +46,7 @@ public class GUIScreenshotsTest extends TestCase {
     protected static ComponentTester tester = new ComponentTester();
     
     /** password used for test certificate */
-    protected static String password = "test123pass";
+    protected static String password = "test123pass.";
     
     /** replacement characters for {@link #keyString} */
     protected static HashMap<Character, Character> replacemap = null;

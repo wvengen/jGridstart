@@ -5,6 +5,7 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -243,6 +244,20 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 			"Passwords don't match", JOptionPane.ERROR_MESSAGE);
 		return false;
 	    }
+	    // make sure password is according to policy
+	    try {
+		if (data().getProperty("password1")==null)
+		    throw new InvalidKeyException("Please supply a password");
+		CertificateRequest.validatePassword(data().getProperty("password1"));
+	    } catch (InvalidKeyException e) {
+		String msg = System.getProperty("jgridstart.password.explanation");
+		if (msg==null) msg = e.getLocalizedMessage();
+		JOptionPane.showMessageDialog(this,
+			"The password must conform to the policy:\n"+msg,
+			"Password too simple", JOptionPane.ERROR_MESSAGE);
+		return false;
+	    }
+	    
 	    // make sure we have a valid email address
 	    try {
 		new InternetAddress(data().getProperty("email")).validate();
