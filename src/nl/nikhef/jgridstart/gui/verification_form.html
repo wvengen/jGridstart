@@ -17,9 +17,9 @@
       </tr>
       <tr>
         <td colspan="2">
-          <span class="check">ID Document valid</span>
-          <span class="check">PoP Challenge verified</span>
-          <span class="check">RA Signature OK</span>
+          <span class="check">ID document valid</span>
+          <span class="check">PoP challenge <span class="fillin" c="${modulus.first20}">0123456789ABCDEF0123</span> verified</span>
+          <span class="check">RA signature OK</span>
         </td>
       </tr>
 	</table>
@@ -52,13 +52,12 @@
 	        fax: +31 20 592 5155
 	      </address>
 	    </td>
-	  </tr></table>  
+	  </tr></table>
 	  
-	  <div class="pop">
-	    <h2>The first twenty (20) characters of your proof-of-possession challenge:</h2>
-	    <div class="fillin" c="${modulus.first20}">0123456789ABCDEF0123</div>
-	  </div>
-	  
+	  <div class="prehead comment">
+	  	(for PoP challenge, see CA area at top of form)
+	  </div>  
+
 	  <div class="contact">
 	    <h2>Contact Information</h2>
 	  </div>
@@ -80,7 +79,14 @@
 	      <td>Email address <br/><input type="text" class="fillin" name="email" value="${email}"/></td>
 	    </tr>
 	  </table>
-	  
+
+<!--
+	  <div class="pop">
+	  	<h2>First twenty (20) characters of your proof−of−possession challenge:</h2>
+		<div class="fillin" c="${modulus.first20}">0123456789ABCDEF0123</div>
+	  </div>
+-->
+
 	  <div class="signature">
 	    <h2>Signature</h2>
 	    

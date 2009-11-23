@@ -138,15 +138,29 @@
 	font-size: 12pt;
 	font-weight: normal;
 }
+/*
+ * PoP challenge box 
+ */
+.form .pop {
+	white-space: nowrap;
+}
+.form .pop * {
+	display: inline-block;
+}
 .form .pop .fillin {
-	width: auto;
-	font-size: 11pt;
+	display: inline;
+	font-size: 12pt;
 	letter-spacing: 0.3em; /* unsupported by flying saucer :( */
+	margin-left: 0.5em;
 	border: 2px solid black;
 	padding: 0.6em 0.6em 0.2em 0.6em;
-	margin: 0 0.5em 0 0.5em;
+}
+.prehead {
+	margin-top: 0.5em;
+	margin-bottom: -1em;
 }
 
+/* user information */
 table.userinfo, table.signature {
 	width: 100%;
 	table-layout: fixed; /* equal-width columns */
@@ -178,7 +192,7 @@ table.userinfo, table.signature {
 	vertical-align: top;
 	text-align: right;
 	display: inline-block;
-	width: 20em;
+	width: 25em;
 }
 .form .reserved .notes-box, .form .reserved .signature-box {
 	font-style: italic;
