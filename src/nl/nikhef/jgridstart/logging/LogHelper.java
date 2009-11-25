@@ -1,6 +1,5 @@
 package nl.nikhef.jgridstart.logging;
 
-import java.util.Properties;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 

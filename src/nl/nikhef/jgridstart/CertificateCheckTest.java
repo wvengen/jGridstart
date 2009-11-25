@@ -3,8 +3,6 @@ package nl.nikhef.jgridstart;
 import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-
 import org.junit.Test;
 
 import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;

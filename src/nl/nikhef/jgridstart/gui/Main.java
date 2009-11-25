@@ -1,8 +1,6 @@
 package nl.nikhef.jgridstart.gui;
 
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.swing.UIManager;

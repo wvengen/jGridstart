@@ -37,7 +37,6 @@ import org.apache.commons.exec.ExecuteResultHandler;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
-import org.apache.commons.exec.StreamPumper;
 import org.apache.commons.lang.StringUtils;
 
 /** GUI test program that runs a command and uploads the output */

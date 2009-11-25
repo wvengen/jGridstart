@@ -1,37 +1,13 @@
 package nl.nikhef.jgridstart;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Logger;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-
-import org.apache.commons.lang.StringUtils;
 
 import nl.nikhef.jgridstart.gui.util.GUIScreenshotsTest;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanelTest;
 import nl.nikhef.jgridstart.install.BrowsersMacOSXTest;
 import nl.nikhef.jgridstart.logging.LogHelper;
-import nl.nikhef.jgridstart.util.ConnectionUtils;
 import nl.nikhef.jgridstart.util.FileUtilsTest;
 import nl.nikhef.jgridstart.util.GeneralUtils;
 import nl.nikhef.jgridstart.util.PasswordCacheTest;

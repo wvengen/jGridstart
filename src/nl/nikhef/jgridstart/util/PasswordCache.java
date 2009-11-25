@@ -2,9 +2,6 @@ package nl.nikhef.jgridstart.util;
 
 import java.awt.Component;
 import java.awt.Window;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.WindowAdapter;
@@ -26,9 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.SwingUtilities;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
-
 import org.bouncycastle.openssl.PasswordFinder;
 
 /** Class that caches passwords for a limited time so that the user doesn't
