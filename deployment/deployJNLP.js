@@ -23,7 +23,7 @@ var deployJNLP = {
 				var msg = 
 					"<h2>Java required</h2>"
 					+ "<p>You need to install Java before you can run jGridstart.</p>"
-					+ "<div><a href='javascript:deployJava.installLatestJRE()'><img src='javabutton.png' alt='Install Java'/></a></div>"
+					+ "<div><a href='javascript:deployJava.installLatestJRE()'><img src='"+this.resolveUrl('javabutton.png')+"' alt='Install Java'/></a></div>"
 					+ "<div class='runanyway'>If you do have Java installed, you can still "
 					+ "<a href='javascript:deployJNLP.launch()'>launch jGridstart</a>.</div>";
 				TINY.box.show(msg, false, 0, 0, false);
@@ -45,6 +45,15 @@ var deployJNLP = {
 		// returns an absolute JNLP url from the jnlp property
 		getJNLP: function() {
 			return this.toAbsURL(this.jnlp);
+		},
+
+		// returns the url to a file in the same directory as the jnlp
+		resolveUrl: function(e) {
+			// if no slashes in jnlp url, it's just this directory
+			if (this.jnlp.indexOf('/') == 0)
+				return e;
+			// otherwise strip off filename and return file with path
+			return this.jnlp.substring(0, this.jnlp.lastIndexOf('/')+1) + e;
 		},
 		
 		// absolutize a url (required for getJNLP() and IE)
