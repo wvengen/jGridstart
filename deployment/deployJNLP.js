@@ -8,6 +8,9 @@ var deployJNLP = {
 		
 		// do launch it, even if java isn't installed
 		launch: function() {
+			// make sure dialog is gone, if any
+			try { TINY.box.hide(); } catch(err) { /* ignore */ }
+			// and really launch
 			deployJava.launch(this.getJNLP());
 		},
 		
