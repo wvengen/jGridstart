@@ -131,6 +131,11 @@ abstract class BrowsersCommon implements IBrowsers {
 	}
 	return knownBrowsers;
     }
+    
+    /** Return Java's idea of the default browser, or {@code null} if none. */
+    protected String findDefaultBrowserJava() {
+	return System.getProperty("deployment.browser.path");
+    }
 
     public void installPKCS12(File pkcs)
     		throws BrowserNotAvailableException, BrowserExecutionException {

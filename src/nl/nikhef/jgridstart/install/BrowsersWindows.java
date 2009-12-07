@@ -55,8 +55,11 @@ class BrowsersWindows extends BrowsersCommon {
 	    logger.fine("found browser "+exe+" at: "+path);
 	}
 	
-	// get default browser from registry
+	// get default browser from registry or Java
 	String defaultExe = findDefaultBrowserRegistry();
+	if (defaultExe == null)
+	    defaultExe = findDefaultBrowserJava();
+
 	if (defaultExe!=null) {
 	    defaultExe = new File(defaultExe).getCanonicalPath();
 	    logger.fine("default browser path: "+defaultBrowser);

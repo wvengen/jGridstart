@@ -43,6 +43,8 @@ class BrowsersUnix extends BrowsersCommon {
 	defaultBrowser = findDefaultBrowserEnvironment();
 	if (defaultBrowser==null)
 	    defaultBrowser = findDefaultBrowserDesktop();
+	if (defaultBrowser==null)
+	    defaultBrowser = findDefaultBrowserJava();
 	// we only want the basename
 	if (defaultBrowser!=null)
 	    defaultBrowser = new File(defaultBrowser).getName();
