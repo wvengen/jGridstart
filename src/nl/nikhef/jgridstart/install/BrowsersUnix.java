@@ -144,7 +144,7 @@ class BrowsersUnix extends BrowsersCommon {
      */
     private String findDefaultBrowserKDE(String versionid) {
 	// http://docs.kde.org/development/en/kdebase-runtime/userguide/configuration-files.html
-	String cfg = System.getenv("HOME") + "/" + versionid + "share/config/kdeglobals";
+	String cfg = System.getenv("HOME") + "/." + versionid + "share/config/kdeglobals";
 	try {
 	    BufferedReader read = new BufferedReader(new FileReader(cfg));
 	    String line;
