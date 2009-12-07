@@ -3,7 +3,10 @@ package nl.nikhef.jgridstart.gui.util;
 import java.awt.Component;
 import java.util.logging.Logger;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 /** Uniform way to handle error messages.
  * <p>
@@ -19,16 +22,26 @@ public class ErrorMessage {
      * @param parent Parent window
      * @param title Title of the dialog
      * @param e Exception to get information from
+     * @param extramsg Additional error message details to display
      */
-    public static void error(Component parent, String title, Throwable e) {
+    public static void error(Component parent, String title, Throwable e, String extramsg) {
 	logException(e);
 	String msg = e.getLocalizedMessage();
 	if (msg==null || msg=="") msg = "Unknown error";
-	JOptionPane.showMessageDialog(parent, msg, title, JOptionPane.ERROR_MESSAGE);
+	if (extramsg!=null) msg += "\n" + extramsg;
+	showErrorDialog(parent, title, msg);
     }
-    /** @see #internal(Component, Exception) */
+    /** @see #error(Component, String, Throwable, String) */
+    public static void error(Component parent, String title, Throwable e) {
+	error(parent, title, e, null);
+    }
+    /** @see #error(Component, String, Throwable, String) */
+    public static void error(Component parent, String title, Exception e, String extramsg) {
+	error(parent, title, (Throwable)e, extramsg);
+    }
+    /** @see #error(Component, String, Throwable, String) */
     public static void error(Component parent, String title, Exception e) {
-	error(parent, title, (Throwable)e);
+	error(parent, title, (Throwable)e, null);
     }
     
     /** show an error to the user. This method is for errors that should
@@ -58,8 +71,7 @@ public class ErrorMessage {
 	String s = "I'm sorry to report that an unexpected internal error occured.\n"
 	          +"Please contact technical support for help.\n";
 	// TODO include contact details for technical support
-	JOptionPane.showMessageDialog(parent, s+msg,
-		"Internal problem", JOptionPane.ERROR_MESSAGE);
+	showErrorDialog(parent, "Internal problem", s+msg);
     }
     
     /** logs an exception */
@@ -68,5 +80,19 @@ public class ErrorMessage {
 	StackTraceElement[] trace = e.getStackTrace();
 	for (int i=0; i<trace.length; i++)
 	    logger.fine("  "+trace[i].toString());
+    }
+    
+    /** show dialog with error message to user */
+    private static void showErrorDialog(Component parent, String title, String msg) {
+	// message
+	JTextArea area = new JTextArea(msg);
+	area.setEditable(false);
+	JLabel dummylbl = new JLabel();
+	area.setBackground(dummylbl.getBackground()); // use JLabel layout 
+	area.setForeground(dummylbl.getForeground());
+	area.setFont(dummylbl.getFont());
+	JScrollPane pane = new JScrollPane(area, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	pane.setBorder(null);
+	JOptionPane.showMessageDialog(parent, new Object[] { pane }, title, JOptionPane.ERROR_MESSAGE);
     }
 }

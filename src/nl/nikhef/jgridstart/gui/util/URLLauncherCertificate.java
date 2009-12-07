@@ -41,7 +41,7 @@ public class URLLauncherCertificate extends URLLauncher {
 	    // just open default browser
 	    BrowserFactory.getInstance().openUrl(location);
 	} catch (Exception e) {
-	    ErrorMessage.error(parent, "Could not launch URL", e);
+	    ErrorMessage.error(parent, "Could not open web page", e, location);
 	}
     }
 

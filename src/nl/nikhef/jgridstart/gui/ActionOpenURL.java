@@ -4,6 +4,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
+import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.install.BrowserFactory;
 
 import java.awt.event.ActionEvent;
@@ -31,11 +32,6 @@ public class ActionOpenURL extends AbstractAction {
 
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action OpenURL: "+getValue(NAME)+": "+url);
-	try {
-	    BrowserFactory.getInstance().openUrl(url);
-	} catch (Exception e1) {
-	    ErrorMessage.error(CertificateAction.findWindow(e.getSource()),
-		    "Could not open external web page:\n"+url, e1);
-	}
+	URLLauncher.openURL(url, CertificateAction.findWindow(e.getSource()));
     }
 }

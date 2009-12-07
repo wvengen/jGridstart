@@ -57,7 +57,7 @@ public class URLLauncher {
 	    BrowserFactory.getInstance().openUrl(location);
 	    //BareBonesBrowserLaunch.openURL(url.toExternalForm(), parent);
 	} catch (Exception e) {
-	    ErrorMessage.error(parent, "Could not launch URL", e);
+	    ErrorMessage.error(parent, "Could not open web page", e, location);
 	}
     }
 
