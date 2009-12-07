@@ -87,15 +87,24 @@ class BrowsersWindows extends BrowsersCommon {
     public void openUrl(String browserid, String urlString)
 	    throws BrowserNotAvailableException, BrowserExecutionException {
 	
-	// check if browserid is present
-	if (!availableBrowsers.containsKey(browserid))
-	    throw new BrowserNotAvailableException(browserid);
+	String[] cmd = null;
 	
-	// run the command
-	String[] cmd = new String[] {
-		availableBrowsers.get(browserid).getProperty("exe"),
-		urlString
-	};
+	if (browserid!=null) {
+	    // check if browserid is present
+	    if (!availableBrowsers.containsKey(browserid))
+		throw new BrowserNotAvailableException(browserid);
+
+	    // run the command
+	    cmd = new String[] {
+		    availableBrowsers.get(browserid).getProperty("exe"),
+		    urlString
+	    };
+	    
+	} else {
+	    // run default browser if no browser specified
+	    cmd = new String[] { "rundll32", "url.dll,FileProtocolHandler", urlString };
+	}
+
 	try {
 	    // execute browser
 	    //   don't wait for this, since starting a new browser when the

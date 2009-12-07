@@ -134,6 +134,7 @@ abstract class BrowsersCommon implements IBrowsers {
     
     /** Return Java's idea of the default browser, or {@code null} if none. */
     protected String findDefaultBrowserJava() {
+	// note that I haven't actually seen anything else than null here ...
 	return System.getProperty("deployment.browser.path");
     }
 

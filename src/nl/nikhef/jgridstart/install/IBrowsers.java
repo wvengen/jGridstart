@@ -43,7 +43,10 @@ public interface IBrowsers {
      * {@link #getBrowserList() getBrowserList} method.
      * <p>
      * If the call to the requested browser fails, the code will
-     * fail over to the default browser.
+     * fail over to the default browser. If the {@literal browserid} argument
+     * is {@code null}, the system's default browser may be called, or a
+     * {@linkplain BrowserNotAvailableException} may be thrown, depending on
+     * the implementation.
      *
      * @param browserid browser identifier
      * @param urlString URL to open
