@@ -144,12 +144,6 @@ public class ActionExport extends CertificateAction {
 	dlg.getRootPane().setDefaultButton(activate);
 	dlg.setModal(true);
 	
-	chooser.addPropertyChangeListener(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY, new PropertyChangeListener() {
-	    public void propertyChange(PropertyChangeEvent evt) {
-		System.out.println("Changed: "+evt.getNewValue());
-	    }
-	});
-	
 	// hook filechooser actions to our own actions
 	chooser.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
