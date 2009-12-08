@@ -3,6 +3,8 @@ package nl.nikhef.jgridstart.gui;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -17,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicFileChooserUI;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateSelection;
@@ -123,26 +126,44 @@ public class ActionExport extends CertificateAction {
 	if (insets!=null) btns.setBorder(BorderFactory.createEmptyBorder(insets.top, insets.left, insets.bottom, insets.right));
 	btns.add(Box.createHorizontalGlue());
 	btns.setLayout(new BoxLayout(btns, BoxLayout.X_AXIS));
-	JButton activate = new JButton(action);
-	btns.add(activate);
-	btns.add(new JButton(new AbstractAction("Cancel") {
+	final JButton activate = new JButton(new AbstractAction((String)action.getValue(Action.NAME)) {
 	    public void actionPerformed(ActionEvent e) {
-		dlg.dispose();
+		chooser.approveSelection();
 	    }
-	}));
+	});
+	btns.add(activate);
+	final JButton cancel = new JButton(new AbstractAction("Cancel") {
+	    public void actionPerformed(ActionEvent e) {
+		chooser.cancelSelection();
+	    }
+	});
+	btns.add(cancel);
 	panel.add(btns);
 
 	dlg.getContentPane().add(panel);
 	dlg.getRootPane().setDefaultButton(activate);
 	dlg.setModal(true);
 	
+	chooser.addPropertyChangeListener(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY, new PropertyChangeListener() {
+	    public void propertyChange(PropertyChangeEvent evt) {
+		System.out.println("Changed: "+evt.getNewValue());
+	    }
+	});
+	
 	// hook filechooser actions to our own actions
 	chooser.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
-		if (JFileChooser.APPROVE_SELECTION.equals(e.getActionCommand()))
+		if (JFileChooser.APPROVE_SELECTION.equals(e.getActionCommand())) {
+		    // workaround for JFileChooser bug, see
+		    // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4528663
+		    if (chooser.getUI() instanceof BasicFileChooserUI) {
+		        BasicFileChooserUI ui = (BasicFileChooserUI)chooser.getUI();
+		        chooser.setSelectedFile(new File(ui.getFileName()));
+		    }
 		    action.actionPerformed(e);
-		else if (JFileChooser.CANCEL_SELECTION.equals(e.getActionCommand()))
-		    dlg.dispose();
+		}
+		dlg.removeAll();
+		dlg.dispose();
 	    }
 	});
 	
