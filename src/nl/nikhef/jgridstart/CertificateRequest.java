@@ -147,35 +147,61 @@ public class CertificateRequest {
      * <p>
      * Throws an {@linkplain InvalidKeyException} if the policy is violated.
      * Requirements are configured through the system properties;
-     * please see {@literal code.properties}.
+     * please see {@literal global.properties}.
      * Properties used:
      * <ul>
+     *   <li><tt>jgridstart.password.mode</tt> -
+     *       how to apply the password policy. {@literal enforceminlength} is always
+     *       checked in strict mode. The value of this property affects all the other
+     *       conditions: {@literal enforce} to check them in strict mode,
+     *       {@literal complain} to check them in non-strict mode, and 
+     *       and {@literal ignore} to ignore them completely. 
      *   <li><tt>jgridstart.password.minlength</tt> -
      *       minimum password length</li>
      *   <li><tt>jgridstart.password.regexp</tt> -
      *       regular expression that should return {@code true}</li>
+     *   <li><tt>jgridstart.enforceminlength</tt> -
+     *       minimum password length that is always enforced in strict mode</li>
      * </ul>
      * If any property is not specified, it is not checked for.
+     * 
+     * @param strict whether to check for strict requirements (strict mode),
+     *        or suggestions only (non-strict mode)  
      */
-    static public void validatePassword(String pw) throws InvalidKeyException {
-	// minimum length
-	String minlen = System.getProperty("jgridstart.password.minlength");
-	if (minlen!=null && pw.length() < Integer.valueOf(minlen))
-	    throw new InvalidKeyException("Password must be at least "+minlen+" characters long.");
-	// regular expression
-	String regex = System.getProperty("jgridstart.password.regexp");
-	if (regex!=null && !Pattern.matches(regex, pw)) {
-	    String msg = System.getProperty("jgridstart.password.explanation");
-	    if (msg==null) msg = "Password must validate regular expression: "+regex;
-	    throw new InvalidKeyException(msg);
+    static public void validatePassword(String pw, boolean strict) throws InvalidKeyException {
+	if (strict) {
+	    // strict minimum length
+	    String minlen = System.getProperty("jgridstart.password.enforceminlength");
+	    if (minlen==null) minlen="4";
+	    if (pw.length() < Integer.valueOf(minlen))
+		throw new InvalidKeyException("Password must be at least "+minlen+" characters long.");
 	}
+	// all the other checks depend on the mode
+	String mode = System.getProperty("jgridstart.password.mode");
+	if (mode==null || "ignore".equals(mode))
+	    return;
+	if ( (strict && "enforce".equals(mode)) || (!strict && "complain".equals(mode)) ) {
+	    String verb = strict ? "must" : "should";
+	    // minimum length
+	    String minlen = System.getProperty("jgridstart.password.minlength");
+	    if (minlen!=null && pw.length() < Integer.valueOf(minlen))
+		throw new InvalidKeyException("Password "+verb+" be at least "+minlen+" characters long.");
+	    // regular expression
+	    String regex = System.getProperty("jgridstart.password.regexp");
+	    if (regex!=null && !Pattern.matches(regex, pw)) {
+		String msg = System.getProperty("jgridstart.password.explanation");
+		if (msg==null) msg = "Password "+verb+" validate regular expression: "+regex;
+		throw new InvalidKeyException(msg);
+	    }
+	}
+	// TODO throw error/exception if password enforcement policy is none of the three
     }
     /** Verifies that password is according to policy.
      * <p>
      * Accepts {@code char} array as parameter for future compatibility.
      * 
-     * @see #validatePassword(String) */
-    static public void validatePassword(char[] pw) throws InvalidKeyException {
-	validatePassword(new String(pw));
+     * @see #validatePassword(String, boolean) */
+    static public void validatePassword(char[] pw, boolean strict) throws InvalidKeyException {
+	validatePassword(new String(pw), strict);
     }
 }

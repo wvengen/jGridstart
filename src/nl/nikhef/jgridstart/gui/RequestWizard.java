@@ -244,20 +244,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 			"Passwords don't match", JOptionPane.ERROR_MESSAGE);
 		return false;
 	    }
-	    // make sure password is according to policy
-	    try {
-		if (data().getProperty("password1")==null)
-		    throw new InvalidKeyException("Please supply a password");
-		CertificateRequest.validatePassword(data().getProperty("password1"));
-	    } catch (InvalidKeyException e) {
-		String msg = System.getProperty("jgridstart.password.explanation");
-		if (msg==null) msg = e.getLocalizedMessage();
-		JOptionPane.showMessageDialog(this,
-			"The password must conform to the policy:\n"+msg,
-			"Password too simple", JOptionPane.ERROR_MESSAGE);
-		return false;
-	    }
-	    
+
 	    // make sure we have a valid email address
 	    try {
 		new InternetAddress(data().getProperty("email")).validate();
@@ -309,6 +296,31 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		    }
 		    ErrorMessage.error(this, "Couldn't read private key", e);
 		}
+	    }
+
+	    // make sure password is according to policy
+	    try {
+		if (data().getProperty("password1")==null)
+		    throw new InvalidKeyException("Please supply a password");
+		CertificateRequest.validatePassword(data().getProperty("password1"), true);
+	    } catch (InvalidKeyException e) {
+		JOptionPane.showMessageDialog(this,
+			"The password must conform to the policy:\n"+e.getLocalizedMessage(),
+			"Password too simple", JOptionPane.ERROR_MESSAGE);
+		return false;
+	    }
+	    // question that can be answered with yes or no at the end
+	    try {
+		CertificateRequest.validatePassword(data().getProperty("password1"), false);
+	    } catch (InvalidKeyException e) {
+		String msg = System.getProperty("jgridstart.password.explanation");
+		if (msg==null) msg = e.getLocalizedMessage();
+		int ret = JOptionPane.showConfirmDialog(this,
+			"Password does not conform to the policy.\n"+
+			"Are you sure you want to use this password?\n"+msg,
+			"Password too simple", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (ret != JOptionPane.OK_OPTION)
+		    return false;
 	    }
 	}
 	
