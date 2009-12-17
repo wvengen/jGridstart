@@ -1,0 +1,12 @@
+// Grant all permissions to jGridstart and libraries.
+//
+// For BouncyCastle and PKCS12KeyStoreUnlimited, only a couple of lines are
+// required, but for OpenJDK to work with Java Web Start, a lot of other
+// permissions must be granted as well. This is solved most easily by granting
+// all permissions.
+//
+// Note that for Java Web Start, this file should be referenced with a full
+// path which is not inside a jar but on the webserver.
+grant {
+  permission java.security.AllPermission; 
+};
