@@ -57,7 +57,7 @@ public abstract class CertificateBaseTest extends TestCase {
 	FileUtils.recursiveDelete(tmpBasePath);
 	// restore CA
 	if (oldCAProvider==null)
-	    System.getProperties().remove("jgridstart.ca.provider");
+	    System.clearProperty("jgridstart.ca.provider");
 	else
 	    System.setProperty("jgridstart.ca.provider", oldCAProvider);
 	// restore passwordcache settings

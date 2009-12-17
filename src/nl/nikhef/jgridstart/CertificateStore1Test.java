@@ -97,7 +97,7 @@ public class CertificateStore1Test extends CertificateBaseTest {
 	System.setProperty("jgridstart.ca.local.hold", "false");
 	store.refresh();
 	assertTrue(cert.isCertificationRequestProcessed());
-	System.getProperties().remove("jgridstart.ca.local.hold");
+	System.clearProperty("jgridstart.ca.local.hold");
     }
     
     /** Test removal by index */
