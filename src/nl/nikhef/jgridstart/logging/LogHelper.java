@@ -17,11 +17,25 @@ public class LogHelper {
 	    System.out.println("Warning: logging configuration could not be set");
 	}
 	// emit some extra info
-	logger.info("Platform: "+System.getProperty("os.name")+" "+System.getProperty("os.arch")+" " +
-		"version "+System.getProperty("sys.version"));
-	logger.info("JRE: "+System.getProperty("java.vendor")+" version "+System.getProperty("java.version") +
-		" JIT "+System.getProperty("java.compiler") + "; " +
-		"installed in "+System.getProperty("java.home"));
-	logger.info("  classpath="+System.getProperty("java.class.path"));
+	logger.info("Platform: "+getSystemProperty("os.name")+" "+getSystemProperty("os.arch")+" " +
+		"version "+getSystemProperty("sys.version"));
+	logger.info("JRE: "+getSystemProperty("java.vendor")+" version "+getSystemProperty("java.version") +
+		" JIT "+getSystemProperty("java.compiler") + "; " +
+		"installed in "+getSystemProperty("java.home"));
+	logger.info("  classpath="+getSystemProperty("java.class.path"));
     }
+
+    /** Retrieve system property safely.
+     * <p>
+     * This method doesn't throw an exception when the value cannot be accessed,
+     * but returns {@literal "<protected>"} instead.
+     */
+    protected static String getSystemProperty(String name) {
+	try {
+	    return System.getProperty(name);
+	} catch(java.security.AccessControlException e) {
+	    return "<protected>";
+	}
+    }
+
 }
