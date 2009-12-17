@@ -3,7 +3,7 @@
  <information>
   <title>jGridstart</title>
   <vendor>Nikhef</vendor>
-  <homepage href="@wwwbase@"/>
+  <homepage href="http://jgridstart.nikhef.nl/"/>
   <description>Setup your computer to work with the grid</description>
  </information>
  <security>

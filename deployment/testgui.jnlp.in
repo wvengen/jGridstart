@@ -3,7 +3,7 @@
  <information>
   <title>jGridstart Tests</title>
   <vendor>Nikhef</vendor>
-  <homepage href="@wwwbase@"/>
+  <homepage href="http://jgridstart.nikhef.nl/"/>
   <description>jGridstart Testing Program</description>
  </information>
  <security>
