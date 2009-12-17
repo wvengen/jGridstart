@@ -27,7 +27,7 @@ public class GeneralUtils {
 	Properties p = getConfig();
 	for (Enumeration<?> e = p.keys(); e.hasMoreElements(); ) {
 	    String key = (String)e.nextElement();
-	    if (System.getProperty(key)==null)
+	    if (key!=null && System.getProperty(key)==null)
 		System.setProperty(key, p.getProperty(key));
 	}
 	logger.info("jGridstart version "+System.getProperty("jgridstart.version")+" (r"+System.getProperty("jgridstart.revision")+"), configuration loaded");
