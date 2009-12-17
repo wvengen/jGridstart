@@ -98,7 +98,9 @@ public class DutchGridCA implements CA {
 	    gen.addCertificatesAndCRLs(certStore);
 	    MimeMultipart multipart = gen.generate(data, "BC");
 
-	    MimeMessage msg = new MimeMessage(Session.getDefaultInstance(System.getProperties()));
+	    // don't use system properties as not to require full access to them
+	    //   we don't need to access mail servers anyway
+	    MimeMessage msg = new MimeMessage(Session.getDefaultInstance(new Properties()));
 	    msg.setContent(multipart, multipart.getContentType());
 	    msg.saveChanges();
 	    
