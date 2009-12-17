@@ -24,12 +24,11 @@ public class GeneralUtils {
      * @throws IOException
      */
     public static void loadConfig() throws IOException {
-	Properties sysp = System.getProperties();
 	Properties p = getConfig();
 	for (Enumeration<?> e = p.keys(); e.hasMoreElements(); ) {
 	    String key = (String)e.nextElement();
-	    if (sysp.getProperty(key)==null)
-		sysp.setProperty(key, p.getProperty(key));
+	    if (System.getProperty(key)==null)
+		System.setProperty(key, p.getProperty(key));
 	}
 	logger.info("jGridstart version "+System.getProperty("jgridstart.version")+" (r"+System.getProperty("jgridstart.revision")+"), configuration loaded");
     }
