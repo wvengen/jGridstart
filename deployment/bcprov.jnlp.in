@@ -5,6 +5,9 @@
   <vendor>Sun Microsystems, Inc.</vendor>
   <offline-allowed/>
  </information>
+ <security>
+  <all-permissions/>
+ </security>
  <resources>
   <jar href="bcprov-jdk14-143.jar"/>
  </resources>
