@@ -152,7 +152,8 @@ public class ActionExport extends CertificateAction {
 		    // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4528663
 		    if (chooser.getUI() instanceof BasicFileChooserUI) {
 		        BasicFileChooserUI ui = (BasicFileChooserUI)chooser.getUI();
-		        chooser.setSelectedFile(new File(ui.getFileName()));
+		        File f = new File(chooser.getCurrentDirectory(), ui.getFileName());
+		        chooser.setSelectedFile(f);
 		    }
 		    action.actionPerformed(e);
 		}
