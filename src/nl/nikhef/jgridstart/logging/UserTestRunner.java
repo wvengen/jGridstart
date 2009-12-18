@@ -248,7 +248,7 @@ public class UserTestRunner {
 			SwingUtilities.invokeLater(new Runnable() {
 			    public void run() {
 				outputpane.append("-- Submission of test results failed"+linesep);
-				outputpane.append(e.getLocalizedMessage()+linesep);
+				outputpane.append(""+e.getLocalizedMessage()+linesep);
 				for (int i=0; i<e.getStackTrace().length; i++) 
 				    outputpane.append(e.getStackTrace()[i]+linesep);
 				setMessage("Submission of test results failed, sorry.");
