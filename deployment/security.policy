@@ -1,0 +1,4 @@
+// we need full access anyway (file save/open & exec)
+grant {
+ permission java.security.AllPermission;
+};
