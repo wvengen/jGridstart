@@ -3,6 +3,8 @@ package nl.nikhef.jgridstart.logging;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import nl.nikhef.jgridstart.util.GeneralUtils;
+
 /** Logging helper methods */
 public class LogHelper {
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.logging");
@@ -31,11 +33,6 @@ public class LogHelper {
      * but returns {@literal "<protected>"} instead.
      */
     protected static String getSystemProperty(String name) {
-	try {
-	    return System.getProperty(name);
-	} catch(java.security.AccessControlException e) {
-	    return "<protected>";
-	}
+	return GeneralUtils.getSystemProperty(name);
     }
-
 }

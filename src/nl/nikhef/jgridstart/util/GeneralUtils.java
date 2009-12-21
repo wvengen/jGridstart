@@ -30,7 +30,14 @@ public class GeneralUtils {
 	    if (key!=null && System.getProperty(key)==null)
 		System.setProperty(key, p.getProperty(key));
 	}
-	logger.info("jGridstart version "+System.getProperty("jgridstart.version")+" (r"+System.getProperty("jgridstart.revision")+"), configuration loaded");
+	logger.info(getVersionString() + ", configuration loaded");
+	// set user-agent now that jgridstart version is known; but don't make it fatal
+	try {
+	    System.setProperty("http.agent", getUserAgentString());
+	    logger.fine("Set user-agent: "+System.getProperty("user.agent"));
+	} catch(Exception e) {
+	    logger.warning("Could not set user-agent: "+e.getLocalizedMessage());
+	}
     }
     
     /** Returns default properties @see #loadConfig */
@@ -38,5 +45,50 @@ public class GeneralUtils {
 	Properties p = new Properties();
 	p.load(Main.class.getResourceAsStream(standardConfig));
 	return p;
+    }
+    
+    /** Retrieve system property safely.
+     * <p>
+     * This method doesn't throw an exception when the value cannot be accessed,
+     * but returns {@literal "<protected>"} instead.
+     */
+    public static String getSystemProperty(String name) {
+	try {
+	    return System.getProperty(name);
+	} catch(java.security.AccessControlException e) {
+	    return "<protected>";
+	}
+    }
+    
+    /** Return jGridstart's version string */
+    public static String getVersionString() {
+	return "jGridstart " + getSystemProperty("jgridstart.version") +
+	       " r" + getSystemProperty("jgridstart.revision");
+    }
+    
+    /** Return jGridstart's user-agent string.
+     * <p>
+     * This string is a complete user-agent string, described by
+     * <a href="http://www-archive.mozilla.org/build/revised-user-agent-strings.html">http://www-archive.mozilla.org/build/revised-user-agent-strings.html</a>,
+     * although the OS/CPU value is not strictly translated to Mozilla's conventions.
+     * <p>
+     * Added to the comment (the stuff between brackets) is the CA implementation.
+     * <p>
+     * Example output:
+     *   {@literal jGridstart/1.1_1234 (X11; I; Linux amd64; TestCA)}
+     * <p>
+     * Note that Java adds something like {@literal Java/1.6.0_01} at the end for the
+     * final user-agent sent to the remote end.
+     */
+    public static String getUserAgentString() {
+	String platform = "X11";
+	if (getSystemProperty("os.name").startsWith("Mac")) platform = "Macintosh";
+	else if (getSystemProperty("os.name").startsWith("Win")) platform = "Windows";
+	return "jGridstart/" + getSystemProperty("jgridstart.version") +
+	       "_" + getSystemProperty("jgridstart.revision") +
+	       " (" + platform + "; I; " +
+	           getSystemProperty("os.name") + " " + getSystemProperty("os.arch") + "; " +
+	           getSystemProperty("jgridstart.ca.provider") +
+	       ")";
     }
 }
