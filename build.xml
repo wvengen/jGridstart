@@ -286,10 +286,12 @@
 		<copy file="${dir.dist}/${target.name}.jnlp.in" tofile="${dir.dist}/${target.name}.jnlp" />
 		<copy file="${dir.dist}/${tests.guitarget.name}.jnlp.in" tofile="${dir.dist}/${tests.guitarget.name}.jnlp" />
 		<copy file="${dir.dist}/bcprov.jnlp.in" tofile="${dir.dist}/bcprov.jnlp" />
+		<copy file="${dir.dist}/bcprov-sun.jnlp.in" tofile="${dir.dist}/bcprov-sun.jnlp" />
 		<replace dir="${dir.dist}">
 			<include name="${target.name}.jnlp"/>
 			<include name="${tests.guitarget.name}.jnlp"/>
 			<include name="bcprov.jnlp"/>
+			<include name="bcprov-sun.jnlp"/>
 			<replacefilter token="@wwwbase@" value="${wwwbase}"/>
 			<replacefilter token="@main@" value="${target.main}"/>
 			<replacefilter token="@tests.main@" value="${tests.guitarget.main}"/>
@@ -307,6 +309,7 @@
 		<delete file="${dir.dist}/${target.name}.jar"/>
 		<delete file="${dir.dist}/${target.name}.jnlp"/>
 		<delete file="${dir.dist}/bcprov.jnlp"/>
+		<delete file="${dir.dist}/bcprov-sun.jnlp"/>
 		<delete file="${dir.dist}/${dep.bouncycastle.basename}"/>
 		<delete file="${dir.dist}/${browsertool.target.name}.jar"/>
 		<delete file="${dir.dist}/${tests.target.name}.jar"/>

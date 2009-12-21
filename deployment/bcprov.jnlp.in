@@ -5,7 +5,7 @@
   <vendor>Sun Microsystems, Inc.</vendor>
   <offline-allowed/>
  </information>
- <!-- the security section is not required for Sun JRE, see jgridstart.jnlp(.in) for more details -->
+ <!-- need a security section for OpenJDK, see jgridstart.jnlp(.in) for more details -->
  <security>
   <all-permissions/>
  </security>
