@@ -12,8 +12,6 @@
  <resources>
   <j2se href="http://java.sun.com/products/autodl/j2se" version="1.5+"/>
   <jar href="@tests.name@.jar"/>
-  <extension name="BouncyCastle cryptography library" href="bcprov.jnlp"/>
-  <property name="java.security.policy" value="@wwwbase@security.policy"/>
  </resources>
  <application-desc main-class="@tests.main@"/>
 </jnlp>
