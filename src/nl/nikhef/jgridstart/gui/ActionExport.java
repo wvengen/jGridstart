@@ -3,8 +3,6 @@ package nl.nikhef.jgridstart.gui;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import javax.swing.AbstractAction;
 import javax.swing.Action;

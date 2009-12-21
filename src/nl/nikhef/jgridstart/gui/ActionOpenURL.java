@@ -3,12 +3,10 @@ package nl.nikhef.jgridstart.gui;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 
-import nl.nikhef.jgridstart.gui.util.ErrorMessage;
-import nl.nikhef.jgridstart.gui.util.URLLauncher;
-import nl.nikhef.jgridstart.install.BrowserFactory;
-
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
+
+import nl.nikhef.jgridstart.gui.util.URLLauncher;
 
 /** Open an external web page showing help */
 public class ActionOpenURL extends AbstractAction {
