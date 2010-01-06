@@ -12,14 +12,11 @@
  <resources>
   <j2se href="http://java.sun.com/products/autodl/j2se" version="1.5+"/>
   <jar href="jgridstart.jar"/>
-  <!-- BouncyCastle requires full permissions, which brings up an additional
-       security dialog for the user; this can be worked around for the Sun JRE,
-       see: http://jgridstart.nikhef.nl/Bouncycastle_and_Java_Web_start -->
   <extension name="BouncyCastle cryptography library" href="bcprov.jnlp"/>
-  <property name="java.security.policy" value="@wwwbase@security.policy"/>
-  <!-- program defaults, customize these for your site -->
-  <property name="jgridstart.defaults.country" value="NL"/>
-  <property name="jgridstart.defaults.level" value="medium"/>
+  <!-- program defaults, customize these for your site (properties are prefixed
+       with "jnlp." to avoid the need for a signed jnlp) -->
+  <property name="jnlp.jgridstart.defaults.country" value="NL"/>
+  <property name="jnlp.jgridstart.defaults.level" value="medium"/>
   <!-- end of program defaults -->
  </resources>
  <application-desc main-class="@main@"/>

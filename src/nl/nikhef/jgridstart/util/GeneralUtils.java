@@ -1,7 +1,9 @@
 package nl.nikhef.jgridstart.util;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -20,10 +22,32 @@ public class GeneralUtils {
      * Reads the standard configuration properties into the {@linkplain System}
      * property store. Doesn't overwrite existing properties, so that they
      * can be overridden from the command-line.
+     * <p>
+     * In addition to this, all properties that have a name starting with
+     * {@literal jnlp.jgridstart.<x>} or {@literal javaws.jgridstart.<x>} are
+     * renamed to {@literal jgridstart.<x>} before the standard configuration
+     * is read. This allows one to modify jgridstart
+     * <a href="http://java.sun.com/javase/6/docs/technotes/guides/javaws/developersguide/syntax.html#resources">properties</a>
+     * in the jnlp file without requiring to
+     * <a href="http://java.sun.com/javase/technologies/desktop/javawebstart/download-spec.html">sign</a> it.
      * 
      * @throws IOException
      */
     public static void loadConfig() throws IOException {
+	// rename java web start properties
+	ArrayList<String> keys = new ArrayList<String>();
+	for (Enumeration<?> e = System.getProperties().keys(); e.hasMoreElements(); ) {
+	    String key = (String)e.nextElement();
+	    if (key.startsWith("jnlp.jgridstart.") || key.startsWith("javaws.jgridstart."))
+		keys.add(key);
+	}
+	for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
+	    String key = it.next();
+	    String newkey = key.replaceFirst("^(jnlp|javaws)\\.(jgridstart\\.)", "$2");
+	    System.setProperty(newkey, System.getProperty(key));
+	    System.clearProperty(key);
+	}
+	// load standard configuration
 	Properties p = getConfig();
 	for (Enumeration<?> e = p.keys(); e.hasMoreElements(); ) {
 	    String key = (String)e.nextElement();
