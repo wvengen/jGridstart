@@ -38,6 +38,7 @@ public class CertificateRequest {
 		if (name.equals("request.submitted")) continue;
 		if (name.equals("request.processed")) continue;
 		if (name.equals("install.done")) continue;
+		if (name.equals("request.serial")) continue;
 		// copy if unset
 		if (!p.containsKey(name))
 		    p.setProperty(name, value);
