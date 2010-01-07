@@ -30,6 +30,11 @@ elif [ "$1" = "check" ]; then
 	export INVOKED_PROGRAM
 	shift
 	$JAVA nl.nikhef.jgridstart.CertificateCheck $@
+elif [ "$1" = "screenshots" ]; then
+	shift
+	CLASSPATH="$CLASSPATH:$LIB/junit/junit-4.7.jar:$LIB/junit/abbot.jar"
+	export CLASSPATH
+	$JAVA nl.nikhef.jgridstart.gui.util.GUIScreenshotsTest $@
 elif [ "$DISPLAY" ]; then
 	$JAVA nl.nikhef.jgridstart.gui.Main $@
 else
