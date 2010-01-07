@@ -39,7 +39,10 @@ public abstract class CertificateAction extends AbstractAction implements ListSe
 	super();
 	this.parent = parent;
 	this.selection = s;
-	if (s!=null) s.addListSelectionListener(this);
+	if (s!=null) {
+	    setEnabled(isWantEnabled);
+	    s.addListSelectionListener(this);
+	}
     }
     public CertificateAction(JFrame parent) { this(parent, null); }
     
