@@ -98,14 +98,9 @@ public class CertificateCheck {
 	    Object o = PEMReader.readObject(f, KeyPair.class);
 	    if (o==null)
 		fail("Private key file contains no private key", f);
-	} catch (PasswordException e) {
-	    if (!e.toString().contains("No password finder specified"))
+	} catch (Exception e) {
+	    if (!PasswordCache.isPasswordNotSuppliedException(e) && !PasswordCache.isPasswordCancelledException(e))
 		throw new CertificateCheckException(e);
-	    // otherwise ok :)
-	} catch (PasswordCancelledException e) {
-	    // is ok :)
-	} catch (IOException e) {
-	    throw new CertificateCheckException(e);
 	}
     }
 

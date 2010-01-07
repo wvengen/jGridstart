@@ -376,8 +376,7 @@ public class PasswordCache {
     /** TODO document */
     public static boolean isPasswordNotSuppliedException(Throwable e) {
 	if (e.getMessage()==null) return false;
-	return e.getMessage().contains("No password finder specified") ||
-	       e.getMessage().contains("Password is null");
+	return e.getMessage().contains("No password finder specified");
     }
     /** @see #isPasswordNotSuppliedException(Throwable) */
     public static boolean isPasswordNotSuppliedException(Exception e) {
@@ -385,9 +384,9 @@ public class PasswordCache {
     }
     /** TODO document */
     public static boolean isPasswordCancelledException(Throwable e) {
+	if (e instanceof PasswordCancelledException) return true;
 	if (e.getMessage()==null) return false;
-	return e.getMessage().contains("Password is null") ||
-	       e.getMessage().contains("No password finder specified");
+	return e.getMessage().contains("Password is null");
     }
     /** @see #isPasswordCancelledException(Throwable) */
     public static boolean isPasswordCancelledException(Exception e) {
