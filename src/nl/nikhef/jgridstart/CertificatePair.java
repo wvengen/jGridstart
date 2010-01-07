@@ -539,8 +539,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		loaded = true;
 		if (dstpw==null) dstpw = pw;
 	    } catch(IOException e) {
-		if (e.getLocalizedMessage()!=null &&
-			e.getLocalizedMessage().contains("wrong password")) {
+		if (PasswordCache.isPasswordWrongException(e)) {
 		    // if bad password, invalidate and ask again
 		    pwcache.invalidate(src.getCanonicalPath());
 		} else throw e;

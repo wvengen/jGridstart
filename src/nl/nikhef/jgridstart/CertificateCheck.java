@@ -21,6 +21,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.bouncycastle.openssl.PasswordException;
 
 import nl.nikhef.jgridstart.util.PEMReader;
 import nl.nikhef.jgridstart.util.PasswordCache;
@@ -97,6 +98,10 @@ public class CertificateCheck {
 	    Object o = PEMReader.readObject(f, KeyPair.class);
 	    if (o==null)
 		fail("Private key file contains no private key", f);
+	} catch (PasswordException e) {
+	    if (!e.toString().contains("No password finder specified"))
+		throw new CertificateCheckException(e);
+	    // otherwise ok :)
 	} catch (PasswordCancelledException e) {
 	    // is ok :)
 	} catch (IOException e) {

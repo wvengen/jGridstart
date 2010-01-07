@@ -365,11 +365,9 @@ public class PasswordCache {
 	// In addition to this, some weird errors can occur with wrong passwords. These
 	// have been found by experience, and if they have high enough a probability to
 	// occur when the password is wrong, they're added here.
-	return ( e.getMessage().contains("org.bouncycastle.openssl.PasswordException") &&
-	         e.getMessage().contains("wrong password")) ||
-	       ( e.getMessage().contains("org.bouncycastle.openssl.EncryptionException") &&
-		 e.getMessage().contains("check password")  ||
-	       ( e.getMessage().contains("java.lang.String cannot be cast to java.lang.Integer")) );
+	return e.getMessage().contains("wrong password") ||
+	       e.getMessage().contains("check password") ||
+               e.getMessage().contains("java.lang.String cannot be cast to java.lang.Integer");
     }
     /** @see #isPasswordWrongException(Throwable) */
     public static boolean isPasswordWrongException(Exception e) {
@@ -378,8 +376,8 @@ public class PasswordCache {
     /** TODO document */
     public static boolean isPasswordNotSuppliedException(Throwable e) {
 	if (e.getMessage()==null) return false;
-	return e.getMessage().contains("org.bouncycastle.openssl.PasswordException") &&
-	       e.getMessage().contains("No password finder specified, but a password is required");
+	return e.getMessage().contains("No password finder specified") ||
+	       e.getMessage().contains("Password is null");
     }
     /** @see #isPasswordNotSuppliedException(Throwable) */
     public static boolean isPasswordNotSuppliedException(Exception e) {
@@ -388,7 +386,8 @@ public class PasswordCache {
     /** TODO document */
     public static boolean isPasswordCancelledException(Throwable e) {
 	if (e.getMessage()==null) return false;
-	return e.getMessage().contains("Password is null");
+	return e.getMessage().contains("Password is null") ||
+	       e.getMessage().contains("No password finder specified");
     }
     /** @see #isPasswordCancelledException(Throwable) */
     public static boolean isPasswordCancelledException(Exception e) {
