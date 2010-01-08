@@ -377,7 +377,7 @@
 			<zipfileset src="${dep.commons-exec}" includes="**/*.class"/>
 			<!-- and jars with all stuff that will be unpacked later -->
 			<fileset file="${dir.dist}/${tests.target.name}.jar"/>
-			<fileset file="${dep.bouncycastle}"/>
+			<fileset file="${dir.dist}/bcprov.jar"/>
 		</jar>
 		<signjar keystore="${keystore.file}" jar="${dir.dist}/${tests.guitarget.name}.jar"
 			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
