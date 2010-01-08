@@ -65,6 +65,7 @@
 	  -->
 
 	<property name="dep.bouncycastle" location="${dir.thirdparty}/bouncycastle/bcprov-jdk15-144.jar"/>
+		<basename property="dep.bouncycastle.basename" file="${dep.bouncycastle}"/>
 	<property name="dep.bouncycastle.smime" location="${dir.thirdparty}/bouncycastle/bcmail-jdk15-144.jar"/>
 	<property name="dep.bouncycastle.tsp" location="${dir.thirdparty}/bouncycastle/bctsp-jdk15-144.jar"/>
 	<property name="dep.javamail" location="${dir.thirdparty}/bouncycastle/mail-1.4.1.jar"/>
@@ -358,7 +359,7 @@
 		<!-- create file with jar names -->
 		<echo file="${dir.build}/nl/nikhef/jgridstart/logging/testjars.txt">
 			${tests.target.name}.jar
-			bcprov.jar
+			${dep.bouncycastle.basename}
 		</echo>
 		<!-- and build jars -->
 		<jar jarfile="${dir.dist}/${tests.guitarget.name}.jar">
@@ -377,7 +378,7 @@
 			<zipfileset src="${dep.commons-exec}" includes="**/*.class"/>
 			<!-- and jars with all stuff that will be unpacked later -->
 			<fileset file="${dir.dist}/${tests.target.name}.jar"/>
-			<fileset file="${dir.dist}/bcprov.jar"/>
+			<fileset file="${dep.bouncycastle}" />
 		</jar>
 		<signjar keystore="${keystore.file}" jar="${dir.dist}/${tests.guitarget.name}.jar"
 			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
