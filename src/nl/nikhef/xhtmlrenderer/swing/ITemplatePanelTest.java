@@ -151,12 +151,8 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	}
 	return match.toArray(new Component[]{});
     }
-    protected Component[] findMany(Matcher m) throws InterruptedException, InvocationTargetException {
-	// invoke and wait for an event in the gui thread, so that really
-	// all events are handled
-	java.awt.EventQueue.invokeAndWait(new Runnable() {
-	    public void run() { }
-	});
+    protected Component[] findMany(Matcher m) throws InterruptedException, InvocationTargetException, AWTException {
+	guiSleep();
 	return findMany((Component)panel, m);
     }
     /** as {@link ComponentFinder#find}
@@ -166,7 +162,6 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
      */
     protected Component find(Matcher m) throws MultipleComponentsFoundException, ComponentNotFoundException, InterruptedException, InvocationTargetException, AWTException {
 	guiSleep();
-	// only then look it up
 	return getFinder().find(m);
     }
     /** Helper method: test the panel's contents 
