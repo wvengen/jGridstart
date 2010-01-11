@@ -99,6 +99,7 @@
 		<pathelement location="${dep.xhtmlrenderer}"/>
 			<pathelement location="${dep.itext}"/>
 		<pathelement location="${dep.winregistry}"/>
+		<pathelement location="${java.home}/lib/javaws.jar"/> <!-- for javax.jnlp.* -->
 	</path>
 	
 	<patternset id="distfiles">
@@ -236,6 +237,7 @@
 			<libraryjar file="${java.home}/lib/rt.jar"/>
 			<libraryjar file="${java.home}/lib/jce.jar"/>
 			<libraryjar file="${java.home}/lib/jsse.jar"/>
+			<libraryjar file="${java.home}/lib/javaws.jar"/>
 			<libraryjar file="${dep.bouncycastle}"/>
 			<libraryjar file="${dep.junit}"/>
 			<libraryjar file="${dep.abbot}"/>

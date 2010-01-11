@@ -1,12 +1,18 @@
 package nl.nikhef.jgridstart;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
+
+import javax.jnlp.BasicService;
+import javax.jnlp.ServiceManager;
+import javax.jnlp.UnavailableServiceException;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -78,15 +84,28 @@ public class Organisation extends Properties {
 	if (orgIndex==null) readAll();
 	return orgIndex.values().toArray(new Organisation[0]);
     }
+
     /** Load the list of organisations from the configuration file */
     protected static void readAll() {
+	// save error handling so that we can load and then show error to avoid
+	//    this being called twice
+	Exception exc = null;
+	String excMsg = null;
 	// load organisations
 	Properties allProps = new Properties();
 	try {
-	    allProps.load(Organisation.class.
-		    getResourceAsStream("/resources/conf/cert_signup.conf"));
+	    allProps.load(getFile());
 	} catch (IOException e) {
-	    ErrorMessage.internal(null, e);
+	    // fallback to internal copy
+	    exc = e;
+	    try {
+		allProps.clear();
+		allProps.load(Organisation.class.getResourceAsStream("/resources/conf/cert_signup.conf"));
+		excMsg = "Could not load organisations from remote location, falling back to default.\n" +
+			"You can probably just continue, but if your organisation is not listed try again later.";
+	    } catch (IOException e2) {
+		excMsg = "Could not load organisations, and fallback failed as well."; 
+	    }
 	}
 	// parse into objects
 	orgIndex = new HashMap<String, Organisation>();
@@ -151,8 +170,33 @@ public class Organisation extends Properties {
 		if (sranameshtml.length()>5) org.setProperty("ranames.html", sranameshtml.substring(0, sranameshtml.length()-5));
 	    }
 	}
-	
+	// handle error
+	if (exc!=null)
+	    ErrorMessage.error(null, "Could not load organisations", exc, excMsg);
     }
+    /** Retrieves organisation file
+     * <p>
+     * Tries to retrieve it from the location specified in the global configuration,
+     * falls back to file supplied with distribution. 
+     */
+    protected static InputStream getFile() throws IOException {
+	if (System.getProperty("jgridstart.org.href")!=null) {
+	    try {
+		BasicService basic = (BasicService)ServiceManager.lookup("javax.jnlp.BasicService");
+		URL baseurl = basic.getCodeBase();
+		URL fileurl = new URL(baseurl, System.getProperty("jgridstart.org.href"));
+		if (!fileurl.toExternalForm().startsWith(baseurl.toExternalForm()))
+		    throw new IOException("Organisation file must reside on same server as application.");
+		return fileurl.openStream();
+	    } catch(UnavailableServiceException e) {
+		// no java web start, try to use full url instead
+		return new URL(System.getProperty("jgridstart.org.href")).openStream();
+	    }
+	}
+	// fallback to local copy
+	return Organisation.class.getResourceAsStream("/resources/conf/cert_signup.conf");
+    }
+    
     /** Returns the Organisation belonging to a CertificatePair, or {@code null} of not found.
      * <p>
      * When the certificate property {@code org} is present, it returns that. Otherwise it
