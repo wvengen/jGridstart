@@ -12,7 +12,7 @@
  <resources>
   <j2se href="http://java.sun.com/products/autodl/j2se" version="1.5+"/>
   <jar href="jgridstart.jar"/>
-  <jar href="bcprov.jar"/>
+  <extension name="BouncyCastle cryptography library" href="@bouncycastle@.jnlp"/>
   <!-- program defaults, customize these for your site (properties are prefixed
        with "jnlp." to avoid the need for a signed jnlp) -->
   <property name="jnlp.jgridstart.defaults.country" value="NL"/>
