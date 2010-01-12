@@ -372,6 +372,8 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	    throw e;
 	}
 	
+	oldCert.setProperty("renewal.childstarted", "true");
+	
 	return newCert;
     }
     

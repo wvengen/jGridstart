@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.Calendar;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -69,4 +70,15 @@ public class CryptoUtils {
 	return getX509NameHash(new X509Principal(p.getEncoded()));
     }
 
+    /** Return number of millseconds that certificate is still valid */
+    public static long getX509MillisecondsValid(X509Certificate cert){
+	Calendar now = Calendar.getInstance();
+	Calendar end = Calendar.getInstance();
+	end.setTime(cert.getNotAfter());
+	return end.getTimeInMillis() - now.getTimeInMillis(); 
+    }
+    /** Return number of days that certificate is still valid */
+    public static long getX509DaysValid(X509Certificate cert) {
+	return getX509MillisecondsValid(cert) / (1000*60*60*24);
+    }
 }

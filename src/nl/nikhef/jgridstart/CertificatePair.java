@@ -33,7 +33,9 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -55,6 +57,7 @@ import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PrivateFileWriter;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
@@ -151,6 +154,11 @@ public class CertificatePair extends Properties implements ItemSelectable {
      *     <dd>is {@code true} if the certificate is valid, {@code null} otherwise</dd>
      * <dt>valid.notafter, valid.notbefore</dt>
      *     <dd>localised validity interval</dd>
+     * <dt>valid.notafter.remaining</dt>
+     *     <dd>Number of days until certificate expires</dd>
+     * <dt>valid.notafter.warning</dt>
+     *     <dd>is {@code true} when certificate will expires within the warning period,
+     *         which is set by the property {@literal jgridstart.renewal.warndays}.</dd>
      * <dt>cert, request</dt>
      *     <dd>is {@code true} when certificate respectively CSR are present</dd>
      * <dt>subject, issuer</dt>
@@ -245,10 +253,23 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		if (getCertificate()==null) return null;
 		return DateFormat.getDateInstance().format(getCertificate().getNotAfter());
 	    }
+	    if (key.equals("valid.notafter.remaining")) {
+		if (getCertificate()==null) return null;
+		return String.valueOf(CryptoUtils.getX509DaysValid(getCertificate()));
+	    }
+	    if (key.equals("valid.notafter.warning")) {
+		if (getCertificate()==null) return null;
+		int days = 30;
+		try {
+		    days = Integer.valueOf(System.getProperty("jgridstart.renewal.warndays"));
+		} catch(NumberFormatException e) { }
+		return Boolean.toString(CryptoUtils.getX509DaysValid(getCertificate()) <= days);
+	    }
 	    if (key.equals("state.icon")) {
 		if (Boolean.valueOf(getProperty("cert")) && !Boolean.valueOf(getProperty("valid")))
 		    return "expired";
-		if (!Boolean.valueOf(getProperty("cert")) && Boolean.valueOf(getProperty("request")))
+		if ((!Boolean.valueOf(getProperty("cert")) && Boolean.valueOf(getProperty("request"))) ||
+		    (Boolean.valueOf(getProperty("valid.notafter.warning")) && !Boolean.valueOf(getProperty("renewal.childstarted"))) )
 		    return "warning";
 		if (Boolean.valueOf(getProperty("valid")))
 		    return "valid";
