@@ -73,6 +73,7 @@ public class ComponentCertificateList extends JList {
 	    // organisation
 	    Organisation org = Organisation.getFromCertificate(cert);
 	    if (org!=null) line1 += org.getProperty("name.full"); // TODO full name, incl. O if OU
+	    else line1 += cert.getProperty("org");
 	    // add serial number to 3rd line, if any
 	    String serial = cert.getProperty("cert.serial");
 	    if (serial!=null) line2 += " <span color='#888888'>(#"+serial+ ")</span>";
