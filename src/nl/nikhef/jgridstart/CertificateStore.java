@@ -9,6 +9,7 @@ import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -183,14 +184,17 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     }
     
     /** Create a new subdirectory for a {@linkplain CertificatePair} in this store.
+     * <p>
+     * It is formatted as {@code user-cert-YYYYddMM-xx} so each item is unique and
+     * can be recognised by its creation date.
      *
      * @return Newly created directory name
      * @throws IOException
      */
     protected File newItem() throws IOException {
 	File dst = null;
-	for (int i = 0; i < Integer.MAX_VALUE; i++) {
-	    dst = new File(path, String.format("user-cert-%04d", i));
+	for (int i = 0; i < 100; i++) {
+	    dst = new File(path, String.format("user-cert-%1$tY%1$tm%1$td-%2$02d", Calendar.getInstance(), i));
 	    if (!dst.exists()) break;
 	}
 	if (dst.exists())
