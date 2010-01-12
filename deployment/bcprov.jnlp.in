@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jnlp spec="1.0+" codebase="@wwwbase@">
  <information>
-  <title>@bouncycastle</title>
+  <title>@bouncycastle@</title>
   <vendor>Sun Microsystems, Inc.</vendor>
   <description>BouncyCastle cryptography library</description>
   <homepage href="http://bouncycastle.org/"/>

@@ -1,0 +1,10 @@
+SwingWorker
+-----------
+
+SwingWorker is set of helper classes for handling background tasks.
+It is included in Java 6 and higher, but not in Java 5. To make it
+work in all cases, a local copy of SwingWorker is included in the
+distribution. It has a different package name than Java 6 so that
+it doesn't conflict.
+
+https://swingworker.dev.java.net/

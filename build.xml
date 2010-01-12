@@ -80,26 +80,29 @@
 	<property name="dep.itext" location="${dir.thirdparty}/flyingsaucer/iText-2.0.8.jar"/>
 	<property name="dep.winregistry" location="${dir.thirdparty}/winregistry/WinRegistry-3.4.jar"/>
 	<property name="dep.apiviz" location="${dir.thirdparty}/javadoc/apiviz-1.3.0.GA.jar"/>
-	<!-- activation framework is present in Java 1.6 and we don't use
-	     it apart for resolving; so we can omit it when compiling there
-	     to avoid ProGuard Warnings (which are fatal); so we need it for
-	     lower versions. This is a little trick with ProGuard's jarfilter -->
+
+	<!-- java activation framework; trickery to make it build on java6 and run on java5 too
+	     (see target jar.small-add.activation) -->
 	<property name="dep.activation" location="${dir.thirdparty}/bouncycastle/activation.jar"/>
+	<condition property="dep.activation.pgfilter" value="!javax/activation/**,!com/sun/activation/**" else="**">
+		<available classname="javax.activation.DataSource"/>
+	</condition>
+	
+	<!-- Compile-time dependencies -->
 	<path id="path.dependencies">
-		<!-- TODO use jdk13 library versions and test -->
 		<pathelement location="${dep.bouncycastle}"/>
 		<pathelement location="${dep.bouncycastle.smime}"/>
 			<pathelement location="${dep.javamail}"/>
+			<pathelement location="${dep.activation}"/>
 		<pathelement location="${dep.commons-lang}"/>
 		<pathelement location="${dep.commons-cli}"/>
 		<pathelement location="${dep.commons-exec}"/>
-		<pathelement location="${dep.junit}"/>
-		<pathelement location="${dep.abbot}"/>
-		<pathelement location="${dep.swingworker}"/> <!-- for java1.5 and below -->
+		<pathelement location="${dep.swingworker}"/>
 		<pathelement location="${dep.xhtmlrenderer}"/>
 			<pathelement location="${dep.itext}"/>
 		<pathelement location="${dep.winregistry}"/>
-		<pathelement location="${java.home}/lib/javaws.jar"/> <!-- for javax.jnlp.* -->
+		<pathelement location="${dep.junit}"/>
+		<pathelement location="${dep.abbot}"/>
 	</path>
 	
 	<patternset id="distfiles">
@@ -116,7 +119,7 @@
 		<exclude name="**/.svn"/>
 	</patternset>
 	
-	<!-- files to include as dependencies in jars -->
+	<!-- files from dependencies to merge into main distribution jar -->
 	<resources id="depfiles">
 		<zipfileset src="${dep.commons-lang}" includes="**/*.class"/>
 		<zipfileset src="${dep.commons-cli}" includes="**/*.class"/>
@@ -136,13 +139,7 @@
 		<zipfileset src="${dep.winregistry}" includes="**/*.class"/>
 		<zipfileset src="${dep.bouncycastle.smime}" includes="**/*.class"/>
 		<zipfileset src="${dep.bouncycastle.tsp}" includes="**/*.class"/>
-		<zipfileset src="${dep.javamail}">
-			<include name="com/sun/mail/handlers/**.class"/>
-			<include name="com/sun/mail/iap/**.class"/>
-			<include name="com/sun/mail/util/**.class"/>
-			<include name="javax/mail/*.class"/>
-			<include name="javax/mail/**/*.class"/>
-		</zipfileset>
+		<zipfileset src="${dep.javamail}" includes="**/*.class"/>
 		<zipfileset src="${dep.activation}" includes="**/*.class"/>
 	</resources>
 	
@@ -151,7 +148,7 @@
 	  - Initialisation and other setup
 	  -->
 
-	<!-- keystore; create one if not supplied -->
+	<!-- keystore; create one with test certificate if not supplied -->
 	<available file="${keystore.file}" type="file" property="keystore.available"/>
 	<target name="keystore" unless="keystore.available">
 		<tempfile property="keystore.file" prefix="keystore" suffix=".ks"/>
@@ -212,7 +209,7 @@
 	<!--
 	  -  Full JAR creation target
 	  -->
-	<target name="jar.large" depends="compile">
+	<target name="jar.large" depends="compile,jar.bcprov">
 		<jar jarfile="${dir.dist}/${target.name}.large.jar">
 			<manifest>
 				<attribute name="Built-By" value="${user.name}"/>
@@ -232,18 +229,20 @@
 	<target name="jar.small" depends="jar.large">
 		<!-- minimize jar file; skipnonpubliclibraryclasses needed for java1.6 -->
 		<proguard obfuscate="false" skipnonpubliclibraryclasses="false" verbose="true">
-			<injar file="${dir.dist}/${target.name}.large.jar"/>
+			<!-- filter out activation classes when building on java6 to avoid clashing with
+			     system classes. These are added at the end when needed to make sure it runs
+			     on java5 as well -->
+			<injar file="${dir.dist}/${target.name}.large.jar" filter="${dep.activation.pgfilter}"/>
 			<outjar file="${dir.dist}/${target.name}.small.jar"/>
 			<libraryjar file="${java.home}/lib/rt.jar"/>
 			<libraryjar file="${java.home}/lib/jce.jar"/>
 			<libraryjar file="${java.home}/lib/jsse.jar"/>
-			<libraryjar file="${java.home}/lib/javaws.jar"/>
 			<libraryjar file="${dep.bouncycastle}"/>
 			<libraryjar file="${dep.junit}"/>
 			<libraryjar file="${dep.abbot}"/>
+			<!-- program entry point, keep this! -->
 			<keepclasseswithmembers access="public">
-				<method access="public static" type="void"
-					name="main" parameters="java.lang.String[]"/>
+				<method access="public static" type="void" name="main" parameters="java.lang.String[]"/>
 			</keepclasseswithmembers>
 			<!-- Somehow xhtmlrenderer classes are stripped too much, this is a workaround. Error e.g.
 			     "Invalid index 2 in LocalVariableTable in class file org/xhtmlrenderer/render/Box" -->
@@ -273,12 +272,43 @@
 			<keepclasseswithmembers name="javax.mail.internet.MimeBodyPart"> <method name="*"/></keepclasseswithmembers>
 			<keepclasseswithmembers name="javax.activation.ActivationDataFlavor"> <method name="*"/></keepclasseswithmembers>
 		</proguard>
+		<!-- add activation framework when building on java6 -->
+		<antcall target="jar.small-add.activation"/>
 	</target>
-
+	
+	<!--
+	  - Target to add java activation framework to small jar
+	  -  Since the java activation framework is present on java6, we can't include it in
+	  -  the proguard step. But to make the resulting jar work on java6 as well, the
+	  -  framework still needs to be present in the final jar. This target adds these
+	  -  classes only if they're not already present in the final small jar.
+	  -->
+	<target name="jar.small-add.activation">
+		<condition property="dep.activation.needpostadd">
+			<not>
+				<available classname="javax.activation.DataSource" classpath="${dir.dist}/${target.name}.small.jar" ignoresystemclasses="true"/>
+			</not>
+		</condition>
+		<antcall target="jar.small-add.activation-do"/>
+	</target>
+	<target name="jar.small-add.activation-do" if="dep.activation.needpostadd">
+		<jar destfile="${dir.dist}/${target.name}.small.jar" update="true" duplicate="fail">
+			<zipfileset src="${dep.activation}" includes="**/*.class"/>
+		</jar>
+	</target>
+	
+	<!--
+	  - BouncyCastle copy target (dependency as external jar)
+	  -->
+	<target name="jar.bcprov">
+		<!-- copy bouncycastle jar to deployment area; also sign it -->
+		<copy file="${dep.bouncycastle}" tofile="${dir.dist}/${target.bouncycastle}.jar"/>
+	</target>
+	
 	<!--
 	  - Distribution creation target
 	  -->
-	<target name="dist" depends="keystore,jar.small,jar.testgui">
+	<target name="dist" depends="keystore,jar.small,jar.testgui,jar.bcprov">
 		<!-- copy large/small jar to distribution -->
 		<copy file="${dir.dist}/${target.name}.small.jar" tofile="${dir.dist}/${target.name}.jar"/>
 		<!-- sign, required for java web start -->
@@ -298,8 +328,6 @@
 			<replacefilter token="@tests.name@" value="${tests.guitarget.name}"/>
 			<replacefilter token="@bouncycastle@" value="${target.bouncycastle}"/>
 		</replace>
-		<!-- copy bouncycastle jar to deployment area; also sign it -->
-		<copy file="${dep.bouncycastle}" tofile="${dir.dist}/${target.bouncycastle}.jar"/>
 		<signjar keystore="${keystore.file}" jar="${dir.dist}/${target.bouncycastle}.jar"
 			alias="${keystore.alias}" storepass="${keystore.passwd}"/>
 		<delete file="${keystore.tempfile}" quiet="true"/>
@@ -361,6 +389,7 @@
 			<zipfileset src="${dep.abbot}"/>
 		</jar>
 	</target>
+	
 	<!-- user test runner -->
 	<target name="jar.testgui" depends="jar.tests,keystore">
 		<!-- create file with jar names -->

@@ -3,16 +3,13 @@ package nl.nikhef.jgridstart;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
-
-import javax.jnlp.BasicService;
-import javax.jnlp.ServiceManager;
-import javax.jnlp.UnavailableServiceException;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -181,17 +178,25 @@ public class Organisation extends Properties {
      */
     protected static InputStream getFile() throws IOException {
 	if (System.getProperty("jgridstart.org.href")!=null) {
+	    URL fileurl = null;
+	    URL baseurl = null;
 	    try {
-		BasicService basic = (BasicService)ServiceManager.lookup("javax.jnlp.BasicService");
-		URL baseurl = basic.getCodeBase();
-		URL fileurl = new URL(baseurl, System.getProperty("jgridstart.org.href"));
-		if (!fileurl.toExternalForm().startsWith(baseurl.toExternalForm()))
-		    throw new IOException("Organisation file must reside on same server as application.");
-		return fileurl.openStream();
-	    } catch(UnavailableServiceException e) {
-		// no java web start, try to use full url instead
-		return new URL(System.getProperty("jgridstart.org.href")).openStream();
+		// Use reflection to call jnlp services to make it work without java web start too
+		//BasicService basic = (BasicService)ServiceManager.lookup("javax.jnlp.BasicService");
+		Class<?> serviceManager = Class.forName("javax.jnlp.ServiceManager");
+		Method lookup = serviceManager.getDeclaredMethod("lookup", new Class[]{ String.class });
+		Class<?> basic = (Class<?>)lookup.invoke(serviceManager, new Object[]{"javax.jnlp.BasicService"});
+		//URL baseurl = basic.getCodeBase();
+		Method getCodeBase = basic.getDeclaredMethod("getCodeBase", new Class[]{});
+		baseurl = (URL)getCodeBase.invoke(basic, new Object[]{});
+		fileurl = new URL(baseurl, System.getProperty("jgridstart.org.href"));
+	    } catch(Exception e) {
+		// java web start codebase call failed, use full url instead
+		fileurl = new URL(System.getProperty("jgridstart.org.href"));
 	    }
+	    if (baseurl!=null && !baseurl.toExternalForm().startsWith(fileurl.toExternalForm()))
+	    	throw new IOException("Organisation file must reside on same server as application.");
+	    return fileurl.openStream();
 	}
 	// fallback to local copy
 	return Organisation.class.getResourceAsStream("/resources/conf/cert_signup.conf");
