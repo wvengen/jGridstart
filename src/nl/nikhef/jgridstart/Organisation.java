@@ -183,18 +183,19 @@ public class Organisation extends Properties {
 	    try {
 		// Use reflection to call jnlp services to make it work without java web start too
 		//BasicService basic = (BasicService)ServiceManager.lookup("javax.jnlp.BasicService");
-		Class<?> serviceManager = Class.forName("javax.jnlp.ServiceManager");
-		Method lookup = serviceManager.getDeclaredMethod("lookup", new Class[]{ String.class });
-		Class<?> basic = (Class<?>)lookup.invoke(serviceManager, new Object[]{"javax.jnlp.BasicService"});
+		Class<?> serviceManagerCls = Class.forName("javax.jnlp.ServiceManager");
+		Method lookup = serviceManagerCls.getDeclaredMethod("lookup", new Class[]{ String.class });
+		Object basic = lookup.invoke(serviceManagerCls, new Object[]{"javax.jnlp.BasicService"});
 		//URL baseurl = basic.getCodeBase();
-		Method getCodeBase = basic.getDeclaredMethod("getCodeBase", new Class[]{});
+		Class<?> basicCls = Class.forName("javax.jnlp.BasicService");
+		Method getCodeBase = basicCls.getDeclaredMethod("getCodeBase", new Class[]{});
 		baseurl = (URL)getCodeBase.invoke(basic, new Object[]{});
 		fileurl = new URL(baseurl, System.getProperty("jgridstart.org.href"));
 	    } catch(Exception e) {
 		// java web start codebase call failed, use full url instead
 		fileurl = new URL(System.getProperty("jgridstart.org.href"));
 	    }
-	    if (baseurl!=null && !baseurl.toExternalForm().startsWith(fileurl.toExternalForm()))
+	    if (baseurl!=null && !fileurl.toExternalForm().startsWith(baseurl.toExternalForm()))
 	    	throw new IOException("Organisation file must reside on same server as application.");
 	    return fileurl.openStream();
 	}
