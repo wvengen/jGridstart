@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 
+/** Window showing log messages */
 public class LogWindow extends JFrame {
     private JTextArea textArea = null;
     private JScrollPane pane = null;

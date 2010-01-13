@@ -20,7 +20,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicFileChooserUI;
 
 import nl.nikhef.jgridstart.CertificatePair;
-import nl.nikhef.jgridstart.CertificateSelection;
+import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.util.PasswordCache;

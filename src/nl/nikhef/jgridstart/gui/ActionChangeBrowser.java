@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
-import nl.nikhef.jgridstart.CertificateSelection;
+import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.install.BrowserFactory;

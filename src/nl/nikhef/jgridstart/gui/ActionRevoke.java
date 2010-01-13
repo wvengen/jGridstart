@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import nl.nikhef.jgridstart.CertificateSelection;
+import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
 public class ActionRevoke extends CertificateAction {

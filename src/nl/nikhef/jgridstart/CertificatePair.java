@@ -33,9 +33,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -57,7 +55,6 @@ import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PrivateFileWriter;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;

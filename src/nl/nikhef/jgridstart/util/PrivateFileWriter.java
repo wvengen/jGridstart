@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Logger;
 
-/**
- * A FileWriter that writes to a file that is accessible only to the user.
+/** {@link FileWriter} that writes to a file that is accessible only to the user.
  * 
  * @author wvengen
  */

@@ -9,10 +9,10 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 /** An ArrayList that can be used as a ListModel.
- * 
- * inspired by http://www.java2s.com/Code/Java/Swing-JFC/ArrayListwithaListModelforeaseofuse.htm
- * 
- * TODO implement addAll()
+ * <p>
+ * inspired by <a href="http://www.java2s.com/Code/Java/Swing-JFC/ArrayListwithaListModelforeaseofuse.htm">FilterGUIListModel</>.
+ * <p> 
+ * TODO implement addAll().
  * TODO implement all constructor combinations
  * 
  * @author wvengen

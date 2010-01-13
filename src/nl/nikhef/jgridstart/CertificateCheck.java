@@ -21,7 +21,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.bouncycastle.openssl.PasswordException;
 
 import nl.nikhef.jgridstart.util.PEMReader;
 import nl.nikhef.jgridstart.util.PasswordCache;
@@ -29,7 +28,7 @@ import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 /** Security checks for a certificate directory.
  * <p>
- * All checks have a void return type and throw an (TODO x) Exception on failure.
+ * All checks have a void return type and throw an {@link CertificateCheckException} on failure.
  */
 public class CertificateCheck {
     
@@ -172,9 +171,8 @@ public class CertificateCheck {
     /** Check if the private key and certificate belong together.
      * <p>
      * This requires the private key to be decrypted so a password
-     * may be asked.
-     * <p>
-     * TODO don't use IOException
+     * may be asked. When the password prompt is cancelled, the
+     * check is silently ignored.
      */
     protected void checkPrivateKeyMatchesCertificate() throws CertificateCheckException {
 	try {
@@ -236,10 +234,13 @@ public class CertificateCheck {
     }
     
     //
-    // Command-line test tool; called from jgridstart.sh
+    // Command-line test tool
     //
     
-    /** Test program */
+    /** Test program that runs checks on a globus certificate directory.
+     * <p>
+     * Usage: <tt>jgridstart.sh check [-h] [-p] <globus certificate dir></tt>
+     */
     public static void main(String[] args) throws Exception {
 	boolean checkPrivate = false;
 	String dir = null;
@@ -277,8 +278,8 @@ public class CertificateCheck {
 	System.exit(0);
     }
 
-    /** Show help message */
-    protected static void actionHelp(CommandLine line, Options opts) {
+    /** Show help message for test program */
+    private static void actionHelp(CommandLine line, Options opts) {
 	// figure out executable name; shellscript sets variable to aid in this
 	String prog = System.getenv("INVOKED_PROGRAM");
 	if (prog==null) prog = "java "+CertificateCheck.class.getName();

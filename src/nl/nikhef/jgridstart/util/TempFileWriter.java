@@ -3,8 +3,7 @@ package nl.nikhef.jgridstart.util;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * A more safe temporary file writer class
+/** A more safe temporary file writer
  * <p>
  * The standard {@link File#createTempFile} method has a number of problems. This is
  * an attempt to counter some of its problems. - file is made accessible by user

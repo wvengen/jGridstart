@@ -16,15 +16,19 @@ import org.apache.commons.lang.StringUtils;
 
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 
-/** Grid organisations to which a user is associated.
+/** Grid organisations to which a user can be associated.
  * <p>
- * This is an ad-hoc class to parse the organisation configuration file, and
- * to query information from that. This file contains metadata for certificate
+ * Each user on the grid is bound to an organisation, which is specified in
+ * the certificate's subject. This class provides additional information
+ * about these organisations.
+ * <p>
+ * This ad-hoc class parses the organisation configuration file, and queries
+ * information from that. The configuration file contains metadata for certificate
  * DNs and addresses of registration authorities. Currently, only user
  * certificates are supported (the {@code cert.users} namespace) and registration
  * authorities ({@code ra} namespace).
  * <p>
- * An organisation is one {@code &lt;id&gt;} in the {@code cert.users.&lt;id&gt;}
+ * An organisation is one {@code <id>} in the {@code cert.users.<id>}
  * namespace, from the point of view of the configuration file.
  * <p>
  * The configuration file is loaded using {@link Class#getResource} from
@@ -217,8 +221,9 @@ public class Organisation extends Properties {
 	return _getFromCertificate(cert);
     }
 
-    /** Returns the Organisation belonging to a CertificatePair, or {@code null} of not found.
+    /** Returns the {@linkplain Organisation} belonging to a @{linkplain CertificatePair}.
      * <p>
+     * Returns {@code null} if the organisation was not found in the list of known organisations.
      * This version always parses the certificate's organisations.
      */
     private static Organisation _getFromCertificate(CertificatePair cert) {
@@ -256,7 +261,7 @@ public class Organisation extends Properties {
     
     /** Return html fragment with list options for all organisations
      * <p>
-     * Returns a list of &gt;option&lt; elements to put in an html select. The CertificatePair
+     * Returns a list of &lt;option&gt; elements to put in an html select. The {@linkplain  CertificatePair}
      * supplied is verified to exist in the options, or else a new option is added that has
      * no existing organisation from the configuration file. This is needed to be able to
      * support organisations that are not present in the configuration file.
@@ -358,7 +363,7 @@ public class Organisation extends Properties {
 	}
 	return r;
     }    
-    /** Returns an html &gt;option&lt; tag for embedding in a &gt;select&lt; tag */
+    /** Returns an html &lt;option&gt; tag for embedding in a &lt;select&gt; tag */
     public String getOptionHTML() {
 	return 
 		"<option value='"+getProperty("x-full-rdn")+"'>" +
@@ -410,7 +415,7 @@ public class Organisation extends Properties {
 	return get(parentid);
     }
     
-    /** RA container */
+    /** Registration authorities associated with grid organisations */
     static public class RA extends Properties {
 	protected RA(String id) {
 	    setProperty("id", id);

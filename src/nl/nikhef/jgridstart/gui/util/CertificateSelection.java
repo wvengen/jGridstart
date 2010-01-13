@@ -1,8 +1,12 @@
-package nl.nikhef.jgridstart;
+package nl.nikhef.jgridstart.gui.util;
 
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.ListSelectionModel;
 
+import nl.nikhef.jgridstart.CertificatePair;
+import nl.nikhef.jgridstart.CertificateStore;
+
+/** Keeps track of currently selected certificate */
 public class CertificateSelection extends DefaultListSelectionModel {
     protected CertificateStore store = null;
 
@@ -21,11 +25,11 @@ public class CertificateSelection extends DefaultListSelectionModel {
 	setSelection(store.indexOf(c));
     }
     
-    /** Retrieve the currently selected index, or -1 if none */
+    /** Retrieve the currently selected index, or {@code -1} if none */
     public int getIndex() {
 	return getMinSelectionIndex();
     }
-    /** Retrieve the currently selected Certificate, or null if none */
+    /** Retrieve the currently selected certificate, or {@code null} if none */
     public CertificatePair getCertificatePair() {
 	int i = getIndex();
 	if (i<0) return null;

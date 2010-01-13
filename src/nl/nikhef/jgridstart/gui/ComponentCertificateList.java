@@ -10,9 +10,9 @@ import javax.swing.JList;
 import org.bouncycastle.asn1.x509.X509Name;
 
 import nl.nikhef.jgridstart.CertificatePair;
-import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStoreWithDefault;
 import nl.nikhef.jgridstart.Organisation;
+import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 
 /** List of certificates.
  * <p>

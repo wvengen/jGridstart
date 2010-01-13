@@ -29,6 +29,10 @@ import nl.nikhef.jgridstart.logging.LogHelper;
 import nl.nikhef.jgridstart.util.GeneralUtils;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
+/** Command-line user-interface program.
+ * <p>
+ * This user-interface is quite unfinished.
+ */
 public class Main {
 
     // setup logging
@@ -162,22 +166,14 @@ public class Main {
 	}
     }
     
-    /** import a certificate into the certificate store 
-     * @throws PasswordCancelledException 
-     * @throws IOException 
-     * @throws CertificateException 
-     * @throws NoSuchProviderException 
-     * @throws KeyStoreException 
-     * @throws UnrecoverableKeyException 
-     * @throws NoSuchAlgorithmException */
+    /** import a certificate into the certificate store */
     protected static void actionImport(CommandLine line) throws ParseException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, NoSuchProviderException, CertificateException, IOException, PasswordCancelledException {
 	// TODO implement and setup cli PasswordCache
 	throw new ParseException("import not implemented");
 	//store.importFrom(new File(line.getOptionValue("import")));
     }
     
-    /** print a certificate 
-     * @throws ParseException */
+    /** print a certificate */
     protected static void actionPrint(CommandLine line) throws ParseException, IOException {
 	CertificatePair cert = getCertificate(line);
 	if (cert.getCertificate()!=null) {
@@ -190,11 +186,7 @@ public class Main {
 	}
     }
     
-    /** get a certificate from its online source after signing 
-     * @throws IOException 
-     * @throws NoSuchAlgorithmException 
-     * @throws KeyManagementException 
-     * @throws CertificateCheckException */
+    /** get a certificate from its online source after signing */
     protected static void actionGet(CommandLine line) throws ParseException, KeyManagementException, NoSuchAlgorithmException, IOException, CertificateCheckException, Exception {
 	CertificatePair cert = getCertificate(line);
 	cert.downloadCertificate();

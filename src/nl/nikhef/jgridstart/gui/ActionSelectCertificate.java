@@ -6,8 +6,9 @@ import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
 import nl.nikhef.jgridstart.CertificatePair;
-import nl.nikhef.jgridstart.CertificateSelection;
+import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 
+/** Set the currently selected certificate */
 public class ActionSelectCertificate extends AbstractAction {
 
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");

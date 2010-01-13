@@ -14,7 +14,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import nl.nikhef.jgridstart.CertificatePair;
-import nl.nikhef.jgridstart.CertificateSelection;
+import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 
 /** Default implementation for {@link Action}s that operate on a {@link CertificatePair}.
  * <p>

@@ -9,6 +9,7 @@ import nl.nikhef.jgridstart.logging.LogHelper;
 import nl.nikhef.jgridstart.logging.LogWindowHandler;
 import nl.nikhef.jgridstart.util.GeneralUtils;
 
+/** Graphical user-interface main program */
 public class Main {
 
     // setup logging

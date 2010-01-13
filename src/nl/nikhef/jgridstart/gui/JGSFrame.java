@@ -37,12 +37,13 @@ import javax.swing.event.ListSelectionListener;
 import org.jdesktop.swingworker.SwingWorker;
 
 import nl.nikhef.jgridstart.CertificatePair;
-import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStoreWithDefault;
+import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.util.PasswordCache;
 
+/** Main jGridstart application window */
 public class JGSFrame extends JFrame {
 
     private JPanel jContentPane = null;
@@ -149,21 +150,18 @@ public class JGSFrame extends JFrame {
     }
     
     /** Return the action associated with an id as registered by the action.
-     * 
+     * <p>
      * Make sure you only reference actions that have been created before.
      * Relevant Actions in this application should register themselves
-     * with BareBonesActionLaunch. */
+     * with {@link nl.nikhef.jgridstart.gui.util.URLLauncher URLLauncher}
+     * or {@link URLLauncherCertificate}. */
     protected Action getAction(String id) {
 	Action action = URLLauncherCertificate.getAction(id);
 	assert(action!=null);
 	return action;
     }
     
-    /**
-     * This method initializes jContentPane
-     * 
-     * @return javax.swing.JPanel
-     */
+    /** Initialize content pane */
     private JPanel getJContentPane() {
 	if (jContentPane == null) {
 	    jContentPane = new JPanel();
@@ -178,11 +176,7 @@ public class JGSFrame extends JFrame {
 	return jContentPane;
     }
 
-    /**
-     * This method initializes jMenuBar	
-     * 	
-     * @return javax.swing.JMenuBar	
-     */
+    /** Initialize menu bar */
     @Override
     public JMenuBar getJMenuBar() {
 	if (jMenuBar == null) {
@@ -260,11 +254,7 @@ public class JGSFrame extends JFrame {
 	}
     }
 
-    /**
-     * This method initializes jPanel	
-     * 	
-     * @return javax.swing.JPanel	
-     */
+    /** Initialize certificate information pane */
     private JPanel getJPanel() {
 	if (certInfoPane == null) {
 	    certInfoPane = new TemplateButtonPanel();
@@ -359,8 +349,11 @@ public class JGSFrame extends JFrame {
 	    viewCertificateList.doClick();
     }
     
-    /** Effectuate a selection change in the gui. Current selection is
-     * managed by the class variable selection. */
+    /** Effectuate a selection change in the gui.
+     * <p>
+     * The current selection is managed by {@link #selection}.
+     */
+    @SuppressWarnings("deprecation") // for Frame.setCursor()
     private void updateSelection() {
 	// update contents and load template
 	CertificatePair c = selection.getCertificatePair();

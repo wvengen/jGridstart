@@ -1,0 +1,16 @@
+<html>
+<body>
+Core jGridstart functionality regarding {@code .globus}-type certificates.
+This is where the actual work regarding certificates happens.
+<p>
+jGridstart works with {@code .globus}-type certificate directories and each
+is represented by a {@link CertificatePair}. Together they form a
+{@link CertificateStore} or {@link CertificateStoreWithDefault}. At several places,
+certificate directories are verified to be consistent using {@link CertificateCheck}.
+<p>
+{@link CertificateRequest} contains some methods to handle new requests. It
+parses and creates certificate subjects from pieces of information, and knows
+about password policies. One such piece of information is the organisation a
+user belongs to. This is handled in the separate class {@link Organisation}.
+</body>
+</html>

@@ -3,14 +3,16 @@ package nl.nikhef.jgridstart.gui.util;
 import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
-/**
- * FileFilter that works with suffixes. It is easily created with a description
- * and comma-separated list of extensions. The description shown in the dialog
- * then shows the original description with a list of extensions appended. E.g:
- * 
- *   new SuffixFileFilter("Foo File", ".foo,.bar");
- * 
- * Yields "Foo File (*.foo, *.bar)" as the description in the JFileChooser.
+/** {@link FileFilter} that works with suffixes.
+ * <p>
+ * It is easily created with a description and comma-separated list of
+ * extensions. The description shown in the dialog then shows the
+ * original description with a list of extensions appended. E.g:
+ * <code>
+ *   new FileFilterSuffix("Foo File", ".foo,.bar");
+ * </code>
+ * Yields {@literal "Foo File (*.foo, *.bar)"} as the description in the
+ * {@linkplain javax.swing.JFileChooser JFileChooser}.
  * 
  * @author wvengen
  */
@@ -18,13 +20,10 @@ public class FileFilterSuffix extends FileFilter {
     private String description = null;
     private String[] extensions = {};
 
-    /**
-     * Create a new SuffixFileFilter.
+    /** Create new {@linkplain FileFilterSuffix}
      * 
-     * @param desc
-     *            Description
-     * @param ext
-     *            Comma-separated list of extensions
+     * @param desc Description
+     * @param ext Comma-separated list of extensions
      */
     public FileFilterSuffix(String desc, String ext) {
 	description = desc;

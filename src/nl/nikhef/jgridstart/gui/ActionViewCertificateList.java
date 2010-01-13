@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
+/** Set visibility of the certificate list */
 public class ActionViewCertificateList extends AbstractAction {
 
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");

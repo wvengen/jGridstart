@@ -22,9 +22,9 @@ import org.xhtmlrenderer.swing.LinkListener;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateRequest;
-import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.Organisation;
+import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
@@ -34,7 +34,17 @@ import nl.nikhef.jgridstart.util.PEMReader;
 import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
-/** Wizard that asks the user for information and generates the certificate */
+/** Wizard that asks the user for information and generates the certificate.
+ * <p>
+ * The most important jGridstart user functionality is implemented here.
+ * <p>
+ * The wizard is based on {@link TemplateWizard}, which uses html files for
+ * page contents. These are present in this package as well, called
+ * <tt>requestwizard-xx.html</tt> (with <tt>xx</tt> a decimal number).
+ * <p>
+ * TODO this could use some improvement, also to allow easier customization 
+ * by certificate authorities.
+ */
 public class RequestWizard extends TemplateWizard implements TemplateWizard.PageListener {
 
     /** CertificateStore to operate on */

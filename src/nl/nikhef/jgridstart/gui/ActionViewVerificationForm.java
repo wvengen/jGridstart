@@ -20,7 +20,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import nl.nikhef.jgridstart.CertificateSelection;
+import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.FileFilterSuffix;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;

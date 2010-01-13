@@ -6,12 +6,17 @@ import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
 import nl.nikhef.jgridstart.CertificatePair;
-import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStoreWithDefault;
+import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
-
+/** Make selected certificate the default.
+ * <p>
+ * See {@link CertificateStoreWithDefault} for an explanation of the default certificate.
+ * 
+ * @author wvengen
+ */
 public class ActionMakeDefault extends CertificateAction {
     
     protected CertificateStoreWithDefault store = null;

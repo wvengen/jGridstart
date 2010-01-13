@@ -7,8 +7,8 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 
 import javax.swing.JFrame;
-import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;

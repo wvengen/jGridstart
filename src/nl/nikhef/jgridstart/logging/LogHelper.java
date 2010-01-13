@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 import nl.nikhef.jgridstart.util.GeneralUtils;
 
-/** Logging helper methods */
+/** Logging initialisation */
 public class LogHelper {
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.logging");
     

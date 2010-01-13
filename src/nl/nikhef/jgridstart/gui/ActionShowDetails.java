@@ -4,9 +4,10 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JFrame;
 
-import nl.nikhef.jgridstart.CertificateSelection;
+import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 
+/** Toggle extended details pane */
 public class ActionShowDetails extends CertificateAction {
     
     public ActionShowDetails(JFrame parent, CertificateSelection s) {

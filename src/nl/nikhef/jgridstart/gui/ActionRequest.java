@@ -7,8 +7,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
-import nl.nikhef.jgridstart.CertificateSelection;
 import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 

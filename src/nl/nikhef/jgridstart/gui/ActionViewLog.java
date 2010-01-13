@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.logging.LogWindowHandler;
 
+/** Show log window */
 public class ActionViewLog extends AbstractAction {
 
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");

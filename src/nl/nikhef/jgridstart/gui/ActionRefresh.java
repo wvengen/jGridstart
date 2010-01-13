@@ -13,6 +13,7 @@ import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+/** Refresh certificate information */
 public class ActionRefresh extends AbstractAction {
 
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");

@@ -301,6 +301,7 @@ public class PasswordCache {
     private class CachePasswordFinder implements PasswordFinder {
 	private String msg, loc;
 	private boolean write;
+	@SuppressWarnings("unused") // we don't use it currently
 	public boolean wasCancelled = false;
 	// TODO implement guess mode (all previous passwords) when no hardware device
 	public CachePasswordFinder(boolean write, String msg, String loc) {
