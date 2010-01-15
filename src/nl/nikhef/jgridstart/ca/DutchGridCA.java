@@ -25,6 +25,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import nl.nikhef.jgridstart.util.ConnectionUtils;
+import nl.nikhef.jgridstart.util.CryptoUtils;
 
 import org.apache.commons.lang.WordUtils;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
@@ -86,6 +87,7 @@ public class DutchGridCA implements CA {
 	
 	String reqstring = encodeCertificationRequest(req, info);
 	
+	CryptoUtils.setDefaultMailcap();
 	try {
 	    // create S/MIME message from it
 	    MimeBodyPart data = new MimeBodyPart();

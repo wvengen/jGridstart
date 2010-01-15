@@ -6,6 +6,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 
+import javax.activation.CommandMap;
+import javax.activation.MailcapCommandMap;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x509.X509Name;
@@ -81,4 +83,32 @@ public class CryptoUtils {
     public static long getX509DaysValid(X509Certificate cert) {
 	return getX509MillisecondsValid(cert) / (1000*60*60*24);
     }
+    
+    /** Initialize mailcap handlers.
+     * <p>
+     * In some rare cases, the error "no object DCH for MIME type" can appear, even for
+     * {@literal text/plain}. In an attempt to avoid this, this should be called
+     * in the application before any MIME messages are processed. To make it possible
+     * to run this on-demand, subsequent calls do nothing, since the mailcap needs to
+     * be initialised only once.
+     */
+    public static void setDefaultMailcap() {
+	if (mailcapInitDone) return;
+	MailcapCommandMap mc = (MailcapCommandMap)CommandMap.getDefaultCommandMap();
+	mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain");
+	mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html");
+	mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml");	
+	mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
+	mc.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822");
+	mc.addMailcap("application/pkcs7-signature;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.pkcs7_signature");
+	mc.addMailcap("application/pkcs7-mime;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.pkcs7_mime");
+	mc.addMailcap("application/x-pkcs7-signature;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.x_pkcs7_signature");
+	mc.addMailcap("application/x-pkcs7-mime;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.x_pkcs7_mime");
+	mc.addMailcap("multipart/signed;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.multipart_signed");
+	CommandMap.setDefaultCommandMap(mc);
+	mailcapInitDone = true;
+    }
+    /** flag to indicate if mailcap has been initialised or not */
+    private static boolean mailcapInitDone = false;
+
 }
