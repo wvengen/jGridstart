@@ -1,14 +1,13 @@
 package nl.nikhef.jgridstart.ca;
 
 public class CAException extends Exception {
-    private String msg = null;
-    
     public CAException(String msg) {
-	this.msg = msg;
+	super(msg);
     }
-    
-    @Override
-    public String toString() {
-	return msg;
+    public CAException(Exception e) {
+	super(e);
+    }
+    public CAException(String msg, Exception e) {
+	super(msg, e);
     }
 }

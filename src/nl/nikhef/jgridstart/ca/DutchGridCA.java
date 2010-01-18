@@ -1,11 +1,9 @@
 package nl.nikhef.jgridstart.ca;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -13,24 +11,16 @@ import java.security.GeneralSecurityException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.cert.CertStore;
-import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 
 import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-
 import nl.nikhef.jgridstart.util.ConnectionUtils;
 import nl.nikhef.jgridstart.util.CryptoUtils;
 
 import org.apache.commons.lang.WordUtils;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.mail.smime.SMIMEException;
-import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.util.encoders.Base64;
@@ -89,29 +79,8 @@ public class DutchGridCA implements CA {
 	
 	CryptoUtils.setDefaultMailcap();
 	try {
-	    // create S/MIME message from it
-	    MimeBodyPart data = new MimeBodyPart();
-	    data.setText(reqstring);
-	    // add signature
-	    SMIMESignedGenerator gen = new SMIMESignedGenerator();
-	    gen.addSigner(oldKey, oldCert, SMIMESignedGenerator.DIGEST_SHA1);
-	    CertStore certStore = CertStore.getInstance("Collection",
-		    new CollectionCertStoreParameters(Arrays.asList(oldCert)), "BC");
-	    gen.addCertificatesAndCRLs(certStore);
-	    MimeMultipart multipart = gen.generate(data, "BC");
-
-	    // don't use system properties as not to require full access to them
-	    //   we don't need to access mail servers anyway
-	    MimeMessage msg = new MimeMessage(Session.getDefaultInstance(new Properties()));
-	    msg.setContent(multipart, multipart.getContentType());
-	    msg.saveChanges();
-	    
-	    ByteArrayOutputStream out = new ByteArrayOutputStream();
-	    msg.writeTo(out);
-	    out.close();
-
+	    String out = CryptoUtils.SignSMIME(reqstring, oldKey, oldCert);
 	    info.setProperty("renewal", Boolean.toString(true));
-	    
 	    return out.toString().replace("Content-Type: application/pkcs7-signature", "Content-Type: application/x-pkcs7-signature");
 	    
 	} catch(MessagingException e) {

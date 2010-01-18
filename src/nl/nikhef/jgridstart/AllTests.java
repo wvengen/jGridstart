@@ -8,6 +8,7 @@ import nl.nikhef.jgridstart.gui.util.GUIScreenshotsTest;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanelTest;
 import nl.nikhef.jgridstart.install.BrowsersMacOSXTest;
 import nl.nikhef.jgridstart.logging.LogHelper;
+import nl.nikhef.jgridstart.util.CryptoUtilsTest;
 import nl.nikhef.jgridstart.util.FileUtilsTest;
 import nl.nikhef.jgridstart.util.GeneralUtils;
 import nl.nikhef.jgridstart.util.PasswordCacheTest;
@@ -31,6 +32,7 @@ public class AllTests {
 	TestSuite suite = new TestSuite("Test for nl.nikhef.jgridstart");
 	//$JUnit-BEGIN$
 	suite.addTestSuite(FileUtilsTest.class);
+	suite.addTestSuite(CryptoUtilsTest.class);
 	suite.addTestSuite(PasswordCacheTest.class);
 	suite.addTestSuite(CertificateCheckTest.class);
 	suite.addTestSuite(CertificateStore1Test.class);

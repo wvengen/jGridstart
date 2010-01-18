@@ -1,18 +1,32 @@
 package nl.nikhef.jgridstart.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.cert.CertStore;
+import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Properties;
 
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.mail.smime.SMIMEException;
+import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 
 /** Cryptographic utilities */
 public class CryptoUtils {
@@ -82,6 +96,68 @@ public class CryptoUtils {
     /** Return number of days that certificate is still valid */
     public static long getX509DaysValid(X509Certificate cert) {
 	return getX509MillisecondsValid(cert) / (1000*60*60*24);
+    }
+
+    /**
+     * S/MIME sign a string.
+     * <p>
+     * The output is a MIME message consisting of two parts. The first is the
+     * MIME-encoded string supplied as input, the second is the message signed
+     * by the key with certificate embedded.
+     * <p>
+     * Example output:
+     * <code>
+     * Message-ID: <1234567899.1.1234567890123.JavaMail.user@host>
+     * MIME-Version: 1.0
+     * Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha1; 
+     * 	boundary="----=_Part_1_190331520.1253198584335"
+     * 
+     * ------=_Part_1_190331520.1253198584335
+     * Content-Type: text/plain; charset=us-ascii
+     * Content-Transfer-Encoding: 7bit
+     * 
+     * This is my freakingly sensitive piece of text,
+     * 
+     * ------=_Part_1_190331520.1253198584335
+     * Content-Type: application/pkcs7-signature; name=smime.p7s; smime-type=signed-data
+     * Content-Transfer-Encoding: base64
+     * Content-Disposition: attachment; filename="smime.p7s"
+     * Content-Description: S/MIME Cryptographic Signature
+     * 
+     * OTAzMDMwMDAwMDBaFw0xMDAzMDMxMDQ5MDFaMFAxEjAQBgNVBAoTCWR1dGNoZ3JpZDEOMAwGA1UE
+     * ChMFdXNlcnMxDzANBgNVBAoTBm5pa2hlZjEZMBcGA1UEAxMQV2lsbGVtIHZhbiBFb.......etc.
+     * yAAAAAAAAA==
+     * ------=_Part_1_190331520.1253198584335--
+     * </code>
+     */
+    public static String SignSMIME(String msg, PrivateKey key, X509Certificate cert) throws GeneralSecurityException, SMIMEException, MessagingException {
+	// create S/MIME message from it
+	MimeBodyPart data = new MimeBodyPart();
+	data.setText(msg);
+	// add signature
+	SMIMESignedGenerator gen = new SMIMESignedGenerator();
+	gen.addSigner(key, cert, SMIMESignedGenerator.DIGEST_SHA1);
+	CertStore certStore = CertStore.getInstance("Collection",
+		new CollectionCertStoreParameters(Arrays.asList(cert)), "BC");
+	gen.addCertificatesAndCRLs(certStore);
+	MimeMultipart multipart = gen.generate(data, "BC");
+
+	// don't use system properties as not to require full access to them
+	//   we don't need to access mail servers anyway
+	MimeMessage outmsg = new MimeMessage(Session.getDefaultInstance(new Properties()));
+	outmsg.setContent(multipart, multipart.getContentType());
+	outmsg.saveChanges();
+
+	ByteArrayOutputStream out = new ByteArrayOutputStream();
+	try {
+	    outmsg.writeTo(out);
+	    out.close();
+	} catch (IOException e) {
+	    // shouldn't happen on {@linkplain ByteArrayOutputStream}
+	    throw new MessagingException("Internal output error", e);
+	}
+	
+	return out.toString();
     }
     
     /** Initialize mailcap handlers.
