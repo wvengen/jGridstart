@@ -168,7 +168,7 @@ public class LocalCA implements CA {
 	    // TODO implement internal CRL for testing and set cRLDistributionPoints
 	    cert = certGen.generate(cakey, "BC");
 	} catch (GeneralSecurityException e) {
-	    throw new IOException("Could not sign certificate: ", e);
+	    throw new IOException("Could not sign certificate:\n"+e.getMessage());
 	}
 	return cert;
     }

@@ -434,7 +434,7 @@ public class FileUtils {
 	    ret = p.waitFor();
 	} catch (InterruptedException e) {
 	    // TODO verify this is the right thing to do
-	    throw new IOException(e);
+	    throw new IOException(e.getMessage());
 	}
 	logger.finest("[  exec #"+index+"] returns "+ret);
 	return ret;
