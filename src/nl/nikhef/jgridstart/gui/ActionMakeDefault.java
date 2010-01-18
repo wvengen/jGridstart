@@ -3,6 +3,7 @@ package nl.nikhef.jgridstart.gui;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import nl.nikhef.jgridstart.CertificatePair;
@@ -32,9 +33,10 @@ public class ActionMakeDefault extends CertificateAction {
     
     @Override
     public boolean wantsEnabled() {
-	CertificatePair cert = selection.getCertificatePair();
 	try {
-	    return cert!=null && cert.getCertificate()!=null && !cert.equals(store.getDefault());
+	    return getCertificatePair()!=null &&
+	           getCertificatePair().getCertificate()!=null &&
+	           Boolean.valueOf(getCertificatePair().getProperty("valid"));
 	} catch (IOException e) {
 	    return false;
 	}
@@ -42,10 +44,9 @@ public class ActionMakeDefault extends CertificateAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-	CertificatePair cert = selection.getCertificatePair();
-	logger.finer("Action: "+getValue(NAME)+" of "+cert);
+	logger.finer("Action: "+getValue(NAME)+" of "+getCertificatePair());
 	try {
-	    store.setDefault(cert);
+	    store.setDefault(getCertificatePair());
 	} catch (IOException e1) {
 	    ErrorMessage.error(findWindow(e.getSource()), "Could not set default certificate", e1);
 	}

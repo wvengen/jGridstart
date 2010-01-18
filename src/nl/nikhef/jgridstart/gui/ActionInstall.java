@@ -23,7 +23,7 @@ public class ActionInstall extends CertificateAction {
     
     public ActionInstall(JFrame parent, CertificateSelection s) {
 	super(parent, s);
-	putValue(NAME, "Install...");
+	putValue(NAME, "Install in browser...");
 	putValue(MNEMONIC_KEY, new Integer('I'));
 	URLLauncherCertificate.addAction("install", this);
     }
@@ -31,7 +31,9 @@ public class ActionInstall extends CertificateAction {
     @Override
     public boolean wantsEnabled() {
 	try {
-	    return getCertificatePair()!=null && getCertificatePair().getCertificate()!=null;
+	    return getCertificatePair()!=null &&
+	           getCertificatePair().getCertificate()!=null &&
+	           Boolean.valueOf(getCertificatePair().getProperty("valid"));
 	} catch (IOException e) {
 	    return false;
 	}

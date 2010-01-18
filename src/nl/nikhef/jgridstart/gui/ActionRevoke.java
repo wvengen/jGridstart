@@ -1,6 +1,8 @@
 package nl.nikhef.jgridstart.gui;
 
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -17,6 +19,17 @@ public class ActionRevoke extends CertificateAction {
 	URLLauncherCertificate.addAction("revoke", this);
     }
     
+    @Override
+    public boolean wantsEnabled() {
+	try {
+	    return getCertificatePair()!=null &&
+	           getCertificatePair().getCertificate()!=null &&
+	           Boolean.valueOf(getCertificatePair().getProperty("valid"));
+	} catch (IOException e) {
+	    return false;
+	}
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
