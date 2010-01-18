@@ -115,11 +115,11 @@ public class DutchGridCA implements CA {
 	    return out.toString().replace("Content-Type: application/pkcs7-signature", "Content-Type: application/x-pkcs7-signature");
 	    
 	} catch(MessagingException e) {
-	    throw new IOException(e.getMessage());
+	    throw new IOException("Could not sign request", e);
 	} catch (GeneralSecurityException e) {
-	    throw new IOException(e.getMessage());
+	    throw new IOException("Could not sign request", e);
 	} catch (SMIMEException e) {
-	    throw new IOException(e.getMessage());
+	    throw new IOException("Could not sign request", e);
 	}
     }
 
