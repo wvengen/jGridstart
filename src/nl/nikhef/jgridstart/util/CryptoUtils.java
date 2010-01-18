@@ -131,6 +131,8 @@ public class CryptoUtils {
      * </code>
      */
     public static String SignSMIME(String msg, PrivateKey key, X509Certificate cert) throws GeneralSecurityException, SMIMEException, MessagingException {
+	// make sure we have the mailcap set right
+	CryptoUtils.setDefaultMailcap();
 	// create S/MIME message from it
 	MimeBodyPart data = new MimeBodyPart();
 	data.setText(msg);

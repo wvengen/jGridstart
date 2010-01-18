@@ -77,7 +77,6 @@ public class DutchGridCA implements CA {
 	
 	String reqstring = encodeCertificationRequest(req, info);
 	
-	CryptoUtils.setDefaultMailcap();
 	try {
 	    String out = CryptoUtils.SignSMIME(reqstring, oldKey, oldCert);
 	    info.setProperty("renewal", Boolean.toString(true));
