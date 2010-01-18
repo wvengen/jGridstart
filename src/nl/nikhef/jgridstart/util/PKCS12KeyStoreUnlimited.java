@@ -52,8 +52,8 @@ import org.bouncycastle.jce.provider.JDKPKCS12KeyStore;
  * This class has intricate knowledge of JCE and BouncyCastle internals. When
  * these change, this class needs to be updated appropriately.
  * <p>
- * This also means that it may be required (when using Java Web Start, for example)
- * to explicitely permit accessing private members using a policy file, e.g.:
+ * If you are using policy files to specify permissions, you may need to add
+ * the following to permit accessing JCE's private members, e.g.: 
  * <pre><code>
  * grant {
  *    // allow access to JCE internals to bypass keysize restrictions
