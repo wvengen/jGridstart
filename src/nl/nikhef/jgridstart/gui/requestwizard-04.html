@@ -34,9 +34,8 @@
 </div>
 
 
-<form>
-
-<ol if="${install.browser.certinst} and !${install.browser.certinst}!=manual">
+<form if="${install.browser.certinst} and ${install.browser.certinst}!=manual">
+  <ol>
 	<li>Please enter the private key password that you have given before.<br/>
 		<label for="privkeypass">Password:</label>
 		<input id="privkeypass" name="wizard.privkeypass" type="password" size="25"/></li>
@@ -113,8 +112,9 @@
 	 
 	<li>A message dialog will indicate if the operation succeeded.</li>
 
-</ol>
-<div if="${install.browser.certinst}"><input type='button' href='action:install(silent)' value='install'/></div>
+  </ol>
+  <input type='button' href='action:install(silent)' value='install'/>
+</form>
 
 <!-- 
   -  Browser unsupported, manual installation
@@ -126,8 +126,6 @@
   file, and importing the resulting file into your webbrowser.
 </p> 
 
-
-</form>
 </div>
 
 </body>
