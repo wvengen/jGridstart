@@ -35,6 +35,12 @@ if not "%1"=="gui" goto :nowantgui
 	goto :end
 
 :nowantgui
+if not "%1"=="check" goto :nowantcheck
+	shift
+	java nl.nikhef.jgridstart.CertificateCheck %1 %2 %3 %4 %5 %6 %7 %8 %9
+	goto :end
+
+:nowantcheck
 if not "%1"=="screenshots" goto :nowantscreenshots
 	shift
 	set CLASSPATH=%CLASSPATH%;%LIB%\junit\junit-4.7.jar;%LIB%\junit\abbot.jar
