@@ -187,6 +187,6 @@ public class CryptoUtils {
 	mailcapInitDone = true;
     }
     /** flag to indicate if mailcap has been initialised or not */
-    private static boolean mailcapInitDone = false;
+    protected static boolean mailcapInitDone = false;
 
 }

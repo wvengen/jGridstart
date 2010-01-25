@@ -7,6 +7,7 @@ import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.logging.Logger;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -19,6 +20,7 @@ import org.junit.Test;
 import junit.framework.TestCase;
 
 public class CryptoUtilsTest extends TestCase {
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
     
     /** Local test private key */
     PrivateKey key = null;
@@ -53,6 +55,23 @@ public class CryptoUtilsTest extends TestCase {
     /** Test if signing works to catch nasty "no object DCH" bug */
     @Test
     public void testSMIMESign() throws Exception {
+	// if mailcapinit not done, try without first to test
+	if (!CryptoUtils.mailcapInitDone) {
+	    CryptoUtils.mailcapInitDone = true;
+	    try {
+		String msg = CryptoUtils.SignSMIME("this is a test message", key, cert);
+		if (msg!=null)
+		    logger.info("S/MIME signing without mailcap init succeeded");
+		else
+		    logger.info("S/MIME signing without mailcap init returned null");
+	    } catch(Exception e) {
+		logger.warning("S/MIME signing without mailcap init failed:" +e);
+	    }
+	    CryptoUtils.mailcapInitDone = false;
+	} else {
+	    logger.warning("Mailcap init already done!");
+	}
+	// then do it for real
 	String msg = CryptoUtils.SignSMIME("this is a test message", key, cert);
 	assertNotNull(msg);
     }
