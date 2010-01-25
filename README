@@ -1,0 +1,39 @@
+jGridstart
+----------
+
+jGridstart is a graphical user interface in Java that helps grid end-users
+to request, obtain, install and renew grid certificates in a friendly way.
+
+Grid certificate authorities (who issue certificates) can use it to provide
+a friendly interface to its services. It is currently tailored for the
+DutchGrid certificate authority, but the plan is to make it more general.
+
+For more information, please visit  http://jgridstart.nikhef.nl/
+
+
+Adapting jGridstart for a new certificate authority requires:
+
+1. Modifying the configuration in resources/conf/global.properties
+     See comments in the file.
+
+2. Selection of a CA interface
+     The nl.nikhef.jgridstart.ca package contains the interface CA, which
+     provides an interface between jGridstart and the CA. The specific
+     implementation used is specified in the global configuration file.
+     You probably need to write one tailored to your CA interface. Please
+     see DutchGridCA, TestCA and LocalCA for examples. Please send us your
+     implementation so we can add it to jGridstart.
+
+3. Customization of the request wizard
+     The RequestWizard (in package nl.nikhef.jgridstart.gui) contains the
+     user-interface logic for requesting/renew certificates. The contents
+     of the wizard's pages are present in the files requestwizard-xx.html.
+     Currently, one would need to rewrite RequestWizard for your specific
+     request process. In the future this should become more easily
+     customizable.
+
+4. Specification of organisations for which one can signup
+    In resources/conf/cert_signup.conf, see comments in that file.
+    At the moment one also needs to update CertificateRequest#postFillData
+    (in package nl.nikhef.jgridstart) and specify how to create a full
+    DN from user information. This is scheduled for improvement as well.
