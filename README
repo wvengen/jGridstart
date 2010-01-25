@@ -14,7 +14,9 @@ For more information, please visit  http://jgridstart.nikhef.nl/
 Adapting jGridstart for a new certificate authority requires:
 
 1. Modifying the configuration in resources/conf/global.properties
-     See comments in the file.
+     See comments in the file. Note that when run as a java web start
+     application, properties can be overridden in the jnlp file
+     (optionally prefixed with "jnlp." to avoid a security warning).
 
 2. Selection of a CA interface
      The nl.nikhef.jgridstart.ca package contains the interface CA, which
@@ -37,3 +39,8 @@ Adapting jGridstart for a new certificate authority requires:
     At the moment one also needs to update CertificateRequest#postFillData
     (in package nl.nikhef.jgridstart) and specify how to create a full
     DN from user information. This is scheduled for improvement as well.
+
+5. Signing of the resulting JAR
+    This is required for running jGridstart as a java web start application.
+    Run "ant dist" to create the distribution files. See build.xml how to
+    specify a default signing key, or (re-)sign it later using jarsigner.
