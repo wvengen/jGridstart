@@ -21,7 +21,7 @@
  </p>
 
 <ul>
-	<li><a href="http://www.nikhef.nl/~wvengen/testca/?action=retrieve_ca_cert&amp;install=true">Install CA certificate</a> (recommended)</li>
+	<li if="${jgridstart.ca.base.cacert}"><a href="${jgridstart.ca.base.cacert}">Install CA certificate</a> (recommended)</li>
 	<li>Subscribe to a virtual organisation (VOMS)<ul>
 		<li><a href="https://voms.grid.sara.nl:8443/vomses">Grid communities hosted in The Netherlands</a></li>
 		<li><a href="https://cic.gridops.org/index.php?section=home&amp;page=volist">European grid communities</a></li>

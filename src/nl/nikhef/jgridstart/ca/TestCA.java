@@ -30,6 +30,8 @@ public class TestCA implements CA {
     
     /** Base URL of certificate authority */
     protected String base = System.getProperty("jgridstart.ca.base");
+    /** URL of CA cert */
+    protected String baseCaCert = System.getProperty("jgridstart.ca.base.cacert");
     /** CA certificate (cached) */
     protected static X509Certificate cacert = null;
 
@@ -38,8 +40,14 @@ public class TestCA implements CA {
      * @throws NoSuchAlgorithmException 
      * @throws KeyManagementException */
     public TestCA() throws NoSuchAlgorithmException, KeyManagementException {
-	if (base==null)
+	if (base==null) {
 	    base = "http://www.nikhef.nl/~wvengen/testca/";
+	    System.setProperty("jgridstart.ca.base", base);
+	}
+	if (baseCaCert==null) {
+	    baseCaCert = base + "?action=retrieve_ca_cert&install=true";
+	    System.setProperty("jgridstart.ca.base.cacert", baseCaCert);
+	}
     }
     
     /** Just returns the PEM encoded version of the request. */

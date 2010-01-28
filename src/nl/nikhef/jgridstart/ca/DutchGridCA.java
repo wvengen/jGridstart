@@ -49,12 +49,18 @@ public class DutchGridCA implements CA {
      * @throws NoSuchAlgorithmException 
      * @throws KeyManagementException */
     public DutchGridCA() throws NoSuchAlgorithmException, KeyManagementException {
-	if (baseSubmit==null)
+	if (baseSubmit==null) {
 	    baseSubmit = "http://ra.dutchgrid.nl/ra/public/submit";
-	if (baseQuery==null)
+	    System.setProperty("jgridstart.ca.base.submit", baseSubmit);
+	}
+	if (baseQuery==null) {
 	    baseQuery = "http://ca.dutchgrid.nl/medium/query/";
-	if (baseCaCert==null)
+	    System.setProperty("jgridstart.ca.base.query", baseQuery);
+	}
+	if (baseCaCert==null) {
 	    baseCaCert = "https://ca.dutchgrid.nl/cgi-bin/nikhef-ms?certder";
+	    System.setProperty("jgridstart.ca.base.cacert", baseCaCert);
+	}
     }
     
     /** Just returns the PEM encoded version of the request. */

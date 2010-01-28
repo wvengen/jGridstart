@@ -35,6 +35,13 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
  * <p>
  * TODO indicate namespace for properties
  * <p>
+ * CA parameters (like URLs and settings) should be retrieved from the
+ * {@link System#getProperty system properties} in the {@literal jgridstart.ca} namespace.
+ * Any URLs or fragments thereof should be put in the {@literal jgridstart.ca.base} namespace.
+ * Please look at existing implementations for reuse of properties. When a property is not
+ * defined, each implementation must set a sensible default and also update the system property
+ * to reflect that.
+ * <p>
  * If you are creating a new implementation and find that the current interface
  * provides insufficient information, please contact the developers, and we'll
  * see if an API update is sensible.
