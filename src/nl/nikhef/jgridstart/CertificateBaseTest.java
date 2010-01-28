@@ -94,6 +94,7 @@ public abstract class CertificateBaseTest extends TestCase {
     /** Generate test request.
      * <p>
      * New key and CSR are generated, and the latter is uploaded using {@link LocalCA}.
+     * Password in {@link PasswordCache} is set as well.
      * 
      * @param certPath
      * @param pw password for new private key
@@ -106,6 +107,7 @@ public abstract class CertificateBaseTest extends TestCase {
 	p.setProperty("subject", "/O=dutchgrid/O=users/O=nikhef/CN=Test User #" + certIndex++);
 	certPath.mkdirs();
 	CertificatePair cert = CertificatePair.generateRequest(certPath, p, pw.toCharArray());
+	PasswordCache.getInstance().set(cert.getKeyFile().getCanonicalPath(), pw.toCharArray());
 	assertNotNull(cert);
 	assertNotNull(cert.getPrivateKey());
 	assertNotNull(cert.getCSR());

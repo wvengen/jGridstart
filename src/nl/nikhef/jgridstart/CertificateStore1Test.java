@@ -121,6 +121,47 @@ public class CertificateStore1Test extends CertificateBaseTest {
 	assertEquals(1, store.size());
     }
     
+    /** Test import from directory */
+    @Test
+    public void testImportDirectory() throws Exception {
+	CertificateStore store = new CertificateStore(newTestStore(1));
+	CertificateStore store2 = new CertificateStore(newTestStore(0));
+	store2.importFrom(store.get(0).getPath());
+	assertEquals(store.get(0), store2.get(0));
+    }
+    /** Test import from directory with other password */
+    @Test
+    public void testImportDirectoryPassword() throws Exception {
+	CertificateStore store = new CertificateStore(newTestStore(1));
+	CertificateStore store2 = new CertificateStore(newTestStore(0));
+	store2.importFrom(store.get(0).getPath(), "foobar".toCharArray());
+	assertEquals(store.get(0), store2.get(0));
+    }
+    /** Test import from PEM file which should use directory instead */
+    @Test
+    public void testImportDirectoryPEMkey() throws Exception {
+	CertificateStore store = new CertificateStore(newTestStore(1));
+	CertificateStore store2 = new CertificateStore(newTestStore(0));
+	store2.importFrom(store.get(0).getKeyFile());
+	assertEquals(store.get(0), store2.get(0));
+    }
+    /** Test import from PEM file which should use directory instead */
+    @Test
+    public void testImportDirectoryPEMcert() throws Exception {
+	CertificateStore store = new CertificateStore(newTestStore(1));
+	CertificateStore store2 = new CertificateStore(newTestStore(0));
+	store2.importFrom(store.get(0).getCertFile());
+	assertEquals(store.get(0), store2.get(0));
+    }
+    /** Test import from PEM file which should use directory instead */
+    @Test
+    public void testImportDirectoryPEMreq() throws Exception {
+	CertificateStore store = new CertificateStore(newTestStore(1));
+	CertificateStore store2 = new CertificateStore(newTestStore(0));
+	store2.importFrom(store.get(0).getCSRFile());
+	assertEquals(store.get(0), store2.get(0));
+    }
+    
     /** Test PKCS certificate export */
     @Test
     public void testExportImportPKCS() throws Exception {
