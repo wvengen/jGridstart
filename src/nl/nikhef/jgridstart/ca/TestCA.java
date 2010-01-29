@@ -35,10 +35,7 @@ public class TestCA implements CA {
     /** CA certificate (cached) */
     protected static X509Certificate cacert = null;
 
-    /** Create new NikhefCA plugin 
-     * 
-     * @throws NoSuchAlgorithmException 
-     * @throws KeyManagementException */
+    /** Create new TestCA */
     public TestCA() throws NoSuchAlgorithmException, KeyManagementException {
 	if (base==null) {
 	    base = "http://www.nikhef.nl/~wvengen/testca/";
@@ -148,7 +145,7 @@ public class TestCA implements CA {
     public X509Certificate getCACertificate() throws IOException {
 	if (cacert==null) {
 	    // download when not present
-	    String scert = ConnectionUtils.pageContents(new URL(base+"?action=retrieve_ca_cert"));
+	    String scert = ConnectionUtils.pageContents(new URL(baseCaCert));
 	    StringReader reader = new StringReader(scert);
 	    PEMReader r = new PEMReader(reader);
 	    cacert = (X509Certificate)r.readObject();
