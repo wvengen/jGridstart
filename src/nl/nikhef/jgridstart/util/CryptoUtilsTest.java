@@ -1,20 +1,39 @@
 package nl.nikhef.jgridstart.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Security;
+import java.security.cert.CertStore;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.mail.smime.SMIMEEnvelopedParser;
+import org.bouncycastle.mail.smime.SMIMEException;
+import org.bouncycastle.mail.smime.SMIMESigned;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.junit.Test;
 import junit.framework.TestCase;
@@ -52,6 +71,23 @@ public class CryptoUtilsTest extends TestCase {
 	cert = certGen.generate(key, "BC");
     }
     
+    /** Helper method: verify S/MIME signed message */
+    protected void verifySMIMEMessage(String str) throws MessagingException, CMSException, SMIMEException, GeneralSecurityException, IOException {
+	// create mime message from smime again
+	MimeMessage outmsg = new MimeMessage(
+		Session.getDefaultInstance(new Properties()),
+		new ByteArrayInputStream(str.getBytes()));
+	SMIMESigned smime = new SMIMESigned((MimeMultipart)outmsg.getContent());
+	// verify!
+	CertStore certs = smime.getCertificatesAndCRLs("Collection", "BC");
+	SignerInformationStore sis = smime.getSignerInfos();
+	for (Iterator<SignerInformation> it = sis.getSigners().iterator(); it.hasNext(); ) {
+	    SignerInformation signer = it.next();
+	    X509Certificate cert = (X509Certificate)certs.getCertificates(signer.getSID()).iterator().next();
+	    signer.verify(cert, "BC");
+	}
+    }
+    
     /** Test if signing works to catch nasty "no object DCH" bug */
     @Test
     public void testSMIMESign() throws Exception {
@@ -74,5 +110,6 @@ public class CryptoUtilsTest extends TestCase {
 	// then do it for real
 	String msg = CryptoUtils.SignSMIME("this is a test message", key, cert);
 	assertNotNull(msg);
+	verifySMIMEMessage(msg);
     }
 }
