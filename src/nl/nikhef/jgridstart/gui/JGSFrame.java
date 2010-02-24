@@ -127,7 +127,8 @@ public class JGSFrame extends JFrame {
 	// create buttons for template panel from actions
 	String[] actions = {
 		"import", "request",
-		"viewrequest", /*"revoke",*/ "install"
+		"viewrequest", /*"revoke",*/ "install",
+		"renew"
 	};
 	certInfoButtons = new HashMap<String, JButton>();
 	for (int i=0; i<actions.length; i++) {
@@ -375,6 +376,7 @@ public class JGSFrame extends JFrame {
 	
 	certInfoButtons.get("import").setVisible(c==null);
 	certInfoButtons.get("request").setVisible(c==null);
+	certInfoButtons.get("renew").setVisible(c!=null && Boolean.valueOf(c.getProperty("valid.notafter.warning")));
 	
 	// also update selected item in menu
 	if (store.size() > 1 && selection.getIndex() >= 0)
