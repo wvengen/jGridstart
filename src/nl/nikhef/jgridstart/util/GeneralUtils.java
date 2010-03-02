@@ -58,7 +58,7 @@ public class GeneralUtils {
 	// set user-agent now that jgridstart version is known; but don't make it fatal
 	try {
 	    System.setProperty("http.agent", getUserAgentString());
-	    logger.fine("Set user-agent: "+System.getProperty("user.agent"));
+	    logger.fine("Set user-agent: "+System.getProperty("http.agent"));
 	} catch(Exception e) {
 	    logger.warning("Could not set user-agent: "+e.getLocalizedMessage());
 	}
