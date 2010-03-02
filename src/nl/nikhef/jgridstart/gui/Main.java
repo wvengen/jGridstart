@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import javax.swing.UIManager;
 
+import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.logging.LogHelper;
 import nl.nikhef.jgridstart.logging.LogWindowHandler;
 import nl.nikhef.jgridstart.util.GeneralUtils;
@@ -31,7 +32,11 @@ public class Main {
 	// creating and showing this application's GUI.
 	javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	    public void run() {
-		createAndShowGUI();
+		try {
+		    createAndShowGUI();
+		} catch(Throwable e) {
+		    ErrorMessage.internal(null, e);
+		}
 	    }
 	});
     }

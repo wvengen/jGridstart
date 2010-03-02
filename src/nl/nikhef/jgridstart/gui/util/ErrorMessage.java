@@ -1,12 +1,25 @@
 package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Window;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
+import nl.nikhef.jgridstart.logging.LogWindow;
+import nl.nikhef.jgridstart.logging.LogWindowHandler;
 
 /** Uniform way to handle error messages.
  * <p>
@@ -82,6 +95,9 @@ public class ErrorMessage {
 	    logger.fine("  "+trace[i].toString());
     }
     
+    private static final String btntxtCopy = "Copy detailed log";
+    private static final String btntxtOk = "Close";
+    
     /** show dialog with error message to user */
     private static void showErrorDialog(Component parent, String title, String msg) {
 	// message
@@ -93,6 +109,45 @@ public class ErrorMessage {
 	area.setFont(dummylbl.getFont());
 	JScrollPane pane = new JScrollPane(area, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	pane.setBorder(null);
-	JOptionPane.showMessageDialog(parent, new Object[] { pane }, title, JOptionPane.ERROR_MESSAGE);
+	// dialog
+        final JOptionPane optionPane = new JOptionPane(
+        	new Object[] { pane },
+                JOptionPane.ERROR_MESSAGE,
+                JOptionPane.YES_NO_OPTION,
+                null,
+                new Object[] {btntxtCopy, btntxtOk}, btntxtOk);
+	final JDialog dlg = createJDialog(parent);
+	dlg.setTitle(title);
+        dlg.setContentPane(optionPane);
+	dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	optionPane.addPropertyChangeListener(
+		new PropertyChangeListener() {
+		    public void propertyChange(PropertyChangeEvent e) {
+			if (dlg.isVisible() && (e.getSource() == optionPane)) {
+			    if (e.getPropertyName().equals(JOptionPane.VALUE_PROPERTY)
+				    && (e.getNewValue().equals(btntxtCopy)) ) {
+				// copy debug log to clipboard
+				LogWindowHandler.getInstance().getWindow().copyToClipboard();
+			    } else if (e.getPropertyName().equals(JOptionPane.VALUE_PROPERTY)
+				    && (e.getNewValue().equals(btntxtOk)) ) {
+				// close dialog
+				dlg.dispose();
+			    }
+			}
+		    }
+		});
+	dlg.pack();
+	dlg.setVisible(true);
+    }
+    
+    /** Create new {@linkplain JDialog} with a parent {@linkplain Component}.
+     * <p>
+     * If the component is no {@linkplain Window}, {@linkplain Frame} or
+     * {@linkplain JDialog}, a new unparented dialog is returned. */
+    protected static JDialog createJDialog(Component parent) {
+	if (parent instanceof Window) return new JDialog((Window)parent);
+	else if (parent instanceof Frame) return new JDialog((Frame)parent);
+	else if (parent instanceof JDialog) return new JDialog((JDialog)parent);
+	else return new JDialog();
     }
 }

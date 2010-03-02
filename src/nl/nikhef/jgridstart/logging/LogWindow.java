@@ -9,6 +9,10 @@
  */
 package nl.nikhef.jgridstart.logging;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
@@ -18,7 +22,7 @@ public class LogWindow extends JFrame {
     private JTextArea textArea = null;
     private JScrollPane pane = null;
 
-    
+    /** Create new log window */
     public LogWindow(String title, int width, int height) {
 	super(title);
 	setSize(width, height);
@@ -31,13 +35,19 @@ public class LogWindow extends JFrame {
 	getContentPane().add(pane);
     }
 
-    /**
-     * This method appends the data to the text area.
+    /** Append a line of text to the text area
      * 
      * @param data The string to log
      */
     public void showInfo(String data) {
 	textArea.append(data);
 	//this.getContentPane().validate();
+    }
+    
+    /** Copy contents of complete log window contents to clipboard */
+    public void copyToClipboard() {
+	StringSelection data = new StringSelection(textArea.getText());
+	Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+	clipboard.setContents(data, data);	
     }
 }
