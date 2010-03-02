@@ -4,6 +4,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -147,11 +150,15 @@ public class ActionExport extends CertificateAction {
 	    public void actionPerformed(ActionEvent e) {
 		if (JFileChooser.APPROVE_SELECTION.equals(e.getActionCommand())) {
 		    // workaround for JFileChooser bug, see
-		    // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4528663
-		    if (chooser.getUI() instanceof BasicFileChooserUI) {
-		        BasicFileChooserUI ui = (BasicFileChooserUI)chooser.getUI();
-		        File f = new File(chooser.getCurrentDirectory(), ui.getFileName());
-		        chooser.setSelectedFile(f);
+		    //   http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4528663
+		    // On Linux&Windows chooser is a BasicFileChooserUI, while on Mac the
+		    // chooser is an AquaFileChooserUI. Both have the getFileName() method.
+		    try {
+			Method getFileName = chooser.getUI().getClass().getDeclaredMethod("getFileName", new Class[]{});
+			String fn = (String)getFileName.invoke(chooser.getUI(), new Object[]{});
+		        chooser.setSelectedFile(new File(fn));
+		    } catch (Exception e1) {
+			logger.warning("Could not activate workaround for Sun bug #4528663 (Custom JFileChooser): "+e);
 		    }
 		    action.actionPerformed(e);
 		}
