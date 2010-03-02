@@ -39,8 +39,18 @@ public class CertificateFileChooser extends JFileChooser {
 	File f = super.getSelectedFile();
 	if (f!=null && getDialogType() == SAVE_DIALOG) {
 	    if (!getFileFilter().accept(f)) {
+		// get file and selected filefilter
 		FileFilter ff = getFileFilter();
-		f = new File(f.getPath() + ((FileFilterSuffix)ff).getExtensions()[0] );
+		String path = f.getPath();
+		String[] exts = ((FileFilterSuffix)ff).getExtensions();
+		// check if the selected file has an extension of this filter
+		boolean hasext = false;
+		for (int i=0; i<exts.length; i++)
+		    if (path.endsWith(exts[i])) hasext = true;
+		// if not, add first extension
+		if (!hasext) path += exts[0];
+		// generate filename
+		f = new File(path);
 	    }
 	}
 	return f;
