@@ -137,6 +137,7 @@ public class ErrorMessage {
 		    }
 		});
 	dlg.pack();
+	dlg.setModal(true);
 	dlg.setVisible(true);
     }
     
