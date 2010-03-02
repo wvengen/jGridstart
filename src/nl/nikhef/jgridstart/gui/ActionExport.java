@@ -158,7 +158,7 @@ public class ActionExport extends CertificateAction {
 			String fn = (String)getFileName.invoke(chooser.getUI(), new Object[]{});
 		        chooser.setSelectedFile(new File(fn));
 		    } catch (Exception e1) {
-			logger.warning("Could not activate workaround for Sun bug #4528663 (Custom JFileChooser): "+e);
+			logger.warning("Could not activate workaround for Sun bug #4528663 (Custom JFileChooser): "+e1);
 		    }
 		    action.actionPerformed(e);
 		}
