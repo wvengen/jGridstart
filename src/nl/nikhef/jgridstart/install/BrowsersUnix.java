@@ -21,13 +21,35 @@ class BrowsersUnix extends BrowsersCommon {
     
     @Override @SuppressWarnings("unchecked") // for clone() cast
     public void initialize() throws IOException {
-	availableBrowsers = (HashMap<String, Properties>)readKnownBrowsers().clone();
+	boolean defaultBrowserFound = false;
+	
+	// find default browser
+	String defaultBrowserExe = null;
+	String defaultBrowserPath = findDefaultBrowserEnvironment();
+	if (defaultBrowserPath==null)
+	    defaultBrowserPath = findDefaultBrowserDesktop();
+	if (defaultBrowserPath==null)
+	    defaultBrowserPath = findDefaultBrowserJava();
+	// we only want the basename
+	if (defaultBrowserPath!=null)
+	    defaultBrowserExe = new File(defaultBrowserPath).getName();
+
 	// find known browsers, keep only which are in path
+	availableBrowsers = (HashMap<String, Properties>)readKnownBrowsers().clone();
 	for (Iterator<Entry<String, Properties>> it = availableBrowsers.entrySet().iterator(); it.hasNext(); ) {
 	    Entry<String, Properties> entry = it.next();
 	    Properties p = entry.getValue();
 	    // we need an exe property
 	    if (p.getProperty("exe")!=null) {
+		// first make sure default browser is in known browsers as well
+		// important when the default browser is not in PATH
+		if (p.getProperty("exe").equals(defaultBrowserExe)) {
+		    // set to full path so it can be found
+		    p.setProperty("exe", defaultBrowserPath);
+		    defaultBrowserFound = true;
+		    defaultBrowser = entry.getKey();
+		    continue;
+		}
 		// find using which; process spawning in unix is cheap
 		try {
 		    String[] cmd = new String[] { "which", p.getProperty("exe") };
@@ -39,15 +61,17 @@ class BrowsersUnix extends BrowsersCommon {
 	    it.remove();
 	}
 	
-	// then find default browser
-	defaultBrowser = findDefaultBrowserEnvironment();
-	if (defaultBrowser==null)
-	    defaultBrowser = findDefaultBrowserDesktop();
-	if (defaultBrowser==null)
-	    defaultBrowser = findDefaultBrowserJava();
-	// we only want the basename
-	if (defaultBrowser!=null)
-	    defaultBrowser = new File(defaultBrowser).getName();
+	// add default browser as entry if not found
+	if (!defaultBrowserFound) {
+	    // dummy entry
+	    Properties p = new Properties();
+	    p.setProperty("desc", defaultBrowserExe);
+	    p.setProperty("exe", defaultBrowserPath);
+	    p.setProperty("certinst", "manual");
+	    defaultBrowser = defaultBrowserExe;
+	    availableBrowsers.put(defaultBrowser, p);
+	}
+	
     }
     
     /** Get default browser from environment $BROWSER, or null if unset. */
