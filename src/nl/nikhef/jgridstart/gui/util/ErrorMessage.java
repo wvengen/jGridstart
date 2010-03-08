@@ -143,11 +143,13 @@ public class ErrorMessage {
     
     /** Create new {@linkplain JDialog} with a parent {@linkplain Component}.
      * <p>
-     * If the component is no {@linkplain Window}, {@linkplain Frame} or
-     * {@linkplain JDialog}, a new unparented dialog is returned. */
+     * If the component is no {@linkplain Frame} or {@linkplain JDialog},
+     * a new unparented dialog is returned.
+     * <p>
+     * {@linkplain JDialog} has no constructor with {@linkplain Window} on
+     * Java5 and below, so that is not used. */
     protected static JDialog createJDialog(Component parent) {
-	if (parent instanceof Window) return new JDialog((Window)parent);
-	else if (parent instanceof Frame) return new JDialog((Frame)parent);
+	if (parent instanceof Frame) return new JDialog((Frame)parent);
 	else if (parent instanceof JDialog) return new JDialog((JDialog)parent);
 	else return new JDialog();
     }
