@@ -27,7 +27,6 @@ class BrowsersWindows extends BrowsersCommon {
     @Override @SuppressWarnings("unchecked") // for clone() cast
     public void initialize() throws IOException {
 	// get default browser from registry or Java
-	boolean defaultBrowserProcessed = false;
 	String defaultExe = findDefaultBrowserRegistry();
 	String defaultName = null;
 	if (defaultExe == null)
@@ -44,8 +43,9 @@ class BrowsersWindows extends BrowsersCommon {
 	availableBrowsers = (HashMap<String, Properties>)readKnownBrowsers().clone();
 	// and keep only browsers that can be found in either registry,
 	// PATH, or inside a subdir of "Program Files".
-	for (Iterator<Properties> it = availableBrowsers.values().iterator(); it.hasNext(); ) {
-	    Properties p = it.next();
+	for (Iterator<Entry<String, Properties>> it = availableBrowsers.entrySet().iterator(); it.hasNext(); ) {
+	    Entry<String, Properties> entry = it.next();
+	    Properties p = entry.getValue();
 	    // keep only browsers that have an executable name
 	    String exe = p.getProperty("exewin");
 	    if (exe==null) exe = p.getProperty("exe");
@@ -59,7 +59,7 @@ class BrowsersWindows extends BrowsersCommon {
 	    // if default, use that
 	    if (exe.equals(defaultName)) {
 		path = defaultExe;
-		defaultBrowserProcessed = true;
+		defaultBrowser = entry.getKey();
 	    } else {
 		// try to find the executable: registry, PATH, subdir of "Program Files"
 		path=findBrowserRegistry1(exe);
@@ -79,14 +79,13 @@ class BrowsersWindows extends BrowsersCommon {
 	}
 	
 	// add entry for default browser if not in list of known browsers
-	if (defaultExe!=null && !defaultBrowserProcessed) {
+	if (defaultBrowser==null && defaultExe!=null) {
 	    defaultBrowser = defaultName;
 	    Properties p = new Properties();
 	    p.setProperty("desc", defaultBrowser);
 	    p.setProperty("exe", new File(defaultExe).getCanonicalPath());
 	    p.setProperty("certinst", "manual");
 	    availableBrowsers.put(defaultBrowser, p);
-	    defaultBrowserProcessed = true;
 	}
 	
 	// free registry object since we're done
