@@ -47,7 +47,7 @@ class BrowsersWindows extends BrowsersCommon {
 	for (Iterator<Properties> it = availableBrowsers.values().iterator(); it.hasNext(); ) {
 	    Properties p = it.next();
 	    // keep only browsers that have an executable name
-	    String exe = p.getProperty("winexe");
+	    String exe = p.getProperty("exewin");
 	    if (exe==null) exe = p.getProperty("exe");
 	    if (exe==null) {
 		it.remove();
