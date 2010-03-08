@@ -27,9 +27,11 @@ class BrowsersWindows extends BrowsersCommon {
     @Override @SuppressWarnings("unchecked") // for clone() cast
     public void initialize() throws IOException {
 	// get default browser from registry or Java
+	boolean defaultBrowserProcessed = false;
 	String defaultExe = findDefaultBrowserRegistry();
 	if (defaultExe == null)
 	    defaultExe = findDefaultBrowserJava();
+	logger.fine("default browser: "+defaultExe);
 
 	// detect available browsers
 	availableBrowsers = (HashMap<String, Properties>)readKnownBrowsers().clone();
@@ -50,6 +52,7 @@ class BrowsersWindows extends BrowsersCommon {
 	    // if default, use that
 	    if (defaultExe!=null && (defaultExe.equals(exe) || defaultExe.equals(exe+".exe"))) {
 		path = defaultExe;
+		defaultBrowserProcessed = true;
 	    } else {
 		// try to find the executable: registry, PATH, subdir of "Program Files"
 		path=findBrowserRegistry1(exe);
@@ -68,18 +71,16 @@ class BrowsersWindows extends BrowsersCommon {
 	    logger.fine("found browser "+exe+" at: "+path);
 	}
 	
-	if (defaultExe!=null) {
-	    defaultExe = new File(defaultExe).getCanonicalPath();
-	    logger.fine("default browser path: "+defaultBrowser);
-	    for (Iterator<Entry<String, Properties>> it = availableBrowsers.entrySet().iterator(); it.hasNext(); ) {
-		Entry<String, Properties> e = it.next();
-		Properties p = e.getValue();
-		if (defaultExe.toLowerCase().equals(p.getProperty("exe").toLowerCase())) {
-		    defaultBrowser = e.getKey();
-		    logger.fine("default browser name: "+defaultBrowser);
-		    break;
-		}
-	    }
+	// add entry for default browser if not in list of known browsers
+	if (defaultExe!=null && !defaultBrowserProcessed) {
+	    File exe = new File(defaultExe);
+	    Properties p = new Properties();
+	    p.setProperty("desc", exe.getName());
+	    p.setProperty("exe", exe.getCanonicalPath());
+	    p.setProperty("certinst", "manual");
+	    defaultBrowser = exe.getName();
+	    availableBrowsers.put(defaultBrowser, p);
+	    defaultBrowserProcessed = true;
 	}
 	
 	// free registry object since we're done
