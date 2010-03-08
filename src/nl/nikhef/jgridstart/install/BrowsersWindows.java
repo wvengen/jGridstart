@@ -29,8 +29,15 @@ class BrowsersWindows extends BrowsersCommon {
 	// get default browser from registry or Java
 	boolean defaultBrowserProcessed = false;
 	String defaultExe = findDefaultBrowserRegistry();
+	String defaultName = null;
 	if (defaultExe == null)
 	    defaultExe = findDefaultBrowserJava();
+	if (defaultExe != null) {
+	    // remove extension for name
+	    defaultName = new File(defaultExe).getName();
+	    if (defaultName.contains("."))
+		defaultName = defaultName.substring(0, defaultName.indexOf("."));
+	}
 	logger.fine("default browser: "+defaultExe);
 
 	// detect available browsers
@@ -50,7 +57,7 @@ class BrowsersWindows extends BrowsersCommon {
 	    // locate executable
 	    String path = null;
 	    // if default, use that
-	    if (defaultExe!=null && (defaultExe.equals(exe) || defaultExe.equals(exe+".exe"))) {
+	    if (exe.equals(defaultName)) {
 		path = defaultExe;
 		defaultBrowserProcessed = true;
 	    } else {
@@ -73,12 +80,11 @@ class BrowsersWindows extends BrowsersCommon {
 	
 	// add entry for default browser if not in list of known browsers
 	if (defaultExe!=null && !defaultBrowserProcessed) {
-	    File exe = new File(defaultExe);
+	    defaultBrowser = defaultName;
 	    Properties p = new Properties();
-	    p.setProperty("desc", exe.getName());
-	    p.setProperty("exe", exe.getCanonicalPath());
+	    p.setProperty("desc", defaultBrowser);
+	    p.setProperty("exe", new File(defaultExe).getCanonicalPath());
 	    p.setProperty("certinst", "manual");
-	    defaultBrowser = exe.getName();
 	    availableBrowsers.put(defaultBrowser, p);
 	    defaultBrowserProcessed = true;
 	}
