@@ -26,6 +26,12 @@ class BrowsersWindows extends BrowsersCommon {
 
     @Override @SuppressWarnings("unchecked") // for clone() cast
     public void initialize() throws IOException {
+	// get default browser from registry or Java
+	String defaultExe = findDefaultBrowserRegistry();
+	if (defaultExe == null)
+	    defaultExe = findDefaultBrowserJava();
+
+	// detect available browsers
 	availableBrowsers = (HashMap<String, Properties>)readKnownBrowsers().clone();
 	// and keep only browsers that can be found in either registry,
 	// PATH, or inside a subdir of "Program Files".
@@ -38,13 +44,19 @@ class BrowsersWindows extends BrowsersCommon {
 		it.remove();
 		continue;
 	    }
-
-	    // try to find the executable: registry, PATH, subdir of "Program Files"
+	    
+	    // locate executable
 	    String path = null;
-	    path=findBrowserRegistry1(exe);
-	    if (path==null) path = findBrowserRegistry2(exe);
-	    if (path==null) path = findBrowserPath(exe);
-	    //TODO if (path==null) path = findBrowserProgramFiles(exe);
+	    // if default, use that
+	    if (defaultExe!=null && (defaultExe.equals(exe) || defaultExe.equals(exe+".exe"))) {
+		path = defaultExe;
+	    } else {
+		// try to find the executable: registry, PATH, subdir of "Program Files"
+		path=findBrowserRegistry1(exe);
+		if (path==null) path = findBrowserRegistry2(exe);
+		if (path==null) path = findBrowserPath(exe);
+		//TODO if (path==null) path = findBrowserProgramFiles(exe);
+	    }
 	    // not found, remove
 	    if (path==null) {
 		it.remove();
@@ -56,11 +68,6 @@ class BrowsersWindows extends BrowsersCommon {
 	    logger.fine("found browser "+exe+" at: "+path);
 	}
 	
-	// get default browser from registry or Java
-	String defaultExe = findDefaultBrowserRegistry();
-	if (defaultExe == null)
-	    defaultExe = findDefaultBrowserJava();
-
 	if (defaultExe!=null) {
 	    defaultExe = new File(defaultExe).getCanonicalPath();
 	    logger.fine("default browser path: "+defaultBrowser);
