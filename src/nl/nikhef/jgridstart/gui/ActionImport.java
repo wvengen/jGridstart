@@ -16,6 +16,7 @@ import javax.swing.KeyStroke;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateStore;
+import nl.nikhef.jgridstart.gui.util.CertificateFileChooser;
 import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
@@ -57,7 +58,7 @@ public class ActionImport extends AbstractAction {
 	hpane.add(check);
 	hpane.add(Box.createHorizontalGlue());
 	
-	JPanel pane = ActionExport.customFileChooser(dlg, chooser,
+	JPanel pane = CertificateFileChooser.customFileChooser(dlg, chooser,
 		new AbstractAction("Import") {
         	    public void actionPerformed(ActionEvent e) {
         		try {

@@ -23,6 +23,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicFileChooserUI;
 
 import nl.nikhef.jgridstart.CertificatePair;
+import nl.nikhef.jgridstart.gui.util.CertificateFileChooser;
 import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
@@ -57,7 +58,7 @@ public class ActionExport extends CertificateAction {
 	hpane.add(check);
 	hpane.add(Box.createHorizontalGlue());
 	
-	JPanel pane = customFileChooser(dlg, chooser,
+	JPanel pane = CertificateFileChooser.customFileChooser(dlg, chooser,
 		new AbstractAction("Export") {
         	    public void actionPerformed(ActionEvent e) {
         		try {
@@ -104,69 +105,5 @@ public class ActionExport extends CertificateAction {
 	    logger.severe("Error exporting certificate "+f+": "+e1);
 	    ErrorMessage.error(findWindow(e.getSource()), "Export failed", e1);
 	}
-    }
-    
-    protected static JPanel customFileChooser(final JDialog dlg, final JFileChooser chooser, final Action action) {
-	Insets insets = null;
-	if (chooser.getBorder() instanceof EmptyBorder)
-	    insets = ((EmptyBorder)chooser.getBorder()).getBorderInsets();
-	// disable buttons because we'll roll our own
-	chooser.setControlButtonsAreShown(false);
-	chooser.setApproveButtonText((String)action.getValue(Action.NAME));
-	// dialog panel with chooser on top
-	JPanel panel = new JPanel();
-	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-	panel.add(chooser);
-	// then container panel for our extra elements
-	JPanel contentpane = new JPanel();
-	contentpane.setLayout(new BoxLayout(contentpane, BoxLayout.Y_AXIS));
-	if (insets!=null) contentpane.setBorder(BorderFactory.createEmptyBorder(0, insets.left, 0, insets.right));
-	panel.add(contentpane);
-	// and the bottom buttons
-	JPanel btns = new JPanel();
-	if (insets!=null) btns.setBorder(BorderFactory.createEmptyBorder(insets.top, insets.left, insets.bottom, insets.right));
-	btns.add(Box.createHorizontalGlue());
-	btns.setLayout(new BoxLayout(btns, BoxLayout.X_AXIS));
-	final JButton activate = new JButton(new AbstractAction((String)action.getValue(Action.NAME)) {
-	    public void actionPerformed(ActionEvent e) {
-		chooser.approveSelection();
-	    }
-	});
-	btns.add(activate);
-	final JButton cancel = new JButton(new AbstractAction("Cancel") {
-	    public void actionPerformed(ActionEvent e) {
-		chooser.cancelSelection();
-	    }
-	});
-	btns.add(cancel);
-	panel.add(btns);
-
-	dlg.getContentPane().add(panel);
-	dlg.getRootPane().setDefaultButton(activate);
-	dlg.setModal(true);
-	
-	// hook filechooser actions to our own actions
-	chooser.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
-		if (JFileChooser.APPROVE_SELECTION.equals(e.getActionCommand())) {
-		    // workaround for JFileChooser bug, see
-		    //   http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4528663
-		    // On Linux&Windows chooser is a BasicFileChooserUI, while on Mac the
-		    // chooser is an AquaFileChooserUI. Both have the getFileName() method.
-		    try {
-			Method getFileName = chooser.getUI().getClass().getDeclaredMethod("getFileName", new Class[]{});
-			String fn = (String)getFileName.invoke(chooser.getUI(), new Object[]{});
-		        chooser.setSelectedFile(new File(fn));
-		    } catch (Exception e1) {
-			logger.warning("Could not activate workaround for Sun bug #4528663 (Custom JFileChooser): "+e1);
-		    }
-		    action.actionPerformed(e);
-		}
-		dlg.removeAll();
-		dlg.dispose();
-	    }
-	});
-	
-	return contentpane;
     }
 }

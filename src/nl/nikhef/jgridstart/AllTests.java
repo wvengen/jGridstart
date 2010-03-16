@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import nl.nikhef.jgridstart.gui.util.CertificateFileChooserTest;
 import nl.nikhef.jgridstart.gui.util.GUIScreenshotsTest;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanelTest;
 import nl.nikhef.jgridstart.install.BrowsersMacOSXTest;
@@ -39,6 +40,7 @@ public class AllTests {
 	suite.addTestSuite(CertificateStore2Test.class);
 	suite.addTestSuite(CertificateStoreWithDefaultTest.class);
 	suite.addTestSuite(BrowsersMacOSXTest.class);
+	suite.addTestSuite(CertificateFileChooserTest.class);
 	suite.addTestSuite(TemplateDocumentTest.class);
 	suite.addTestSuite(TemplatePanelTest.class);
 	suite.addTestSuite(TemplateButtonPanelTest.class);
