@@ -161,7 +161,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    // form display
 	    JButton btn = (JButton) new BasicFinder().find(new Matcher() {
 		public boolean matches(Component c) {
-		    return c instanceof JButton && ((JButton)c).getText().equals("display form");
+		    return c instanceof JButton && ((JButton)c).getText().startsWith("display form");
 		}
 	    });
 	    btn.doClick();
