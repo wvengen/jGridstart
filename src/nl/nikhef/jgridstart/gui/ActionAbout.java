@@ -30,6 +30,6 @@ public class ActionAbout extends AbstractAction {
 		"jGridstart version: "+System.getProperty("jgridstart.version")+ 
 			" (rev "+System.getProperty("jgridstart.revision")+")\n" +
 		"Java runtime environment version: "+System.getProperty("java.version"),
-		"About jGridStart", JOptionPane.INFORMATION_MESSAGE);
+		"About jGridstart", JOptionPane.INFORMATION_MESSAGE);
     }
 }
