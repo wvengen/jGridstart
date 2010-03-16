@@ -74,20 +74,20 @@ public class ArrayListModel<T> extends ArrayList<T> implements ListModel {
     
     protected void notifyAdded(int start, int end) {
 	ListDataEvent e = new ListDataEvent(source, ListDataEvent.INTERVAL_ADDED, start, end);
-	for (Iterator<ListDataListener> i = listeners.iterator(); i.hasNext(); ) {
-	    i.next().intervalAdded(e);
+	for (ListDataListener l: listeners) {
+	    l.intervalAdded(e);
 	}
     }
     protected void notifyRemoved(int start, int end) {
 	ListDataEvent e = new ListDataEvent(source, ListDataEvent.INTERVAL_REMOVED, start, end);
-	for (Iterator<ListDataListener> i = listeners.iterator(); i.hasNext(); ) {
-	    i.next().intervalRemoved(e);
+	for (ListDataListener l: listeners) {
+	    l.intervalRemoved(e);
 	}
     }
     protected void notifyChanged(int index) {
 	ListDataEvent e = new ListDataEvent(source, ListDataEvent.CONTENTS_CHANGED, index, index);
-	for (Iterator<ListDataListener> i = listeners.iterator(); i.hasNext(); ) {
-	    i.next().contentsChanged(e);
+	for (ListDataListener l:  listeners) {
+	    l.contentsChanged(e);
 	}
     }
 

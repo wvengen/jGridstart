@@ -13,6 +13,7 @@ import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.CertStore;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
@@ -72,6 +73,7 @@ public class CryptoUtilsTest extends TestCase {
     }
     
     /** Helper method: verify S/MIME signed message */
+    @SuppressWarnings("unchecked") // for SignerInformationStore#getSigners
     protected void verifySMIMEMessage(String str) throws MessagingException, CMSException, SMIMEException, GeneralSecurityException, IOException {
 	// create mime message from smime again
 	MimeMessage outmsg = new MimeMessage(

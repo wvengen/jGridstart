@@ -435,8 +435,8 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 
     public void setData(Properties p) {
 	// need to setData on all cached instances!
-	for (Iterator<TemplateDocument> it = docs.iterator(); it.hasNext(); )
-	    it.next().setData(p);
+	for (TemplateDocument doc: docs)
+	    doc.setData(p);
 	// and pane itself
 	pane.setData(p);
     }

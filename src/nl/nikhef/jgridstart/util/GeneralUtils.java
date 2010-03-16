@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
@@ -41,8 +42,7 @@ public class GeneralUtils {
 	    if (key.startsWith("jnlp.jgridstart.") || key.startsWith("javaws.jgridstart."))
 		keys.add(key);
 	}
-	for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
-	    String key = it.next();
+	for (String key: keys) {
 	    String newkey = key.replaceFirst("^(jnlp|javaws)\\.(jgridstart\\.)", "$2");
 	    System.setProperty(newkey, System.getProperty(key));
 	    System.clearProperty(key);

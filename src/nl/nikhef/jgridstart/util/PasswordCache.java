@@ -88,8 +88,8 @@ public class PasswordCache {
     public void setTimeout(int s) {
 	this.timeout = s;
 	// update timeout of current passwords
-	for (Iterator<String> it = timers.keySet().iterator(); it.hasNext(); ) {
-	    touch(it.next());
+	for (String loc: timers.keySet()) {
+	    touch(loc);
 	}
     }
     /** Return the current password timeout.
@@ -251,8 +251,8 @@ public class PasswordCache {
     /** Completely clear the cache so that no passwords are present. */
     public void clear() {
 	Set<String> locations = new HashSet<String>(passwords.keySet());
-	for (Iterator<String> it=locations.iterator(); it.hasNext(); ) {
-	    invalidate(it.next());
+	for (String loc: locations) {
+	    invalidate(loc);
 	}
     }
     

@@ -58,8 +58,7 @@ public class CertificateStoreWithDefaultTest extends CertificateBaseTest {
 	CertificateStoreWithDefault store = new CertificateStoreWithDefault(storePath);
 	assertEquals(2, store.size());
 	CertificatePair cert1 = null, cert2 = null;
-	for (Iterator<CertificatePair> it = store.iterator(); it.hasNext(); ) {
-	    CertificatePair thisCert = it.next();
+	for (CertificatePair thisCert: store) {
 	    if (thisCert.getPath().equals(childPath1)) cert1 = thisCert;
 	    if (thisCert.getPath().equals(childPath2)) cert2 = thisCert;
 	}
@@ -79,8 +78,7 @@ public class CertificateStoreWithDefaultTest extends CertificateBaseTest {
 	CertificateStoreWithDefault store = new CertificateStoreWithDefault(storePath);
 	assertEquals(3, store.size());
 	CertificatePair cert1 = null, cert2 = null, cert3 = null;
-	for (Iterator<CertificatePair> it = store.iterator(); it.hasNext(); ) {
-	    CertificatePair thisCert = it.next();
+	for (CertificatePair thisCert: store) {
 	    if (thisCert.getPath().equals(childPath1)) cert1 = thisCert;
 	    if (thisCert.getPath().equals(childPath2)) cert2 = thisCert;
 	    if (thisCert.getPath().equals(childPath3)) cert3 = thisCert;

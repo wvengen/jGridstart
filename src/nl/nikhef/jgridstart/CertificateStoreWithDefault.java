@@ -134,8 +134,7 @@ public class CertificateStoreWithDefault extends CertificateStore {
 	    // this speeds up the check when no default certificate exists
 	    if (!new File(path, "userkey.pem").exists()) return null;
 	    // find certificate with same path as store
-	    for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {
-		CertificatePair c = it.next();
+	    for (CertificatePair c: this) {
 		if (c.path == path) {
 		    defaultCert = c;
 		    break;
@@ -245,8 +244,7 @@ public class CertificateStoreWithDefault extends CertificateStore {
      */
     protected CertificatePair findDefaultCertificate() throws IOException {
 	// now compare with other certificates in store
-	for (Iterator<CertificatePair> it = iterator(); it.hasNext(); ) {
-	    CertificatePair cert = it.next();
+	for (CertificatePair cert: this) {
 	    if (compareDefaultCertificate(cert))
 		return cert;
 	}

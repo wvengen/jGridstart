@@ -200,8 +200,7 @@ public class Main {
 	    throw new ParseException("please specify certificate");
 	
 	CertificatePair cert = null;
-	for (Iterator<CertificatePair> it = store.iterator(); it.hasNext(); ) {
-	    CertificatePair cur = it.next();
+	for (CertificatePair cur: store) {
 	    if (cur.getPath().getName().equals(value)) {
 		cert = cur;
 		break;

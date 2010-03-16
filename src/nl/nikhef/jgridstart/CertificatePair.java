@@ -33,6 +33,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -394,24 +395,22 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * <p>
      * This file is written with permissions so that only the user can read
      * it, because it may contain personal information. 
-     * 
-     * @throws IOException 
-     * @throws FileNotFoundException */
+     */
+    @SuppressWarnings("unchecked") // for Properties#keys
     public void store() throws FileNotFoundException, IOException {
 	logger.finest("Storing certificate properties: "+getPropertiesFile());
 	Properties p = (Properties)CertificatePair.super.clone();
 	// remove volatile properties
 	ArrayList<String> propsToRemove = new ArrayList<String>();
 	for (Enumeration<?> en=p.propertyNames(); en.hasMoreElements(); ) {
-	    String key = (String)en.nextElement();
+	    String key = (String)en.nextElement();	    
 	    if (Boolean.valueOf(p.getProperty(key+".volatile")))
 		propsToRemove.add(key);
 	    // remove "*.volatile" entries, also stray ones without a property
 	    if (key.endsWith(".volatile"))
 		propsToRemove.add(key);
 	}
-	for (Iterator<String> it = propsToRemove.iterator(); it.hasNext(); ) {
-	    String key = it.next();
+	for (String key: propsToRemove) {
 	    p.remove(key);
 	}
 	// and store with OutputStream for Java 1.5 and below
@@ -622,9 +621,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	logger.finer("Importing certificate from directory: "+src);
 
 	// copy all files
-	List<File> files = Arrays.asList(src.listFiles());
-	for (Iterator<File> i = files.iterator(); i.hasNext();) {
-	    File f = i.next();
+	for (File f: src.listFiles()) {
 	    if (!f.isFile()) continue;
 	    FileUtils.CopyFile(f, new File(path, f.getName()));
 	}
@@ -1222,8 +1219,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
     protected void notifyChanged() {
 	ItemEvent e = new ItemEvent(CertificatePair.this, ItemEvent.ITEM_STATE_CHANGED, CertificatePair.this, 0);
 	synchronized(itemListeners) {
-	    for (Iterator<ItemListener> it = itemListeners.iterator(); it.hasNext(); ) {
-		it.next().itemStateChanged(e);
+	    for (ItemListener l: itemListeners) {
+		l.itemStateChanged(e);
 	    }
 	}
     }

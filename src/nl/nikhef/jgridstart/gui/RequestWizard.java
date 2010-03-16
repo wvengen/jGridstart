@@ -580,8 +580,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	@Override
 	protected void process(List<String> keys) {
 	    // process messages
-	    for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
-		String key = it.next();
+	    for (String key: keys) {
 		if (key==null) continue;
 		// process cancel
 		if (key.equals("state.cancelled")) {
