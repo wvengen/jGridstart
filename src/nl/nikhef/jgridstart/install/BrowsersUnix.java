@@ -63,13 +63,17 @@ class BrowsersUnix extends BrowsersCommon {
 	
 	// add default browser as entry if not found
 	if (!defaultBrowserFound) {
-	    // dummy entry
-	    Properties p = new Properties();
-	    p.setProperty("desc", defaultBrowserExe);
-	    p.setProperty("exe", defaultBrowserPath);
-	    p.setProperty("certinst", "manual");
-	    defaultBrowser = defaultBrowserExe;
-	    availableBrowsers.put(defaultBrowser, p);
+	    if (defaultBrowserPath!=null) {
+		// dummy entry
+		Properties p = new Properties();
+		p.setProperty("desc", defaultBrowserExe);
+		p.setProperty("exe", defaultBrowserPath);
+		p.setProperty("certinst", "manual");
+		defaultBrowser = defaultBrowserExe;
+		availableBrowsers.put(defaultBrowser, p);
+	    } else {
+		// TODO select first browser detected
+	    }
 	}
 	
     }
