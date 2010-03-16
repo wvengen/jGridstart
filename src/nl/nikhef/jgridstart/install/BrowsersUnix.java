@@ -156,6 +156,9 @@ class BrowsersUnix extends BrowsersCommon {
 	} catch(IOException e) {
 	    return null;
 	}
+	// still zero return value when key doesn't exist ... sigh
+	if (output.toString().trim().equals("No value set for `"+key+"'"))
+	    return null;
 	return output.toString().trim();
     }
     
