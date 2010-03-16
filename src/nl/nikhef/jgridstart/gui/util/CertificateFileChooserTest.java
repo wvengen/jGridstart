@@ -46,7 +46,8 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
     /** helper method: create custom test file chooser */
     protected JDialog createTestChooser(File srcdir) {
 	// embed in frame with password selection fields
-	final JDialog dlg = new JDialog((JDialog)null, "Custom test filechooser");
+	final JDialog dlg = new JDialog();
+	dlg.setTitle("Custom test filechooser");
 	final JFileChooser chooser = new JFileChooser(srcdir);
 	
 	selectedFile = null;
