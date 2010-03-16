@@ -49,6 +49,8 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
 	final JDialog dlg = new JDialog();
 	dlg.setTitle("Custom test filechooser");
 	final JFileChooser chooser = new JFileChooser(srcdir);
+	// to enable entry box for all platforms
+	chooser.setDialogType(JFileChooser.SAVE_DIALOG);
 	
 	selectedFile = null;
 
