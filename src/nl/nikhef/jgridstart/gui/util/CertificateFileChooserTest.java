@@ -69,7 +69,11 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
 	
 	dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	dlg.pack();
-	dlg.setModal(false); // for easy testing!f
+	dlg.setModal(false); // tests must run during dialog
+	dlg.setVisible(true);
+	tester.waitForIdle();
+	dlg.toFront();
+	tester.waitForIdle();
 	return dlg;
     }
     /** helper method: create custom test file chooser */
@@ -101,7 +105,6 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
     public void testCustomFilenameClick() throws Exception {
 	JDialog dlg = createTestChooser();
 	dlg.setVisible(true);
-	tester.waitForIdle();
 	tester.keyString("foobar.xyz");
 	pressOk();
 	assertEquals("foobar.xyz", waitSelected().getName());
@@ -111,8 +114,6 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
     @Test
     public void testCustomFilenameEnter() throws Exception {
 	JDialog dlg = createTestChooser();
-	dlg.setVisible(true);
-	tester.waitForIdle();
 	tester.keyString("foobar.xyz\n");
 	assertEquals("foobar.xyz", waitSelected().getName());
     }
@@ -122,8 +123,6 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
     public void testCustomCheckpathClick() throws Exception {
 	File dir = new File(System.getProperty("java.io.tmpdir"));
 	JDialog dlg = createTestChooser(dir);
-	dlg.setVisible(true);
-	tester.waitForIdle();
 	tester.keyString("foo.txt");
 	pressOk();
 	assertEquals(new File(dir, "foo.txt").getCanonicalPath(), waitSelected().getCanonicalPath());
@@ -134,8 +133,6 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
     public void testCustomCheckpathEnter() throws Exception {
 	File dir = new File(System.getProperty("java.io.tmpdir"));
 	JDialog dlg = createTestChooser(dir);
-	dlg.setVisible(true);
-	tester.waitForIdle();
 	tester.keyString("bar.xyz\n");
 	assertEquals(new File(dir, "bar.xyz").getCanonicalPath(), waitSelected().getCanonicalPath());
     }
@@ -145,8 +142,6 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
     public void testCustomFullpathClick() throws Exception {
 	File f = new File(System.getProperty("java.io.tmpdir"), "yeah.bl");
 	JDialog dlg = createTestChooser();
-	dlg.setVisible(true);
-	tester.waitForIdle();
 	tester.keyString(f.getPath());
 	pressOk();
 	assertEquals(f.getCanonicalPath(), waitSelected().getCanonicalPath());
@@ -157,8 +152,6 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
     public void testCustomFullpathEnter() throws Exception {
 	File f = new File(System.getProperty("java.io.tmpdir"), "yeah.cl");
 	JDialog dlg = createTestChooser();
-	dlg.setVisible(true);
-	tester.waitForIdle();
 	tester.keyString(f.getPath()+"\n");
 	assertEquals(f.getCanonicalPath(), waitSelected().getCanonicalPath());
     }
