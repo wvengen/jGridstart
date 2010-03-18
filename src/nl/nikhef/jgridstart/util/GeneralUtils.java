@@ -2,9 +2,7 @@ package nl.nikhef.jgridstart.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Logger;
 

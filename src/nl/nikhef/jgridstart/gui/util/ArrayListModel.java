@@ -2,8 +2,6 @@ package nl.nikhef.jgridstart.gui.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;

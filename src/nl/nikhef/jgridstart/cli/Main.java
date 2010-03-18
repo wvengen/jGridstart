@@ -8,7 +8,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

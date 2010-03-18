@@ -6,7 +6,6 @@ import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 import org.bouncycastle.openssl.PasswordFinder;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 public class PasswordCacheTest extends TestCase {
@@ -30,7 +29,7 @@ public class PasswordCacheTest extends TestCase {
     }
     
     public void testGetInstance() {
-	Assert.assertEquals(cache, PasswordCache.getInstance());
+	assertEquals(cache, PasswordCache.getInstance());
     }
 
     public void testSet() throws PasswordCancelledException {
@@ -38,28 +37,28 @@ public class PasswordCacheTest extends TestCase {
 	char[] pw = "Xyz123zyX".toCharArray();
 	cache.set("foo", pw);
 	// check this entry
-	Assert.assertNotNull(cache.getForDecrypt("", "foo"));
-	Assert.assertTrue(Arrays.equals(cache.getForDecrypt("", "foo"), pw));
+	assertNotNull(cache.getForDecrypt("", "foo"));
+	assertTrue(Arrays.equals(cache.getForDecrypt("", "foo"), pw));
 	// make sure another entry isn't set
-	Assert.assertNull(cache.getForDecrypt("", "bar"));
+	assertNull(cache.getForDecrypt("", "bar"));
     }
 
     public void testInvalidate() throws PasswordCancelledException {
 	cache.clear();
 	cache.set("blah", "test".toCharArray());
-	Assert.assertNotNull(cache.getForDecrypt("", "blah"));
+	assertNotNull(cache.getForDecrypt("", "blah"));
 	cache.invalidate("blah");
-	Assert.assertNull(cache.getForDecrypt("", "blah"));
+	assertNull(cache.getForDecrypt("", "blah"));
     }
     
     public void testClear() throws PasswordCancelledException {
 	cache.set("foobar", "faosdifj".toCharArray());
 	cache.set("barfoo", "asduiofs".toCharArray());
-	Assert.assertNotNull(cache.getForDecrypt("", "foobar"));
-	Assert.assertNotNull(cache.getForDecrypt("", "barfoo"));
+	assertNotNull(cache.getForDecrypt("", "foobar"));
+	assertNotNull(cache.getForDecrypt("", "barfoo"));
 	cache.clear();
-	Assert.assertNull(cache.getForDecrypt("", "foobar"));
-	Assert.assertNull(cache.getForDecrypt("", "barfoo"));
+	assertNull(cache.getForDecrypt("", "foobar"));
+	assertNull(cache.getForDecrypt("", "barfoo"));
     }
 
     public void testGetDecryptPasswordFinder() {
@@ -67,7 +66,7 @@ public class PasswordCacheTest extends TestCase {
 	char[] pw = "aoksdJLKASjkl".toCharArray();
 	cache.set("bar", pw);
 	PasswordFinder f = cache.getDecryptPasswordFinder("", "bar");
-	Assert.assertTrue(Arrays.equals(f.getPassword(), pw));
+	assertTrue(Arrays.equals(f.getPassword(), pw));
     }
     
     public void testTimeout() throws InterruptedException, PasswordCancelledException {
@@ -75,9 +74,9 @@ public class PasswordCacheTest extends TestCase {
 	cache.clear();
 	cache.setTimeout(timeout);
 	cache.set("blah", "test".toCharArray());
-	Assert.assertNotNull(cache.getForDecrypt("", "blah"));
+	assertNotNull(cache.getForDecrypt("", "blah"));
 	Thread.sleep((timeout+1)*1000);
-	Assert.assertNull(cache.getForDecrypt("", "blah"));
+	assertNull(cache.getForDecrypt("", "blah"));
     }
 
 }

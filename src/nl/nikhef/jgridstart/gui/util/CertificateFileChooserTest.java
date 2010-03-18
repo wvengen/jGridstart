@@ -9,7 +9,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JPanel;
 
 import junit.extensions.abbot.ComponentTestFixture;
 
@@ -54,7 +53,7 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
 	
 	selectedFile = null;
 
-	JPanel pane = CertificateFileChooser.customFileChooser(dlg, chooser,
+	CertificateFileChooser.customFileChooser(dlg, chooser,
 		new AbstractAction(okBtnTxt) {
         	    public void actionPerformed(ActionEvent e) {
         		try {
@@ -108,7 +107,8 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
 	tester.keyString("foobar.xyz");
 	pressOk();
 	assertEquals("foobar.xyz", waitSelected().getName());
-    }
+	dlg.dispose();
+   }
 
     /** Test filename with enter */
     @Test
@@ -116,6 +116,7 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
 	JDialog dlg = createTestChooser();
 	tester.keyString("foobar.xyz\n");
 	assertEquals("foobar.xyz", waitSelected().getName());
+	dlg.dispose();
     }
 
     /** Test filename+dir with ok button */
@@ -126,7 +127,8 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
 	tester.keyString("foo.txt");
 	pressOk();
 	assertEquals(new File(dir, "foo.txt").getCanonicalPath(), waitSelected().getCanonicalPath());
-    }
+	dlg.dispose();
+   }
 
     /** Test filename+dir with enter */
     @Test
@@ -135,6 +137,7 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
 	JDialog dlg = createTestChooser(dir);
 	tester.keyString("bar.xyz\n");
 	assertEquals(new File(dir, "bar.xyz").getCanonicalPath(), waitSelected().getCanonicalPath());
+	dlg.dispose();
     }
     
     /** Test full filename entering with ok button */
@@ -145,6 +148,7 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
 	tester.keyString(f.getPath());
 	pressOk();
 	assertEquals(f.getCanonicalPath(), waitSelected().getCanonicalPath());
+	dlg.dispose();
     }
    
     /** Test full filename entering with enter */
@@ -154,5 +158,6 @@ public class CertificateFileChooserTest extends ComponentTestFixture {
 	JDialog dlg = createTestChooser();
 	tester.keyString(f.getPath()+"\n");
 	assertEquals(f.getCanonicalPath(), waitSelected().getCanonicalPath());
+	dlg.dispose();
     }
 }

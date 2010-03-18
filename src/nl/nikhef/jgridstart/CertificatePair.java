@@ -16,27 +16,20 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.TooManyListenersException;
@@ -396,7 +389,6 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * This file is written with permissions so that only the user can read
      * it, because it may contain personal information. 
      */
-    @SuppressWarnings("unchecked") // for Properties#keys
     public void store() throws FileNotFoundException, IOException {
 	logger.finest("Storing certificate properties: "+getPropertiesFile());
 	Properties p = (Properties)CertificatePair.super.clone();

@@ -1,24 +1,18 @@
 package nl.nikhef.jgridstart.gui.util;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import nl.nikhef.jgridstart.logging.LogWindow;
 import nl.nikhef.jgridstart.logging.LogWindowHandler;
 
 /** Uniform way to handle error messages.

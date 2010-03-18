@@ -1,7 +1,6 @@
 package nl.nikhef.jgridstart;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.Properties;
 
 import nl.nikhef.jgridstart.util.FileUtils;

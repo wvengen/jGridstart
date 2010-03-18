@@ -7,7 +7,6 @@ import java.awt.Frame;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 

@@ -1,27 +1,16 @@
 package nl.nikhef.jgridstart.gui;
 
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.basic.BasicFileChooserUI;
-
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.gui.util.CertificateFileChooser;
 import nl.nikhef.jgridstart.gui.util.CertificateSelection;

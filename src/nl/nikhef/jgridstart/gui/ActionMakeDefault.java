@@ -3,10 +3,8 @@ package nl.nikhef.jgridstart.gui;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateStoreWithDefault;
 import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
