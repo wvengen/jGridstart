@@ -87,6 +87,10 @@ public class ErrorMessage {
 	StackTraceElement[] trace = e.getStackTrace();
 	for (int i=0; i<trace.length; i++)
 	    logger.fine("  "+trace[i].toString());
+	if (e.getCause()!=null) {
+	    logger.fine("[Caused by exception:]");
+	    logException(e.getCause());
+	}
     }
     
     private static final String btntxtCopy = "Copy detailed log";
