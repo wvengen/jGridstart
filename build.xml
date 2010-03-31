@@ -69,7 +69,7 @@
 		<basename property="dep.bouncycastle.basename" file="${dep.bouncycastle}"/>
 	<property name="dep.bouncycastle.smime" location="${dir.thirdparty}/bouncycastle/bcmail-jdk15-144.jar"/>
 	<property name="dep.bouncycastle.tsp" location="${dir.thirdparty}/bouncycastle/bctsp-jdk15-144.jar"/>
-	<property name="dep.javamail" location="${dir.thirdparty}/bouncycastle/mail-1.4.1.jar"/>
+	<property name="dep.javamail" location="${dir.thirdparty}/bouncycastle/mail-1.4.3.jar"/>
 	<property name="dep.commons-cli" location="${dir.thirdparty}/commons/commons-cli-1.2.jar"/>
 	<property name="dep.commons-lang" location="${dir.thirdparty}/commons/commons-lang-2.4.jar"/>
 	<property name="dep.commons-exec" location="${dir.thirdparty}/commons/commons-exec-1.0.jar"/>

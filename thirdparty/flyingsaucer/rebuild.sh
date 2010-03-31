@@ -17,11 +17,12 @@ if [ -e "$BUILDDIR" ]; then
 fi
 mkdir "$BUILDDIR"
 if [ "$SOURCE" != "CVS" ]; then
-	echo "*** Downloading release"
-	rm -f src.zip
-	wget -q -O src.zip "$SOURCE"
+	#echo "*** Downloading release"
+	#rm -f src.zip
+	#wget -q -O src.zip "$SOURCE"
 	echo "*** Extracting source"
-	unzip -q -d "$BUILDDIR" src.zip && rm -f src.zip
+	#unzip -q -d "$BUILDDIR" src.zip && rm -f src.zip
+	unzip -q -d "$BUILDDIR" src.zip
 else (
 	echo "*** Retrieving CVS head"
 	cd "$BUILDDIR/.."
@@ -33,6 +34,7 @@ else (
 for i in $ROOT/*.diff; do
 	# patches starting with xhtmlrenderer-cvs- only for cvs
 	basename "$i" | grep -q '^xhtmlrenderer-cvs-' && [ "$SOURCE" != "CVS" ] && continue
+	basename "$i" | grep -q '^xhtmlrenderer-nocvs-' && [ "$SOURCE" = "CVS" ] && continue
 	# apply
 	patch -l -p0 -d "$BUILDDIR" <"$i"
 done
