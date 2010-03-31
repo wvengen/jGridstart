@@ -350,9 +350,10 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * @param oldCert certificate to renew
      * @param pw password to use for new private key
      */
-    public CertificatePair generateRenewal(CertificatePair oldCert, char[] pw) throws IOException, GeneralSecurityException, PasswordCancelledException, CAException {
+    public CertificatePair generateRenewal(CertificatePair oldCert, char[] pw) throws IOException, GeneralSecurityException, PasswordCancelledException, CAException, CertificateCheckException {
 	// ask for private key first, cancel would skip everything
 	PrivateKey oldKey = oldCert.getPrivateKey();
+	oldCert.check(true);
 	
 	// generate request
 	CertificatePair newCert = generateRequest(oldCert, pw);
@@ -381,7 +382,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * 
      * @see #generateRenewal(CertificatePair, char[])
      */
-    public CertificatePair generateRenewal(CertificatePair oldCert) throws PasswordCancelledException, IOException, GeneralSecurityException, CAException {
+    public CertificatePair generateRenewal(CertificatePair oldCert) throws PasswordCancelledException, IOException, GeneralSecurityException, CAException, CertificateCheckException {
 	return generateRenewal(oldCert, null);
     }
 }

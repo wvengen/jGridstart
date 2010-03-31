@@ -23,6 +23,7 @@ import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateRequest;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.Organisation;
+import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
@@ -304,6 +305,13 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 			return false;
 		    }
 		    ErrorMessage.error(this, "Couldn't read private key", e);
+		    return false;
+		}
+		try {
+		    certParent.check(true);
+		} catch (CertificateCheckException e) {
+		    ErrorMessage.error(this, "Parent certificate/key invalid", e);
+		    return false;
 		}
 	    }
 

@@ -447,20 +447,16 @@ public class CertificatePair extends Properties implements ItemSelectable {
 
 	if (src.isDirectory()) {
 	    cert.importFromDirectory(src, dstpw);
-	    cert.check(dstpw!=null); // private key may not be decrypted here
 	} else 	if (ext.equals("p12") || ext.equals("pfx")) {
 	    cert.importFromPKCS(src, dstpw);
-	    cert.check(true); // needed password at import, so check privkey as well
 	} else if (ext.equals("pem")) {
 	    // if the file is a .globus-type file, import from directory instead
 	    if (src.getName().equals("userkey.pem") || src.getName().equals("usercert.pem") ||
 		src.getName().equals("userrequest.pem") || src.getName().equals("usercert_request.pem")) {
 		logger.info("Importing globus-type certificate instead of pem file: "+src.getParent());
 		cert.importFromDirectory(src.getParentFile(), dstpw);
-		cert.check(dstpw!=null);
 	    } else {
 		cert.importFromPEM(src, dstpw);
-		cert.check(true);
 	    }
 	} else {
 	    throw new IOException("Cannot determine format to import from, unknown file extension: "+ext);
@@ -490,7 +486,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @param src PEM file to import from
      */
     protected void importFromPEM(File src, char[] dstpw)
-    		throws IOException, CertificateCheckException, GeneralSecurityException, PasswordCancelledException {
+    		throws IOException, GeneralSecurityException, PasswordCancelledException, CertificateCheckException {
 	int count = 0;
 	logger.finer("Trying to import certificate from PEM file: "+src);
 	// set destination password if given
@@ -530,6 +526,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 
 	if (count == 0)
 	    throw new IOException("not a PEM file: " + src);
+	
+	check(true);
     }
 
     /** Import from PKCS.
@@ -541,7 +539,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @param dstpw password for new private keym or {@code null} to use same as import password
      */
     protected void importFromPKCS(File src, char[] dstpw)
-    		throws IOException, PasswordCancelledException, GeneralSecurityException {
+    		throws IOException, PasswordCancelledException, GeneralSecurityException, CertificateCheckException {
 	PasswordCache pwcache = PasswordCache.getInstance();
 	String storename = "PKCS#12 store " + src.getName();
 	KeyStore store = PKCS12KeyStoreUnlimited.getInstance();
@@ -597,6 +595,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		}
 	    }
 	}
+	
+	check(true); // needed password at import, so check privkey as well
     }
     
     /** Import from Globus-type directory.
@@ -625,6 +625,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	}
 	// load from new location
 	load(path);
+	// make sure it is ok
+	check(dstpw!=null);	
     }
 
     /** Export the certificate and private key to a file.
@@ -634,7 +636,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * @param dst destination to export {@link TooManyListenersException}
      * @param pw password to encrypt exported key with, or {@code null} to use private key password
      */
-    public void exportTo(File dst, char[] pw) throws IOException, GeneralSecurityException {
+    public void exportTo(File dst, char[] pw) throws IOException, GeneralSecurityException, CertificateCheckException {
 	if (dst==null || dst.getName()==null)
 	    throw new NullPointerException("Please supply a filename to export to");
 	String ext = dst.getName().toLowerCase();
@@ -669,13 +671,15 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * 
      * @param dst destination to export {@link TooManyListenersException}
      */
-    public void exportTo(File dst) throws PasswordCancelledException, IOException, GeneralSecurityException {
+    public void exportTo(File dst) throws PasswordCancelledException, IOException, GeneralSecurityException, CertificateCheckException {
 	exportTo(dst, null);
     }
     
     /** Export the certificate and private key to a PKCS#12 file. */
-    protected void exportToPKCS(File dst, char[] pw) throws IOException, GeneralSecurityException, PasswordCancelledException {
+    protected void exportToPKCS(File dst, char[] pw) throws IOException, GeneralSecurityException, PasswordCancelledException, CertificateCheckException {
 	logger.finer("Exporting certificate '"+this+"' to PKCS#12: "+dst);
+	
+	check(true); // needed password at export, so check privkey as well
 
 	// Create certificate chain TODO do proper chain
 	X509Certificate[] certchain = {getCertificate()}; // TODO include chain?
@@ -696,8 +700,10 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * This is quite simple, since it just concatenates the existing
      * files from its {@code .globus} directory; no password is needed.
      */
-    protected void exportToPEM(File dst, char[] pw) throws IOException {
+    protected void exportToPEM(File dst, char[] pw) throws IOException, CertificateCheckException {
 	logger.finer("Exporting certificate '"+this+"' to PEM: "+dst);
+	
+	check(pw!=null); // if password given, check privkey as well
 	
 	PEMWriter out = new PEMWriter(dst);
 	try {
@@ -931,9 +937,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * The decryption password is requested from the user when required
      * using {@link PasswordCache}. When the password is incorrect, the user is
      * asked the password up to three times, after which a exception is thrown. 
-     * 
-     * @throws IOException 
-     * @throws PasswordCancelledException */
+     */
     protected PrivateKey getPrivateKey() throws IOException, PasswordCancelledException {
 	return getPrivateKey(getKeyFile());
     }
@@ -943,9 +947,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * The decryption password is requested from the user when required
      * using {@link PasswordCache}. When the password is incorrect, the user is
      * asked the password up to three times, after which a exception is thrown. 
-     * 
-     * @throws IOException 
-     * @throws PasswordCancelledException */
+     */
     protected static PrivateKey getPrivateKey(File keyFile) throws IOException, PasswordCancelledException {
 	PrivateKey key = null;
 	final String srcmsg = "private key";
@@ -1026,7 +1028,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
      *                  known to be in the {@link PasswordCache}
      * @throws CertificateCheckException 
      */
-    protected void check(boolean checkPriv) throws CertificateCheckException {
+    public void check(boolean checkPriv) throws CertificateCheckException {
 	CertificateCheck c = new CertificateCheck(this);
 	c.check();
 	if (checkPriv) c.checkPrivate();
