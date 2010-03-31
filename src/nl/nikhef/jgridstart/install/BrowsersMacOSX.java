@@ -45,7 +45,9 @@ class BrowsersMacOSX extends BrowsersCommon {
 		if (p.getProperty("uti").equals(known.getProperty("uti"))) {
 		    for (Enumeration<?> en = known.keys(); en.hasMoreElements(); ) {
 			String key = (String)en.nextElement();
-			if (!p.containsKey(key)) p.setProperty(key, known.getProperty(key));			    }
+			if (!p.containsKey(key)) p.setProperty(key, known.getProperty(key));
+		    }
+		    logger.fine("found browser "+p.getProperty("uti"));
 		}
 	    }
 	    availableBrowsers.put(p.getProperty("uti"), p);
@@ -55,7 +57,12 @@ class BrowsersMacOSX extends BrowsersCommon {
 	defaultBrowser = parseDefaultBrowser(defaults(new String[] {"read", "com.apple.LaunchServices"}));
 	
 	// fallback to Safari as default browser
-	if (defaultBrowser==null) defaultBrowser = "com.apple.safari";
+	if (defaultBrowser==null) {
+	    defaultBrowser = "com.apple.safari";
+	    logger.fine("default browser not found, falling back to: "+defaultBrowser);
+	} else {
+	    logger.fine("default browser: "+defaultBrowser);
+	}
     }
 
     @Override

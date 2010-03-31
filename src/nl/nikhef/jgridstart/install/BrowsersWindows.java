@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart.install;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
@@ -123,6 +124,7 @@ class BrowsersWindows extends BrowsersCommon {
 	    // execute browser
 	    //   don't wait for this, since starting a new browser when the
 	    //   process isn't running yet can take a loooong time
+	    logger.fine("running browser: "+Arrays.toString(cmd));
 	    Runtime.getRuntime().exec(cmd);
 	    /*
 	    StringBuffer output = new StringBuffer();

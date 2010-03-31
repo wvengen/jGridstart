@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.HashMap;
@@ -33,7 +34,8 @@ class BrowsersUnix extends BrowsersCommon {
 	// we only want the basename
 	if (defaultBrowserPath!=null)
 	    defaultBrowserExe = new File(defaultBrowserPath).getName();
-
+	logger.fine("default browser: "+defaultBrowserExe);
+	
 	// find known browsers, keep only which are in path
 	availableBrowsers = (HashMap<String, Properties>)readKnownBrowsers().clone();
 	for (Iterator<Entry<String, Properties>> it = availableBrowsers.entrySet().iterator(); it.hasNext(); ) {
@@ -51,11 +53,13 @@ class BrowsersUnix extends BrowsersCommon {
 		    continue;
 		}
 		// find using which; process spawning in unix is cheap
-		try {
-		    String[] cmd = new String[] { "which", p.getProperty("exe") };
-		    int ret = Runtime.getRuntime().exec(cmd).waitFor();
-		    if (ret==0) continue;
-		} catch (InterruptedException e) { }
+		String[] cmd = new String[] { "which", p.getProperty("exe") };
+		//int ret = Runtime.getRuntime().exec(cmd).waitFor();
+		int ret = FileUtils.Exec(cmd);
+		if (ret==0) {
+		    logger.fine("found browser "+entry.getKey()+" at: "+p.getProperty("exe"));
+		    continue;
+		}
 	    }
 	    // error or not found, remove from list
 	    it.remove();
@@ -226,6 +230,7 @@ class BrowsersUnix extends BrowsersCommon {
 	    // execute browser
 	    //   don't wait for this, since starting a new browser when the
 	    //   process isn't running yet can take a loooong time
+	    logger.fine("running browser: "+Arrays.toString(cmd));
 	    Runtime.getRuntime().exec(cmd);
 	    /*
 	    StringBuffer output = new StringBuffer();
