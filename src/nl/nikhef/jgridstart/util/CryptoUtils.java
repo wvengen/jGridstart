@@ -12,6 +12,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
@@ -22,6 +23,9 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.security.auth.x500.X500Principal;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.jce.X509Principal;
@@ -30,6 +34,8 @@ import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 
 /** Cryptographic utilities */
 public class CryptoUtils {
+
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
     
     /** Return a certificate's subject hash.
      * <p>
@@ -158,8 +164,39 @@ public class CryptoUtils {
 	    // shouldn't happen on {@linkplain ByteArrayOutputStream}
 	    throw new MessagingException("Internal output error", e);
 	}
-	
-	return out.toString();
+
+	return javaMailWrappingWorkaround(out.toString());
+    }
+    
+    /** Workaround for JavaMail line-wrapping problem.
+     * <p>
+     * See BouncyCastle bug
+     * <a href="http://www.bouncycastle.org/jira/browse/BJA-256">BJA-256</a>,
+     * which is actually a JavaMail and OpenSSL problem. 
+     */
+    /* package private */ static String javaMailWrappingWorkaround(String input) {
+	String lines[] = input.split("\r\n");
+	// separator is last non-empty line
+	int lastsepline = lines.length-1;
+	while ("".equals(lines[lastsepline].trim())) lastsepline--;
+	// signature is text before that from empty line
+	int firstsigline = lastsepline-1;
+	while (!"".equals(lines[firstsigline].trim())) firstsigline--;
+	firstsigline++;
+	// wrapping length is length of first line
+	int wraplen = lines[firstsigline].trim().length();
+	// gather signature
+	StringBuffer sigbody = new StringBuffer();
+	for (int i=firstsigline; i<lastsepline; i++) {
+	    if (lines[i].trim().length() != wraplen)
+		logger.info("JavaMail line-wrapping bug detected on line "+i);
+	    sigbody.append(lines[i].trim());
+	}
+	// reconstruct message
+	return StringUtils.join(ArrayUtils.subarray(lines, 0, firstsigline), "\r\n") + "\r\n" +
+	       WordUtils.wrap(sigbody.toString(), wraplen, "\r\n", true) + "\r\n" +
+	       lines[lastsepline] +
+	       (input.endsWith("\r\n") ? "\r\n" : "");
     }
     
     /** Initialize mailcap handlers.
@@ -169,6 +206,8 @@ public class CryptoUtils {
      * in the application before any MIME messages are processed. To make it possible
      * to run this on-demand, subsequent calls do nothing, since the mailcap needs to
      * be initialised only once.
+     * <p>
+     * This is done automatically by {@link #SignSMIME}.
      */
     public static void setDefaultMailcap() {
 	if (mailcapInitDone) return;
