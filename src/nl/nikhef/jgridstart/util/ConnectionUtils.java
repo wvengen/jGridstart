@@ -112,7 +112,8 @@ public class ConnectionUtils {
     protected static URLConnection URLopenConnection(URL url) throws IOException {
 	URLConnection conn = url.openConnection();
 	if (conn instanceof HttpURLConnection) {
-	    String agent = System.getProperty("http.agent");
+	    String agent = System.getProperty("http.agent") +
+	    	" Java "+System.getProperty("java.version");
 	    if (agent != null)
 		((HttpURLConnection)conn).setRequestProperty("User-Agent", agent);
 	}
