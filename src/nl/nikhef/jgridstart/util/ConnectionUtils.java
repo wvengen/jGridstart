@@ -113,7 +113,7 @@ public class ConnectionUtils {
 	URLConnection conn = url.openConnection();
 	if (conn instanceof HttpURLConnection) {
 	    String agent = System.getProperty("http.agent") +
-	    	" Java "+System.getProperty("java.version");
+	    	" Java/"+System.getProperty("java.version");
 	    if (agent != null)
 		((HttpURLConnection)conn).setRequestProperty("User-Agent", agent);
 	}
