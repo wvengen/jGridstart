@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -80,7 +81,7 @@ public class ConnectionUtils {
 	if (data != null) {
 	    if (post) {
 		// post: write data to stream
-		conn = url.openConnection();
+		conn = URLopenConnection(url);
 		// send post data if present
 		if (post) {
 		    conn.setDoOutput(true);
@@ -94,10 +95,28 @@ public class ConnectionUtils {
 		conn = url.openConnection();
 	    }
 	} else
-	    conn = url.openConnection();
+	    conn = URLopenConnection(url);
 	logger.fine("Creating Reader for url: "+url);
 	// return reader for response
 	return new InputStreamReader(conn.getInputStream());
+    }
+    
+    /** Open connection with workarounds.
+     * <p>
+     * Currently specifically sets user-agent because with Java Web Start
+     * the system property <tt>http.agent</tt> does not properly set the
+     * user-agent for connections.
+     * <p>
+     * See also <a href="http://www.noizeramp.com/article.php?article=se-networking_specifics_under_Java_Web_Start">Networking specifics under Java Web Start</a>.
+     */
+    protected static URLConnection URLopenConnection(URL url) throws IOException {
+	URLConnection conn = url.openConnection();
+	if (conn instanceof HttpURLConnection) {
+	    String agent = System.getProperty("http.agent");
+	    if (agent != null)
+		((HttpURLConnection)conn).setRequestProperty("User-Agent", agent);
+	}
+	return conn;
     }
     
     /** Return a query string from arguments for pre or post
