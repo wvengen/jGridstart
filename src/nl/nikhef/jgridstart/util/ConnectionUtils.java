@@ -92,7 +92,7 @@ public class ConnectionUtils {
 	    } else {
 		// pre: put data in URL
 		url = new URL(url, "?" + data);
-		conn = url.openConnection();
+		conn = URLopenConnection(url);
 	    }
 	} else
 	    conn = URLopenConnection(url);
