@@ -1,5 +1,9 @@
 #!/bin/sh
-JAVA=java
+if [ "$JAVA_HOME" ]; then
+	JAVA="$JAVA_HOME/bin/java"
+else
+	JAVA=java
+fi
 BASE=`dirname $0`
 LIB="$BASE/thirdparty"
 CLASSPATH="$LIB/bouncycastle/bcprov-jdk15-144.jar:$LIB/bouncycastle/bcmail-jdk15-144.jar:$LIB/bouncycastle/mail-1.4.3.jar:$LIB/commons/commons-lang-2.4.jar:$LIB/commons/commons-cli-1.2.jar:$LIB/flyingsaucer/core-renderer-minimal.jar:$LIB/flyingsaucer/iText-2.0.8.jar:$LIB/swingworker/swing-worker-1.2.jar:$BASE/bin"
