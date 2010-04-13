@@ -27,7 +27,10 @@ public class Main {
 	// load system properties if not yet set, not fatal if it fails
 	try {
 	    GeneralUtils.loadConfig();
-	} catch (IOException e) { }
+	} catch (IOException e) {
+	    logger.warning("Could not load configuration:"+e);
+	    ErrorMessage.logException(e);
+	}
 	// Schedule a job for the event-dispatching thread:
 	// creating and showing this application's GUI.
 	javax.swing.SwingUtilities.invokeLater(new Runnable() {
