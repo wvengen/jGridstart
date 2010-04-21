@@ -83,7 +83,7 @@ public class ErrorMessage {
     
     /** logs an exception */
     public static void logException(Throwable e) {
-	logger.warning("[Exception] "+e.getMessage());
+	logger.warning("[Exception] "+e.getClass()+":"+e.getMessage());
 	StackTraceElement[] trace = e.getStackTrace();
 	for (int i=0; i<trace.length; i++)
 	    logger.fine("  "+trace[i].toString());
