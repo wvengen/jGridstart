@@ -53,6 +53,7 @@ public class FileUtils {
 		//   try to remedy this, both error and exception are handled and
 		//   do some logging.
 		try {
+		    logger.fine("Detecting presence of robocopy...");
 		    int ret = Exec(new String[]{"robocopy.exe"});
 		    if (ret==0 || ret==16) hasRobocopy = true;
 		    logger.fine("Robocopy found (exit code "+ret+")");
