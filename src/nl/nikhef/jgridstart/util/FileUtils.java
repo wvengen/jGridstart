@@ -49,10 +49,18 @@ public class FileUtils {
 		// windows: use special copy program to retain permissions.
 		//   on Vista, "xcopy /O" requires administrative rights, so we
 		//   have to resort to using robocopy there.
+		// On some WinXP systems an exception would not be caught. Just
+		//   try to remedy this, both error and exception are handled and
+		//   do some logging.
 		try {
 		    int ret = Exec(new String[]{"robocopy.exe"});
 		    if (ret==0 || ret==16) hasRobocopy = true;
-		} catch (Exception e) { }
+		    logger.fine("Robocopy found (exit code "+ret+")");
+		} catch (Error e) {
+		    logger.fine("Robocopy not found (error): "+e.getMessage());
+		} catch (Exception e) {
+		    logger.fine("Robocopy not found (exception): "+e.getMessage());
+		}
 		copyDetected = true;
 	    }
 	    
