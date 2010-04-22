@@ -60,7 +60,7 @@ public class LogWindowHandler extends Handler {
 
 	// accessing super class methods to set the parameters
 	setLevel(level != null ? Level.parse(level) : Level.INFO);
-	setFilter(makeFilter(filter));
+	setFilter(filter != null ? makeFilter(filter) : null);
 	setFormatter(makeFormatter(formatter));
     }
 
