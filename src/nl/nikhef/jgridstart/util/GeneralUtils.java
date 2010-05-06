@@ -55,7 +55,7 @@ public class GeneralUtils {
 	logger.info(getVersionString() + ", configuration loaded");
 	// set user-agent now that jgridstart version is known; but don't make it fatal
 	try {
-	    System.setProperty("http.agent", getUserAgentString());
+	    System.setProperty("http.agent", getUserAgentStringWithoutJava());
 	    logger.fine("Set user-agent: "+System.getProperty("http.agent"));
 	} catch(Exception e) {
 	    logger.warning("Could not set user-agent: "+e.getLocalizedMessage());
@@ -97,12 +97,28 @@ public class GeneralUtils {
      * Added to the comment (the stuff between brackets) is the CA implementation.
      * <p>
      * Example output:
-     *   {@literal jGridstart/1.1_1234 (X11; I; Linux amd64; TestCA)}
-     * <p>
-     * Note that Java adds something like {@literal Java/1.6.0_01} at the end for the
-     * final user-agent sent to the remote end.
+     *   {@literal jGridstart/1.1_1234 (X11; I; Linux amd64; TestCA) Java/1.6.0}
      */
     public static String getUserAgentString() {
+	return getUserAgentString(null);
+	       
+    }
+    /** Return jGridstart's user-agent string with intermediate portion.
+     * <p>
+     * This is useful for setting the user-agent of http client libraries
+     * so that the full stack of libraries is shown.
+     * 
+     * @see #getUserAgentString()
+     */
+    public static String getUserAgentString(String middle) {
+	return getUserAgentStringWithoutJava() + 
+		(middle!=null? " " + middle : "") +
+		" Java/" + getSystemProperty("java.version");
+    }
+    /** Same as {@link #getUserAgentString} but without Java
+     * @see #getUserAgentString()
+     */
+    public static String getUserAgentStringWithoutJava() {
 	String platform = "X11";
 	if (getSystemProperty("os.name").startsWith("Mac")) platform = "Macintosh";
 	else if (getSystemProperty("os.name").startsWith("Win")) platform = "Windows";
