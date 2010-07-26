@@ -63,10 +63,12 @@ import org.bouncycastle.jce.provider.JDKPKCS12KeyStore;
  * } 
  * </code></pre>
  * <p>
- * TODO describe tested configurations 
+ * This is tested continuously on CentOS 4, CentOS 5, Windows XP 32-bit,
+ * Windows 2003 32-bit, Mac OS X 10.4 and Mac OS X 10.5 with Java5 and Java6.
+ * In addition, OpenJDK is tested on CentOS 5. Many other platforms and
+ * configurations are tested occasionaly as well.
  * 
- * 
- * @author wvengen
+ * @author Willem van Engen <wvengen@nikhef.nl>
  */
 public class PKCS12KeyStoreUnlimited extends JDKPKCS12KeyStore {
     
