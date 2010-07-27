@@ -245,7 +245,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	}
 	
 	// make sure input fields for certificate are ok
-	if (curPage==0 && cert==null) {
+	if (curPage==0 && cert==null && newPage!=0) {
 	    // make sure passwords are equal
 	    if (data().getProperty("password1")!=null &&
 		    !data().getProperty("password1").equals(data().getProperty("password2"))) {

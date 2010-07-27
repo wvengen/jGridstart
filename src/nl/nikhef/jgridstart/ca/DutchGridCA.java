@@ -103,7 +103,8 @@ public class DutchGridCA implements CA {
      * for notifying the user when the request is processed, and the field {@code agreecps}
      * must be {@code true} to succeed; the latter corresponds to the "I agree to the
      * privacy policy" checkbox on the website. The field {@code fullname} should contain
-     * the user's full name.
+     * the user's full name. The optional field {@code comments} is used for additional
+     * comments.
      * 
      * @param req {@inheritDoc}
      * @param info {@inheritDoc}; {@code email}, {@code fullname} and {@code agreecps} are used here.
@@ -128,6 +129,7 @@ public class DutchGridCA implements CA {
 		"email_1", info.getProperty("email"),
 		"email_2", info.getProperty("email"),
 		"requesttext", sendreq,
+		"comments", info.getProperty("comments", ""),
 		"Publish", "Upload Publishing Data",
 		"robot", "yes",
 		"dummy", "dummy"

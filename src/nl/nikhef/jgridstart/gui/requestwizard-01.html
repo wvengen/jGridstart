@@ -38,12 +38,18 @@
 		<th><label for="org">Organisation</label></th>
 		<td><select id="org" name="org" c="${organisations.html.options}"/></td>
 	</tr>
-	<tr>	
-		<th><label>Certification level</label></th>
-		<td><input id="level-medium" name="level" value="medium" type="radio"/>
-				<label for="level-medium">Medium</label><br/>
-		    <input id="level-demo" name="level" value="demo" type="radio"/>
-					<label for="level-demo">Demo</label></td>
+	<tr if="${jgridstart.ca.provider}==DutchGridCA or ${jgridstart.ca.provider}==nl.nikhef.jgridstart.ca.DutchGridCA">
+		<td colspan="2" class="helpbutton_container">
+			<a class="helpbutton" href="action:toggle(wizard.show.advanced)">(advanced)</a>
+		</td>
+	</tr>
+	<tr class="help" if="${jgridstart.ca.provider}==DutchGridCA or ${jgridstart.ca.provider}==nl.nikhef.jgridstart.ca.DutchGridCA">
+		<th if="${wizard.show.advanced}">
+			<label for="comments">Comments</label>
+		</th>
+		<td if="${wizard.show.advanced}">
+			<input id="comments" name="comments" type="text" size="30"/>
+		</td>
 	</tr>
 	<tr if="${renewal}">
 		<td colspan="2" class="legend">

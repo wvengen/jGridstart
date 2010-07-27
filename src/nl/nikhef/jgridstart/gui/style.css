@@ -148,8 +148,8 @@ form table td.legend:first-child {
 	color: #080808;
 	font-size: 90%;
 	padding: 3pt .6em 3pt .6em;
-	margin: 0 .5em 5pt .5em;
 }
+.wizard-page .helpbutton_container { padding-bottom: 0; } 
 .wizard-page .helpbutton {
 	font-size: 80%;
 	/*cursor: hand;*/
