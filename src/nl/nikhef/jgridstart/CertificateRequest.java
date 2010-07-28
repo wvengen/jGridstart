@@ -82,11 +82,11 @@ public class CertificateRequest {
     static public void postFillData(Properties p) {
 	// construct subject
 	String subject = "";
-	if (p.getProperty("level").equals("tutorial"))
+	if (p.getProperty("level", "").equals("tutorial"))
 	    subject += "O=edgtutorial";
 	else
 	    subject += "O=dutchgrid";
-	if (p.getProperty("level").equals("demo"))
+	if (p.getProperty("level", "").equals("demo"))
 	    subject += ", O=dutch-demo";
 	subject += ", O=users";
 	

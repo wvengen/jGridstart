@@ -265,17 +265,8 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		return false;
 	    }
 	    
-	    // Not needed for renewal, since it may be that the level wasn't
-	    //   specified because the parent hadn't set the level explictely
-	    //   after an import, for example.
+	    // Not needed for renewal
 	    if (!isRenewal()) {
-		// and a level was chosen
-		if (data().getProperty("level")==null) {
-		    JOptionPane.showMessageDialog(this,
-			    "Please select a certification level",
-			    "Missing data", JOptionPane.ERROR_MESSAGE);
-		    return false;
-		}
 		if (data().getProperty("givenname").length()==0 ||
 			data().getProperty("surname").length()==0 ) {
 		    JOptionPane.showMessageDialog(this,

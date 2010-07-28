@@ -172,7 +172,7 @@ public class CertificateStoreWithDefault extends CertificateStore {
 	    oldDefault.store();
 	    File newPath = newItem();
 	    try {
-		FileUtils.MoveFiles(FileUtils.listFilesOnly(path), newPath);
+		FileUtils.MoveFiles(oldDefault.getRelatedFiles(), newPath);
 		oldDefault.load(newPath);
 	    } catch (IOException e) {
 		deletePath(newPath);
@@ -189,7 +189,7 @@ public class CertificateStoreWithDefault extends CertificateStore {
 			"will not change the default certificate for safety.\n" +
 			"You may try to restart the program and try again.\n");
 	    // then delete them
-	    File[] dflfiles = FileUtils.listFilesOnly(oldDefault.getPath());
+	    File[] dflfiles = oldDefault.getRelatedFiles();
 	    for (int i=0; i<dflfiles.length; i++)
 		new File(path, dflfiles[i].getName()).delete();
 	}
@@ -199,7 +199,7 @@ public class CertificateStoreWithDefault extends CertificateStore {
 	    // Make sure there are no files that we may accidentally overwrite
 	    // this happens if no default certificate was detected but there are
 	    // still some files we might overwrite.
-	    File[] files = FileUtils.listFilesOnly(c.getPath());
+	    File[] files = c.getRelatedFiles();
 	    String fmsg = "";
 	    for (int i=0; i<files.length; i++) {
 		File f = new File(path, files[i].getName());
@@ -257,7 +257,7 @@ public class CertificateStoreWithDefault extends CertificateStore {
     protected boolean compareDefaultCertificate(CertificatePair other) throws IOException {
 	if (other==null) return false;
 	if (!other.getKeyFile().exists()) return false;
-	File[] otherFiles = FileUtils.listFilesOnly(other.getPath());
+	File[] otherFiles = other.getRelatedFiles();
 	for (int i=0; i<otherFiles.length; i++) {
 	    File otherFile = otherFiles[i];
 	    File dflFile = new File(path, otherFile.getName());

@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
@@ -235,6 +237,9 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
      * <p>
      * This removes it permanently from disk, so be careful.
      * In the future it may be put into an archive instead.
+     * Only files related to the certificate are removed (see
+     * {@link CertificatePair#getRelatedFilesPossible}) and if the
+     * directory is empty afterwards, it will be removed too.
      * <p>
      * TODO should this be called 'remove' or is that too dangerous?
      * 
@@ -246,16 +251,21 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	deletePath(cert.getPath());
 	return cert;
     }
-    /** Deletes a path on which a {@linkplain CertificatePair} is based from disk. */
+    /** Deletes a path on which a {@linkplain CertificatePair} is based from disk.
+     * @see delete
+     */
     protected void deletePath(File certPath) throws IOException {
 	// and from disk; subdirs are not deleted
-	File[] items = certPath.listFiles();
-	for (int i=0; i<items.length; i++)
-	    if (!items[i].delete())
+	String[] items = CertificatePair.getRelatedFilesPossible();
+	for (int i=0; i<items.length; i++) {
+	    File f = new File(certPath, items[i]);
+	    if (!f.exists()) continue;
+	    if (!f.delete())
 		throw new IOException("Could not remove file: " +
 			items[i] + ".\n" +
 			"Please check permissions, disk space and quota.");
-	if (!certPath.delete())
+	}
+	if (certPath.listFiles().length==0 && !certPath.delete())
 	    throw new IOException("Could not remove certificate directory " + 
 		    certPath + ".\n" +
 		    "Please check permissions, disk space and quota."); 

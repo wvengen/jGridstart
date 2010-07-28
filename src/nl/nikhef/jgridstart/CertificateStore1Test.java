@@ -230,6 +230,41 @@ public class CertificateStore1Test extends CertificateBaseTest {
 	assertEquals(cert2, cert);
     }
     
+    /** Verify related certificate files are found properly */
+    @Test
+    public void testRelatedFiles() throws Exception {
+	CertificateStore store = new CertificateStore(newTestStore(1));
+	// key, request, cert, userinfo
+	store.get(0).store(); // to make sure userinfo is there
+	assertEquals(4, store.get(0).getRelatedFiles().length);
+	// make sure other files are not counted
+	FileOutputStream out = new FileOutputStream(new File(store.get(0).getPath(), "dummy.dat"));
+	out.write(0);
+	out.close();
+	assertEquals(4, store.get(0).getRelatedFiles().length);
+	// now remove some files and check again
+	store.get(0).getCertFile().delete();
+	assertEquals(3, store.get(0).getRelatedFiles().length);
+	store.get(0).getCSRFile().delete();
+	assertEquals(2, store.get(0).getRelatedFiles().length);
+    }
+    
+    /** Verify additional files are not deleted */
+    @Test
+    public void testRelatedFilesNotDeleted() throws Exception {
+	CertificateStore store = new CertificateStore(newTestStore(2));
+	File[] paths = {store.get(0).getPath(), store.get(1).getPath()};
+	FileOutputStream out = new FileOutputStream(new File(store.get(0).getPath(), "foo.beh"));
+	out.write(0);
+	out.close();
+	// try to delete, should delete directory
+	store.delete(1);
+	assertFalse(paths[1].exists());
+	// try to delete, should not delete directory
+	store.delete(0);
+	assertTrue(paths[0].exists());
+    }
+    
     /** Verify that subject is a PRINTABLESTRING (and not UTF8STRING).
      * <p>
      * This is required for some grid software to work properly (mkproxy).

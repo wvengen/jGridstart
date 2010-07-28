@@ -49,6 +49,7 @@ import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PrivateFileWriter;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
@@ -1002,6 +1003,35 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	return req;
     }
 
+    /** Return list of certificate-related filenames.
+     * <p>
+     * Often a user stores additional files in the ~/.globus directory. This
+     * method returns the filenames of files that belong to this certificate
+     * and should be kept together.
+     */
+    public static String[] getRelatedFilesPossible() {
+	return new String[] {
+		"userkey.pem", "usercert.pem", "usercert_request.pem", "userrequest.pem",
+		"usercert.p12",
+		"userinfo.properties"
+	};
+    }
+
+    /** Return list of existing certificate-related files.
+     * <p>
+     * Returns all files related to this certificate in this directory.
+     */
+    public File[] getRelatedFiles() {
+	String[] filenames = getRelatedFilesPossible();
+	File[] files = {};
+	for (int i=0; i<filenames.length; i++) {
+	    File f = new File(path, filenames[i]);
+	    if (f.exists())
+		files = (File[])ArrayUtils.add(files, f);
+	}
+	return files;
+    }
+    
     /** Refresh an item from disk and update its status from online sources.
      * 
      * @return whether the refresh was successful or no
