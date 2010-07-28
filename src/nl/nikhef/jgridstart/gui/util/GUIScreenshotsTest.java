@@ -142,7 +142,6 @@ public class GUIScreenshotsTest extends TestCase {
 	    keyString("Doe\t");
 	    keyString("john.doe@example.com\t");
 	    keyString("N\t");
-	    keyString(" \t\t");
 	    keyString(password+"\t");
 	    keyString(password+"\t");
 	    // wait for submission
