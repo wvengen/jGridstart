@@ -297,7 +297,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    saveScreenshot(new File(shotdir, prefix+"importexport02.png"));
 	    assertWindowname("jgridstart-export-file-dialog");
 	    // enter name and do export
-	    tester.keyString("my_certificate.p12\n");
+	    tester.keyString("jgridstart_test_certificate.p12\n");
 	    Thread.sleep(2000);
 	    saveScreenshot(new File(shotdir, prefix+"importexport03.png"));
 	    assertWindowname("jgridstart-password-entry-decrypt");
@@ -316,7 +316,7 @@ public class GUIScreenshotsTest extends TestCase {
 	    assertWindowname("jgridstart-import-file-dialog");
 	    guiSleep();
 	    // enter name and do import
-	    tester.keyString("my_certificate.p12\n");
+	    tester.keyString("jgridstart_test_certificate.p12\n");
 	    Thread.sleep(1000);
 	    saveScreenshot(new File(shotdir, prefix+"importexport05.png"));
 	    assertWindowname("jgridstart-password-entry-decrypt");
