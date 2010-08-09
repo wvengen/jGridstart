@@ -6,6 +6,9 @@ var deployJNLP = {
 		// minimum java version, as a string
 		minjava: '1.5',
 		
+		// name of application
+		product: 'this application',
+		
 		// do launch it, even if java isn't installed
 		launch: function() {
 			// make sure dialog is gone, if any
@@ -25,10 +28,12 @@ var deployJNLP = {
 				deployJava.returnPage = document.location;
 				var msg = 
 					"<h2>Java required</h2>"
-					+ "<p>You need to install Java before you can run jGridstart.</p>"
+					+ "<p>You need to install Java before you can run "+this.product+".</p>"
 					+ "<div><a href='javascript:deployJava.installLatestJRE()'><img src='"+this.resolveUrl('javabutton.png')+"' alt='Install Java'/></a></div>"
 					+ "<div class='runanyway'>If you do have Java installed, you can still "
-					+ "<a href='javascript:deployJNLP.launch()'>launch jGridstart</a>.</div>";
+					+ "<a href='"+this.getJNLP()+"' onclick='deployJNLP.launch(); return false'>launch "+this.product+"</a>.</div>"
+					+ "<div class='runanyway'>When that fails you might be able to manually run the command:"
+					+ "<span class='cmd'><br/>javaws&nbsp;"+this.getJNLP()+"</span></div>";
 				TINY.box.show(msg, false, 0, 0, false);
 			}
 		},
@@ -36,7 +41,7 @@ var deployJNLP = {
 		// output a launchbutton
 		launchButton: function() {
 			document.write('<div class="jwslaunch" style="text-align: center">');
-			document.write('<a href="javascript:deployJNLP.installOrLaunch()">');
+			document.write('<a href="'+this.getJNLP()+'" onclick="deployJNLP.installOrLaunch(); return false">');
 			document.write('<img src="'+deployJava.launchButtonPNG+'" border="0" alt="Launch"/>');
 			document.write('</a>');
 			if (!deployJava.isWebStartInstalled(this.minjava)) {

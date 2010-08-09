@@ -31,6 +31,10 @@
 #tinycontent .runanyway a[href] {
 	color: #55f;
 }
+#tinycontent .runanyway .cmd {
+	font-family: monospace;
+	font-size: 80%;
+}
 
 a img {
 	border: none;
