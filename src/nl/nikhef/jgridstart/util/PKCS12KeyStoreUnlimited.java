@@ -36,10 +36,11 @@ import org.bouncycastle.jce.provider.JDKPKCS12KeyStore;
  * class provides a workaround that circumvent the Java policy restrictions
  * and allows opening PKCS#12 keystores with passwords longer than 7 characters. 
  * <p>
- * You should use {@code BCPKCS12KeyStore.getInstance()} instead of
+ * You should use {@code PKCS12KeyStoreUnlimited.getInstance()} instead of
  * {@code KeyStore.getInstance("PKCS12", "BC")}. Now {@link KeyStore#load} and
- * {@link KeyStore#store} will work with passwords longer than seven characters
- * without the unlimited strength policy files installed.
+ * and {@link KeyStore#store} {@link KeyStore#store} will work with passwords
+ * longer than seven characters without the unlimited strength policy files
+ * installed.
  * <p>
  * To illustrate, here is some code to read a certificate from a PKCS#12 file.
  * <pre><code>
@@ -60,7 +61,7 @@ import org.bouncycastle.jce.provider.JDKPKCS12KeyStore;
  *    // as implemented by PKCS12KeyStoreUnlimited
  *    permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
  *    permission java.lang.RuntimePermission "accessDeclaredMembers";
- * } 
+ * }
  * </code></pre>
  * <p>
  * This is tested continuously on CentOS 4, CentOS 5, Windows XP 32-bit,
