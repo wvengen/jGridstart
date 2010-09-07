@@ -33,6 +33,14 @@ public class ActionExport extends CertificateAction {
     @Override
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
+
+	String filename = null;
+	String[] args = e.getActionCommand().split(",\\s*");
+	for (int i=0; i<args.length; i++) {
+	    if (args[i].startsWith("filename="))
+		filename = args[i].substring(9);
+	}
+	
 	final JFileChooser chooser = new CertificateFileChooser(false);
 	
 	// embed in frame with password selection fields
@@ -46,6 +54,10 @@ public class ActionExport extends CertificateAction {
 	check.setSelected(true);
 	hpane.add(check);
 	hpane.add(Box.createHorizontalGlue());
+	
+	if (filename!=null) {
+	    chooser.setSelectedFile(new File(filename));
+	}
 	
 	JPanel pane = CertificateFileChooser.customFileChooser(dlg, chooser,
 		new AbstractAction("Export") {
