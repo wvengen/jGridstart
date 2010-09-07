@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang.ArrayUtils;
-
 import nl.nikhef.jgridstart.util.FileUtils;
 import nl.nikhef.jgridstart.util.PasswordCache;
 import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
@@ -28,7 +26,8 @@ import nl.nikhef.jgridstart.gui.util.ArrayListModel;
  * This represents a directory that has {@code .globus}-type subdirectories as
  * its children, each of which is represented by a {@link CertificatePair}.
  * <p>
- * The default location of this store is {@code ~/.globus}. The key and
+ * The default location of this store is {@code ~/.globus} (though it can be
+ * overridden by the system property {@code x509_user_dir}. The key and
  * certificate found in this directory itself are ignored; please see
  * {@link CertificateStoreWithDefault} for handling those.
  * <p>
@@ -79,7 +78,8 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     /** load certificates from the default directory
      * <p>
      * This is {@code ~/.globus} by default, but if the hostname starts
-     * with "tutorial" we have something different.
+     * with "tutorial" we have something different. The system property
+     * {@code x509_user_dir} can be used to override this.
      * <p>
      * TODO move this out of jGridStart and put it in a configfile
      */
@@ -90,13 +90,16 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	} catch (UnknownHostException e) {
 	    hostname = "";
 	}
-	String certhome = System.getProperty("user.home") + File.separator;
-	if (hostname.startsWith("tutorial")) {
-	    certhome += "personal-dutchgrid-certificate";
-	} else {
-	    certhome += ".globus";
+	String certhome = System.getProperty("x509_user_dir");
+	if (certhome == null) {
+	    certhome = System.getProperty("user.home") + File.separator;
+	    if (hostname.startsWith("tutorial")) {
+		certhome += "personal-dutchgrid-certificate";
+	    } else {
+		certhome += ".globus";
+	    }
 	}
-	certhome += File.separator;
+	if (!certhome.endsWith(File.separator)) certhome += File.separator;
 	load(certhome);
     }
     
