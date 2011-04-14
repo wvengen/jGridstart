@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.util;
+package nl.nikhef.jgridstart.osutil;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -68,7 +68,7 @@ public class PrivateFileWriter extends FileWriter {
     protected void ensurePermissions() {
 	// make sure we have correct permissions before actually writing data
 	if (!permissionsSet) {
-	    FileUtils.chmod(file, true, true, false, true);
+	    FileUtil.chmod(file, true, true, false, true);
 	    permissionsSet = true;
 	}
     }
