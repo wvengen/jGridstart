@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>nl.nikhef.jgridstart</groupId>
+  <artifactId>passwordcache</artifactId>
+  <version>1.0</version>
+  <name>Password Cache</name>
+  <url>http://jgridstart.nikhef.nl/module/passwordcache</url>
+  <description>User-friendly password management for BouncyCastle</description>
+  <inceptionYear>2010</inceptionYear>
+
+  <parent>
+    <groupId>nl.nikhef.jgridstart</groupId>
+    <artifactId>jgridstart</artifactId>
+    <version>1.0</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>${bcprov.depname}</artifactId>
+      <version>${bcprov.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>nl.nikhef.jgridstart</groupId>
+      <artifactId>osutil</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <!--  bouncycastle's $url/apidocs isn't valid ... -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <links>
+            <link>http://www.bouncycastle.org/docs/docs1.5/</link>
+          </links>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+</project>

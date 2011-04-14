@@ -1,0 +1,151 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- package information -->
+  <groupId>nl.nikhef.jgridstart</groupId>
+  <artifactId>jgridstart-main</artifactId>
+  <version>1.10</version>
+  <name>jGridstart main application</name>
+  <url>http://jgridstart.nikhef.nl/</url>
+  <description>jGridstart helps grid end-users to request, obtain, install and renew grid certificates in a friendly way.</description>
+
+  <parent>
+    <groupId>nl.nikhef.jgridstart</groupId>
+    <artifactId>jgridstart</artifactId>
+    <version>1.0</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  
+  <properties>
+    <!-- Revision is 'dev' by default. Set the property to override, e.g.
+           mvn compile -Djgridstart.revision=`svnversion`                 -->
+    <jgridstart.revision>dev</jgridstart.revision>
+    <jgridstart.version>${version}</jgridstart.version>
+  </properties>
+
+  <!-- direct dependencies -->
+  <dependencies>
+    <dependency>
+      <groupId>nl.nikhef.jgridstart</groupId>
+      <artifactId>browsers</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>nl.nikhef.jgridstart</groupId>
+      <artifactId>osutil</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>${bcprov.depname}</artifactId>
+      <version>${bcprov.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcmail-${bcprov.jdk}</artifactId>
+      <version>${bcprov.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>nl.nikhef.jgridstart</groupId>
+      <artifactId>xhtmlrenderer</artifactId>
+      <version>1.0</version>
+      <!-- we want a different bouncycastle version and don't use the iText 
+        cryptography features anyway; to have this working automatically
+        in Eclipse this entry is placed after the new bouncycastle dependencies
+        so that the new one is taken first (it seems m2eclipse doesn't do
+        exclusions properly)  -->
+      <exclusions>
+        <exclusion>
+	  <groupId>bouncycastle</groupId>
+	  <artifactId>bcprov-jdk14</artifactId>
+        </exclusion>
+        <exclusion>
+	  <groupId>bouncycastle</groupId>
+	  <artifactId>bcmail-jdk14</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>nl.nikhef.jgridstart</groupId>
+      <artifactId>passwordcache</artifactId>
+      <version>1.0</version>
+      <exclusions>
+        <exclusion>
+	  <groupId>org.bouncycastle</groupId>
+	  <artifactId>bcprov-jdk14</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+    	<groupId>commons-lang</groupId>
+    	<artifactId>commons-lang</artifactId>
+    	<version>2.5</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.jdesktop</groupId>
+    	<artifactId>swing-worker</artifactId>
+    	<version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>nl.nikhef.jgridstart</groupId>
+      <artifactId>xhtmlrenderer</artifactId>
+      <version>1.0</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>abbot</groupId>
+      <artifactId>abbot</artifactId>
+      <version>1.0.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>javax.mail</groupId>
+    	<artifactId>mail</artifactId>
+    	<version>1.4.1</version>
+    	<scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <!-- enable resource filtering to put version number in configuration -->
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <!-- main class -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>nl.nikhef.jgridstart.gui.Main</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <repositories>
+    <!-- for swing-worker -->
+    <repository>
+      <id>maven2-repository.dev.java.net</id>
+      <name>Java.net Repository for Maven</name>
+      <url>http://download.java.net/maven/2</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+  
+</project>

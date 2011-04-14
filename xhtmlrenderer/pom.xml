@@ -1,0 +1,64 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>nl.nikhef</groupId>
+  <artifactId>xhtmlrenderer</artifactId>
+  <version>1.0</version>
+  <name>Enhanced XHTMLRenderer</name>
+  <url>http://jgridstart.nikhef.nl/module/xhtmlrenderer</url>
+  <description>A more flexible XHTMLRenderer with template support</description>
+  <inceptionYear>2010</inceptionYear>
+
+  <parent>
+    <groupId>nl.nikhef</groupId>
+    <artifactId>jgridstart</artifactId>
+    <version>1.0</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.xhtmlrenderer</groupId>
+      <artifactId>core-renderer</artifactId>
+      <version>R8</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>abbot</groupId>
+      <artifactId>abbot</artifactId>
+      <version>1.0.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <!--  XHTMLRenderer's $url/apidocs isn't valid ... -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <links>
+            <link>http://pigeonholdings.com/projects/flyingsaucer/R8/javadoc/user/</link>
+          </links>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <repositories>
+    <repository>
+      <id>maven2-repository.dev.java.net</id>
+      <name>Java.net Repository for Maven</name>
+      <url>http://download.java.net/maven/2</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+
+</project>

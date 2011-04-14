@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>nl.nikhef.jgridstart</groupId>
+  <artifactId>osutil</artifactId>
+  <version>1.0</version>
+  <name>OSUtils</name>
+  <description>Access to operating system functions</description>
+  <url>http://jgridstart.nikhef.nl/module/osutil</url>
+  <inceptionYear>2010</inceptionYear>
+
+  <parent>
+    <groupId>nl.nikhef.jgridstart</groupId>
+    <artifactId>jgridstart</artifactId>
+    <version>1.0</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
+
