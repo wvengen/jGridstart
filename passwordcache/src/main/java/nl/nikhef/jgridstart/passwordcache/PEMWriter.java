@@ -1,11 +1,11 @@
-package nl.nikhef.jgridstart.util;
+package nl.nikhef.passwordcache;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
+import nl.nikhef.jgridstart.osutil.FileUtil;
 
 import org.bouncycastle.openssl.PasswordFinder;
 
@@ -38,7 +38,7 @@ public class PEMWriter extends org.bouncycastle.openssl.PEMWriter {
      */
     @Override
     public void writeObject(Object obj, String algorithm, char[] password, SecureRandom random) throws IOException {
-	FileUtils.chmod(f, true, true, false, true);
+	FileUtil.chmod(f, true, true, false, true);
 	super.writeObject(obj, algorithm, password, random);
     }
 

@@ -1,11 +1,7 @@
-package nl.nikhef.jgridstart.util;
+package nl.nikhef.passwordcache;
 
 import java.util.Arrays;
-
-import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
-
 import org.bouncycastle.openssl.PasswordFinder;
-
 import junit.framework.TestCase;
 
 public class PasswordCacheTest extends TestCase {

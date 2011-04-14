@@ -1,11 +1,9 @@
-package nl.nikhef.jgridstart.util;
+package nl.nikhef.passwordcache;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-
-import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
 
 /** PEM file reader that works directory on files, integrated with {@link PasswordCache}. */
 public class PEMReader extends org.bouncycastle.openssl.PEMReader {

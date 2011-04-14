@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.util;
+package nl.nikhef.passwordcache;
 
 import java.awt.Component;
 import java.awt.Window;
@@ -36,7 +36,7 @@ import org.bouncycastle.openssl.PasswordFinder;
  */
 public class PasswordCache {
     
-    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
+    static private Logger logger = Logger.getLogger("nl.nikhef.passwordcache");
     
     /** UI: no questions asked, returns null if password isn't in cache */
     public static final int UI_NONE = 0;
@@ -342,17 +342,6 @@ public class PasswordCache {
 	@Override
 	public void run() {
 	    invalidate(loc);
-	}
-    }
-    
-    /** user cancelled password entry */
-    public static class PasswordCancelledException extends IOException {
-	public PasswordCancelledException() {
-	    super();
-	}
-	@Override
-	public String toString() {
-	    return "Password request was cancelled";
 	}
     }
     
