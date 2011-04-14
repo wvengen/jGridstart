@@ -1,12 +1,12 @@
-package nl.nikhef.jgridstart.install;
+package nl.nikhef.browsers;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 
-import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
-import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
+import nl.nikhef.browsers.exception.BrowserExecutionException;
+import nl.nikhef.browsers.exception.BrowserNotAvailableException;
 
 import org.apache.commons.cli.*;
 

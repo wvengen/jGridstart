@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.install.exception;
+package nl.nikhef.browsers.exception;
 
 /**
  * Browser exception occuring when the requested browser is not present

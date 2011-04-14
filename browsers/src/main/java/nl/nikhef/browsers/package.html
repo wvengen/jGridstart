@@ -4,9 +4,9 @@ Interface to web browsers installed on the system. This allows one to open an
 URL in a web browser, and install certificates and keys into their
 certificate stores.
 <p>
-Each platform ({@link nl.nikhef.jgridstart.install.BrowsersWindows Windows},
-{@link nl.nikhef.jgridstart.install.BrowsersMacOSX Mac OS X} and
-{@link nl.nikhef.jgridstart.install.BrowsersUnix Unix/Linux})
+Each platform ({@link nl.nikhef.browsers.BrowsersWindows Windows},
+{@link nl.nikhef.browsers.BrowsersMacOSX Mac OS X} and
+{@link nl.nikhef.browsers.BrowsersUnix Unix/Linux})
 has its own method of running the web
 browsers, of detecting which browsers are installed, and of discovering which
 is the system default. All platforms share a list of known browsers, however,
@@ -15,9 +15,9 @@ browsers can be invoked.
 <p>
 For client-side SSL authentication, it may be needed to install a certificate
 and corresponding private key into the browser. This is done by the method
-{@link nl.nikhef.jgridstart.install.IBrowsers#installPKCS12}, which expects a
+{@link nl.nikhef.browsers.IBrowsers#installPKCS12}, which expects a
 <a href="http://en.wikipedia.org/wiki/PKCS12">PKCS#12</a> file to import from.
 After this, you can use
-{@link nl.nikhef.jgridstart.install.IBrowsers#openUrl} to open a HTTPS page.
+{@link nl.nikhef.browsers.IBrowsers#openUrl} to open a HTTPS page.
 </body>
 </html>

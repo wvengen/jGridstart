@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.install;
+package nl.nikhef.browsers;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,9 +13,9 @@ import at.jta.Key;
 import at.jta.RegistryErrorException;
 import at.jta.Regor;
 
-import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
-import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
-import nl.nikhef.jgridstart.util.FileUtils;
+import nl.nikhef.browsers.exception.BrowserExecutionException;
+import nl.nikhef.browsers.exception.BrowserNotAvailableException;
+import nl.nikhef.osutil.FileUtil;
 
 /** Windows implementation of browser discovery and launch */
 class BrowsersWindows extends BrowsersCommon {
@@ -128,7 +128,7 @@ class BrowsersWindows extends BrowsersCommon {
 	    Runtime.getRuntime().exec(cmd);
 	    /*
 	    StringBuffer output = new StringBuffer();
-	    if ( FileUtils.Exec(cmd, null, output) != 0)
+	    if ( FileUtil.Exec(cmd, null, output) != 0)
 		throw new BrowserExecutionException(browserid, output.toString());
 	     */
 	} catch (IOException e) {
@@ -148,7 +148,7 @@ class BrowsersWindows extends BrowsersCommon {
 	};
 	try {
 	    StringBuffer output = new StringBuffer();
-	    if ( FileUtils.Exec(cmd, null, output) != 0)
+	    if ( FileUtil.Exec(cmd, null, output) != 0)
 		throw new BrowserExecutionException(browserid, output.toString());
 	} catch (IOException e) {
 	    throw new BrowserExecutionException(browserid, e);

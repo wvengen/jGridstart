@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.install;
+package nl.nikhef.browsers;
 
 import java.io.IOException;
 

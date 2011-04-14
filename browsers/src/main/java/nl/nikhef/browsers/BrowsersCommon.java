@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.install;
+package nl.nikhef.browsers;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,10 +12,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import nl.nikhef.jgridstart.install.exception.BrowserExecutionException;
-import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
-import nl.nikhef.jgridstart.util.FileUtils;
-import nl.nikhef.jgridstart.util.PrivateFileWriter;
+import nl.nikhef.browsers.exception.BrowserExecutionException;
+import nl.nikhef.browsers.exception.BrowserNotAvailableException;
+import nl.nikhef.osutil.FileUtil;
+import nl.nikhef.osutil.PrivateFileWriter;
 
 /** Platform-agnostic parts of browser discovery and certificate installation.
  * <p>
@@ -28,7 +28,7 @@ import nl.nikhef.jgridstart.util.PrivateFileWriter;
  */
 abstract class BrowsersCommon implements IBrowsers {
 
-    static protected Logger logger = Logger.getLogger("nl.nikhef.jgridstart.install");
+    static protected Logger logger = Logger.getLogger("nl.nikhef.browsers");
     
     /** List of known browsers parsed from {@literal browsers.properties} */
     protected HashMap<String, Properties> knownBrowsers = new HashMap<String, Properties>();
@@ -172,9 +172,9 @@ abstract class BrowsersCommon implements IBrowsers {
 	File tmpdir = null, pkcsNew = null, htmlNew = null;
 	try {
 	    // create a temporary directory to store pkcs and html page
-	    tmpdir = FileUtils.createTempDir("jgridstart_certinst");
+	    tmpdir = FileUtil.createTempDir("jgridstart_certinst");
 	    pkcsNew = new File(tmpdir, "import.p12");
-	    FileUtils.CopyFile(pkcs, pkcsNew);
+	    FileUtil.CopyFile(pkcs, pkcsNew);
 	    htmlNew = new File(tmpdir, "certinstall_moz.html");
 	    OutputStream htmlWriter = new PrivateFileWriter(htmlNew).getOutputStream();
 	    InputStream htmlReader = getClass().getResourceAsStream(htmlNew.getName());

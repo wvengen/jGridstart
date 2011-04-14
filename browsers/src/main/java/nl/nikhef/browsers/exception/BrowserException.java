@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.install.exception;
+package nl.nikhef.browsers.exception;
 
 /**
  * Browser exception.
