@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import abbot.finder.matchers.ClassMatcher;
 
-public class TemplatePanelTest extends ITemplatePanelTest {
+public class TemplatePanelGuitest extends ITemplatePanelTest {
     @Override
     protected ITemplatePanel createPanel() {
 	return new TemplatePanel();

@@ -33,8 +33,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import junit.extensions.abbot.ComponentTestFixture;
 
-import nl.nikhef.jgridstart.gui.Main;
-
 import org.junit.Test;
 import org.w3c.dom.Element;
 import org.xhtmlrenderer.css.parser.FSRGBColor;
@@ -68,7 +66,9 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
     @Override
     protected void setUp() throws IOException {
 	tester = new ComponentTester();
-	LogManager.getLogManager().readConfiguration(Main.class.getResourceAsStream("/logging.properties"));
+	try {
+	    LogManager.getLogManager().readConfiguration(ITemplatePanelTest.class.getResourceAsStream("/logging.properties"));
+	} catch (IOException e) { /* ignore */ }
     }
     @Override
     protected void tearDown() {
