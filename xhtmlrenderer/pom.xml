@@ -11,7 +11,7 @@
   <inceptionYear>2010</inceptionYear>
 
   <parent>
-    <groupId>nl.nikhef</groupId>
+    <groupId>nl.nikhef.jgridstart</groupId>
     <artifactId>jgridstart</artifactId>
     <version>1.0</version>
     <relativePath>../pom.xml</relativePath>
