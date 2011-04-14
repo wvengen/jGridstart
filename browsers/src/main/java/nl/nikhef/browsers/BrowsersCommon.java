@@ -14,8 +14,8 @@ import java.util.logging.Logger;
 
 import nl.nikhef.browsers.exception.BrowserExecutionException;
 import nl.nikhef.browsers.exception.BrowserNotAvailableException;
-import nl.nikhef.osutil.FileUtil;
-import nl.nikhef.osutil.PrivateFileWriter;
+import nl.nikhef.jgridstart.osutil.FileUtil;
+import nl.nikhef.jgridstart.osutil.PrivateFileWriter;
 
 /** Platform-agnostic parts of browser discovery and certificate installation.
  * <p>

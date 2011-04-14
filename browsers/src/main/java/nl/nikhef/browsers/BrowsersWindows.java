@@ -15,7 +15,7 @@ import at.jta.Regor;
 
 import nl.nikhef.browsers.exception.BrowserExecutionException;
 import nl.nikhef.browsers.exception.BrowserNotAvailableException;
-import nl.nikhef.osutil.FileUtil;
+import nl.nikhef.jgridstart.osutil.FileUtil;
 
 /** Windows implementation of browser discovery and launch */
 class BrowsersWindows extends BrowsersCommon {

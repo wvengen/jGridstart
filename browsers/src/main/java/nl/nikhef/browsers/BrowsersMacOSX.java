@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import nl.nikhef.browsers.exception.BrowserExecutionException;
 import nl.nikhef.browsers.exception.BrowserNotAvailableException;
-import nl.nikhef.osutil.FileUtil;
+import nl.nikhef.jgridstart.osutil.FileUtil;
 
 /** Mac OS X implementation of browser discovery and launch */
 class BrowsersMacOSX extends BrowsersCommon {

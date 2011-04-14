@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 import nl.nikhef.browsers.exception.BrowserExecutionException;
 import nl.nikhef.browsers.exception.BrowserNotAvailableException;
-import nl.nikhef.osutil.FileUtil;
+import nl.nikhef.jgridstart.osutil.FileUtil;
 
 /** Unix/Linux/BSD/... implementation of browser discovery and launch. */
 class BrowsersUnix extends BrowsersCommon {
