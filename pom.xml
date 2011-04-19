@@ -42,6 +42,7 @@
     <module>xhtmlrenderer</module>
     <module>passwordcache</module>
     <module>jgridstart</module>
+    <module>jgridstart-small</module>
     <module>jgridstart-jws</module>
   </modules>
 

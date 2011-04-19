@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="@wwwbase@">
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="$jnlpspec" codebase="$property.deployurl">
  <information>
-  <title>@bouncycastle@</title>
+  <title>${property.bcprov.fullname}</title>
   <vendor>Sun Microsystems, Inc.</vendor>
   <description>BouncyCastle cryptography library</description>
   <homepage href="http://bouncycastle.org/"/>
@@ -11,7 +11,7 @@
   <all-permissions/>
  </security>
  <resources>
-  <jar href="@bouncycastle@.jar"/>
+  <jar href="${property.bcprov.fullname}.jar"/>
  </resources>
  <component-desc/>
 </jnlp>

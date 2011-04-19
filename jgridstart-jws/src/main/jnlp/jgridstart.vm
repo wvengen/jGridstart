@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="1.0+" href="jgridstart.jnlp" codebase="@wwwbase@">
+<jnlp spec="$jnlpspec}" href="$outputFile" codebase="$property.deployurl">
  <information>
-  <title>jGridstart</title>
-  <vendor>Nikhef</vendor>
+  <title>jGridstart $project.Version</title>
+  <vendor>$informationVendor</vendor>
   <homepage href="http://jgridstart.nikhef.nl/"/>
   <description>Setup your computer to work with the grid</description>
  </information>
@@ -10,14 +10,14 @@
   <all-permissions/>
  </security>
  <resources>
-  <j2se href="http://java.sun.com/products/autodl/j2se" version="1.5+"/>
-  <jar href="jgridstart.jar"/>
-  <extension name="BouncyCastle cryptography library" href="@bouncycastle@.jnlp"/>
+  <j2se href="http://java.sun.com/products/autodl/j2se" version="${j2seVersion}+"/>
+  <jar href=""/>
+  <extension name="BouncyCastle cryptography library" href="bcprov.jnlp"/>
   <!-- program defaults, customize these for your site (properties are prefixed
        with "jnlp." to avoid the need for a signed jnlp) -->
   <property name="jnlp.jgridstart.defaults.country" value="NL"/>
   <property name="jnlp.jgridstart.defaults.level" value="medium"/>
   <!-- end of program defaults -->
  </resources>
- <application-desc main-class="@main@"/>
+ <application-desc main-class="$mainClass"/>
 </jnlp>

@@ -5,10 +5,11 @@
   <!-- package information -->
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>jgridstart-jws</artifactId>
-  <version>1.9</version>
+  <version>1.10</version>
   <name>jGridstart Java Web Start</name>
   <url>http://jgridstart.nikhef.nl/</url>
   <description>Java web start deployment for jGridstart</description>
+  <packaging>pom</packaging>
 
   <parent>
     <groupId>nl.nikhef.jgridstart</groupId>
@@ -17,123 +18,40 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
+  <properties>
+    <deployurl>http://www.nikhef.nl/~wvengen/jgridstart-devel/</deployurl>
+    <mainClass>nl.nikhef.jgridstart.gui.Main</mainClass>
+  </properties>
+
   <!-- just package the jGridstart application -->
   <dependencies>
     <dependency>
       <groupId>nl.nikhef.jgridstart</groupId>
-      <artifactId>jgridstart-main</artifactId>
-      <version>1.9</version>
+      <artifactId>jgridstart-small</artifactId>
+      <version>1.10</version>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
-      <!-- assemble project with dependencies into single jar
-           (except BouncyCastle which needs its own signature) -->
+      <!-- jnlp generation -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>1.4</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals><goal>shade</goal></goals>
-          </execution>
-        </executions>
-        <configuration>
-          <artifactSet>
-            <excludes>
-              <exclude>org.bouncycastle:${bcprov.depname}</exclude>
-            </excludes>
-          </artifactSet>
-          <filters>
-            <filter>
-              <artifact>*:*</artifact>
-              <excludes><exclude>META-INF/*</exclude></excludes>
-            </filter>
-          </filters>
-          <transformers>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-              <manifestEntries>
-                <Main-Class>nl.nikhef.jgridstart.gui.Main</Main-Class>
-                <Class-Path>${bcprov.fullname}.jar</Class-Path>
-              </manifestEntries>
-            </transformer>
-          </transformers>
-        </configuration>
+        <groupId>org.codehaus.mojo.webstart</groupId>
+	<artifactId>webstart-maven-plugin</artifactId>
+	<configuration>
+          <jnlpFiles>
+            <jnlpFile>
+              <templateFilename>jgridstart.vm</templateFilename>
+	      <outputFile>jgridstart.jnlp</outputFile>
+              <jnlpResources><jnlpResource>
+	        <mainClass>${mainClass}</mainClass>
+              </jnlpResource></jnlpResources>
+            </jnlpFile>
+          </jnlpFiles>
+          <!-- TODO bcprov.jnlp -->
+	</configuration>
       </plugin>
 
-      <!-- Copy BouncyCastle jar to target, it's required for running the app.
-           Also we need it to properly run ProGuard, as there is no other way to
-           reference the dependency's jar directly. -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-bouncycastle</id>
-            <phase>package</phase>
-            <goals><goal>copy</goal></goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.bouncycastle</groupId>
-                  <artifactId>${bcprov.depname}</artifactId>
-                  <version>${bcprov.version}</version>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
-                  <destFileName>${bcprov.fullname}.jar</destFileName>
-                </artifactItem>
-              </artifactItems>
-              <!-- other configurations here -->
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- ProGuard to minimise resulting file size -->
-      <plugin>
-        <groupId>com.pyx4me</groupId>
-        <artifactId>proguard-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals><goal>proguard</goal></goals>
-          </execution>
-        </executions>
-        <configuration>
-          <proguardInclude>src/main/assembly/proguard.conf</proguardInclude>
-          <injar>${project.build.finalName}.jar</injar>
-          <outjar>${project.build.finalName}-small.jar</outjar>
-          <proguardVersion>4.5.1</proguardVersion>
-          <options>
-            <option>-target ${maven.compiler.target}</option>
-          </options>
-          <includeDependency>false</includeDependency>
-          <libs><lib>${project.build.directory}/${bcprov.fullname}.jar</lib></libs>
-          <!-- some packages include non-resolved dependencies and cruft that seems
-               to be included anyway, so this is quite important for ProGuard. -->
-          <inFilter>
-            !resources/schema/**,
-            !org/xhtmlrenderer/tool/**,
-            !org/xhtmlrenderer/swt/**,
-            !org/xhtmlrenderer/SWT/**,
-            !com/lowagie/tools/**,
-            !org/bouncycastle/mail/smime/examples/**,
-            !META-INF/maven/**,
-            !META-INF/*.txt
-          </inFilter>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>net.sf.proguard</groupId>
-            <artifactId>proguard</artifactId>
-            <version>4.5.1</version>
-            <scope>runtime</scope>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <!-- finally package for java web start -->
-      
       <!-- ordinary testing is done already in build step, skip now -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
