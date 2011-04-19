@@ -25,8 +25,8 @@ import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.logging.LogHelper;
-import nl.nikhef.jgridstart.util.GeneralUtils;
-import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
+import nl.nikhef.jgridstart.osutils.GeneralUtils;
+import nl.nikhef.jgridstart.passwordcache.PasswordCancelledException;
 
 /** Command-line user-interface program.
  * <p>

@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.osutil;
+package nl.nikhef.jgridstart.osutils;
 
 import java.io.File;
 import java.io.IOException;

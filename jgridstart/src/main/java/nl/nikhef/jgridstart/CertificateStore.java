@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import nl.nikhef.jgridstart.util.FileUtils;
-import nl.nikhef.jgridstart.util.PasswordCache;
-import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
+import nl.nikhef.jgridstart.osutils.FileUtils;
+import nl.nikhef.jgridstart.passwordcache.PasswordCache;
+import nl.nikhef.jgridstart.passwordcache.PasswordCancelledException;
 import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.ca.CAException;
 import nl.nikhef.jgridstart.gui.util.ArrayListModel;

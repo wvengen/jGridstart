@@ -8,7 +8,7 @@ import javax.swing.event.ListSelectionListener;
 
 import nl.nikhef.jgridstart.CertificatePair;
 import nl.nikhef.jgridstart.gui.CertificateAction;
-import nl.nikhef.jgridstart.install.BrowserFactory;
+import nl.nikhef.browsers.BrowserFactory;
 
 /** URL Handler uses an external web browser specified by a {@linkplain CertificatePair}.
  * <p>

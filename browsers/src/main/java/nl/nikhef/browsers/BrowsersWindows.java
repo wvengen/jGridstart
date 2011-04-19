@@ -15,7 +15,7 @@ import at.jta.Regor;
 
 import nl.nikhef.browsers.exception.BrowserExecutionException;
 import nl.nikhef.browsers.exception.BrowserNotAvailableException;
-import nl.nikhef.jgridstart.osutil.FileUtil;
+import nl.nikhef.jgridstart.osutils.FileUtils;
 
 /** Windows implementation of browser discovery and launch */
 class BrowsersWindows extends BrowsersCommon {
@@ -128,7 +128,7 @@ class BrowsersWindows extends BrowsersCommon {
 	    Runtime.getRuntime().exec(cmd);
 	    /*
 	    StringBuffer output = new StringBuffer();
-	    if ( FileUtil.Exec(cmd, null, output) != 0)
+	    if ( FileUtils.Exec(cmd, null, output) != 0)
 		throw new BrowserExecutionException(browserid, output.toString());
 	     */
 	} catch (IOException e) {
@@ -148,7 +148,7 @@ class BrowsersWindows extends BrowsersCommon {
 	};
 	try {
 	    StringBuffer output = new StringBuffer();
-	    if ( FileUtil.Exec(cmd, null, output) != 0)
+	    if ( FileUtils.Exec(cmd, null, output) != 0)
 		throw new BrowserExecutionException(browserid, output.toString());
 	} catch (IOException e) {
 	    throw new BrowserExecutionException(browserid, e);

@@ -22,9 +22,9 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import nl.nikhef.jgridstart.util.PEMReader;
-import nl.nikhef.jgridstart.util.PasswordCache;
-import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
+import nl.nikhef.jgridstart.passwordcache.PEMReader;
+import nl.nikhef.jgridstart.passwordcache.PasswordCache;
+import nl.nikhef.jgridstart.passwordcache.PasswordCancelledException;
 
 /** Security checks for a certificate directory.
  * <p>

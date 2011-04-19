@@ -37,7 +37,7 @@
   <dependencies>
     <dependency>
       <groupId>nl.nikhef.jgridstart</groupId>
-      <artifactId>osutil</artifactId>
+      <artifactId>osutils</artifactId>
       <version>1.0</version>
     </dependency>
     <dependency>

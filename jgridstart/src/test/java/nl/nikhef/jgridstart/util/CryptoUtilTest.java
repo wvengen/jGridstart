@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.util;
+package nl.nikhef.jgridstart.osutils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -32,7 +32,7 @@ import org.junit.Test;
 import junit.framework.TestCase;
 
 public class CryptoUtilsTest extends TestCase {
-    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.osutils");
     
     /** Local test private key */
     PrivateKey key = null;

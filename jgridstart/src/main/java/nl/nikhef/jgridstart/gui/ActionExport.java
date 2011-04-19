@@ -16,8 +16,8 @@ import nl.nikhef.jgridstart.gui.util.CertificateFileChooser;
 import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
-import nl.nikhef.jgridstart.util.PasswordCache;
-import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
+import nl.nikhef.jgridstart.passwordcache.PasswordCache;
+import nl.nikhef.jgridstart.passwordcache.PasswordCancelledException;
 
 /** Export selected certificate to PKCS#12/PEM file */
 public class ActionExport extends CertificateAction {

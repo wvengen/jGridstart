@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>nl.nikhef.jgridstart</groupId>
-  <artifactId>osutil</artifactId>
+  <artifactId>osutils</artifactId>
   <version>1.0</version>
-  <name>OS Util</name>
+  <name>OS Utils</name>
   <description>Access to operating system functions</description>
-  <url>http://jgridstart.nikhef.nl/module/osutil</url>
+  <url>http://jgridstart.nikhef.nl/module/osutils</url>
   <inceptionYear>2010</inceptionYear>
 
   <parent>

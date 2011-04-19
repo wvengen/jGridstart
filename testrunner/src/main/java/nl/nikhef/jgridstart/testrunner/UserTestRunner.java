@@ -27,8 +27,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
-import nl.nikhef.jgridstart.util.ConnectionUtils;
-import nl.nikhef.jgridstart.util.FileUtils;
+import nl.nikhef.jgridstart.osutils.ConnectionUtils;
+import nl.nikhef.jgridstart.osutils.FileUtils;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;

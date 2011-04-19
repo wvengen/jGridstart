@@ -41,7 +41,7 @@ import nl.nikhef.jgridstart.CertificateStoreWithDefault;
 import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
-import nl.nikhef.jgridstart.util.PasswordCache;
+import nl.nikhef.jgridstart.passwordcache.PasswordCache;
 
 /** Main jGridstart application window */
 public class JGSFrame extends JFrame {

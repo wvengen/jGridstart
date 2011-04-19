@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.util;
+package nl.nikhef.jgridstart.osutils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 /** Cryptographic utilities */
 public class CryptoUtils {
 
-    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.osutils");
     
     /** Return a certificate's subject hash.
      * <p>

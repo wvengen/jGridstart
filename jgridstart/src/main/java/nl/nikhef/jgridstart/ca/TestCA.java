@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import nl.nikhef.jgridstart.util.ConnectionUtils;
+import nl.nikhef.jgridstart.osutils.ConnectionUtils;
 
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.openssl.PEMReader;

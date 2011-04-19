@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.osutil;
+package nl.nikhef.jgridstart.osutils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 
 /** Some file-related utilities */
-public class FileUtil {
+public class FileUtils {
     static protected Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
     
     /** cache file copy method (Windows only) */

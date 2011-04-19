@@ -16,8 +16,8 @@ import javax.swing.ListSelectionModel;
 import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
-import nl.nikhef.jgridstart.install.BrowserFactory;
-import nl.nikhef.jgridstart.install.IBrowsers;
+import nl.nikhef.browsers.BrowserFactory;
+import nl.nikhef.browsers.IBrowsers;
 
 /** Pops up a dialog for selecting the certificate's preferred web browser. */
 public class ActionChangeBrowser extends CertificateAction {

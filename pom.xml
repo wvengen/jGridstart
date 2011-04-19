@@ -37,7 +37,7 @@
 
   <modules>
     <module>mvn-parent</module>
-    <module>osutil</module>
+    <module>osutils</module>
     <module>browsers</module>
     <module>xhtmlrenderer</module>
     <module>passwordcache</module>

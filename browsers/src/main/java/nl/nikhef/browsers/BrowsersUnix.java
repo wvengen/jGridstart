@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 import nl.nikhef.browsers.exception.BrowserExecutionException;
 import nl.nikhef.browsers.exception.BrowserNotAvailableException;
-import nl.nikhef.jgridstart.osutil.FileUtil;
+import nl.nikhef.jgridstart.osutils.FileUtils;
 
 /** Unix/Linux/BSD/... implementation of browser discovery and launch. */
 class BrowsersUnix extends BrowsersCommon {
@@ -55,7 +55,7 @@ class BrowsersUnix extends BrowsersCommon {
 		// find using which; process spawning in unix is cheap
 		String[] cmd = new String[] { "which", p.getProperty("exe") };
 		//int ret = Runtime.getRuntime().exec(cmd).waitFor();
-		int ret = FileUtil.Exec(cmd);
+		int ret = FileUtils.Exec(cmd);
 		if (ret==0) {
 		    logger.fine("found browser "+entry.getKey()+" at: "+p.getProperty("exe"));
 		    continue;
@@ -112,7 +112,7 @@ class BrowsersUnix extends BrowsersCommon {
      * @throws IOException */
     private String readLink(String path) throws IOException {
 	String output = "";
-	if (FileUtil.Exec(new String[] { "readlink", path }, output)!=0)
+	if (FileUtils.Exec(new String[] { "readlink", path }, output)!=0)
 	    return null;
 	return output.trim();
     }
@@ -159,7 +159,7 @@ class BrowsersUnix extends BrowsersCommon {
 	StringBuffer output = new StringBuffer();
 	try {
 	    String[] cmd = new String[] { "gconftool-2", "-g", key };
-	    if (FileUtil.Exec(cmd, null, output)!=0)
+	    if (FileUtils.Exec(cmd, null, output)!=0)
 	    	return null;
 	} catch(IOException e) {
 	    return null;
@@ -234,7 +234,7 @@ class BrowsersUnix extends BrowsersCommon {
 	    Runtime.getRuntime().exec(cmd);
 	    /*
 	    StringBuffer output = new StringBuffer();
-	    if ( FileUtil.Exec(cmd, null, output) != 0)
+	    if ( FileUtils.Exec(cmd, null, output) != 0)
 		throw new BrowserExecutionException(browserid, output.toString());
 	    */
 	} catch (IOException e) {

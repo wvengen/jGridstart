@@ -3,7 +3,7 @@ package nl.nikhef.jgridstart;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
-import nl.nikhef.jgridstart.util.FileUtils;
+import nl.nikhef.jgridstart.osutils.FileUtils;
 
 /** A {@link CertificateStore} which has the notion of a default certificate.
  * <p>

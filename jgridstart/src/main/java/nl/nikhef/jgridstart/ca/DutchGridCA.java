@@ -15,8 +15,8 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 
 import javax.mail.MessagingException;
-import nl.nikhef.jgridstart.util.ConnectionUtils;
-import nl.nikhef.jgridstart.util.CryptoUtils;
+import nl.nikhef.jgridstart.osutils.ConnectionUtils;
+import nl.nikhef.jgridstart.osutils.CryptoUtils;
 
 import org.apache.commons.lang.WordUtils;
 import org.bouncycastle.jce.PKCS10CertificationRequest;

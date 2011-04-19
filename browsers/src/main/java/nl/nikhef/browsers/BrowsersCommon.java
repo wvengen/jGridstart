@@ -14,8 +14,8 @@ import java.util.logging.Logger;
 
 import nl.nikhef.browsers.exception.BrowserExecutionException;
 import nl.nikhef.browsers.exception.BrowserNotAvailableException;
-import nl.nikhef.jgridstart.osutil.FileUtil;
-import nl.nikhef.jgridstart.osutil.PrivateFileWriter;
+import nl.nikhef.jgridstart.osutils.FileUtils;
+import nl.nikhef.jgridstart.osutils.PrivateFileWriter;
 
 /** Platform-agnostic parts of browser discovery and certificate installation.
  * <p>
@@ -172,9 +172,9 @@ abstract class BrowsersCommon implements IBrowsers {
 	File tmpdir = null, pkcsNew = null, htmlNew = null;
 	try {
 	    // create a temporary directory to store pkcs and html page
-	    tmpdir = FileUtil.createTempDir("jgridstart_certinst");
+	    tmpdir = FileUtils.createTempDir("jgridstart_certinst");
 	    pkcsNew = new File(tmpdir, "import.p12");
-	    FileUtil.CopyFile(pkcs, pkcsNew);
+	    FileUtils.CopyFile(pkcs, pkcsNew);
 	    htmlNew = new File(tmpdir, "certinstall_moz.html");
 	    OutputStream htmlWriter = new PrivateFileWriter(htmlNew).getOutputStream();
 	    InputStream htmlReader = getClass().getResourceAsStream(htmlNew.getName());

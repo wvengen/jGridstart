@@ -8,9 +8,9 @@ import java.util.Properties;
 import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.ca.CAException;
 import nl.nikhef.jgridstart.ca.LocalCA;
-import nl.nikhef.jgridstart.util.FileUtils;
-import nl.nikhef.jgridstart.util.PasswordCache;
-import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
+import nl.nikhef.jgridstart.osutils.FileUtils;
+import nl.nikhef.jgridstart.passwordcache.PasswordCache;
+import nl.nikhef.jgridstart.passwordcache.PasswordCancelledException;
 import junit.framework.TestCase;
 
 /** Base class for {@link CertificatePair} and {@link CertificateStore} tests */

@@ -8,7 +8,7 @@ import javax.swing.UIManager;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.logging.LogHelper;
 import nl.nikhef.jgridstart.logging.LogWindowHandler;
-import nl.nikhef.jgridstart.util.GeneralUtils;
+import nl.nikhef.jgridstart.osutils.GeneralUtils;
 
 /** Graphical user-interface main program */
 public class Main {

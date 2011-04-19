@@ -29,8 +29,8 @@ import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 
 import nl.nikhef.jgridstart.logging.LogHelper;
-import nl.nikhef.jgridstart.util.FileUtils;
-import nl.nikhef.jgridstart.util.PasswordCache;
+import nl.nikhef.jgridstart.osutils.FileUtils;
+import nl.nikhef.jgridstart.passwordcache.PasswordCache;
 
 import abbot.finder.BasicFinder;
 import abbot.finder.ComponentNotFoundException;

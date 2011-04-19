@@ -6,8 +6,8 @@ import java.security.SecureRandom;
 import org.junit.Test;
 
 import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
-import nl.nikhef.jgridstart.util.FileUtils;
-import nl.nikhef.jgridstart.util.PasswordCache;
+import nl.nikhef.jgridstart.osutils.FileUtils;
+import nl.nikhef.jgridstart.passwordcache.PasswordCache;
 
 public class CertificateCheckTest extends CertificateBaseTest {
     

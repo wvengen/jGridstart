@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.osutil;
+package nl.nikhef.jgridstart.osutils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,7 +14,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-public class FileUtilTest extends TestCase {
+public class FileUtilsTest extends TestCase {
     
     /** as {@link #assertEquals} but then with lineendings trimmed */
     public void assertTrimmedEquals(CharSequence expect, CharSequence real) throws AssertionFailedError {
@@ -57,7 +57,7 @@ public class FileUtilTest extends TestCase {
 	} else {
 	    String perms = (read?"r":"-") + (write?"w":"-") + (exec?"x":"-");
 	    StringBuffer out = new StringBuffer();
-	    FileUtil.Exec(new String[]{"ls", "-l", "-d", f.getPath()}, null, out);
+	    FileUtils.Exec(new String[]{"ls", "-l", "-d", f.getPath()}, null, out);
 	    // http://www.opengroup.org/onlinepubs/000095399/utilities/ls.html
 	    Pattern p = Pattern.compile("\\s*([dbclp-])([r-][w-][SsTtx-])([r-][w-][SsTtx-])([r-][w-][SsTtx-]).*", Pattern.DOTALL);
 	    Matcher m = p.matcher(out.toString());
@@ -120,7 +120,7 @@ public class FileUtilTest extends TestCase {
     @Test
     public void testCopyCheckOtherDirOrigNameExists() throws Exception {
 	File src = createDummyTempFile();
-	File tmpdir = FileUtil.createTempDir("test");
+	File tmpdir = FileUtils.createTempDir("test");
 	File tmpsrc = new File(tmpdir, src.getName());
 	File tmpdst = new File(tmpdir, "foobar.tmp");
 	final String tmpsrcText = "dummy test file with same name as file copied from";
@@ -128,9 +128,9 @@ public class FileUtilTest extends TestCase {
 	    FileWriter writer = new FileWriter(tmpsrc);
 	    writer.append(tmpsrcText);
 	    writer.close();
-	    FileUtil.CopyFile(src, tmpdst);
-	    assertTrimmedEquals(dummyString, FileUtil.readFile(tmpdst));
-	    assertTrimmedEquals(tmpsrcText, FileUtil.readFile(tmpsrc));
+	    FileUtils.CopyFile(src, tmpdst);
+	    assertTrimmedEquals(dummyString, FileUtils.readFile(tmpdst));
+	    assertTrimmedEquals(tmpsrcText, FileUtils.readFile(tmpsrc));
 	} finally {
 	    src.delete();
 	    tmpsrc.delete();
@@ -142,11 +142,11 @@ public class FileUtilTest extends TestCase {
     @Test
     public void testCopyCheckOtherDirSameName() throws Exception {
 	File src = createDummyTempFile();
-	File tmpdir = FileUtil.createTempDir("test");
+	File tmpdir = FileUtils.createTempDir("test");
 	File tmpdst = new File(tmpdir, src.getName());
 	try {
-	    FileUtil.CopyFile(src, tmpdst);
-	    assertTrimmedEquals(dummyString, FileUtil.readFile(tmpdst));
+	    FileUtils.CopyFile(src, tmpdst);
+	    assertTrimmedEquals(dummyString, FileUtils.readFile(tmpdst));
 	} finally {
 	    src.delete();
 	    tmpdst.delete();
@@ -158,13 +158,13 @@ public class FileUtilTest extends TestCase {
 	File src = createDummyTempFile();
 	File dst = new File(src.getParentFile(), src.getName()+".copy");
 	try {
-	    FileUtil.chmod(src, read, write, exec, userOnly);
-	    if (!FileUtil.CopyFile(src, dst))
+	    FileUtils.chmod(src, read, write, exec, userOnly);
+	    if (!FileUtils.CopyFile(src, dst))
 		throw new IOException("File copy failed");
 	    // compare permissions
 	    assertPermissions(dst, read, write, exec, userOnly);
 	    // compare contents
-	    if (read) assertEquals(dummyString, FileUtil.readFile(dst));
+	    if (read) assertEquals(dummyString, FileUtils.readFile(dst));
 	} finally {
 	    src.delete();
 	    dst.delete();
@@ -173,7 +173,7 @@ public class FileUtilTest extends TestCase {
     
     @Test
     public void testListFilesOnly() throws Exception {
-	File dir = FileUtil.createTempDir("test");
+	File dir = FileUtils.createTempDir("test");
 	File file1 = new File(dir, "test01.tmp");
 	File file2 = new File(dir, "test02.tmp");
 	File file3 = new File(dir, "test03.tmp");
@@ -185,7 +185,7 @@ public class FileUtilTest extends TestCase {
 	    file3.createNewFile();
 	    filedir.mkdir();
 
-	    File[] files = FileUtil.listFilesOnly(dir);
+	    File[] files = FileUtils.listFilesOnly(dir);
 	    Arrays.sort(files);
 	    File [] wantfiles = new File[] {file1, file2, file3};
 	    Arrays.sort(wantfiles);
@@ -206,7 +206,7 @@ public class FileUtilTest extends TestCase {
     public void testReadFile() throws Exception  {
 	File tmp = createDummyTempFile();
 	try {
-	    assertEquals(dummyString, FileUtil.readFile(tmp));
+	    assertEquals(dummyString, FileUtils.readFile(tmp));
 	} finally {
 	    tmp.delete();
 	}
@@ -225,19 +225,19 @@ public class FileUtilTest extends TestCase {
 	File tmp = File.createTempFile("test", "tmp");
 	try {
 	    assertTrue(tmp.exists());
-	    FileUtil.chmod(tmp, true, false, false, userOnly);
+	    FileUtils.chmod(tmp, true, false, false, userOnly);
 	    assertPermissions(tmp, true, false, false, userOnly);
-	    FileUtil.chmod(tmp, true, true, false, userOnly);
+	    FileUtils.chmod(tmp, true, true, false, userOnly);
 	    assertPermissions(tmp, true, true, false,userOnly);
-	    FileUtil.chmod(tmp, true, true, true, userOnly);
+	    FileUtils.chmod(tmp, true, true, true, userOnly);
 	    assertPermissions(tmp, true, true, true, userOnly);
-	    FileUtil.chmod(tmp, false, true, true, userOnly);
+	    FileUtils.chmod(tmp, false, true, true, userOnly);
 	    assertPermissions(tmp, false, true, true, userOnly);
-	    FileUtil.chmod(tmp, false, false, true, userOnly);
+	    FileUtils.chmod(tmp, false, false, true, userOnly);
 	    assertPermissions(tmp, false, false, true, userOnly);
-	    FileUtil.chmod(tmp, false, true, false, userOnly);
+	    FileUtils.chmod(tmp, false, true, false, userOnly);
 	    assertPermissions(tmp, false, true, false, userOnly);
-	    FileUtil.chmod(tmp, false, false, false, userOnly);
+	    FileUtils.chmod(tmp, false, false, false, userOnly);
 	    assertPermissions(tmp, false, false, false, userOnly);
 	} finally {
 	    tmp.delete();
@@ -246,7 +246,7 @@ public class FileUtilTest extends TestCase {
 
     @Test
     public void testCreateTempDir() throws Exception {
-	File tmpDir = FileUtil.createTempDir("foobar");
+	File tmpDir = FileUtils.createTempDir("foobar");
 	try {
 	    assertTrue(tmpDir.exists());
 	    assertTrue(tmpDir.isDirectory());
@@ -262,12 +262,12 @@ public class FileUtilTest extends TestCase {
 	String[] cmd = new String[]{"echo", "hi there"};
 	if (System.getProperty("os.name").startsWith("Windows"))
 	    cmd = new String[]{"cmd", "/C", "echo", "hi there"};
-	assertEquals(0, FileUtil.Exec(cmd));
+	assertEquals(0, FileUtils.Exec(cmd));
     }
     @Test
     public void testExecSimpleFail() throws Exception {
 	try {
-	    FileUtil.Exec(new String[]{"some_nonExis.ting2283filefoo.bar.really"});
+	    FileUtils.Exec(new String[]{"some_nonExis.ting2283filefoo.bar.really"});
 	} catch (IOException e) {
 	    return;
 	}
@@ -280,7 +280,7 @@ public class FileUtilTest extends TestCase {
 	String[] cmd = new String[]{"echo", "hi there"};
 	if (System.getProperty("os.name").startsWith("Windows"))
 	    cmd = new String[]{"cmd", "/C", "echo hi there"};
-	FileUtil.Exec(cmd, null, out);
+	FileUtils.Exec(cmd, null, out);
 	assertTrimmedEquals("hi there", out.toString());
     }
     @Test
@@ -292,12 +292,12 @@ public class FileUtilTest extends TestCase {
 	if (!System.getProperty("os.name").startsWith("Windows")) {
 	    String[] cmd = new String[] { "cat" };
 	    StringBuffer out = new StringBuffer();
-	    FileUtil.Exec(cmd, "foo bar", out);
+	    FileUtils.Exec(cmd, "foo bar", out);
 	    assertTrimmedEquals("foo bar", out.toString());
     	} else {
 	    String[] cmd = new String[] { "cmd" };
 	    StringBuffer out = new StringBuffer();
-	    FileUtil.Exec(cmd, "exit"+System.getProperty("line.separator"), out);
+	    FileUtils.Exec(cmd, "exit"+System.getProperty("line.separator"), out);
 	    assertTrue(out.toString().startsWith("Microsoft Windows"));
     	}
     }

@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.util;
+package nl.nikhef.jgridstart.osutils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import nl.nikhef.jgridstart.gui.Main;
 /** General utility functions that don't fit elsewhere */
 public class GeneralUtils {
     
-    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.osutils");
     
     /** Properties resource containing standard configuration @see #loadConfig */
     protected static final String standardConfig = "/resources/conf/global.properties";

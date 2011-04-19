@@ -28,11 +28,11 @@ import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
-import nl.nikhef.jgridstart.install.BrowserFactory;
-import nl.nikhef.jgridstart.install.exception.BrowserNotAvailableException;
-import nl.nikhef.jgridstart.util.PEMReader;
-import nl.nikhef.jgridstart.util.PasswordCache;
-import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
+import nl.nikhef.browsers.BrowserFactory;
+import nl.nikhef.browsers.exception.BrowserNotAvailableException;
+import nl.nikhef.jgridstart.passwordcache.PEMReader;
+import nl.nikhef.jgridstart.passwordcache.PasswordCache;
+import nl.nikhef.jgridstart.passwordcache.PasswordCancelledException;
 
 /** Wizard that asks the user for information and generates the certificate.
  * <p>

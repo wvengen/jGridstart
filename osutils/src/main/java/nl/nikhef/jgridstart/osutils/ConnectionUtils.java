@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.osutil;
+package nl.nikhef.jgridstart.osutils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.net.URLEncoder;
 import java.util.logging.Logger;
 
 /** Helper methods for reading (external) URLs */
-public class ConnectionUtil {
+public class ConnectionUtils {
     
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
     

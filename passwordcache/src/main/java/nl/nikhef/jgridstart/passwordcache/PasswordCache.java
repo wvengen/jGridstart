@@ -1,4 +1,4 @@
-package nl.nikhef.passwordcache;
+package nl.nikhef.jgridstart.passwordcache;
 
 import java.awt.Component;
 import java.awt.Window;

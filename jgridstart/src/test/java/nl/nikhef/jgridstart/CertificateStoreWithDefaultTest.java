@@ -3,7 +3,7 @@ package nl.nikhef.jgridstart;
 import java.io.File;
 import java.util.Properties;
 
-import nl.nikhef.jgridstart.util.FileUtils;
+import nl.nikhef.jgridstart.osutils.FileUtils;
 
 import org.junit.Test;
 

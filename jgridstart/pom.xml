@@ -27,13 +27,13 @@
   <!-- direct dependencies -->
   <dependencies>
     <dependency>
-      <groupId>nl.nikhef.jgridstart</groupId>
+      <groupId>nl.nikhef</groupId>
       <artifactId>browsers</artifactId>
       <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>nl.nikhef.jgridstart</groupId>
-      <artifactId>osutil</artifactId>
+      <artifactId>osutils</artifactId>
       <version>1.0</version>
     </dependency>
     <dependency>
@@ -47,7 +47,7 @@
       <version>${bcprov.version}</version>
     </dependency>
     <dependency>
-      <groupId>nl.nikhef.jgridstart</groupId>
+      <groupId>nl.nikhef</groupId>
       <artifactId>xhtmlrenderer</artifactId>
       <version>1.0</version>
       <!-- we want a different bouncycastle version and don't use the iText 
@@ -88,7 +88,7 @@
     	<version>1.1</version>
     </dependency>
     <dependency>
-      <groupId>nl.nikhef.jgridstart</groupId>
+      <groupId>nl.nikhef</groupId>
       <artifactId>xhtmlrenderer</artifactId>
       <version>1.0</version>
       <type>test-jar</type>

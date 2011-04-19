@@ -8,9 +8,9 @@ import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.URLLauncher;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
-import nl.nikhef.jgridstart.install.BrowserFactory;
-import nl.nikhef.jgridstart.util.TempFileWriter;
-import nl.nikhef.jgridstart.util.PasswordCache.PasswordCancelledException;
+import nl.nikhef.browsers.BrowserFactory;
+import nl.nikhef.jgridstart.osutils.TempFileWriter;
+import nl.nikhef.jgridstart.passwordcache.PasswordCancelledException;
 
 /** Install certificate into web browser.
  * <p>

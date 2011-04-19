@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import nl.nikhef.browsers.exception.BrowserExecutionException;
 import nl.nikhef.browsers.exception.BrowserNotAvailableException;
-import nl.nikhef.jgridstart.osutil.FileUtil;
+import nl.nikhef.jgridstart.osutils.FileUtils;
 
 /** Mac OS X implementation of browser discovery and launch */
 class BrowsersMacOSX extends BrowsersCommon {
@@ -76,7 +76,7 @@ class BrowsersMacOSX extends BrowsersCommon {
 	try {
 	    String[] cmd = new String[] { "open", "-b", browserid, urlString};
 	    StringBuffer output = new StringBuffer();
-	    if ( FileUtil.Exec(cmd, null, output) != 0)
+	    if ( FileUtils.Exec(cmd, null, output) != 0)
 		throw new BrowserExecutionException(browserid, output.toString());
 	} catch (IOException e) {
 	    throw new BrowserExecutionException(browserid, e);
@@ -89,7 +89,7 @@ class BrowsersMacOSX extends BrowsersCommon {
 	try {
 	    String[] cmd = new String[] { "open", pkcs.toURI().toASCIIString()};
 	    StringBuffer output = new StringBuffer();
-	    if ( FileUtil.Exec(cmd, null, output) != 0)
+	    if ( FileUtils.Exec(cmd, null, output) != 0)
 		throw new BrowserExecutionException(browserid, output.toString());
 	} catch (IOException e) {
 	    throw new BrowserExecutionException(browserid, e);
@@ -123,7 +123,7 @@ class BrowsersMacOSX extends BrowsersCommon {
 	System.arraycopy(args, 0, cmd, 1, args.length);
 	
 	StringBuffer output = new StringBuffer();
-	FileUtil.Exec(cmd, null, output);
+	FileUtils.Exec(cmd, null, output);
 	
 	return output.toString();
     }
@@ -222,7 +222,7 @@ class BrowsersMacOSX extends BrowsersCommon {
     /** Run "defaults" and return output. */
     protected String defaults(String[] args) throws IOException {
 	StringBuffer dfloutput = new StringBuffer();
-	FileUtil.Exec(new String[] { "defaults", "read", "com.apple.LaunchServices" }, null, dfloutput);
+	FileUtils.Exec(new String[] { "defaults", "read", "com.apple.LaunchServices" }, null, dfloutput);
 	return dfloutput.toString();
     }
     

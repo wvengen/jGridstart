@@ -6,7 +6,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
-import nl.nikhef.jgridstart.install.BrowserFactory;
+import nl.nikhef.browsers.BrowserFactory;
 
 /** URL Handler to external webbrowser and {@linkplain Action} invocation.
  * <p>
