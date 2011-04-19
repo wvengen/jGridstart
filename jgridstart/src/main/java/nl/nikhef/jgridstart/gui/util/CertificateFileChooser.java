@@ -78,7 +78,6 @@ public class CertificateFileChooser extends JFileChooser {
      * @param dlg dialog where component is part of
      * @param chooser filechooser to use
      * @param action default action to execute
-     * @return
      */
     public static JPanel customFileChooser(final JDialog dlg, final JFileChooser chooser, final Action action) {
 	Insets insets = null;

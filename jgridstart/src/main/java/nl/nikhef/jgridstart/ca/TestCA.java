@@ -68,7 +68,7 @@ public class TestCA implements CA {
      * 
      * @param req {@inheritDoc} request returned by encode/sign
      * @param info {@inheritDoc}; {@code email} and {@code fullname} are used here
-     * @returns {@inheritDoc}
+     * @return {@inheritDoc}
      */
     public void uploadCertificationRequest(String req, Properties info) throws IOException {
 	String[] postdata = {

@@ -98,7 +98,7 @@ public interface CA {
      * 
      * @param req certification signing request
      * @param info extra information that may be sent with the request (implementation-dependant)
-     * @returns certificate signing request serial number
+     * @return certificate signing request serial number
      * @throws IOException 
      */
     public void uploadCertificationRequest(String req, Properties info) throws IOException;

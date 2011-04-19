@@ -255,7 +255,7 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	return cert;
     }
     /** Deletes a path on which a {@linkplain CertificatePair} is based from disk.
-     * @see delete
+     * @see #delete
      */
     protected void deletePath(File certPath) throws IOException {
 	// and from disk; subdirs are not deleted
