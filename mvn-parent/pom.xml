@@ -40,7 +40,7 @@
     <maven.compiler.target>1.5</maven.compiler.target>
     <!-- used BouncyCastle version -->
     <bcprov.jdk>jdk15</bcprov.jdk>
-    <bcprov.version>1.44</bcprov.version>
+    <bcprov.version>1.46</bcprov.version>
     <bcprov.depname>bcprov-${bcprov.jdk}</bcprov.depname>
     <bcprov.fullname>${bcprov.depname}-${bcprov.version}</bcprov.fullname>
   </properties>

@@ -14,7 +14,6 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 
-import javax.mail.MessagingException;
 import nl.nikhef.jgridstart.osutils.ConnectionUtils;
 import nl.nikhef.jgridstart.osutils.CryptoUtils;
 
@@ -88,8 +87,6 @@ public class DutchGridCA implements CA {
 	    info.setProperty("renewal", Boolean.toString(true));
 	    return out.toString().replace("Content-Type: application/pkcs7-signature", "Content-Type: application/x-pkcs7-signature");
 	    
-	} catch(MessagingException e) {
-	    throw new IOException("Could not sign request:\n"+e.getMessage());
 	} catch (GeneralSecurityException e) {
 	    throw new IOException("Could not sign request:\n"+e.getMessage());
 	} catch (SMIMEException e) {

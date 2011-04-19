@@ -10,8 +10,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
@@ -256,15 +254,15 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    }
 
 	    // make sure we have a valid email address
-	    try {
-		new InternetAddress(data().getProperty("email")).validate();
-	    } catch (AddressException e) {	    
+	    //  >=Java6: new InternetAddress(...)
+	    // we want to avoid dependency on JavaMail so do very basic check
+	    if (!data().getProperty("email").matches("^.+@.+\\..+")) {
 		JOptionPane.showMessageDialog(this,
-			"Please enter a valid email address.\n(" + e.getLocalizedMessage() + ")",
+			"Please enter a valid email address.",
 			"Bad email address", JOptionPane.ERROR_MESSAGE);
 		return false;
-	    }
-	    
+            }
+
 	    // Not needed for renewal
 	    if (!isRenewal()) {
 		if (data().getProperty("givenname").length()==0 ||

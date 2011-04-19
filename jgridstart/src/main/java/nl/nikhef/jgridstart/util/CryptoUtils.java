@@ -14,23 +14,23 @@ import java.util.Calendar;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.activation.CommandMap;
-import javax.activation.MailcapCommandMap;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
 import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.cms.SignerInfoGeneratorBuilder;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.mail.smime.SMIMEException;
-import org.bouncycastle.mail.smime.SMIMESignedGenerator;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorException;
+import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.util.encoders.Base64;
 
 /** Cryptographic utilities */
 public class CryptoUtils {
@@ -113,7 +113,6 @@ public class CryptoUtils {
      * <p>
      * Example output:
      * <code>
-     * Message-ID: <1234567899.1.1234567890123.JavaMail.user@host>
      * MIME-Version: 1.0
      * Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha1; 
      * 	boundary="----=_Part_1_190331520.1253198584335"
@@ -122,7 +121,7 @@ public class CryptoUtils {
      * Content-Type: text/plain; charset=us-ascii
      * Content-Transfer-Encoding: 7bit
      * 
-     * This is my freakingly sensitive piece of text,
+     * This is my important piece of text.
      * 
      * ------=_Part_1_190331520.1253198584335
      * Content-Type: application/pkcs7-signature; name=smime.p7s; smime-type=signed-data
@@ -136,96 +135,59 @@ public class CryptoUtils {
      * ------=_Part_1_190331520.1253198584335--
      * </code>
      */
-    public static String SignSMIME(String msg, PrivateKey key, X509Certificate cert) throws GeneralSecurityException, SMIMEException, MessagingException {
-	// make sure we have the mailcap set right
-	CryptoUtils.setDefaultMailcap();
-	// create S/MIME message from it
-	MimeBodyPart data = new MimeBodyPart();
-	data.setText(msg);
-	// add signature
-	SMIMESignedGenerator gen = new SMIMESignedGenerator();
-	gen.addSigner(key, cert, SMIMESignedGenerator.DIGEST_SHA1);
-	CertStore certStore = CertStore.getInstance("Collection",
-		new CollectionCertStoreParameters(Arrays.asList(cert)), "BC");
-	gen.addCertificatesAndCRLs(certStore);
-	MimeMultipart multipart = gen.generate(data, "BC");
-
-	// don't use system properties as not to require full access to them
-	//   we don't need to access mail servers anyway
-	MimeMessage outmsg = new MimeMessage(Session.getDefaultInstance(new Properties()));
-	outmsg.setContent(multipart, multipart.getContentType());
-	outmsg.saveChanges();
-
-	ByteArrayOutputStream out = new ByteArrayOutputStream();
+    public static String SignSMIME(String msg, PrivateKey key, X509Certificate cert) throws GeneralSecurityException, SMIMEException, IOException {
 	try {
-	    outmsg.writeTo(out);
-	    out.close();
-	} catch (IOException e) {
-	    // shouldn't happen on {@linkplain ByteArrayOutputStream}
-	    throw new MessagingException("Internal output error", e);
-	}
+	    ContentSigner sigGen = new JcaContentSignerBuilder("SHA1withRSA").setProvider("BC").build(key);
+	    JcaX509CertificateHolder certHolder = new JcaX509CertificateHolder(cert);
+	
+	    String tosign = 
+		"Content-Type: text/plain; charset=us-ascii\r\n" +
+		"Content-Transfer-Encoding: 7bit\r\n" +
+		"\r\n" +
+		msg;
 
-	return javaMailWrappingWorkaround(out.toString());
+	    CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
+	    gen.addSignerInfoGenerator(new SignerInfoGeneratorBuilder(
+		new BcDigestCalculatorProvider()).build(sigGen, certHolder));
+	    CertStore certStore = CertStore.getInstance("Collection",
+		new CollectionCertStoreParameters(Arrays.asList(cert)), "BC");
+	    gen.addCertificatesAndCRLs(certStore);
+	
+	    CMSSignedData signed = gen.generate(new CMSProcessableByteArray(tosign.getBytes()));
+
+	    // TODO make sure not in body or signature	
+	    String mimeboundary = "------------mime_boundary_12345";
+	
+	    return
+		"MIME-Version: 1.0\r\n" +
+		"Content-Type: multipart/signed; protocol=\"application/pkcs7-signature\"; micalg=sha1; boundary=\""+mimeboundary+"\"\r\n" +
+		"\r\n" +
+		"--" + mimeboundary + "\r\n" +
+		tosign + "\r\n" +
+		"--" + mimeboundary + "\r\n" +
+		"Content-Type: application/x-pkcs7-signature; name=\"smime.p7s\"; smime-type=signed-data\r\n" +
+		"Content-Transfer-Encoding: base64\r\n" +
+		"\r\n" +
+		base64encode(signed.getEncoded()) + "\r\n" +
+		"--" + mimeboundary + "--\r\n";
+	} catch (CMSException e) {
+		throw new SMIMEException(e.getMessage(), e);
+	} catch (OperatorException e) {
+		throw new SMIMEException(e.getMessage(), e);
+	}
     }
     
-    /** Workaround for JavaMail line-wrapping problem.
-     * <p>
-     * See BouncyCastle bug
-     * <a href="http://www.bouncycastle.org/jira/browse/BJA-256">BJA-256</a>,
-     * which is actually a JavaMail and OpenSSL problem. 
-     */
-    /* package private */ static String javaMailWrappingWorkaround(String input) {
-	String lines[] = input.split("\r\n");
-	// separator is last non-empty line
-	int lastsepline = lines.length-1;
-	while ("".equals(lines[lastsepline].trim())) lastsepline--;
-	// signature is text before that from empty line
-	int firstsigline = lastsepline-1;
-	while (!"".equals(lines[firstsigline].trim())) firstsigline--;
-	firstsigline++;
-	// wrapping length is length of first line
-	int wraplen = lines[firstsigline].trim().length();
-	// gather signature
-	StringBuffer sigbody = new StringBuffer();
-	for (int i=firstsigline; i<lastsepline; i++) {
-	    if (lines[i].trim().length() != wraplen)
-		logger.info("JavaMail line-wrapping bug detected on line "+i);
-	    sigbody.append(lines[i].trim());
+    protected static String base64encode(byte[] data) {
+	return base64encode(data, 64);
+    }
+    protected static String base64encode(byte[] data, int len) {
+	byte[] base64 = Base64.encode(data);
+	StringBuffer out = new StringBuffer();
+	for (int i=0; i<base64.length; i++) {
+	    if (i>0 && i%len == 0)
+		out.append("\r\n");
+	    out.append((char)base64[i]);
 	}
-	// reconstruct message
-	return StringUtils.join(ArrayUtils.subarray(lines, 0, firstsigline), "\r\n") + "\r\n" +
-	       WordUtils.wrap(sigbody.toString(), wraplen, "\r\n", true) + "\r\n" +
-	       lines[lastsepline] +
-	       (input.endsWith("\r\n") ? "\r\n" : "");
-    }
-    
-    /** Initialize mailcap handlers.
-     * <p>
-     * In some rare cases, the error "no object DCH for MIME type" can appear, even for
-     * {@literal text/plain}. In an attempt to avoid this, this should be called
-     * in the application before any MIME messages are processed. To make it possible
-     * to run this on-demand, subsequent calls do nothing, since the mailcap needs to
-     * be initialised only once.
-     * <p>
-     * This is done automatically by {@link #SignSMIME}.
-     */
-    public static void setDefaultMailcap() {
-	if (mailcapInitDone) return;
-	MailcapCommandMap mc = (MailcapCommandMap)CommandMap.getDefaultCommandMap();
-	mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain");
-	mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html");
-	mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml");	
-	mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
-	mc.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822");
-	mc.addMailcap("application/pkcs7-signature;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.pkcs7_signature");
-	mc.addMailcap("application/pkcs7-mime;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.pkcs7_mime");
-	mc.addMailcap("application/x-pkcs7-signature;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.x_pkcs7_signature");
-	mc.addMailcap("application/x-pkcs7-mime;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.x_pkcs7_mime");
-	mc.addMailcap("multipart/signed;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.multipart_signed");
-	CommandMap.setDefaultCommandMap(mc);
-	mailcapInitDone = true;
-    }
-    /** flag to indicate if mailcap has been initialised or not */
-    protected static boolean mailcapInitDone = false;
-
+	return out.toString();
+    }    
 }
