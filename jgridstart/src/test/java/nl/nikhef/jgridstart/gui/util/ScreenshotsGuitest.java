@@ -40,7 +40,7 @@ import abbot.tester.ComponentTester;
 import abbot.util.AWT;
 
 /** Generate screenshots the for documentation of jGridstart */
-public class GUIScreenshotsTest extends TestCase {
+public class ScreenshotsGuitest extends TestCase {
     
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui.util");
     protected static ComponentTester tester = new ComponentTester();

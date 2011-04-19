@@ -4,9 +4,9 @@ import javax.swing.JButton;
 
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanelTest;
-import nl.nikhef.xhtmlrenderer.swing.TemplatePanelTest;
+import nl.nikhef.xhtmlrenderer.swing.TemplatePanelGuitest;
 
-public class TemplateButtonPanelTest extends TemplatePanelTest {
+public class TemplateButtonPanelGuitest extends TemplatePanelGuitest {
     @Override
     protected ITemplatePanel createPanel() {
 	return new TemplateButtonPanel();

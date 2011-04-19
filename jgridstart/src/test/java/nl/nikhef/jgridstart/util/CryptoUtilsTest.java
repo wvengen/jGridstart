@@ -85,68 +85,8 @@ public class CryptoUtilsTest extends TestCase {
     /** Test if signing works to catch nasty "no object DCH" bug */
     @Test
     public void testSMIMESign() throws Exception {
-	// if mailcapinit not done, try without first to test
-	if (!CryptoUtils.mailcapInitDone) {
-	    CryptoUtils.mailcapInitDone = true;
-	    try {
-		String msg = CryptoUtils.SignSMIME("this is a test message", key, cert);
-		if (msg!=null)
-		    logger.info("S/MIME signing without mailcap init succeeded");
-		else
-		    logger.info("S/MIME signing without mailcap init returned null");
-	    } catch(Exception e) {
-		logger.warning("S/MIME signing without mailcap init failed:" +e);
-	    }
-	    CryptoUtils.mailcapInitDone = false;
-	} else {
-	    logger.warning("Mailcap init already done!");
-	}
-	// then do it for real
 	String msg = CryptoUtils.SignSMIME("this is a test message", key, cert);
 	assertNotNull(msg);
 	verifySMIMEMessage(msg);
-    }
-    
-    /** Test if line wrapping workaround works as expected */
-    @Test
-    public void testjavaMailWrappingWorkaround() throws Exception {
-	String msg1 =
-	    "Message-ID: <1660743788.2.1253198584345.JavaMail.wvengen@toce>\r\n" +
-	    "MIME-Version: 1.0\r\n" +
-	    "Content-Type: multipart/signed; protocol=\"application/pkcs7-signature\"; micalg=sha1;\r\n" + 
-	    "    boundary=\"----=_Part_1_190331520.1253198584335\"\r\n" +
-	    "\r\n" +
-	    "------=_Part_1_190331520.1253198584335\r\n" +
-	    "Content-Type: text/plain; charset=us-ascii\r\n" +
-	    "Content-Transfer-Encoding: 7bit\r\n" +
-	    "\r\n" +
-	    "(message)\n" +
-	    "\r\n" +
-	    "------=_Part_1_190331520.1253198584335\r\n" +
-	    "Content-Type: application/x-pkcs7-signature; name=smime.p7s; smime-type=signed-data\r\n" +
-	    "More: headers\r\n" +
-	    "\r\n";
-	String msg2 =
-	    "YKN6NXXqGXhapZq1JmveXQeXHYvZtBZyNfPARVD/wmtFuODkwra1rYNLqL1XOhq0BN216CjBfN2d\r\n" +
-	    "zEbZ5XemdAkzDcPYrM7/GWmdxo92ZQanCuU70WDtHYgmWRsmzeBnURBUasWGrReq6x0Q1RpdfRfvAAAA\r\n" +
-	    "AAAA\r\n";
-	String msg2wrapped = 
-	    "YKN6NXXqGXhapZq1JmveXQeXHYvZtBZyNfPARVD/wmtFuODkwra1rYNLqL1XOhq0BN216CjBfN2d\r\n" +
-	    "zEbZ5XemdAkzDcPYrM7/GWmdxo92ZQanCuU70WDtHYgmWRsmzeBnURBUasWGrReq6x0Q1RpdfRfv\r\n" +
-	    "AAAAAAAA\r\n";
-	String msg3 = "------=_Part_1_190331520.1253198584335--\r\n";
-	
-	String msg = msg1+msg2+msg3;
-	String[] lines = msg.split("\r\n");
-	assertEquals(lines[lines.length-2].length(), 4);
-	assertEquals(lines[lines.length-3].length(), 80);
-	assertEquals(lines[lines.length-4].length(), 76);
-	// wrap and check again
-	msg = CryptoUtils.javaMailWrappingWorkaround(msg);
-	lines = msg.split("\r\n");
-	assertEquals(lines[lines.length-2].length(), 8);
-	assertEquals(lines[lines.length-3].length(), 76);
-	assertEquals(lines[lines.length-4].length(), 76);
-	assertEquals((msg1+msg2wrapped+msg3), msg);
     }
 }

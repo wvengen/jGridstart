@@ -15,7 +15,7 @@ import nl.nikhef.jgridstart.gui.util.TemplateWizard.PageListener;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
 import nl.nikhef.xhtmlrenderer.swing.TemplateDocument;
 
-public class TemplateWizardTest extends TemplateButtonPanelTest {
+public class TemplateWizardGuitest extends TemplateButtonPanelGuitest {
     @Override
     protected ITemplatePanel createPanel() {
 	return new TemplateWizard();

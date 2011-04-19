@@ -21,7 +21,7 @@ import abbot.finder.MultipleComponentsFoundException;
 import abbot.tester.ComponentTester;
 
 
-public class CertificateFileChooserTest extends ComponentTestFixture {
+public class CertificateFileChooserGuitest extends ComponentTestFixture {
     
     /** file selected @see #createTestChooser */
     private File selectedFile = null;
