@@ -6,9 +6,9 @@
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>jgridstart-jws</artifactId>
   <version>1.10</version>
-  <name>jGridstart Java Web Start</name>
+  <name>jGridstart application (java web start)</name>
   <url>http://jgridstart.nikhef.nl/</url>
-  <description>Java web start deployment for jGridstart</description>
+  <description>Java Web Start version of jGridstart</description>
   <packaging>pom</packaging>
 
   <parent>
@@ -67,7 +67,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.7</version>
         <configuration><skip>true</skip></configuration>
       </plugin>
     </plugins>

@@ -6,7 +6,7 @@
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>jgridstart-small</artifactId>
   <version>1.10</version>
-  <name>jGridstart (compressed)</name>
+  <name>jGridstart application (compressed)</name>
   <url>http://jgridstart.nikhef.nl/</url>
   <description>Compressed version of jGridstart</description>
 
@@ -32,6 +32,21 @@
 
   <build>
     <plugins>
+
+      <!-- shade replaces main artifact; need to clean before packaging -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>auto-clean</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <!-- assemble project with dependencies into single jar
            (except BouncyCastle which needs its own signature) -->
       <plugin>
@@ -45,10 +60,12 @@
           </execution>
         </executions>
         <configuration>
-          <finalName>${project.build.finalName}.full</finalName> <!-- proguard's injar -->
+          <outputFile>${project.build.directory}/${project.build.finalName}-shaded.jar</outputFile>
           <artifactSet>
             <excludes>
               <exclude>org.bouncycastle:${bcprov.depname}</exclude>
+              <!-- exclude myself since here are no sources; required for performRelease=true -->
+              <exclude>nl.nikhef.jgridstart:jgridstart-small</exclude>
             </excludes>
           </artifactSet>
           <filters>
@@ -106,9 +123,11 @@
           </execution>
         </executions>
         <configuration>
-          <proguardInclude>src/main/assembly/proguard.conf</proguardInclude>
-          <injar>${project.build.finalName}.full.jar</injar>
+          <injar>${project.build.finalName}-shaded.jar</injar>
           <outjar>${project.build.finalName}.jar</outjar>
+          <attach>false</attach>
+          <attachArtifactClassifier></attachArtifactClassifier> <!-- main artifact -->
+          <proguardInclude>src/main/assembly/proguard.conf</proguardInclude>
           <proguardVersion>4.5.1</proguardVersion>
           <options>
             <option>-target ${maven.compiler.target}</option>
@@ -154,7 +173,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.7</version>
         <configuration><skip>true</skip></configuration>
       </plugin>
     </plugins>
