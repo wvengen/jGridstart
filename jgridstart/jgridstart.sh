@@ -5,5 +5,4 @@ if ! mvn -v >/dev/null 2>&1; then
 	exit 1
 fi
 
-mvn -B -q exec:java -Dexec.mainClass="nl.nikhef.jgridstart.gui.Main" -Dexec.args="$@"
-
+mvn -B -q exec:java -Dexec.mainClass="nl.nikhef.jgridstart.gui.Main" -Dexec.args="`echo $@`"
