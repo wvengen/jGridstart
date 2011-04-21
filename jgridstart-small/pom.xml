@@ -52,7 +52,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>1.4</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -60,7 +59,8 @@
           </execution>
         </executions>
         <configuration>
-          <outputFile>${project.build.directory}/${project.build.finalName}-shaded.jar</outputFile>
+          <shadedArtifactAttached>true</shadedArtifactAttached>
+          <shadedClassifierName>shaded</shadedClassifierName>
           <artifactSet>
             <excludes>
               <exclude>org.bouncycastle:${bcprov.depname}</exclude>
@@ -106,7 +106,6 @@
                   <destFileName>${bcprov.fullname}.jar</destFileName>
                 </artifactItem>
               </artifactItems>
-              <!-- other configurations here -->
             </configuration>
           </execution>
         </executions>
