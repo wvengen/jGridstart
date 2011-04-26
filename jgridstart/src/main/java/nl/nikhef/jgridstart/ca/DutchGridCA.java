@@ -15,7 +15,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 
 import nl.nikhef.jgridstart.osutils.ConnectionUtils;
-import nl.nikhef.jgridstart.osutils.CryptoUtils;
+import nl.nikhef.jgridstart.util.CryptoUtils;
 
 import org.apache.commons.lang.WordUtils;
 import org.bouncycastle.jce.PKCS10CertificationRequest;

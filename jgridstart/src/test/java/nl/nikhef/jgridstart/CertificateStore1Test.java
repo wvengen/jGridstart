@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import nl.nikhef.jgridstart.osutils.FileUtils;
-import nl.nikhef.jgridstart.osutils.PKCS12KeyStoreUnlimited;
+import nl.nikhef.jgridstart.util.PKCS12KeyStoreUnlimited;
 import nl.nikhef.jgridstart.passwordcache.PasswordCache;
 
 import org.bouncycastle.asn1.ASN1Sequence;

@@ -3,7 +3,7 @@ package nl.nikhef.jgridstart.logging;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import nl.nikhef.jgridstart.osutils.GeneralUtils;
+import nl.nikhef.jgridstart.util.GeneralUtils;
 
 /** Logging initialisation */
 public class LogHelper {

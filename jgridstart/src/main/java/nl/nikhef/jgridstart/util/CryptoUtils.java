@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.osutils;
+package nl.nikhef.jgridstart.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import org.bouncycastle.util.encoders.Base64;
 /** Cryptographic utilities */
 public class CryptoUtils {
 
-    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.osutils");
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.util");
     
     /** Return a certificate's subject hash.
      * <p>
