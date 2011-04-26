@@ -196,6 +196,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     @Override
     public void setData(Properties p) {
 	super.setData(p);
+	String orgOptions = Organisation.getAllOptionsHTML(cert);
 	// also set static properties for the forms
 	// initialize properties when new request / renewal
 	if (cert==null) {
@@ -213,15 +214,17 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		data().setProperty("agreecps.lock", Boolean.toString(false));
     	    	data().setProperty("wizard.title", "Renew a certificate");
 	    }
+	    // but don't preselect an organisation so the user can't leave it the default
+	    orgOptions = "<option value=''>(select your organisation)</option>"+orgOptions;	    
 	} else {
 	    CertificateRequest.completeData(cert);
 	    if (!data().containsKey("wizard.title"))
 		data().setProperty("wizard.title", "Certificate Request");
-	}
+	}	
 	data().setProperty("wizard.title.volatile", "true");
 	data().setProperty("wizard.title.html", data().getProperty("wizard.title"));
 	data().setProperty("wizard.title.html.volatile", "true");
-	data().setProperty("organisations.html.options", Organisation.getAllOptionsHTML(cert));
+	data().setProperty("organisations.html.options", orgOptions);
 	data().setProperty("organisations.html.options.volatile", "true");
 	// workaround for checkboxes without a name; even with checked="checked" they
 	// would sometimes not be shown as checked (irregular behaviour though)
@@ -250,6 +253,14 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 		JOptionPane.showMessageDialog(this,
 			"Passwords don't match, please make sure they are equal.",
 			"Passwords don't match", JOptionPane.ERROR_MESSAGE);
+		return false;
+	    }
+	    
+	    // make sure an organisation is selected
+	    if (data().getProperty("org").length()==0) {
+		JOptionPane.showMessageDialog(this,
+			"Please select the organisation you're associated with.",
+			"No organisation selected", JOptionPane.ERROR_MESSAGE);
 		return false;
 	    }
 
