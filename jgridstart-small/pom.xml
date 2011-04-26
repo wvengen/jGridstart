@@ -127,7 +127,6 @@
           <attach>false</attach>
           <attachArtifactClassifier></attachArtifactClassifier> <!-- main artifact -->
           <proguardInclude>src/main/assembly/proguard.conf</proguardInclude>
-          <proguardVersion>4.5.1</proguardVersion>
           <options>
             <option>-target ${maven.compiler.target}</option>
           </options>
@@ -150,7 +149,7 @@
           <dependency>
             <groupId>net.sf.proguard</groupId>
             <artifactId>proguard</artifactId>
-            <version>4.5.1</version>
+            <version>4.4</version>
             <scope>runtime</scope>
           </dependency>
         </dependencies>
