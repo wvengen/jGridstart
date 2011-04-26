@@ -119,7 +119,14 @@
     <resources>
       <resource>
         <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
         <filtering>true</filtering>
+        <includes>
+          <include>resources/conf/global.properties</include>
+        </includes>
       </resource>
     </resources>
     <plugins>
