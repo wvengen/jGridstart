@@ -614,7 +614,8 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	logger.finer("Importing certificate from directory: "+src);
 
 	// copy all files
-	for (File f: src.listFiles()) {
+	for (String fs: getRelatedFilesPossible()) {
+	    File f = new File(src, fs);
 	    if (!f.isFile()) continue;
 	    FileUtils.CopyFile(f, new File(path, f.getName()));
 	}
