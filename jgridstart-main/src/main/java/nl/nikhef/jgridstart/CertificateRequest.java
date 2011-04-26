@@ -205,4 +205,21 @@ public class CertificateRequest {
     static public void validatePassword(char[] pw, boolean strict) throws InvalidKeyException {
 	validatePassword(new String(pw), strict);
     }
+    
+    /** Verifies that DN (complete or component) is valid.
+     * <p>
+     * The CP/CPS specified that PRINTABLESTRING should be used, and that
+     * quotes should not be used. What characters are allowed explicitly
+     * is determined by the property <tt>jgridstart.dnpolicy</tt> which is
+     * a regular expression.
+     */
+    static public void validateDN(String dn) throws Exception {
+	String regex = System.getProperty("jgridstart.dnpolicy.regexp");
+	if (regex!=null && !Pattern.matches(regex, dn)) {
+	    String msg = System.getProperty("jgridstart.dnpolicy.explanation");
+	    if (msg==null) msg = "\""+dn+"\" does not validate regular expression: "+regex;
+	    throw new Exception(msg);
+	}
+    }
+    
 }

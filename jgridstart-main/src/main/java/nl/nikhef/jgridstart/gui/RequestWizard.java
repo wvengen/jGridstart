@@ -263,7 +263,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 			"No organisation selected", JOptionPane.ERROR_MESSAGE);
 		return false;
 	    }
-
+	    
 	    // make sure we have a valid email address
 	    //  >=Java6: new InternetAddress(...)
 	    // we want to avoid dependency on JavaMail so do very basic check
@@ -276,11 +276,30 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 
 	    // Not needed for renewal
 	    if (!isRenewal()) {
+		// check names are given
 		if (data().getProperty("givenname").length()==0 ||
 			data().getProperty("surname").length()==0 ) {
 		    JOptionPane.showMessageDialog(this,
 			    "Please enter your full name",
 			    "Missing data", JOptionPane.ERROR_MESSAGE);
+		    return false;
+		}
+		
+		// verify allowed characters for name
+		try {
+		    CertificateRequest.validateDN(data().getProperty("givenname"));
+		} catch(Exception e) {
+		    JOptionPane.showMessageDialog(this,
+			    "Given name: "+e.getMessage(),
+			    "Invalid characters used (given name)", JOptionPane.ERROR_MESSAGE);
+		    return false;
+		}
+		try {
+		    CertificateRequest.validateDN(data().getProperty("surname"));
+		} catch(Exception e) {
+		    JOptionPane.showMessageDialog(this,
+			    "Surname: "+e.getMessage(),
+			    "Invalid characters used (surname)", JOptionPane.ERROR_MESSAGE);
 		    return false;
 		}
 	    }
