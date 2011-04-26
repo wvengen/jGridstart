@@ -10,6 +10,7 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -21,7 +22,7 @@ import nl.nikhef.jgridstart.CertificateCheck.CertificateCheckException;
 import nl.nikhef.jgridstart.ca.CAException;
 import nl.nikhef.jgridstart.gui.util.ArrayListModel;
 
-/** Mangement of multiple {@code .globus}-type certificates on disk
+/** Management of multiple {@code .globus}-type certificates on disk
  * <p>
  * This represents a directory that has {@code .globus}-type subdirectories as
  * its children, each of which is represented by a {@link CertificatePair}.
@@ -191,15 +192,17 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
     /** Create a new subdirectory for a {@linkplain CertificatePair} in this store.
      * <p>
      * It is formatted as {@code user-cert-YYYYddMM-xx} so each item is unique and
-     * can be recognised by its creation date.
+     * can be recognised by its creation date. When {@code when} is non-null, it will
+     * be used as the date, otherwise the current date will be used. 
      *
+     * @param when Creation date or start of validity period of certificate; or {@literal null}.
      * @return Newly created directory name
      * @throws IOException
      */
-    protected File newItem() throws IOException {
+    protected File newItem(Calendar when) throws IOException {
 	File dst = null;
 	for (int i = 0; i < 100; i++) {
-	    dst = new File(path, String.format("user-cert-%1$tY%1$tm%1$td-%2$02d", Calendar.getInstance(), i));
+	    dst = new File(path, String.format("user-cert-%1$tY%1$tm%1$td-%2$02d", when, i));
 	    if (!dst.exists()) break;
 	}
 	if (dst.exists())
@@ -211,6 +214,41 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 		    "Please check permissions, disk space and quota.");
 	return dst;
     }
+    
+    protected File newItem() throws IOException {
+	return newItem(Calendar.getInstance());
+    }
+    
+    /** Move a {@linkplain CertificatePair} to its proper location.
+     * <p>
+     * Entries are named after the certificate or request's creation date by convention.
+     * When a certificate is imported this is not yet known, so we have to move it
+     * afterwards. This method moves it to the correct location, unless no date can
+     * be found.
+     * <p>
+     * This will update {@linkplain CertificatePair}'s idea of its path as well.
+     * 
+     * @param cert {@linkplain CertificatePair} to move
+     * @return new location, or {@literal null} if moving didn't happen
+     */
+   private File moveProper(CertificatePair cert) throws IOException {
+       // get date from certificate
+       Date date = null;
+       if (cert.getCertificate()!=null)
+	   date = cert.getCertificate().getNotBefore();
+       if (date == null) return null;
+       // move it
+       Calendar cal = Calendar.getInstance();
+       cal.setTime(date);
+       File dst = newItem(cal);
+       if (cert.path.renameTo(dst)) {
+	   cert.path = dst;
+	   return dst;
+       } else {
+	   dst.delete();
+	   return null;
+       }
+   }
     
     /** Hook parent to add an {@linkplain ItemListener} when an item is added.
      * <p>
@@ -292,6 +330,8 @@ public class CertificateStore extends ArrayListModel<CertificatePair> implements
 	// import
 	try {
 	    CertificatePair cert = CertificatePair.importFrom(src, dst, dstpw);
+	    // rename directory to one that matches the certificate
+	    moveProper(cert);
 	    add(cert);
 	    return cert;
 	} catch(IOException e) {
