@@ -1,6 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"> <modelVersion>4.0.0</modelVersion>
 
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>jgridstart</artifactId>
@@ -41,7 +40,7 @@
     <module>browsers</module>
     <module>xhtmlrenderer</module>
     <module>passwordcache</module>
-    <module>jgridstart</module>
+    <module>jgridstart-main</module>
     <module>jgridstart-small</module>
     <module>jgridstart-jws</module>
   </modules>
