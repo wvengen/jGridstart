@@ -24,9 +24,9 @@
   </organization>
   
   <scm>
-    <url>https://ndpfsvn.nikhef.nl/cgi-bin/viewvc.cgi/pdpsoft/branches/nl.nikhef.jgridstart-flyingsaucer/nl.nikhef.jgridstart/</url>
-    <connection>scm:svn:https://ndpfsvn.nikhef.nl/repos/pdpsoft/branches/nl.nikhef.jgridstart-flyingsaucer/nl.nikhef.jgridstart</connection>
-    <developerConnection>scm:svn:svn+ssh://svn@ndpfsvn.nikhef.nl/repos/pdpsoft/branches/nl.nikhef.jgridstart-flyingsaucer/nl.nikhef.jgridstart</developerConnection>
+    <url>https://github.com/wvengen/jGridstart</url>
+    <connection>scm:git:https://github.com/wvengen/jGridstart.git</connection>
+    <developerConnection>scm:svn:ssh://git@github.com/wvengen/jGridstart.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
