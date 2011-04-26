@@ -22,7 +22,7 @@ public class Main {
     /** graphical user-interface entry point */
     public static void main(String[] args) {
 	logger.addHandler(LogWindowHandler.getInstance());
-	logger.fine("main starting");	
+	LogHelper.logEnvironment();
 	
 	// load system properties if not yet set, not fatal if it fails
 	try {

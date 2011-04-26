@@ -18,6 +18,10 @@ public class LogHelper {
 	} catch(Exception e) {
 	    System.out.println("Warning: logging configuration could not be set");
 	}
+    }
+    
+    /** Log environment information */
+    public static void logEnvironment() {
 	// emit some extra info
 	logger.info("Platform: "+getSystemProperty("os.name")+" "+getSystemProperty("os.arch")+" " +
 		"version "+getSystemProperty("sys.version"));
