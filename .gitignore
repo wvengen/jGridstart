@@ -1,1 +1,7 @@
+# output files
 target
+# Eclipse files, these are derived from the Maven configuration anyway
+.classpath
+.project
+.settings
+.metadata
