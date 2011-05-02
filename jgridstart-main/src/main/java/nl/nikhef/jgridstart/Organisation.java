@@ -236,8 +236,9 @@ public class Organisation extends Properties {
 	Organisation org = null;
 	int weight = -100;
 	for (int i=0; i<sorgs.length; i++) {
-	    if (orgRdn.containsKey(sorgs[i])) {
-		Organisation curorg = get(sorgs[i]);
+	    String cursorg = sorgs[i].toLowerCase(); // for TERENA certificates
+	    if (orgRdn.containsKey(cursorg)) {
+		Organisation curorg = get(cursorg);
 		int curweight = 0;
 		// calculate weight
 		if (curorg.getProperty("ra")==null)
