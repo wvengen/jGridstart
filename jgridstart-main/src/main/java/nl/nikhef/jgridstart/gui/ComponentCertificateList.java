@@ -26,6 +26,8 @@ public class ComponentCertificateList extends JList {
     
     /** maximum length of name to display; any longer gets an ellipsis */
     final static int maxNameLen = 22;
+    /** maximum length of serial number to display; any longer gets an ellipsis */
+    final static int maxSerialLen = 6;
 
     /** currently selected item */
     protected CertificateSelection selection = null;
@@ -76,6 +78,7 @@ public class ComponentCertificateList extends JList {
 	    else line1 += cert.getProperty("org");
 	    // add serial number to 3rd line, if any
 	    String serial = cert.getProperty("cert.serial");
+	    if (serial!=null && serial.length() > maxSerialLen) serial = "&#x2026;"+serial.substring(serial.length()-maxSerialLen+2);
 	    if (serial!=null) line2 += " <span color='#888888'>(#"+serial+ ")</span>";
 	    // set html contents
 	    String s =
