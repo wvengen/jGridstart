@@ -78,8 +78,11 @@ public class ComponentCertificateList extends JList {
 	    else line1 += cert.getProperty("org");
 	    // add serial number to 3rd line, if any
 	    String serial = cert.getProperty("cert.serial");
-	    if (serial!=null && serial.length() > maxSerialLen) serial = "&#x2026;"+serial.substring(serial.length()-maxSerialLen+2);
-	    if (serial!=null) line2 += " <span color='#888888'>(#"+serial+ ")</span>";
+	    if (serial!=null) {
+		if (serial.length() > maxSerialLen)
+		    serial = "&#x2026;"+serial.substring(serial.length()-maxSerialLen+2);
+		line2 += " <span color='#888888'>(#"+serial+ ")</span>";
+	    }
 	    // set html contents
 	    String s =
 		"<html><body width='100%'>" +

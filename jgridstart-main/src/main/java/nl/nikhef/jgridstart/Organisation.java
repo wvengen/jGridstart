@@ -62,6 +62,9 @@ public class Organisation extends Properties {
      * This returns the organisation as read from the configuration file.
      * If the organisation is not found, however, a new {@linkplain Organisation}
      * object is returned which has id and name set to the argument {@code org}.
+     * <p>
+     * Comparison with existing organisation is done case-insensitively. It is
+     * assumed that all organisation names in the configuration file are lower-case.
      * 
      * @param xfullrdn {@code x-full-rdn} identifier
      * @return Organisation, or {@code null} if {@code org} was {@code null} itself.
@@ -69,9 +72,9 @@ public class Organisation extends Properties {
     public static Organisation get(String xfullrdn) {
 	if (xfullrdn==null) return null;
 	if (orgRdn==null) readAll();
-	Organisation o = orgRdn.get(xfullrdn);
+	Organisation o = orgRdn.get(xfullrdn.toLowerCase());
 	if (o==null) {
-	    o = new Organisation(xfullrdn);
+	    o = new Organisation(xfullrdn.toLowerCase());
 	    String[] parts = xfullrdn.split(",\\s*");
 	    o.setProperty("rdn", parts[parts.length-1].trim());
 	    o.setProperty("x-full-rdn", xfullrdn);
@@ -237,7 +240,7 @@ public class Organisation extends Properties {
 	int weight = -100;
 	for (int i=0; i<sorgs.length; i++) {
 	    String cursorg = sorgs[i].toLowerCase(); // for TERENA certificates
-	    if (orgRdn.containsKey(cursorg)) {
+	    if (orgRdn.containsKey(sorgs[i].toLowerCase())) {
 		Organisation curorg = get(cursorg);
 		int curweight = 0;
 		// calculate weight
