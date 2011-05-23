@@ -141,8 +141,9 @@ public class DutchGridCA implements CA {
 
 	// returns "200 ..." on success
 	// TODO CAException instead of IOException
+	logger.info("Answer: "+answer);
 	if (!answer.startsWith("200")) {
-	    logger.warning("Certificate signing request upload failed:" +answer);
+	    logger.warning("Certificate signing request upload failed: "+answer);
 	    throw new IOException("Certificate signing request upload failed:\n"+answer);
 	}
 
