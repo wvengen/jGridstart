@@ -78,14 +78,14 @@
       </exclusions>
     </dependency>
     <dependency>
-    	<groupId>commons-lang</groupId>
-    	<artifactId>commons-lang</artifactId>
-    	<version>2.5</version>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.5</version>
     </dependency>
     <dependency>
-    	<groupId>org.jdesktop</groupId>
-    	<artifactId>swing-worker</artifactId>
-    	<version>1.1</version>
+      <groupId>org.jdesktop</groupId>
+      <artifactId>swing-worker</artifactId>
+      <version>1.1</version>
     </dependency>
     <dependency>
       <groupId>nl.nikhef</groupId>
@@ -107,10 +107,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>javax.mail</groupId>
-    	<artifactId>mail</artifactId>
-    	<version>1.4.1</version>
-    	<scope>test</scope>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4.1</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

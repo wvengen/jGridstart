@@ -43,6 +43,7 @@
     <module>jgridstart-main</module>
     <module>jgridstart-small</module>
     <module>jgridstart-jws</module>
+    <module>jgridstart-tests</module>
   </modules>
 
 </project>

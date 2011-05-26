@@ -1,0 +1,174 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- package information -->
+  <groupId>nl.nikhef.jgridstart</groupId>
+  <artifactId>jgridstart-tests</artifactId>
+  <version>1.10</version>
+  <name>jGridstart application (tests)</name>
+  <url>http://jgridstart.nikhef.nl/</url>
+  <description>jGridstart test package</description>
+
+  <parent>
+    <groupId>nl.nikhef.jgridstart</groupId>
+    <artifactId>jgridstart</artifactId>
+    <version>1.0</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <properties>
+    <mainClass>nl.nikhef.jgridstart.gui.Main</mainClass>
+  </properties>
+
+  <dependencies>
+    <!-- depend on main output jar -->
+    <dependency>
+      <groupId>nl.nikhef.jgridstart</groupId>
+      <artifactId>jgridstart-main</artifactId>
+      <version>1.10</version>
+    </dependency>
+
+    <!-- and include a number of specific test packages. -->
+    <dependency>
+      <groupId>nl.nikhef.jgridstart</groupId>
+      <artifactId>jgridstart-main</artifactId>
+      <version>1.10</version>
+      <type>test-jar</type>
+    </dependency>
+    <dependency>
+      <groupId>nl.nikhef.jgridstart</groupId>
+      <artifactId>passwordcache</artifactId>
+      <version>1.0</version>
+      <type>test-jar</type>
+    </dependency>
+    <dependency>
+      <groupId>nl.nikhef</groupId>
+      <artifactId>xhtmlrenderer</artifactId>
+      <version>1.0</version>
+      <type>test-jar</type>
+    </dependency>
+    <!-- http://jira.codehaus.org/browse/MNG-4032 -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+    </dependency>
+    <dependency>
+      <groupId>abbot</groupId>
+      <artifactId>abbot</artifactId>
+      <version>1.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4.1</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <!-- shade replaces main artifact; need to clean before packaging -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>auto-clean</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- assemble project with dependencies into single jar
+           (except BouncyCastle which needs its own signature) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>shade-main</id>
+            <phase>package</phase>
+            <goals><goal>shade</goal></goals>
+          </execution>
+        </executions>
+        <configuration>
+          <shadedArtifactAttached>false</shadedArtifactAttached>
+          <shadedClassifierName>shaded</shadedClassifierName>
+          <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+          <artifactSet>
+            <excludes>
+              <exclude>org.bouncycastle:${bcprov.depname}</exclude>
+              <exclude>bouncycastle:*</exclude>
+              <!-- exclude myself since here are no sources; required for performRelease=true -->
+              <exclude>nl.nikhef.jgridstart:jgridstart-tests</exclude>
+            </excludes>
+          </artifactSet>
+          <filters>
+            <filter>
+              <artifact>*</artifact>
+              <excludes><exclude>META-INF/*</exclude></excludes>
+            </filter>
+          </filters>
+          <transformers>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+              <manifestEntries>
+                <Main-Class>${mainClass}</Main-Class>
+                <Class-Path>${bcprov.fullname}.jar</Class-Path>
+              </manifestEntries>
+            </transformer>
+          </transformers>
+        </configuration>
+      </plugin>
+      
+      <!-- Copy BouncyCastle jar to target, it's required for running the app.
+           Also we need it to properly run ProGuard, as there is no other way to
+           reference the dependency's jar directly. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-bouncycastle</id>
+            <phase>package</phase>
+            <goals><goal>copy</goal></goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>${bcprov.depname}</artifactId>
+                  <version>${bcprov.version}</version>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                  <destFileName>${bcprov.fullname}.jar</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- ordinary testing is done already in build step, skip now -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration><skipTests>true</skipTests></configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <!-- don't build JavaDoc -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration><skip>true</skip></configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+</project>
