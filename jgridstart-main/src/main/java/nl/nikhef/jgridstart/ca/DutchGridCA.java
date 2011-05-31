@@ -20,7 +20,7 @@ import nl.nikhef.jgridstart.util.CryptoUtils;
 import org.apache.commons.lang.WordUtils;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.mail.smime.SMIMEException;
-import org.bouncycastle.openssl.PEMReader;
+import nl.nikhef.jgridstart.util.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.util.encoders.Base64;
 

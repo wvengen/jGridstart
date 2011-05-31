@@ -15,7 +15,7 @@ import java.security.cert.X509Certificate;
 import nl.nikhef.jgridstart.osutils.ConnectionUtils;
 
 import org.bouncycastle.jce.PKCS10CertificationRequest;
-import org.bouncycastle.openssl.PEMReader;
+import nl.nikhef.jgridstart.util.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
 
 /**

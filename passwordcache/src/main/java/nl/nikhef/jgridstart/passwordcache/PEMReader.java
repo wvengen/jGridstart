@@ -44,8 +44,11 @@ public class PEMReader extends org.bouncycastle.openssl.PEMReader {
      * and throws a {@link PasswordCancelledException} when the user cancelled the
      * password entry.
      * <p>
+     * This method accepts garbage before and after any PEM blocks (outside of BEGIN/END).
+     * BouncyCastle 1.46 does not accept this (earlier versions do).
+     * <p>
      * Currently uses {@link #mark} and {@link #reset}, so these cannot be used by
-     * calling code, sorry. 
+     * calling code, sorry.
      */
     @Override
     public Object readObject() throws IOException {
