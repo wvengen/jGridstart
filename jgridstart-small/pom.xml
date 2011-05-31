@@ -140,10 +140,15 @@
             !org/xhtmlrenderer/tool/**,
             !org/xhtmlrenderer/swt/**,
             !org/xhtmlrenderer/SWT/**,
+            !org/xhtmlrenderer/simple/xhtml/swt/**,
+            !org/xhtmlrenderer/simple/SWT*,
             !com/lowagie/tools/**,
             !org/bouncycastle/mail/smime/examples/**,
             !META-INF/maven/**,
-            !META-INF/*.txt
+            !META-INF/*.txt,
+            <!-- bouncycastle version mismatch; we don't use it, cross fingers -->
+            !com/lowagie/text/pdf/TSAClient*,
+            !com/lowagie/text/pdf/OcspClient*
           </inFilter>
         </configuration>
         <dependencies>

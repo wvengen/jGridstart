@@ -21,7 +21,41 @@
     <dependency>
       <groupId>org.xhtmlrenderer</groupId>
       <artifactId>core-renderer</artifactId>
-      <version>R8</version>
+      <version>R8-local</version>
+      <!-- we want a different bouncycastle version and don't use the iText 
+        cryptography features anyway; to have this working automatically
+        in Eclipse this entry is placed after the new bouncycastle dependencies
+        so that the new one is taken first (it seems m2eclipse doesn't do
+        exclusions properly)  -->
+      <exclusions>
+        <exclusion>
+	  <groupId>bouncycastle</groupId>
+	  <artifactId>bcprov-jdk14</artifactId>
+        </exclusion>
+        <exclusion>
+	  <groupId>bouncycastle</groupId>
+	  <artifactId>bcmail-jdk14</artifactId>
+        </exclusion>
+        <exclusion>
+	  <groupId>org.bouncycastle</groupId>
+	  <artifactId>bctsp-jdk14</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-${bcprov.jdk}</artifactId>
+      <version>${bcprov.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcmail-${bcprov.jdk}</artifactId>
+      <version>${bcprov.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bctsp-${bcprov.jdk}</artifactId>
+      <version>${bcprov.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

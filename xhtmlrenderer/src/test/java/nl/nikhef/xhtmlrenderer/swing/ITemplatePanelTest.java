@@ -68,7 +68,7 @@ public abstract class ITemplatePanelTest extends ComponentTestFixture {
 	tester = new ComponentTester();
 	try {
 	    LogManager.getLogManager().readConfiguration(ITemplatePanelTest.class.getResourceAsStream("/logging.properties"));
-	} catch (IOException e) { /* ignore */ }
+	} catch (Exception e) { /* ignore */ }
     }
     @Override
     protected void tearDown() {

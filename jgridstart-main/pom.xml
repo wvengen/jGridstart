@@ -50,32 +50,11 @@
       <groupId>nl.nikhef</groupId>
       <artifactId>xhtmlrenderer</artifactId>
       <version>1.0</version>
-      <!-- we want a different bouncycastle version and don't use the iText 
-        cryptography features anyway; to have this working automatically
-        in Eclipse this entry is placed after the new bouncycastle dependencies
-        so that the new one is taken first (it seems m2eclipse doesn't do
-        exclusions properly)  -->
-      <exclusions>
-        <exclusion>
-	  <groupId>bouncycastle</groupId>
-	  <artifactId>bcprov-jdk14</artifactId>
-        </exclusion>
-        <exclusion>
-	  <groupId>bouncycastle</groupId>
-	  <artifactId>bcmail-jdk14</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>nl.nikhef.jgridstart</groupId>
       <artifactId>passwordcache</artifactId>
       <version>1.0</version>
-      <exclusions>
-        <exclusion>
-	  <groupId>org.bouncycastle</groupId>
-	  <artifactId>bcprov-jdk14</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-lang</groupId>
