@@ -43,9 +43,20 @@ public class PEMReader extends org.bouncycastle.openssl.PEMReader {
      * This method also invalidates the password when an {@linkplain IOException} occurs
      * and throws a {@link PasswordCancelledException} when the user cancelled the
      * password entry.
+     * <p>
+     * Currently uses {@link #mark} and {@link #reset}, so these cannot be used by
+     * calling code, sorry. 
      */
     @Override
     public Object readObject() throws IOException {
+	// BouncyCastle 1.46 doesn't allow text before "---BEGIN" anymore
+	String line;
+	do {
+	    mark(256);
+	    line = readLine();
+	} while (line!=null && !line.startsWith("-----BEGIN"));
+	if (line!=null) reset();
+	
 	try {
 	    return super.readObject();
 	} catch(IOException e) {
