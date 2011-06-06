@@ -89,4 +89,12 @@ public class CryptoUtilsTest extends TestCase {
 	assertNotNull(msg);
 	verifySMIMEMessage(msg);
     }
+
+    /** And different line-endings ... */
+    @Test
+    public void testSMIMESignLineendings() throws Exception {
+	String msg = CryptoUtils.SignSMIME("And\nanother\rtest\r\nmessage\n\ryeah\n\nhere\r\rwe\n\r\r\ngo!", key, cert);
+	assertNotNull(msg);
+	verifySMIMEMessage(msg);
+    }
 }
