@@ -21,7 +21,7 @@
     <dependency>
       <groupId>org.xhtmlrenderer</groupId>
       <artifactId>core-renderer</artifactId>
-      <version>R8-local</version>
+      <version>R8</version>
       <!-- we want a different bouncycastle version and don't use the iText 
         cryptography features anyway; to have this working automatically
         in Eclipse this entry is placed after the new bouncycastle dependencies
