@@ -139,6 +139,10 @@ public class CryptoUtils {
 	try {
 	    ContentSigner sigGen = new JcaContentSignerBuilder("SHA1withRSA").setProvider("BC").build(key);
 	    JcaX509CertificateHolder certHolder = new JcaX509CertificateHolder(cert);
+	    
+	    // BC 1.46 appears to require "\r\n" line-endings
+	    msg = msg.replaceAll("(?<!\r)\n", "\r\n");
+	    msg = msg.replaceAll("\r(?!\n)", "\r\n");
 	
 	    String tosign = 
 		"Content-Type: text/plain; charset=us-ascii\r\n" +
