@@ -97,6 +97,15 @@ public class CertificateCheckTest extends CertificateBaseTest {
 	setAlgorithm("RSA");
 	test(tmp, "hJKHhklQW34213AWE");
     }
+    /** Test cert+key with data in front of PEM file (BC 1.46 PEMReader) */
+    @Test public void testO_07() throws Exception {
+	File tmp = new File(tmpBasePath, "testO07");
+	CertificatePair cert = newTestCertificate(tmp, "foobar2");
+	String pemcert = FileUtils.readFile(cert.getCertFile());
+	FileUtils.writeFile(cert.getCertFile(), "hi there!!\n"+pemcert);
+	cert.refresh();
+	test(tmp, "foobar2");
+    }
 
     /** Empty directory */
     @Test public void testE_01() throws Exception { 
