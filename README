@@ -44,6 +44,10 @@ The source is split into several modules:
   - jgridstart-jws
       Java Web Start package.
 
+  - jgridstart-tests
+      Bundle of combined tests of all packages, with dependencies. This is
+      useful for running the tests at different places.
+
   - testrunner
       GUI for running unit tests on user's computer to analyse problems.
       Currently unusable, needs to be adapted.
@@ -82,6 +86,6 @@ Adapting jGridstart for a new certificate authority requires:
 
 5. Signing of the resulting JAR
     This is required for running jGridstart as a java web start application.
-    Run "ant dist" to create the distribution files. See build.xml how to
-    specify a default signing key, or (re-)sign it later using jarsigner.
+    By default a temporary generated key is used. For production you may
+    want to use a commercial code-signing certificate.
 
