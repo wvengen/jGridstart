@@ -20,6 +20,11 @@
 
   <properties>
     <mainClass>nl.nikhef.jgridstart.gui.Main</mainClass>
+    <!-- properties without dots for Velocity templates during vm->jnlp generation -->
+    <bcprovJdk>${bcprov.jdk}</bcprovJdk>
+    <bcprovVersion>${bcprov.version}</bcprovVersion>
+    <bcprovDepname>${bcprov.depname}</bcprovDepname>
+    <bcprovFullname>${bcprov.fullname}</bcprovFullname>
   </properties>
 
   <build>
@@ -36,6 +41,7 @@
         </executions>
 	<configuration>
           <jnlpFiles>
+            <!-- main application jnlp -->
             <jnlpFile>
               <templateFilename>jgridstart.vm</templateFilename>
 	      <outputFilename>jgridstart.jnlp</outputFilename>
@@ -48,7 +54,23 @@
                 </jarResource>
               </jarResources>
             </jnlpFile>
+          <!-- workaround for doubly signed bcprov JAR for JREs before 1.6.0_14
+               http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6598556 -->
+            <jnlpFile>
+              <templateFilename>bcprov.vm</templateFilename>
+	      <outputFilename>${bcprov.fullname}.jnlp</outputFilename>
+              <jarResources>
+                <jarResource>
+	          <groupId>org.bouncycastle</groupId>
+		  <artifactId>${bcprov.depname}</artifactId>
+		  <version>${bcprov.version}</version>
+                  <!-- mainClass required by Maven plugin, but it's useless here -->
+                  <mainClass>org.bouncycastle.LICENSE</mainClass>
+                </jarResource>
+              </jarResources>
+            </jnlpFile>
           </jnlpFiles>
+          <excludeTransitive>true</excludeTransitive> <!-- for workaround below -->
 
           <sign>
             <keystore>${project.build.directory}/keystore</keystore>

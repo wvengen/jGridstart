@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="${jnlpspec}" href="$$name" codebase="$$codebase">
+ <information>
+   <title>${bcprovDepname}</title>
+   <version>${bcprovVersion}</version>
+   <vendor>Sun Microsystems, Inc.</vendor>
+   <offline-allowed/>
+ </information>
+ <security>
+   <all-permissions/>
+ </security>
+ <resources>
+   <jar href="${bcprovDepname}.jar" version="${bcprovVersion}"/>
+ </resources>
+ <component-desc/>
+</jnlp>
