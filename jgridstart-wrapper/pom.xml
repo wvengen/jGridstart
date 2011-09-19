@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- package information -->
+  <groupId>nl.nikhef.jgridstart</groupId>
+  <artifactId>jgridstart-wrapper</artifactId>
+  <version>1.10</version>
+  <name>jGridstart application (wrapper)</name>
+  <url>http://jgridstart.nikhef.nl/</url>
+  <description>Wrapper for running jGridstart with Java Web Start</description>
+
+  <parent>
+    <groupId>nl.nikhef.jgridstart</groupId>
+    <artifactId>jgridstart</artifactId>
+    <version>1.0</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>nl.nikhef.jgridstart</groupId>
+      <artifactId>jgridstart-small</artifactId>
+      <version>1.10</version>
+    </dependency>
+  </dependencies>
+
+</project>

@@ -18,17 +18,39 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
+  <dependencies>
+    <dependency>
+      <groupId>nl.nikhef.jgridstart</groupId>
+      <artifactId>jgridstart-small</artifactId>
+      <version>1.10</version>
+    </dependency>
+  </dependencies>
+
   <properties>
     <mainClass>nl.nikhef.jgridstart.gui.Main</mainClass>
-    <!-- properties without dots for Velocity templates during vm->jnlp generation -->
-    <bcprovJdk>${bcprov.jdk}</bcprovJdk>
-    <bcprovVersion>${bcprov.version}</bcprovVersion>
-    <bcprovDepname>${bcprov.depname}</bcprovDepname>
-    <bcprovFullname>${bcprov.fullname}</bcprovFullname>
   </properties>
 
   <build>
     <plugins>
+
+      <plugin>
+        <groupId>org.dstovall</groupId>
+        <artifactId>onejar-maven-plugin</artifactId>
+        <version>1.4.4</version>
+        <executions>
+          <execution>
+            <configuration>
+	      <mainClass>${mainClass}</mainClass>
+              <!-- Optional, default is false -->
+              <attachToBuild>true</attachToBuild>
+              <!-- Optional, default is "onejar" -->
+              <classifier>onejar</classifier>
+            </configuration>
+            <goals><goal>one-jar</goal></goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <!-- jnlp generation -->
       <plugin>
         <groupId>org.codehaus.mojo.webstart</groupId>
@@ -36,42 +58,14 @@
         <executions>
           <execution>
             <phase>process-resources</phase>
-            <goals><goal>jnlp-download-servlet</goal></goals>
+            <goals><goal>jnlp</goal></goals>
           </execution>
         </executions>
 	<configuration>
-          <jnlpFiles>
-            <!-- main application jnlp -->
-            <jnlpFile>
-              <templateFilename>jgridstart.vm</templateFilename>
-	      <outputFilename>jgridstart.jnlp</outputFilename>
-              <jarResources>
-                <jarResource>
-                  <groupId>nl.nikhef.jgridstart</groupId>
-                  <artifactId>jgridstart-small</artifactId>
-                  <version>1.10</version>
-                  <mainClass>${mainClass}</mainClass>
-                </jarResource>
-              </jarResources>
-            </jnlpFile>
-          <!-- workaround for doubly signed bcprov JAR for JREs before 1.6.0_14
-               http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6598556 -->
-            <jnlpFile>
-              <templateFilename>bcprov.vm</templateFilename>
-	      <outputFilename>${bcprov.fullname}.jnlp</outputFilename>
-              <jarResources>
-                <jarResource>
-	          <groupId>org.bouncycastle</groupId>
-		  <artifactId>${bcprov.depname}</artifactId>
-		  <version>${bcprov.version}</version>
-                  <!-- mainClass required by Maven plugin, but it's useless here -->
-                  <mainClass>org.bouncycastle.LICENSE</mainClass>
-                </jarResource>
-              </jarResources>
-            </jnlpFile>
-          </jnlpFiles>
-          <excludeTransitive>true</excludeTransitive> <!-- for workaround below -->
-
+          <jnlp>
+	    <outputFile>jgridstart.jnlp</outputFile>
+	    <!-- mainClass -->
+          </jnlp>
           <sign>
             <keystore>${project.build.directory}/keystore</keystore>
             <keypass>123password</keypass>
@@ -109,5 +103,12 @@
       </plugin>
     </plugins>
   </reporting>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>onejar-maven-plugin.googlecode.com</id>
+      <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
+    </pluginRepository>
+  </pluginRepositories>
 
 </project>
