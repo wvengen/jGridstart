@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -46,10 +47,12 @@ import nl.nikhef.jgridstart.gui.util.ErrorMessage;
  */
 public class Organisation extends Properties {
     
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart");
+
     ///
     /// Static members
     ///
-
+    
     /** global list of all organisations, indexed by configfile index */
     protected static HashMap<String, Organisation> orgIndex = null;
     /** global list of all organisations, indexed by x-full-rdn */
@@ -199,8 +202,14 @@ public class Organisation extends Properties {
 		baseurl = (URL)getCodeBase.invoke(basic, new Object[]{});
 		fileurl = new URL(baseurl, System.getProperty("jgridstart.org.href"));
 	    } catch(Exception e) {
-		// java web start codebase call failed, use full url instead
-		fileurl = new URL(System.getProperty("jgridstart.org.href"));
+		// maybe we're running wrapped with java property set but no javax.jnlp service
+		if (System.getProperty("jgridstart.wrapper.codebase")!=null) {
+		    fileurl = new URL(System.getProperty("jgridstart.wrapper.codebase") +
+			    "/" + System.getProperty("jgridstart.org.href"));
+		} else {
+		    // otherwise full url is the only option
+		    fileurl = new URL(System.getProperty("jgridstart.org.href"));
+		}
 	    }
 	    if (baseurl!=null && !fileurl.toExternalForm().startsWith(baseurl.toExternalForm()))
 	    	throw new IOException("Organisation file must reside on same server as application.");

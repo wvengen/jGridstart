@@ -1,11 +1,12 @@
 package nl.nikhef.jgridstart.wrapper;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
@@ -89,6 +90,10 @@ public class Wrapper {
 	    }
 	    cmd.add("-D"+key+"="+value);
 	}
+	// add extra option for jnlp codebase we lose otherwise
+	try {
+	    cmd.add("-Djgridstart.wrapper.codebase="+getCodeBase().toExternalForm());
+	} catch(Exception e) { }
 	// main JAR file
 	cmd.add("-jar");
 	cmd.add(new File(tmpdir, mainJar).getAbsolutePath());
@@ -114,5 +119,17 @@ public class Wrapper {
 	    b.append(new String(data));
 	in.close();
 	return b.toString();
+    }
+    
+    public static URL getCodeBase() throws Exception {
+	// Use reflection to call jnlp services to make it work without java web start too
+	//BasicService basic = (BasicService)ServiceManager.lookup("javax.jnlp.BasicService");
+	Class<?> serviceManagerCls = Class.forName("javax.jnlp.ServiceManager");
+	Method lookup = serviceManagerCls.getDeclaredMethod("lookup", new Class[]{ String.class });
+	Object basic = lookup.invoke(serviceManagerCls, new Object[]{"javax.jnlp.BasicService"});
+	//URL baseurl = basic.getCodeBase();
+	Class<?> basicCls = Class.forName("javax.jnlp.BasicService");
+	Method getCodeBase = basicCls.getDeclaredMethod("getCodeBase", new Class[]{});
+	return (URL)getCodeBase.invoke(basic, new Object[]{});
     }
 }
