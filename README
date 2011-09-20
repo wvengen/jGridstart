@@ -39,7 +39,13 @@ The source is split into several modules:
       Main jGridstart application.
 
   - jgridstart-small
-      Creation of a single minified jar.
+      Creation of a minified jar.
+
+  - jgridstart-wrapper
+      Wrapper around jgridstart-small that contains the minified jar as well
+      as bouncycastle. When it is run, it unpacks them to a temporary directory
+      and executes it locally. This is to avoid all kinds of problems when
+      using bouncycastle and java web start together.
 
   - jgridstart-jws
       Java Web Start package.
