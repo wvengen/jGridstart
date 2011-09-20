@@ -20,7 +20,7 @@ import java.util.jar.JarFile;
 public class Wrapper {
     
     // TODO make this more configurable
-    public static final String mainJar = "jgridstart-small-1.10.jar";
+    public static final String mainJarStart = "jgridstart-small-";
 
     public static File tmpdir;
     
@@ -40,6 +40,7 @@ public class Wrapper {
 
 	// // extract JARs
 	if (info) System.out.println("Extracting JARs to temporary directory: "+tmpdir.getAbsolutePath());
+        String mainJar = null;
 	String[] libfiles = getResourceListing(Wrapper.class, "lib/");
 	for (String fn: libfiles) {
 	    if (info) System.out.println("  "+fn);
@@ -52,6 +53,7 @@ public class Wrapper {
 		out.write(buf, 0, n);
 	    in.close();
 	    out.close();
+            if (fn.startsWith(mainJarStart)) mainJar = fn;
 	}
 	
 	// // construct command to run
