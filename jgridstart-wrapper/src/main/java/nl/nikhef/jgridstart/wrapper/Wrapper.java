@@ -72,6 +72,15 @@ public class Wrapper {
 	    if (key.equals("file.separator")) continue;
 	    if (key.equals("path.separator")) continue;
 	    if (key.equals("line.separator")) continue;
+	    // java web start has special property for VM arguments, use these
+	    if (key.equals("jnlpx.vmargs")) {
+		if ( (value.startsWith("\"") && value.endsWith("\"")) ||
+			(value.startsWith("'") && value.endsWith("'")) )
+		    value = value.substring(1, value.length()-1);
+		for (String a: value.split("\\s+(?=([^\"]*\"[^\"]*\")*(?![^\"]*\"))"))
+		    cmd.add(a);
+		continue;
+	    }
 	    cmd.add("-D"+key+"="+value);
 	}
 	// main JAR file
@@ -89,6 +98,7 @@ public class Wrapper {
 	Process p = Runtime.getRuntime().exec(cmd.toArray(new String[0]));
 	int ret = p.waitFor();
 	if (info) System.out.println("Done, exit code: "+ret);
+	System.exit(ret);
     }
 
     /**
