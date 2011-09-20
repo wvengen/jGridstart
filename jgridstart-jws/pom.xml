@@ -9,7 +9,7 @@
   <name>jGridstart application (java web start)</name>
   <url>http://jgridstart.nikhef.nl/</url>
   <description>Java Web Start version of jGridstart</description>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <parent>
     <groupId>nl.nikhef.jgridstart</groupId>
@@ -21,35 +21,17 @@
   <dependencies>
     <dependency>
       <groupId>nl.nikhef.jgridstart</groupId>
-      <artifactId>jgridstart-small</artifactId>
+      <artifactId>jgridstart-wrapper</artifactId>
       <version>1.10</version>
     </dependency>
   </dependencies>
 
   <properties>
-    <mainClass>nl.nikhef.jgridstart.gui.Main</mainClass>
+    <mainClass>nl.nikhef.jgridstart.wrapper.Wrapper</mainClass>
   </properties>
 
   <build>
     <plugins>
-
-      <plugin>
-        <groupId>org.dstovall</groupId>
-        <artifactId>onejar-maven-plugin</artifactId>
-        <version>1.4.4</version>
-        <executions>
-          <execution>
-            <configuration>
-	      <mainClass>${mainClass}</mainClass>
-              <!-- Optional, default is false -->
-              <attachToBuild>true</attachToBuild>
-              <!-- Optional, default is "onejar" -->
-              <classifier>onejar</classifier>
-            </configuration>
-            <goals><goal>one-jar</goal></goals>
-          </execution>
-        </executions>
-      </plugin>
 
       <!-- jnlp generation -->
       <plugin>
@@ -64,8 +46,11 @@
 	<configuration>
           <jnlp>
 	    <outputFile>jgridstart.jnlp</outputFile>
-	    <!-- mainClass -->
+	    <mainClass>${mainClass}</mainClass>
           </jnlp>
+          <dependencies>
+            <includes><include>nl.nikhef.jgridstart:jgridstart-wrapper</include></includes>
+          </dependencies>
           <sign>
             <keystore>${project.build.directory}/keystore</keystore>
             <keypass>123password</keypass>
@@ -103,12 +88,5 @@
       </plugin>
     </plugins>
   </reporting>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>onejar-maven-plugin.googlecode.com</id>
-      <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
-    </pluginRepository>
-  </pluginRepositories>
 
 </project>

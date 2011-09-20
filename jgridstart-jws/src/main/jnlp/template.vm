@@ -16,7 +16,6 @@
   <property name="jnlp.jgridstart.defaults.level" value="medium"/>
   <!-- end of program defaults -->
   <j2se href="http://java.sun.com/products/autodl/j2se" version="${j2seVersion}"/>
-  <extension name="BouncyCastle crypto library" href="${bcprovFullname}.jnlp"/>
   $dependencies
  </resources>
  <application-desc main-class="${mainClass}"/>
