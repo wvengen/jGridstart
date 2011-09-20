@@ -118,6 +118,9 @@
             <manifest>
               <mainClass>nl.nikhef.jgridstart.gui.Main</mainClass>
             </manifest>
+            <manifestEntries>
+              <SplashScreen-Image>resources/splash.png</SplashScreen-Image>
+            </manifestEntries>
           </archive>
         </configuration>
       </plugin>

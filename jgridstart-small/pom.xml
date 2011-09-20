@@ -19,6 +19,7 @@
 
   <properties>
     <mainClass>nl.nikhef.jgridstart.gui.Main</mainClass>
+    <splash>resources/splash.png</splash>
   </properties>
 
   <!-- just package the jGridstart application -->
@@ -80,6 +81,7 @@
               <manifestEntries>
                 <Main-Class>${mainClass}</Main-Class>
                 <Class-Path>${bcprov.fullname}.jar</Class-Path>
+                <SplashScreen-Image>${splash}</SplashScreen-Image>
               </manifestEntries>
             </transformer>
           </transformers>
