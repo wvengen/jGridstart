@@ -17,6 +17,10 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
+  <properties>
+    <splash>resources/splash.png</splash>
+  </properties>
+
   <!-- The code itself does and must _not_ use these dependencies, since
        they will not be packaged with the resulting JAR. This is needed,
        however, to let copy-dependencies find what it needs. -->
@@ -30,6 +34,7 @@
 
   <build>
     <plugins>
+
       <!-- copy dependencies to lib/ -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -45,6 +50,7 @@
           </execution>
         </executions>
       </plugin>
+
       <!-- main class for runnable JAR -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -54,8 +60,35 @@
             <manifest>
               <mainClass>nl.nikhef.jgridstart.wrapper.Wrapper</mainClass>
             </manifest>
+            <manifestEntries>
+              <SplashScreen-Image>${splash}</SplashScreen-Image>
+            </manifestEntries>
           </archive>
         </configuration>
+      </plugin>
+
+      <!-- put splash screen into wrapper jar too -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-splash</id>
+            <phase>compile</phase>
+            <goals><goal>unpack</goal></goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>nl.nikhef.jgridstart</groupId>
+                  <artifactId>jgridstart-small</artifactId>
+                  <version>1.10</version>
+                  <includes>${splash}</includes>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}/classes</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
