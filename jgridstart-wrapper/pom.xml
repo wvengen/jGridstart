@@ -51,6 +51,23 @@
         </executions>
       </plugin>
 
+      <!-- generate list of dependencies so it knows what to load -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>lib-classpath</id>
+            <phase>compile</phase>
+            <goals><goal>build-classpath</goal></goals>
+            <configuration>
+              <outputFile>${project.build.directory}/classes/lib/classpath</outputFile>
+              <prefix>lib</prefix>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <!-- main class for runnable JAR -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

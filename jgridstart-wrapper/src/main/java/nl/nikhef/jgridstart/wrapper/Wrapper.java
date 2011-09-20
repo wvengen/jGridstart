@@ -6,16 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 public class Wrapper {
     
@@ -39,22 +31,34 @@ public class Wrapper {
 	tmpdir.mkdirs();
 
 	// // extract JARs
+	ClassLoader cl = Wrapper.class.getClassLoader();
 	if (info) System.out.println("Extracting JARs to temporary directory: "+tmpdir.getAbsolutePath());
         String mainJar = null;
-	String[] libfiles = getResourceListing(Wrapper.class, "lib/");
-	for (String fn: libfiles) {
-	    if (info) System.out.println("  "+fn);
-	    File f = new File(tmpdir, fn);
+        String classpath = readStream(cl.getResourceAsStream("lib/classpath"));
+	for (String fpath: classpath.split(":")) {
+	    fpath = fpath.trim();
+	    if (fpath.equals("")) continue;
+	    String fname = fpath;
+	    if (fname.contains("/"))
+		fname = fname.substring(fname.lastIndexOf('/')+1);
+	    if (info) System.out.println("  "+fname);
+	    File f = new File(tmpdir, fname);
 	    if (cleanup) f.deleteOnExit();
-	    InputStream in = Wrapper.class.getResourceAsStream("/lib/"+fn);
-	    OutputStream out = new BufferedOutputStream(new FileOutputStream(f));
+	    InputStream in = cl.getResourceAsStream(fpath);
+	    OutputStream out = new FileOutputStream(f);
 	    byte[] buf = new byte[2048];
-	    for (int n=in.read(buf); n>0; n=in.read(buf))
+	    while (true) {
+		int n = in.read(buf);
+		if (n<=0) break;
 		out.write(buf, 0, n);
-	    in.close();
+	    }
 	    out.close();
-            if (fn.startsWith(mainJarStart)) mainJar = fn;
+	    in.close();
+            if (fname.startsWith(mainJarStart)) mainJar = fname;
 	}
+	
+	if (mainJar==null)
+	    throw new Exception("Could not find main application JAR.");
 	
 	// // construct command to run
 	// java command
@@ -102,56 +106,13 @@ public class Wrapper {
 	if (info) System.out.println("Done, exit code: "+ret);
 	System.exit(ret);
     }
-
-    /**
-     * List directory contents for a resource folder. Not recursive.
-     * This is basically a brute-force implementation.
-     * Works for regular files and also JARs.
-     * 
-     * @author Greg Briggs
-     * @param clazz Any java class that lives in the same place as the resources you want.
-     * @param path Should end with "/", but not start with one.
-     * @return Just the name of each member item, not the full paths.
-     * @throws URISyntaxException 
-     * @throws IOException 
-     */
-    public static String[] getResourceListing(Class<?> clazz, String path) throws URISyntaxException, IOException {
-	URL dirURL = clazz.getClassLoader().getResource(path);
-	if (dirURL != null && dirURL.getProtocol().equals("file")) {
-	    /* A file path: easy enough */
-	    return new File(dirURL.toURI()).list();
-	}
-
-	if (dirURL == null) {
-	    /* 
-	     * In case of a jar file, we can't actually find a directory.
-	     * Have to assume the same jar as clazz.
-	     */
-	    String me = clazz.getName().replace(".", "/")+".class";
-	    dirURL = clazz.getClassLoader().getResource(me);
-	}
-
-	if (dirURL.getProtocol().equals("jar")) {
-	    /* A JAR path */
-	    String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")); //strip out only the JAR file
-	    JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
-	    Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
-	    Set<String> result = new HashSet<String>(); //avoid duplicates in case it is a subdirectory
-	    while(entries.hasMoreElements()) {
-		String name = entries.nextElement().getName();
-		if (name.startsWith(path)) { //filter according to the path
-		    String entry = name.substring(path.length());
-		    int checkSubdir = entry.indexOf("/");
-		    if (checkSubdir >= 0) {
-			// if it is a subdirectory, we just return the directory name
-			entry = entry.substring(0, checkSubdir);
-		    }
-		    if (!entry.equals("")) result.add(entry);
-		}
-	    }
-	    return result.toArray(new String[result.size()]);
-	} 
-
-	throw new UnsupportedOperationException("Cannot list files for URL "+dirURL);
+    
+    public static String readStream(InputStream in) throws IOException {
+	StringBuffer b = new StringBuffer();
+	byte[] data = new byte[1024];
+	while (in.read(data) > 0)
+	    b.append(new String(data));
+	in.close();
+	return b.toString();
     }
 }
