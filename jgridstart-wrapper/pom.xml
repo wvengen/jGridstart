@@ -17,6 +17,9 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
+  <!-- The code itself does and must _not_ use these dependencies, since
+       they will not be packaged with the resulting JAR. This is needed,
+       however, to let copy-dependencies find what it needs. -->
   <dependencies>
     <dependency>
       <groupId>nl.nikhef.jgridstart</groupId>
@@ -24,5 +27,37 @@
       <version>1.10</version>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <!-- copy dependencies to lib/ -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-lib</id>
+            <phase>compile</phase>
+            <goals><goal>copy-dependencies</goal></goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/classes/lib</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- main class for runnable JAR -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>nl.nikhef.jgridstart.wrapper.Wrapper</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
