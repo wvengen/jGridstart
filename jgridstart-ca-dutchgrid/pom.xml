@@ -5,7 +5,7 @@
   <!-- package information -->
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>jgridstart-ca-dutchgrid</artifactId>
-  <version>1.11</version>
+  <version>1.11-multica</version>
   <name>DutchGrid CA for jGridstart</name>
   <url>http://jgridstart.nikhef.nl/</url>
   <description>DutchGrid CA interface for jGridstart</description>
@@ -21,7 +21,7 @@
     <dependency>
       <groupId>nl.nikhef.jgridstart</groupId>
       <artifactId>jgridstart-main</artifactId>
-      <version>1.11</version>
+      <version>1.11-multica</version>
     </dependency>
   </dependencies>
 
