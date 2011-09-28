@@ -15,7 +15,11 @@ public class Main {
 
     // setup logging
     static {
-	LogHelper.setupLogging(false);
+	boolean debug = false;
+	try {
+		debug = Boolean.valueOf(System.getProperty("jgridstart.debug"));
+	} catch(Exception e) { }
+	LogHelper.setupLogging(debug);
     }
     static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart");
 
