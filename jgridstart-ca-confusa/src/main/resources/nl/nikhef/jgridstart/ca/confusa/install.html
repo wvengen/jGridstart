@@ -1,0 +1,140 @@
+<html>
+<head>
+	<title>Installation</title>
+	<link rel="stylesheet" type="text/css" href="resources:css/style.css"/>
+</head>
+<body id="wizard">
+
+<div class="wizard-title" c="${wizard.title.html}"/>
+<div class="wizard-contents" c="${wizard.contents.html}"/>
+
+<!-- certificate still to be downloaded -->
+<div class="wizard-page" if="!${cert}">
+  <p if="!${request.processed}">Your request has not been processed yet.</p>
+  <p if="${request.processed} and !${wizard.error}">Your request has been processed, retrieving certificate...</p>
+  <p if="${wizard.error}" class="info-bad">Could not retrieve certificate from authority.</p>
+  <p if="${wizard.error}" class="info-detail" c="${wizard.error}" />
+</div>
+
+<!-- certificate present, install! -->
+<div class="wizard-page" if="${cert}">
+
+<div if="!${install.done}">
+  <p>Congratulations, your certificate has been approved and
+  was retrieved from the Certification Authority. To be able to access
+  web-based services, you will finally want to
+  install it into your webbrowser, <em c="${install.browser.desc}">your webbrowser</em>
+  (<a href='action:changebrowser'>change browser</a>).</p>
+  <p>Please follow these steps:</p>
+</div>
+
+<div if="${install.done}">
+  <p>Your certificate has been installed in a webbrowser in the past. If you want to
+  reinstall the certificate into your webbrowser,
+  <em c="${install.browser.desc}">your webbrowser</em>
+  (<a href='action:changebrowser'>change browser</a>), follow these steps:</p>
+</div>
+
+
+<form if="${install.browser.certinst} and ${install.browser.certinst}!=manual">
+  <ol>
+	<li>Please enter the private key password that you have given before.<br/>
+		<label for="privkeypass">Password:</label>
+		<input id="privkeypass" name="wizard.privkeypass" type="password" size="25"/></li>
+
+	<li>Read these instructions, then press
+	      <span if="!${install.done}"><em>Next</em>.</span>
+	      <span if="${install.done}">the <em>install</em> button below.</span>
+	    </li>
+		
+	<!--
+	  -  Mozilla browsers
+	  -->
+	
+	  <li if="${install.browser.certinst}==mozilla">
+	    When an <em>Internet Security</em> dialog appears, choose <em>Allow</em>.</li>
+	
+	  <li if="${install.browser.certinst}==mozilla">
+	    If you have set a master password, enter it in the dialog that pops up.</li>
+	
+	  <li if="${install.browser.certinst}==mozilla">
+	    In the password dialog for the <em>certificate backup</em>, enter your
+		private key password.</li>
+
+	
+	<!--
+	  -  Internet Explorer and other browsers using Windows keystore
+	  -->
+	
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Win">
+	    The <em>Certificate Import Wizard</em> will appear, press <em>Next</em> twice.</li>
+
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Win">
+	    In the password field, enter your private key password.
+		Please do <strong>enable strong private key protection</strong>
+		for increased security.</li>
+	
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Win">
+	    Press <em>Next</em> a couple of times, and <em>Finish</em>.</li>
+	
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Win">
+	    If you enabled strong private key protection, confirm the keystore access
+	    by pressing <em>Ok</em>.</li>
+
+
+	<!-- 
+	  -  Safari and other Mac OS keystore-aware browsers
+	   -->
+	   	 
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Mac">
+	    The <em>Add Certificates</em> dialog will appear, confirm that
+		you want to import the certificate.</li>
+		
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Mac">
+	    When the password of the PKCS#12 file to import is asked,
+	    enter your private key password.</li>
+
+	  <li if="${install.browser.certinst}==system and ${os.name[0:3]}==Mac">
+	  	If you have set a password for your keychain, enter it in the next
+		dialog.</li>
+	    
+	<!-- 
+	  -  Browsers that import by opening the PKCS#12 file directly
+	  -->
+	  
+	  <li if="${install.browser.certinst}==browser and ${install.browser}!=konqueror">
+	  	<em c="${install.browser.desc}">your webbrowser</em> will open a new window or tab.</li>
+
+	  <li if="${install.browser.certinst}==browser">
+	    When the password of the PKCS#12 file to import is asked,
+	    enter your private key password.</li>
+		
+	<li if="${install.browser.certinst}==browser and ${install.browser}==konqueror">
+		In the konqueror window that appears, press the <em>Import All</em> button.</li>
+	    
+	 
+	<!-- For all OSes -->
+	 
+	<li>A message dialog will indicate if the operation succeeded.</li>
+
+  </ol>
+  <div style="text-align: center" if="${install.done}">
+  	<input type='button' href='action:install(silent,passwordfield=wizard.privkeypass)' value='install in browser...'/>
+  </div>
+</form>
+
+<!-- 
+  -  Browser unsupported, manual installation
+  -->
+ 
+<p if="!${install.browser.certinst} or ${install.browser.certinst}==manual">
+  Automatic installation of your certificate is not supported for this webbrowser.
+  You can do it manually by <a href="action:export">exporting</a> it to a PKCS#12
+  file, and importing the resulting file into your webbrowser.
+</p> 
+
+</div>
+
+</body>
+</html>
+

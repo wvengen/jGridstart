@@ -1,0 +1,51 @@
+<html>
+<head>
+<title>Enter details</title>
+<link rel="stylesheet" type="text/css" href="resources:css/style.css" />
+</head>
+<body id="wizard">
+
+<div class="wizard-title" c="${wizard.title.html}" />
+<div class="wizard-contents" c="${wizard.contents.html}" />
+
+<div class="wizard-page">
+<form>
+<table>
+  <tr>
+    <td colspan="2" class="legend">
+      This wizard will guide through retrieving a new certificate.
+    </td>
+  </tr>
+  <tr>
+    <th><label for="fullname">Full name</label></th>
+    <td><input type="text" id="fullname" name="fullname" size="30" disabled="disabled" value="Test"/></td>
+  </tr>
+  <tr>
+    <th><label for="org">Organisation</label></th>
+    <td><input type="text" id="org" name="org" size="30" disabled="disabled" value="testorg"/></td>
+  </tr>
+  <tr>
+    <td colspan="2" class="legend">
+      Your personal key is generated together with the request, and needs to remain private
+      to you only.
+      <span c="${jgridstart.password.explanation}" /> Please choose your password carefully;
+      it must not be easy to guess, but you need to remember it.
+    </td>
+  </tr>
+  <tr>
+    <th><label for="password1">Password</label></th>
+    <td><input id="password1" name="password1" type="password" size="25" /><br />
+        <input id="password2" name="password2" type="password" size="25" /></td>
+  </tr>
+  <tr if="true">
+    <td colspan="2">
+      <input type="checkbox" name="moveold" id="moveold" checked="checked"/>
+      <label for="moveold">Move existing certificate to subdirectory upon completion.</label>
+    </td>
+  </tr>
+</table>
+
+</form>
+</div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<html>
+<head>
+<title>Generate and submit</title>
+<link rel="stylesheet" type="text/css" href="resources:css/style.css" />
+</head>
+<body id="wizard">
+
+<div class="wizard-title" c="${wizard.title.html}" />
+<div class="wizard-contents" c="${wizard.contents.html}" />
+
+<div class="wizard-page">
+
+<div if="!${cert}">
+  <div if="!${request.submitted}">
+    <p>Your request needs to be submitted to the Certificate Authority,
+      which will provide your certificate.</p>
+
+    <p if="!${wizard.error}">Please wait while your request is being submitted...</p>
+
+    <p if="${wizard.error}" class="info-bad">Submission failed.</p>
+    <p if="${wizard.error}" class="info-detail" c="${wizard.error}" />
+    <p if="${wizard.error}">When the issue is solved, you will need to go back and
+      submit your request again.</p>
+  </div>
+
+  <p if="${request.submitted}">Your request has been submitted successfully to
+    the Certificate Authority, please proceed by pressing <em>Next</em>.</p>
+
+</div>
+
+<p if="${cert}">Your certificate is present already, it is not necessary to submit a request.</p>
+
+<div if="${path}">
+  <a class="helpbutton"	href="action:toggle(wizard.show.more1)">(more)</a>
+  <div class="help" if="${wizard.show.more1}">This key
+    <span if="${request}">and request</span> <span if="${cert}">and certificate</span>
+    are located on your disk in <tt c="${path}" />
+  </div>
+</div>
+
+</div>
+</body>
+</html>

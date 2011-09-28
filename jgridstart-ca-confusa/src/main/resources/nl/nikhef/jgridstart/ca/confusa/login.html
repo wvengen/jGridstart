@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>Login</title>
+<link rel="stylesheet" type="text/css" href="resources:css/style.css" />
+</head>
+<body id="wizard">
+
+<div class="wizard-title" c="${wizard.title.html}" />
+<div class="wizard-contents" c="${wizard.contents.html}" />
+
+<div class="wizard-page">
+<p>This wizard will guide you through retrieving a new certificate.</p>
+
+<div if="!${wizard.authdone} and !${wizard.authurl}">
+  <p>Detecting login status ...</p>
+</div>
+
+<div if="!${wizard.authdone} and ${wizard.authurl}">
+  <p>You need to login at your institution to be able to request
+  a new certificate. Please visit the following website to do so:</p>
+  <p style="margin-left: 2em;"><a href="${wizard.authurl}">Login at Confusa</a></p>
+</div>
+
+<div if="${wizard.authdone}">
+  <p>You have logged in with dn <span c="${subject}"/>, please press <i>Next</i> to continue.</p>
+</div>
+
+</div>
+</body>
+</html>
