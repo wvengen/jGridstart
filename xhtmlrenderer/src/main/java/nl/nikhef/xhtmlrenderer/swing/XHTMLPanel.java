@@ -22,6 +22,7 @@ import org.xhtmlrenderer.extend.UserAgentCallback;
 import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
 import org.xhtmlrenderer.swing.FSMouseListener;
 import org.xhtmlrenderer.swing.LinkListener;
+import org.xhtmlrenderer.swing.NaiveUserAgent;
 
 /** An {@link org.xhtmlrenderer.simple.XHTMLPanel} with minor tweaks.
  * <p>
@@ -29,13 +30,17 @@ import org.xhtmlrenderer.swing.LinkListener;
  * it blends nicely into the user-interface.
  * <p>
  * The method {@link #replaceLinkListener} is added for convenience.
+ * <p>
+ * If no {@linkplain UserAgentCallback} is supplied on creation, a default
+ * one is installed that resolves {@literal resources:<path>} uri's to the file
+ * <tt><classpath>/resources/<path></tt>. 
  * 
  * @author wvengen
  */
 public class XHTMLPanel extends org.xhtmlrenderer.simple.XHTMLPanel implements IXHTMLPanel {
 
     public XHTMLPanel() {
-	super();
+	super(new ResourceUserAgent());
 	initialize_tweaks();
     }
 
@@ -100,7 +105,7 @@ public class XHTMLPanel extends org.xhtmlrenderer.simple.XHTMLPanel implements I
 		    // workaround Linux where it seems too large
 		    String osName = System.getProperty("os.name");
 		    if (!osName.startsWith("Mac OS") && !osName.startsWith("Windows"))
-			font = font.deriveFont(font.getSize2D()*0.9f);
+			font = font.deriveFont(font.getSize2D()*0.86f);
 		    
 		    // add to UA stylesheet
 		    _defaultStylesheet = super.getDefaultStylesheet(factory);
@@ -137,5 +142,25 @@ public class XHTMLPanel extends org.xhtmlrenderer.simple.XHTMLPanel implements I
 	    }
 	});
     }
-    
+
+    /** XHTMLRenderer user-agent that knows the {@literal resource:} protocol
+     * <p>
+     * This protocol locates resources using the system classloader. In this
+     * way, one can use the url {@literal resources:css/style.css} to find
+     * the file {@literal /resources/css/style.css} in the classpath and use
+     * that as the referenced file.
+     * <p>
+     * XHTMLPanel's ClassLoader is used at the moment.
+     */
+    static public class ResourceUserAgent extends NaiveUserAgent {
+	@Override
+	public String resolveURI(String uri) {
+	    // handle resource: protocol
+	    if (uri!=null && uri.startsWith("resources:")) {
+		uri = "/resources/"+uri.substring(10);
+		uri = XHTMLPanel.class.getResource(uri).toExternalForm();
+	    }
+	    return super.resolveURI(uri);
+	}
+    }
 }
