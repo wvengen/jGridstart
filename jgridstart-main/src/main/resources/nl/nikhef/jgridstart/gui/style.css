@@ -82,6 +82,7 @@ body#wizard {
 	background: white;
 }
 
+
 /*
  * Form
  */
@@ -131,6 +132,7 @@ form table td.legend:first-child {
 	border: none;
 	color: #888;
 }
+
 
 /*
  * Expandable help

@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.gui;
+package nl.nikhef.jgridstart.ca.dutchgrid;
 
 import java.awt.Cursor;
 import java.awt.Dialog;

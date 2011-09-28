@@ -41,6 +41,8 @@
     <module>xhtmlrenderer</module>
     <module>passwordcache</module>
     <module>jgridstart-main</module>
+    <module>jgridstart-ca-dutchgrid</module>
+    <module>jgridstart-ca-confusa</module>
     <module>jgridstart-small</module>
     <module>jgridstart-wrapper</module>
     <module>jgridstart-jws</module>

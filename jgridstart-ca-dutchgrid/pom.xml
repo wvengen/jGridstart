@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- package information -->
+  <groupId>nl.nikhef.jgridstart</groupId>
+  <artifactId>jgridstart-ca-dutchgrid</artifactId>
+  <version>1.11</version>
+  <name>DutchGrid CA for jGridstart</name>
+  <url>http://jgridstart.nikhef.nl/</url>
+  <description>DutchGrid CA interface for jGridstart</description>
+
+  <parent>
+    <groupId>nl.nikhef.jgridstart</groupId>
+    <artifactId>jgridstart</artifactId>
+    <version>1.0</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  
+  <dependencies>
+    <dependency>
+      <groupId>nl.nikhef.jgridstart</groupId>
+      <artifactId>jgridstart-main</artifactId>
+      <version>1.11</version>
+    </dependency>
+  </dependencies>
+
+</project>

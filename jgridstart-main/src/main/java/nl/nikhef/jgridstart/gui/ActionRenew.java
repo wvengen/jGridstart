@@ -12,6 +12,8 @@ import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
+import nl.nikhef.jgridstart.gui.wizard.IRequestWizard;
+import nl.nikhef.jgridstart.gui.wizard.RequestWizardCommon;
 
 /** Renew a certificate
  * 
@@ -51,16 +53,20 @@ public class ActionRenew extends CertificateAction {
 	
 	// show request wizard for renewal
 	logger.finer("Action: "+getValue(NAME));
-	TemplateWizard dlg = null;
+	IRequestWizard dlg = null;
 
-	Window w = findWindow(e.getSource());
-	if (w instanceof Frame)
-	    dlg = new RequestWizard((Frame)w, store, getCertificatePair(), selection);
-	else if (w instanceof Dialog)
-	    dlg = new RequestWizard((Dialog)w, store, getCertificatePair(), selection);
-	else
-	    ErrorMessage.internal(w, "Expected Frame or Dialog as owner");
+	try {
+	    Window w = findWindow(e.getSource());
+	    if (w instanceof Frame)
+		dlg = RequestWizardCommon.createInstance((Frame)w, store, selection, null, getCertificatePair());
+	    else if (w instanceof Dialog)
+		dlg = RequestWizardCommon.createInstance((Dialog)w, store, selection, null, getCertificatePair());
+	    else
+		ErrorMessage.internal(w, "Expected Frame or Dialog as owner");
 
-	dlg.setVisible(true);
+	    dlg.setVisible(true);
+	} catch (Exception e1) {
+	    ErrorMessage.internal(parent, e1);
+	}
     }
 }

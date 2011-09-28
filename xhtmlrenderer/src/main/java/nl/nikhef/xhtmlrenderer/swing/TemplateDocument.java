@@ -87,7 +87,7 @@ import org.xml.sax.SAXException;
  * 
  * @author wvengen
  */
-public class TemplateDocument extends DocumentDelegate {
+public class TemplateDocument extends DocumentDelegate implements ITemplateDocument {
     
     /** The template from which this document is derived */
     private Document template = null;
@@ -110,6 +110,7 @@ public class TemplateDocument extends DocumentDelegate {
      * @param p New properties to set 
      */
     public void setData(Properties p) {
+	assert(p != null);
 	data = p;
 	refresh();
     }

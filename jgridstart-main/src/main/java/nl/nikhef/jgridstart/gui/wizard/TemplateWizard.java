@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.gui.util;
+package nl.nikhef.jgridstart.gui.wizard;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -30,6 +30,7 @@ import javax.swing.KeyStroke;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
 import nl.nikhef.xhtmlrenderer.swing.TemplateDocument;
 

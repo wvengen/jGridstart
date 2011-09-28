@@ -11,6 +11,8 @@ import javax.swing.JFrame;
 import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
+import nl.nikhef.jgridstart.gui.wizard.IRequestWizard;
+import nl.nikhef.jgridstart.gui.wizard.RequestWizardCommon;
 
 /** Show the request wizard for an existing certificate.
  * <p>
@@ -19,8 +21,10 @@ import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
  * doesn't create a new one.
  * <p>
  * The currently shown step is derived from its state.
- * Alternatively, the action can be invoked with a number (as string)
- * in the actioncommand to display a specified step.
+ * Alternatively, the action can be invoked with the argument
+ * {@code id=<pageid>} to open the wizard on a certain page id.
+ * In links, this would be: {@code action:viewrequest(id=user details)}
+ * to open the page with id "{@literal user details}". 
  * 
  * @see ActionRequest
  * @author wvengen
@@ -51,22 +55,34 @@ public class ActionViewRequest extends CertificateAction {
     @Override
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
-	RequestWizard dlg = null;
+	IRequestWizard dlg = null;
 	
-	Window w = findWindow(e.getSource());
-	if (w instanceof Frame)
-	    dlg = new RequestWizard((Frame)w, getCertificatePair(), selection);
-	else if (w instanceof Dialog)
-	    dlg = new RequestWizard((Dialog)w, getCertificatePair(), selection);
-	else
-	    ErrorMessage.internal(w, "Expected Frame or Dialog as owner");
-
 	try {
-	    dlg.setStep(Integer.valueOf(e.getActionCommand()));
-	} catch (NumberFormatException e1) {
-	    // figure out correct step
-	    dlg.setStepDetect();
+	    Window w = findWindow(e.getSource());
+	    if (w instanceof Frame)
+		dlg = RequestWizardCommon.createInstance((Frame)w, null, selection, getCertificatePair());
+	    else if (w instanceof Dialog)
+		dlg = RequestWizardCommon.createInstance((Dialog)w, null, selection, getCertificatePair());
+	    else
+		ErrorMessage.internal(w, "Expected Frame or Dialog as owner");
+
+	    String id = null;
+	    if (e.getActionCommand()!=null) {
+		String[] parts = e.getActionCommand().split(",");
+		for (int i=0; i<parts.length; i++) {
+		    String[] kv = parts[i].split("=", 2);
+		    if (kv[0].trim().equals("id"))
+			id = kv[1];
+		}
+	    }
+	    if (id!=null)
+		dlg.setPage(id);
+	    else
+		dlg.setPageDetect();
+
+	    dlg.setVisible(true);
+	} catch (Exception e1) {
+	    ErrorMessage.internal(parent, e1);
 	}
-	dlg.setVisible(true);
     }
 }

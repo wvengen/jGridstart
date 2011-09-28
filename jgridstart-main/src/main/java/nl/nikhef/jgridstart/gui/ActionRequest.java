@@ -9,8 +9,11 @@ import javax.swing.KeyStroke;
 
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.gui.util.CertificateSelection;
+import nl.nikhef.jgridstart.gui.util.ErrorMessage;
 import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
+import nl.nikhef.jgridstart.gui.wizard.IRequestWizard;
+import nl.nikhef.jgridstart.gui.wizard.RequestWizardCommon;
 
 /** Open the "request a new certificate" wizard
  * 
@@ -37,7 +40,11 @@ public class ActionRequest extends AbstractAction {
     
     public void actionPerformed(ActionEvent e) {
 	logger.finer("Action: "+getValue(NAME));
-	TemplateWizard dlg = new RequestWizard(parent, store, selection);
-	dlg.setVisible(true);
+	try {
+	    IRequestWizard dlg = RequestWizardCommon.createInstance(parent, store, selection);
+	    dlg.setVisible(true);
+	} catch(Exception e1) {
+	    ErrorMessage.internal(parent, e1);
+	}
     }
 }

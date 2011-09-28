@@ -1,4 +1,4 @@
-package nl.nikhef.jgridstart.ca;
+package nl.nikhef.jgridstart.ca.dutchgrid;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -14,6 +14,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 
+import nl.nikhef.jgridstart.ca.CA;
 import nl.nikhef.jgridstart.osutils.ConnectionUtils;
 import nl.nikhef.jgridstart.util.CryptoUtils;
 
