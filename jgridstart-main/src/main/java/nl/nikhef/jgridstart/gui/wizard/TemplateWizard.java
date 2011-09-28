@@ -2,6 +2,7 @@ package nl.nikhef.jgridstart.gui.wizard;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -9,11 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.print.PrinterException;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -27,9 +27,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import nl.nikhef.jgridstart.gui.util.TemplateButtonPanel;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
 import nl.nikhef.xhtmlrenderer.swing.TemplateDocument;
@@ -41,7 +38,6 @@ import org.xhtmlrenderer.layout.SharedContext;
 import org.xhtmlrenderer.simple.extend.FormSubmissionListener;
 import org.xhtmlrenderer.swing.FSMouseListener;
 import org.xhtmlrenderer.swing.LinkListener;
-import org.xml.sax.SAXException;
 
 /** HTML-based wizard dialog.
  * <p>
@@ -64,14 +60,13 @@ import org.xml.sax.SAXException;
  * HTML document title for each page to construct the overview of the available
  * steps.
  */
-public class TemplateWizard extends JDialog implements ITemplatePanel {
+public class TemplateWizard extends JDialog implements ITemplateWizard {
 
-    /** wizard page templates for each step */
-    public ArrayList<URL> pages = new ArrayList<URL>();
     /** list of loaded documents */
-    private ArrayList<TemplateDocument> docs = new ArrayList<TemplateDocument>();
+    protected ArrayList<ITemplateWizardPage> pages = new ArrayList<ITemplateWizardPage>();
+    
     /** currently active step (base 0), -1 for not initialized */
-    protected int step = -1;
+    protected int page = -1;
     /** actual dialog content with HTML and buttons */
     protected TemplateButtonPanel pane = null;
     protected JPanel btnRight = null;
@@ -82,8 +77,6 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
     protected Action prevAction = null;
     /** "Cancel"/"Close" action */
     protected Action cancelAction = null;
-    /** Listener for page changes */
-    protected PageListener handler = null;
 
     // constructors
     public TemplateWizard()               { super(); initialize(); }
@@ -93,85 +86,119 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
     public TemplateWizard(Dialog owner, Properties p) { this(owner); setData(p); }
     public TemplateWizard(Frame owner, Properties p)  { this(owner); setData(p);  }
     
-    /** return the TemplateDocument by index.
+    /** Change wizard page
      * <p>
-     * The document is loaded on demand. Always use this method to access
-     * the document, or else it may not be loaded.
+     * This fails if the exitpage or enterpage handlers veto this
+     * (by returning {@literal false}), or if the page is not
+     * present. In these cases, {@literal false} is returned.
+     * <p>
+     * If the argument is {@literal null}, the first page is shown.
      *
-     * @return loaded document on success, {@code null} on failure
+     * @param id identifier of step to show, or {@literal null} for first page
+     * @return whether the step was shown or no
      */
-    protected TemplateDocument getDocument(int i)  {
-	// load when needed
-	while (docs.size() <= i) docs.add(null);
-	if (docs.get(i)==null || !docs.get(i).getDocumentURI().equals(pages.get(i).toExternalForm()) ) {
-	    try {
-		Document src = retrieveDocument(pages.get(i));
-		TemplateDocument doc = new TemplateDocument(src, data());
-		doc.setDocumentURI(pages.get(i).toExternalForm());
-		docs.set(i, doc);
-		return doc;
-	    } catch (SAXException e) {
-	    } catch (IOException e) {
-	    } catch (ParserConfigurationException e) {
-	    }
-	    return null;
+    public boolean setPage(String id) {
+	for (int i=0; i<pages.size(); i++) {
+	    if (pages.get(i).getId().equals(id))
+		return setPage(i);
 	}
-	return docs.get(i);
-    }
-    /** Returns the title of a step */
-    protected String getDocumentTitle(int step) {
-	return getSharedContext().getNamespaceHandler().getDocumentTitle(getDocument(step));	
+	return false;
     }
     
-    /** set the currently displayed page */
-    // TODO describe behaviour, especially what happens in last step
-    //      (based on handler being present or not)
-    public void setStep(int s) {
-	int oldStep = step;
-	// call pre-hook first
-	if (handler!=null && step>=0 && !handler.pageLeave(this, oldStep, s))
-	    return;
-	
-	// handle final "Close" step which just quits the dialog
-	if (s == pages.size()) {
-	    if (handler!=null)
-		handler.pageEnter(this, oldStep, s);
-	    else
-		dispose();
-	    return;
+    /** Sets the page to the first that is not done.
+     * <p>
+     * Each page is queried, starting from the first one, and if
+     * {@link TemplateWizardPage#isDone isDone} returns {@literal false},
+     * that page is shown.
+     * <p>
+     * If all pages are done, the last one is displayed.
+     */
+    public boolean setPageDetect() {
+	for (int i=0; i<pages.size(); i++) {
+	    if (!pages.get(i).isDone())
+		return setPage(i);
 	}
-	step = s;
-	// Update the ui
-	updateWizardProperties(step);
-	setTitle(pane.getDocumentTitle());
-	// no "Previous" at start; no "Next" beyond the final "Close"
-	if (s == pages.size()-1)
-	    cancelAction.putValue(Action.NAME, "Close");
-	nextAction.setEnabled(step < (pages.size()-1) );
-	prevAction.setEnabled(step > 0);
-	// enter handler so it can update properties
-	if (handler!=null) handler.pageEnter(this, oldStep, s);
-	// set new contents and get title from that as well
-	getDocument(s).refresh();
-	pane.setDocument(getDocument(s));
-	
-	// pack here to give child classes a chance to setPreferredSize()
-	// in their constructors or in setStep(). This is only called if
-	// the window is not yet visible because pack()ing resets the
-	// dialog size to its preferred size, which is unwanted when the
-	// user resized the window.
-	if (!isVisible()) pack();
+	return setPage(pages.size()-1);
+    }
+
+    /** Change wizard page by number
+     * <p>
+     * This fails if the exitpage or enterpage handlers veto this
+     * (by returning {@literal false}), or if the page is not
+     * present. In these cases, {@literal false} is returned.
+     * <p>
+     * When newPage is negative, the index is relative to the end.
+     *
+     * @param newPage page number to show
+     * @return whether the step was shown or no
+     */
+    protected boolean setPage(int newPage) {
+	// set wait cursor during page change
+	Cursor oldCursor = getCursor();
+	setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	try {
+	    // negative is relative from end
+	    if (newPage<0) newPage = pages.size() + newPage;
+	    
+	    // validate page number
+	    if (newPage<0 || newPage>=pages.size())
+		return false;
+
+	    // call exit handler, if any
+	    if (page>=0 &&
+		    !pages.get(page).pageLeave(pages.get(newPage), newPage>page))
+		return false;
+
+	    ITemplateWizardPage oldPage = null;
+	    if (page>=0) oldPage = pages.get(page);
+	    page = newPage;
+	    // Update the ui
+	    updateWizardProperties(newPage);
+	    // no "Previous" at start; no "Next" beyond the final "Close"
+	    if (newPage == pages.size()-1)
+		setSystemAffected(true);
+	    setButtonEnabled(BUTTON_NEXT, page < (pages.size()-1) );
+	    setButtonEnabled(BUTTON_PREV, page > 0);
+	    // call enter handler
+	    pages.get(newPage).pageEnter(oldPage);
+
+	    // set new contents and get title from that as well
+	    pages.get(newPage).setData(data());
+	    pane.setDocument(pages.get(newPage));
+	    pane.refresh();
+	    
+	    if (data().contains("wizard.title"))
+		setTitle(data().getProperty("wizard.title") + " - " + pages.get(newPage).getTitle());
+	    else
+		setTitle(pages.get(newPage).getTitle());
+	    
+	    setName("jgridstart-wizard-"+pages.get(newPage).getId());
+
+	    // pack here to give child classes a chance to setPreferredSize()
+	    // in their constructors or in setStep(). This is only called if
+	    // the window is not yet visible because pack()ing resets the
+	    // dialog size to its preferred size, which is unwanted when the
+	    // user resized the window.
+	    if (!isVisible()) pack();
+
+	    // success!
+	    return true;
+	    
+	} finally {
+	    // always restore old cursor
+	    setCursor(oldCursor);
+	}
     }
     /** go to another page by relative distance */
-    public void setStepRelative(int delta) {
-	if (step < 0)
-	    step = 0;
-	setStep(step + delta);
+    public boolean setPageRelative(int delta) {
+	if (page < 0)
+	    page = 0;
+	return setPage(page + delta);
     }
     
     /** Update the wizard properties for a step.
      * <p>
-     * This generaties the properties {@code wizard.*} which can be
+     * This generates the properties {@code wizard.*} which can be
      * referenced in the template. The following variables are defined
      * by default:
      * <ul>
@@ -189,7 +216,7 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
      * @param step step for which the contents is displayed; the default
      *             implementation marks the currently displayed step. 
      */
-    public void updateWizardProperties(int step) {
+    protected void updateWizardProperties(int step) {
 	String v = "<ul>\n";
 	
 	for (int i=0; i<pages.size(); i++)
@@ -204,6 +231,12 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
      * Default implementation returns a li item with an optional class
      * {@code wizard-current} if it is the current page, or
      * {@code wizard-future} if it is a step later than the current one.
+     * <p>
+     * For each page, the method {@link TemplateWizardPage#isDone isDone} is
+     * called. If it returns {@literal true}, the class {@code wizard-done}
+     * is added. The stylesheet can add a checkmark, for example, for
+     * this class to show the user that that step doesn't need to be done
+     * (anymore).
      * 
      * @param step step to return contents for; index in {@link #pages}
      * @param current the currently active step
@@ -212,7 +245,8 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	String classes = "";
 	if (step==current) classes += " wizard-current";
 	if (step>current)  classes += " wizard-future";
-	return (classes=="" ? "<li>" : "<li class='"+classes+"'>") + getDocumentTitle(step) + "</li>\n";
+	if (pages.get(step).isDone()) classes += " wizard-done";
+	return (classes=="" ? "<li>" : "<li class='"+classes+"'>") + pages.get(step).getContentsTitle() + "</li>\n";
     }
 
     /** Shows or hides the dialog.
@@ -223,9 +257,67 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
     @Override
     public void setVisible(boolean visible) {
 	// need to setup some stuff if no step selected
-	if (visible && step < 0 && pages.size() > 0)
-	    setStep(0);
+	if (visible && page < 0 && pages.size() > 0)
+	    setPage(0);
 	super.setVisible(visible);
+    }
+    
+    /** Button: next @see #setButtonEnabled */
+    static public final int BUTTON_PREV = 1;
+    static public final int BUTTON_NEXT = 2;
+    static public final int BUTTON_CLOSE = 3;
+    
+    /** Make button enabled or disabled
+     * 
+     * @param button one of {@linkplain #BUTTON_PREV}, {@linkplain #BUTTON_NEXT}
+     *          or {@linkplain #BUTTON_CLOSE}.
+     * @param enabled whether to enable the button or no
+     */
+    public void setButtonEnabled(int button, boolean enabled) {
+	if (button==BUTTON_PREV)
+	    prevAction.setEnabled(enabled);
+	else if (button==BUTTON_NEXT)
+	    nextAction.setEnabled(enabled);
+	else if (button==BUTTON_CLOSE)
+	    cancelAction.setEnabled(enabled);
+	else
+	    assert(false);
+    }
+    
+    public boolean getButtonEnabled(int button) {
+	if (button==BUTTON_PREV)
+	    return prevAction.isEnabled();
+	if (button==BUTTON_NEXT)
+	    return nextAction.isEnabled();
+	if (button==BUTTON_CLOSE)
+	    return cancelAction.isEnabled();
+	else
+	    assert(false);
+	return false;
+    }
+    
+    /** Indicate whether closing the wizard leaves system changed or not.
+     * <p>
+     * This affects the close/cancel button. If closing the wizard leaves
+     * the user unaffected, the button should be named "Cancel". If the
+     * wizard has changed anything on the system, it should be named "Close".
+     * <p>
+     * For example, when closing the wizard reverts back all changes that
+     * were done, it should definitely be called "Cancel". 
+     */
+    public void setSystemAffected(boolean affected) {
+	if (affected)
+	    cancelAction.putValue(Action.NAME, "Close");
+	else
+	    cancelAction.putValue(Action.NAME, "Cancel");
+    }
+    
+    public ITemplateWizard getWizard() {
+	return this;
+    }
+    
+    public Component getWindow() {
+	return this;
     }
     
     /** Initialize and build the dialog
@@ -254,7 +346,7 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	// "Previous" button
 	prevAction = new AbstractAction("Previous") {
 	    public void actionPerformed(ActionEvent e) {
-		setStepRelative(-1);
+		setPageRelative(-1);
 	    }
 	};
 	prevAction.putValue(Action.MNEMONIC_KEY, new Integer('P'));
@@ -265,7 +357,7 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	// "Next" button; name and mnemonic set in setStep()
 	nextAction = new AbstractAction("Next") {
 	    public void actionPerformed(ActionEvent e) {
-		setStepRelative(1);
+		setPageRelative(1);
 	    }
 	};
 	nextAction.putValue(Action.MNEMONIC_KEY, new Integer('N'));
@@ -273,13 +365,14 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	nextButton.setName("wizard_next");
 	pane.addButton(btnRight, nextButton, true, false);
 	// close window on escape
-	btnRight.add(Box.createRigidArea(new Dimension(pane.btnBorderWidth*8, 0)));
+	btnRight.add(Box.createRigidArea(new Dimension(pane.BUTTON_BORDER*8, 0)));
 	cancelAction = new AbstractAction("Cancel") {
 	    public void actionPerformed(ActionEvent e) {
 		TemplateWizard.this.dispose();
 	    }
 	};
 	cancelAction.putValue(Action.MNEMONIC_KEY, new Integer('C'));
+	setSystemAffected(false);
 	JButton cancelButton = new JButton(cancelAction);
 	cancelButton.setName("wizard_close");
 	pane.addButton(btnRight, cancelButton, true);
@@ -288,53 +381,12 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 	getRootPane().getActionMap().put("ESCAPE", cancelAction);
     }
     
-    /** set the handler to be called when a page switch is done.
-     * The handler is called after the page has been shown and can be
-     * used to modify the dialog contents. */
-    public void setHandler(PageListener l) {
-	handler = l;
+    /** Add a page to the wizard. */
+    public void addPage(ITemplateWizardPage page) {
+	page.associate(this, this);
+	pages.add(page);
     }
     
-    public interface PageListener {
-	/** Called before a page is to be changed
-	 * 
-	 * @param w Current TemplateWizard
-	 * @param curPage Page number almost leaving (index in pages)
-	 * @param newPage Page number going to (index in pages)
-	 * @return {@code true} to continue, {@code false} to stay on current page
-	 */
-	boolean pageLeave(TemplateWizard w, int curPage, int newPage);
-
-	/** Called after page was changed.
-	 * <p>
-	 * This is called after the page has been shown and can be used to
-	 * modify the dialog contents.
-	 * 
-	 * @param w Current TemplateWizard
-	 * @param prevPage Page number previously shown (index in pages)
-	 * @param curPage Page number just shown (index in pages)
-	 */
-	void pageEnter(TemplateWizard w, int prevPage, int curPage);
-    }
-    
-    /** Returns a {@linkplain Document} for a {@linkplain URL}.
-     * <p>
-     * This version explicitly allows the use of default caches to enable
-     * resource caching from URLs obtained with {@link Class#getResource}. 
-     */
-    protected Document retrieveDocument(URL url) throws SAXException, IOException, ParserConfigurationException {
-	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	
-	URLConnection conn = url.openConnection();
-	conn.setDefaultUseCaches(true);
-	InputStream in = conn.getInputStream();
-	try {
-	    return factory.newDocumentBuilder().parse(in);
-	} finally {
-	    in.close();
-	}
-    }
-
     @Override
     public void setBackground(Color c) {
 	super.setBackground(c);
@@ -407,14 +459,11 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 
     /** {@inheritDoc}
      * <p>
-     * Actually calls {@link #setStep} so that the {@link PageListener}
-     * and other hooks are properly updated.
-     * 
-     * @return always returns {@code true}
+     * Actually invokes {@link #setPage} so that the
+     * hooks are properly called.
      */
     public boolean refresh() {
-	setStep(step);
-	return true;
+	return setPage(page);
     }
 
     public void reloadDocument(Document doc) {
@@ -435,8 +484,8 @@ public class TemplateWizard extends JDialog implements ITemplatePanel {
 
     public void setData(Properties p) {
 	// need to setData on all cached instances!
-	for (TemplateDocument doc: docs)
-	    doc.setData(p);
+	for (Iterator<ITemplateWizardPage> it = pages.iterator(); it.hasNext(); )
+	    it.next().setData(p);
 	// and pane itself
 	pane.setData(p);
     }

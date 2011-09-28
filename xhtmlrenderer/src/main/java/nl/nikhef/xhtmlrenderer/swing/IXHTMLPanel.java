@@ -30,7 +30,7 @@ public interface IXHTMLPanel extends IDocumentContainer, FormSubmissionListener,
     
     public void addMouseTrackingListener(FSMouseListener l);
     public void removeMouseTrackingListener(FSMouseListener l);
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public List getMouseTrackingListeners();
 
     public void setFormSubmissionListener(FormSubmissionListener fsl);

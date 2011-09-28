@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import nl.nikhef.jgridstart.gui.wizard.TemplateWizard;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
 import nl.nikhef.xhtmlrenderer.swing.TemplateDocument;
 import nl.nikhef.xhtmlrenderer.swing.TemplatePanel;
@@ -53,7 +54,7 @@ public class TemplateButtonPanel extends JPanel implements ITemplatePanel {
     /** pane containing the buttons */
     protected JPanel buttonpane = null;
     /** empty space around buttons */
-    protected final int btnBorderWidth = 2;
+    public final int BUTTON_BORDER = 2;
     
     public TemplateButtonPanel() {
 	super();
@@ -78,7 +79,7 @@ public class TemplateButtonPanel extends JPanel implements ITemplatePanel {
 	buttonpane = new JPanel();
 	buttonpane.setLayout(new BoxLayout(buttonpane, BoxLayout.X_AXIS));
 	buttonpane.setBorder(BorderFactory.createEmptyBorder(
-		btnBorderWidth, btnBorderWidth, btnBorderWidth, btnBorderWidth));
+		BUTTON_BORDER, BUTTON_BORDER, BUTTON_BORDER, BUTTON_BORDER));
 	buttonpane.add(Box.createHorizontalGlue());
 	add(buttonpane, null);
     }
@@ -108,7 +109,7 @@ public class TemplateButtonPanel extends JPanel implements ITemplatePanel {
      */
     public void addButton(JPanel panel, JButton btn, boolean isDefault, boolean isLast) {
 	panel.add(btn, null);
-	panel.add(Box.createRigidArea(new Dimension(btnBorderWidth, 0)));
+	panel.add(Box.createRigidArea(new Dimension(BUTTON_BORDER, 0)));
 	if (isDefault && btn.getAction()!=null)
 	    contentpane.setSubmitAction(btn.getAction());
 	if (isLast) {
@@ -152,7 +153,7 @@ public class TemplateButtonPanel extends JPanel implements ITemplatePanel {
      * This is implemented as some whitespace to visually separate buttons
      */
     public void addSeparator() {
-	buttonpane.add(Box.createRigidArea(new Dimension(btnBorderWidth*8, 0)));
+	buttonpane.add(Box.createRigidArea(new Dimension(BUTTON_BORDER*8, 0)));
     }
 
     /*

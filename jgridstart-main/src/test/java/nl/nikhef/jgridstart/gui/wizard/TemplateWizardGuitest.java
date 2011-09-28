@@ -1,6 +1,5 @@
-package nl.nikhef.jgridstart.gui.util;
+package nl.nikhef.jgridstart.gui.wizard;
 
-import java.net.URL;
 import java.io.ByteArrayInputStream;
 import java.awt.Dimension;
 import javax.swing.JButton;
@@ -11,9 +10,8 @@ import org.w3c.dom.Document;
 import org.junit.Test;
 import abbot.finder.matchers.NameMatcher;
 
-import nl.nikhef.jgridstart.gui.util.TemplateWizard.PageListener;
+import nl.nikhef.jgridstart.gui.util.TemplateButtonPanelGuitest;
 import nl.nikhef.xhtmlrenderer.swing.ITemplatePanel;
-import nl.nikhef.xhtmlrenderer.swing.TemplateDocument;
 
 public class TemplateWizardGuitest extends TemplateButtonPanelGuitest {
     @Override
@@ -28,8 +26,8 @@ public class TemplateWizardGuitest extends TemplateButtonPanelGuitest {
     @Test
     public void testWizard1() throws Exception {
 	TemplateWizard wiz = new TemplateWizard();
-	wiz.pages.add(getClass().getResource("testWizard1.html"));
-	wiz.setStep(0);
+	wiz.addPage(new TemplateWizardPage("start", getClass().getResource("testWizard1.html")));
+	wiz.setPage("start");
 	wiz.data().setProperty("foo", "foocontents!");
 	showWindow(wiz);
 	bodyEquals(wiz, "foocontents!");
@@ -38,9 +36,9 @@ public class TemplateWizardGuitest extends TemplateButtonPanelGuitest {
     @Test
     public void testWizardNext() throws Exception {
 	TemplateWizard wiz = new TemplateWizard();
-	wiz.pages.add(getClass().getResource("testWizard1.html"));
-	wiz.pages.add(getClass().getResource("testWizard2.html"));
-	wiz.setStep(0);
+	wiz.addPage(new TemplateWizardPage("start", getClass().getResource("testWizard1.html")));
+	wiz.addPage(new TemplateWizardPage("end", getClass().getResource("testWizard2.html")));
+	wiz.setPage("start");
 	showWindow(wiz);
 	JButton next = (JButton)find(new NameMatcher("wizard_next"));
 	next.doClick();
@@ -50,9 +48,9 @@ public class TemplateWizardGuitest extends TemplateButtonPanelGuitest {
     @Test
     public void testWizardPrevious() throws Exception {
 	TemplateWizard wiz = new TemplateWizard();
-	wiz.pages.add(getClass().getResource("testWizard1.html"));
-	wiz.pages.add(getClass().getResource("testWizard2.html"));
-	wiz.setStep(0);
+	wiz.addPage(new TemplateWizardPage("1", getClass().getResource("testWizard1.html")));
+	wiz.addPage(new TemplateWizardPage("2", getClass().getResource("testWizard2.html")));
+	wiz.setPage("2");
 	wiz.data().setProperty("foo", "foocontents!");
 	showWindow(wiz);
 	JButton next = (JButton)find(new NameMatcher("wizard_next"));
@@ -65,8 +63,7 @@ public class TemplateWizardGuitest extends TemplateButtonPanelGuitest {
     @Test
     public void testWizardCancel() throws Exception {
 	TemplateWizard wiz = new TemplateWizard();
-	wiz.pages.add(getClass().getResource("testWizard1.html"));
-	wiz.setStep(0);
+	wiz.addPage(new TemplateWizardPage("0", getClass().getResource("testWizard1.html")));
 	showWindow(wiz);
 	assertTrue(wiz.isVisible());
 	JButton close = (JButton)find(new NameMatcher("wizard_close"));
@@ -77,19 +74,19 @@ public class TemplateWizardGuitest extends TemplateButtonPanelGuitest {
     @Test
     public void testWizardHandler() throws Exception {
 	TemplateWizard wiz = new TemplateWizard();
-	wiz.pages.add(getClass().getResource("testWizard1.html"));
-	wiz.pages.add(getClass().getResource("testWizard2.html"));
-	handlerPage = -1;
-	wiz.setHandler(new PageListener() {
-	    public void pageEnter(TemplateWizard w, int o, int n) {
-		handlerPage = n;
-	    }
-	    public boolean pageLeave(TemplateWizard w, int o, int n) { return true; }
+	wiz.addPage(new TemplateWizardPage("1", getClass().getResource("testWizard1.html")) {
+	    @Override
+	    public void pageEnter(ITemplateWizardPage oldPage) { handlerPage=0; }
 	});
+	wiz.addPage(new TemplateWizardPage("new2", getClass().getResource("testWizard2.html")) {
+	    @Override
+	    public void pageEnter(ITemplateWizardPage oldPage) { handlerPage=1; }
+	});
+	handlerPage = -1;
 	showWindow(wiz);
-	wiz.setStep(0);
+	wiz.setPage("1");
 	assertEquals(0, handlerPage);
-	wiz.setStep(1);
+	wiz.setPage("new2");
 	assertEquals(1, handlerPage);
 	JButton prev = (JButton)find(new NameMatcher("wizard_previous"));
 	prev.doClick();
@@ -99,7 +96,7 @@ public class TemplateWizardGuitest extends TemplateButtonPanelGuitest {
     @Test
     public void testWizardEmpty() throws Exception {
 	TemplateWizard wiz = new TemplateWizard();
-	wiz.pages.add(getClass().getResource("testWizard1.html"));
+	wiz.addPage(new TemplateWizardPage("id", getClass().getResource("testWizard1.html")));
 	showWindow(wiz);
 	bodyEquals(wiz, "");
 	assertFalse(((JButton)find(new NameMatcher("wizard_previous"))).isEnabled());
@@ -135,23 +132,20 @@ public class TemplateWizardGuitest extends TemplateButtonPanelGuitest {
 			"<div class='wizard-page'>Hello there then</div>" +
 			"</body></html>",
 	};
-	
-	TemplateWizard wiz = new TemplateWizard() {
-	    // use embedded document as source instead of external pages
-	    @Override
-	    public TemplateDocument getDocument(int step) {
-		try {
-		    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		    DocumentBuilder builder = factory.newDocumentBuilder();
-		    Document src = builder.parse(new ByteArrayInputStream(testPages[step].getBytes()));
-		    return new TemplateDocument(src, data());
-		} catch(Exception e) {
-		    return null;
-		}
-	    }
-	};
-	// create dummy list so it knows the right number of pages
-	for (int i=0; i<testPages.length; i++) wiz.pages.add(new URL("http://localhost/"));
+
+	// create wizard,
+	TemplateWizard wiz = new TemplateWizard();
+	// add pages
+	for (int i=0; i<testPages.length; i++) {
+	    Document doc = null;
+	    try {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		doc = builder.parse(new ByteArrayInputStream(testPages[i].getBytes()));
+	    } catch(Exception e) { }
+	    TemplateWizardPage mkpage = new TemplateWizardPage(String.valueOf(i), doc);
+	    wiz.addPage(mkpage);
+	}
 	// and go!
 	setTestPane(null, wiz);
 	wiz.setPreferredSize(new Dimension(500,400));

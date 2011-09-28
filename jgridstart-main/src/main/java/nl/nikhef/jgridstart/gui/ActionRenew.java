@@ -10,10 +10,10 @@ import javax.swing.JFrame;
 import nl.nikhef.jgridstart.CertificateStore;
 import nl.nikhef.jgridstart.gui.util.CertificateSelection;
 import nl.nikhef.jgridstart.gui.util.ErrorMessage;
-import nl.nikhef.jgridstart.gui.util.TemplateWizard;
 import nl.nikhef.jgridstart.gui.util.URLLauncherCertificate;
 import nl.nikhef.jgridstart.gui.wizard.IRequestWizard;
 import nl.nikhef.jgridstart.gui.wizard.RequestWizardCommon;
+import nl.nikhef.jgridstart.gui.wizard.TemplateWizard;
 
 /** Renew a certificate
  * 
