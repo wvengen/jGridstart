@@ -101,9 +101,9 @@ public class TemplateWizardPage extends TemplateDocument implements ITemplateWiz
     /**
      * Callback when leaving a page.
      * <p>
-     * Default implementation returns {@link #validate}. If that throws a
-     * {@link ValidationException} which a non-{@literal null} message, an error
-     * dialog is shown and {@literal false} is returned.
+     * Default implementation returns {@link #validate} when user pressed "Next".
+     * If that throws a {@link ValidationException} which a non-{@literal null}
+     * message, an error dialog is shown and {@literal false} is returned.
      * 
      * @see #validate
      * @param newPage new page that will be shown
@@ -111,6 +111,8 @@ public class TemplateWizardPage extends TemplateDocument implements ITemplateWiz
      * @return {@literal false} to stay on the current page
      */
     public boolean pageLeave(ITemplateWizardPage newPage, boolean isNext) {
+	if (!isNext)
+	    return true;
 	// validate
 	try {
 	    validate();
