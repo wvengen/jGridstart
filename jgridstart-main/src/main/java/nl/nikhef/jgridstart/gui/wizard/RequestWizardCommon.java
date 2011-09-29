@@ -52,7 +52,10 @@ public class RequestWizardCommon extends TemplateWizard implements IRequestWizar
      * a Frame as Dialog as argument.
      */
     static public RequestWizardCommon createInstance(Frame parent, CertificateStore store, CertificateSelection sel, CertificatePair cert, CertificatePair certParent) throws ClassNotFoundException, RuntimeException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException  {
-	Class<?> clazz = Class.forName(System.getProperty("jgridstart.requestwizard.provider"));
+	String clazzname = System.getProperty("jgridstart.requestwizard.provider");
+	if (clazzname==null || "".equals(clazzname))
+	    throw new RuntimeException("No request wizard provider specified.");
+	Class<?> clazz = Class.forName(clazzname);
 	Constructor<?> constr = clazz.getDeclaredConstructor(new Class[]{Frame.class});
 	constr.setAccessible(true); // to be able to call protected methods -- why needed?!?!?
 	RequestWizardCommon wizard = (RequestWizardCommon)constr.newInstance(new Object[]{parent});
@@ -66,7 +69,10 @@ public class RequestWizardCommon extends TemplateWizard implements IRequestWizar
 	return createInstance(parent, store, sel, null);
     }
     static public RequestWizardCommon createInstance(Dialog parent, CertificateStore store, CertificateSelection sel, CertificatePair cert, CertificatePair certParent) throws ClassNotFoundException, RuntimeException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException  {
-	Class<?> clazz = Class.forName(System.getProperty("jgridstart.requestwizard.provider"));
+	String clazzname = System.getProperty("jgridstart.requestwizard.provider");
+	if (clazzname==null || "".equals(clazzname))
+	    throw new RuntimeException("No request wizard provider specified.");
+	Class<?> clazz = Class.forName(clazzname);
 	Constructor<?> constr = clazz.getDeclaredConstructor(new Class[]{Dialog.class});
 	RequestWizardCommon wizard = (RequestWizardCommon)constr.newInstance(new Object[]{parent});
 	wizard.construct(store, sel, cert, certParent);
