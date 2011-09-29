@@ -53,7 +53,7 @@ public class PageLogin extends RequestWizardPage {
 	// if the next button becomes enabled, just move to next page
 	//if (!getWizard().getButtonEnabled(TemplateWizard.BUTTON_NEXT) && isDone())
 	//    getWizard().setPageRelative(1);
-	// enable button only after certificate was submitted
+	// enable button only after login was successful
 	getWizard().setButtonEnabled(TemplateWizard.BUTTON_NEXT, isDone());
 	
 	// start worker thread
@@ -68,6 +68,16 @@ public class PageLogin extends RequestWizardPage {
     
     @Override
     public boolean pageLeave(ITemplateWizardPage newPage, boolean isNext) {
+	// if we are logged in, update user details when needed
+	if (isDone() && !Boolean.valueOf("subject")) {
+	    try {
+		for (Map.Entry<Object, Object> entry: getCA().getUserInfo().entrySet())
+		    data().setProperty((String)entry.getKey(), (String)entry.getValue());
+	    } catch (Exception e) {
+		// TODO this is ok for CAException, but is it for IOException?
+		ErrorMessage.internal(getParent(), e);
+	    }
+	}
 	// don't do anything yet if we return to the same page
 	if (newPage==this) return true;
 	// stop worker
@@ -121,10 +131,6 @@ public class PageLogin extends RequestWizardPage {
 		// else try to see if user logged in
 		try {
 		    getCA().loginProcess(null, null);
-		    // update properties
-		    // TODO would this be better off in the {@link #done} method?
-		    for (Map.Entry<Object, Object> entry: getCA().getUserInfo().entrySet())
-			data().setProperty((String)entry.getKey(), (String)entry.getValue());
 		} catch (OAuthException e1) {
 		    // if not succeeded keep trying
 		    continue;

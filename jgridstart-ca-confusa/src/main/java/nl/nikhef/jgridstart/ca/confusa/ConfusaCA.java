@@ -214,7 +214,7 @@ public class ConfusaCA implements CA {
 	    // must contain location url for certificate now
 	    Header[] locations = result.getHeaders("Location");
 	    if (locations.length<1)
-		throw new IOException("Missing certificate location, although submission seemed succesful.");
+		throw new IOException("Missing certificate location in CA response, although submission seemed succesful.");
 	    if (locations.length>1)
 		logger.warning("Multiple ("+Integer.toString(locations.length)+") certificate locations, using first one.");
 	    info.setProperty("request.certurl", result.getHeaders("Location")[0].getValue());
@@ -392,7 +392,7 @@ public class ConfusaCA implements CA {
     
     /** Retrieve user info.
      * <p>
-     * This only works after a successful login. The result it cached.
+     * This only works after a successful login. The result is cached.
      */
     public Properties getUserInfo() throws IOException {
 	if (userInfo==null) {
@@ -401,7 +401,9 @@ public class ConfusaCA implements CA {
 	    String dn = readEntity(response.getEntity());
 	    if (!dn.startsWith("DN="))
 		throw new IOException("Could not retrieve user DN.\n "+dn);
-	    dn = dn.substring(4);
+	    // DN is slash-separated; it should start with one for CertificatePair#generateRequest 
+	    dn = dn.substring(4).trim();
+	    if (!dn.startsWith("/")) dn = "/" + dn;
 	    response = oauthPost(baseInfo + "/user", null);
 	    String uinf = readEntity(response.getEntity());
 	    Document xuinf = null;
@@ -418,7 +420,7 @@ public class ConfusaCA implements CA {
 	    
 	    // set as properties
 	    Properties p = new Properties();
-	    p.setProperty("subject", dn.trim());
+	    p.setProperty("subject", dn);
 	    p.setProperty("uid", xuinf.getElementsByTagName("uid").item(0).getTextContent().trim());
 	    p.setProperty("fullname", xuinf.getElementsByTagName("name").item(0).getTextContent().trim());
 	    p.setProperty("org", xuinf.getElementsByTagName("orgDN").item(0).getTextContent().trim());
