@@ -5,7 +5,7 @@
   <!-- package information -->
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>jgridstart-small</artifactId>
-  <version>1.11</version>
+  <version>1.11-multica</version>
   <name>jGridstart application (compressed)</name>
   <url>http://jgridstart.nikhef.nl/</url>
   <description>Compressed version of jGridstart</description>
@@ -22,12 +22,17 @@
     <splash>resources/splash.png</splash>
   </properties>
 
-  <!-- just package the jGridstart application -->
+  <!-- just package the jGridstart application and some CAs -->
   <dependencies>
     <dependency>
       <groupId>nl.nikhef.jgridstart</groupId>
-      <artifactId>jgridstart-main</artifactId>
-      <version>1.11</version>
+      <artifactId>jgridstart-ca-dutchgrid</artifactId>
+      <version>1.11-multica</version>
+    </dependency>
+    <dependency>
+      <groupId>nl.nikhef.jgridstart</groupId>
+      <artifactId>jgridstart-ca-confusa</artifactId>
+      <version>1.11-multica</version>
     </dependency>
   </dependencies>
 
@@ -150,7 +155,12 @@
             !META-INF/*.txt,
             <!-- bouncycastle version mismatch; we don't use it, cross fingers -->
             !com/lowagie/text/pdf/TSAClient*,
-            !com/lowagie/text/pdf/OcspClient*
+            !com/lowagie/text/pdf/OcspClient*,
+	    <!-- Apache commons logging backends with unresolved runtime deps we don't use -->
+	    !org/apache/commons/logging/impl/AvalonLogger.class,
+	    !org/apache/commons/logging/impl/Log4JLogger.class,
+	    !org/apache/commons/logging/impl/LogKitLogger.class,
+	    !org/apache/commons/logging/impl/ServletContextCleaner.class
           </inFilter>
         </configuration>
         <dependencies>
