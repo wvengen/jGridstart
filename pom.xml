@@ -44,7 +44,6 @@
     <module>jgridstart-small</module>
     <module>jgridstart-wrapper</module>
     <module>jgridstart-jws</module>
-    <module>jgridstart-tests</module>
   </modules>
 
 </project>
