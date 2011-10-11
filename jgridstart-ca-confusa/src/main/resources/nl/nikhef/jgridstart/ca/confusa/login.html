@@ -11,19 +11,26 @@
 <div class="wizard-page">
 <p>This wizard will guide you through retrieving a new certificate.</p>
 
-<div if="!${wizard.authdone} and !${wizard.authurl}">
-  <p>Detecting login status ...</p>
-</div>
+<p if="${wizard.error}" class="info-bad">Could not login.</p>
+<p if="${wizard.error}" class="info-detail" c="${wizard.error}" />
 
-<div if="!${wizard.authdone} and ${wizard.authurl}">
-  <p>You need to login at your institution to be able to request
-  a new certificate. Please visit the following website to do so:</p>
-  <p style="margin-left: 2em;"><a href="${wizard.authurl}">Login at Confusa</a></p>
-</div>
+<div if="!${wizard.error}">
 
-<div if="${wizard.authdone}">
-  <p>You have logged in, please press <i>Next</i> to continue.</p>
-  <p>Subject: <tt c="${subject}" /></p>
+  <div if="!${wizard.authdone} and !${wizard.authurl}">
+    <p>Detecting login status ...</p>
+  </div>
+
+  <div if="!${wizard.authdone} and ${wizard.authurl}">
+    <p>You need to login at your institution to be able to request
+    a new certificate. Please visit the following website to do so:</p>
+    <p style="margin-left: 2em;"><a href="${wizard.authurl}">Login at Confusa</a></p>
+  </div>
+
+  <div if="${wizard.authdone}">
+    <p>You have logged in, please press <i>Next</i> to continue.</p>
+    <p>Subject: <tt c="${subject}" /></p>
+  </div>
+  
 </div>
 
 </div>

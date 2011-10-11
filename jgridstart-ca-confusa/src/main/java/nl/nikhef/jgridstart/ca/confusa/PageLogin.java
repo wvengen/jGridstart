@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import oauth.signpost.exception.OAuthException;
+import oauth.signpost.exception.OAuthNotAuthorizedException;
 
 import org.xml.sax.SAXException;
 
@@ -131,8 +132,8 @@ public class PageLogin extends RequestWizardPage {
 		// else try to see if user logged in
 		try {
 		    getCA().loginProcess(null, null);
-		} catch (OAuthException e1) {
-		    // if not succeeded keep trying
+		} catch (OAuthNotAuthorizedException e) {
+		    // if not logged in keep trying
 		    continue;
 		}
 		// return when done
