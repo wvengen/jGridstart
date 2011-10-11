@@ -111,6 +111,15 @@ public class RequestWizardCommon extends TemplateWizard implements IRequestWizar
 	replaceLinkListener(new LinkListener() {
 	    @Override
             public void linkClicked(BasicPanel panel, String uri) {
+		// handle help toggle buttons, not a regular action
+		if (uri.startsWith("action:toggle(")) {
+		    String var = uri.substring(14,uri.length()-1);
+		    boolean val = Boolean.valueOf(data().getProperty(var));
+		    data().setProperty(var, Boolean.toString(!val));
+		    data().setProperty(var+".volatile", "true");
+		    refresh();
+		    return;
+		}
 		// select certificate so that any "action:" links are executed
 		// on the correct certificate.
 		if (uri.startsWith("action:"))
@@ -120,7 +129,7 @@ public class RequestWizardCommon extends TemplateWizard implements IRequestWizar
 		// refresh document after action because properties may be updated
 		if (uri.startsWith("action:"))
 		    refresh();
-	    }	    
+	    }
 	});
     }
     

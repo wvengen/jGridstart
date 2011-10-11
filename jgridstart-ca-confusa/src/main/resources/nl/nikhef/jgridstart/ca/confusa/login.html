@@ -28,7 +28,11 @@
 
   <div if="${wizard.authdone}">
     <p>You have logged in, please press <i>Next</i> to continue.</p>
-    <p>Subject: <tt c="${subject}" /></p>
+    
+    <a class="helpbutton"	href="action:toggle(wizard.show.moresubject)">(more)</a>
+    <div class="help" if="${wizard.show.moresubject}">
+      Subject: <tt c="${subject}" style="font-size: 80%;" />
+    </div>
   </div>
   
 </div>

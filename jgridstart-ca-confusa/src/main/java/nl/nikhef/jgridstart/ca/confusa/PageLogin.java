@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthException;
 import oauth.signpost.exception.OAuthNotAuthorizedException;
 
@@ -135,6 +136,10 @@ public class PageLogin extends RequestWizardPage {
 		} catch (OAuthNotAuthorizedException e) {
 		    // if not logged in keep trying
 		    continue;
+		} catch(OAuthCommunicationException e) {
+		    // SimpleSAMLphp can give server error when asking this twice
+		    if (e.getMessage().contains("Internal server error")) continue;
+		    else throw e;
 		}
 		// return when done
 		if (PageLogin.this.isDone()) return null;

@@ -6,6 +6,7 @@ import java.net.URL;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.xhtmlrenderer.css.parser.property.PrimitivePropertyBuilders.Clear;
 import org.xml.sax.SAXException;
 
 /** Page of a request wizard.

@@ -370,7 +370,7 @@ public class ConfusaCA implements CA {
      * <p>TODO use IOException & CAPasswordWrongException oid
      */
     public URL loginPrepare() throws OAuthException, MalformedURLException {
-	logger.fine("Requesting OAuth request token");
+	logger.fine("Requesting OAuth request token, key="+consumer.getConsumerKey());
 	return new URL(provider.retrieveRequestToken(consumer, OAuth.OUT_OF_BAND));
     }
     

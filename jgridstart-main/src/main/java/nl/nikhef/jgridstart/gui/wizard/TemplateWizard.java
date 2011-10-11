@@ -148,6 +148,9 @@ public class TemplateWizard extends JDialog implements ITemplateWizard {
 	    if (page>=0 &&
 		    !pages.get(page).pageLeave(pages.get(newPage), newPage>page))
 		return false;
+	    
+	    // clear error if going to another page
+	    if (page != newPage) data().remove("wizard.error");
 
 	    ITemplateWizardPage oldPage = null;
 	    if (page>=0) oldPage = pages.get(page);
