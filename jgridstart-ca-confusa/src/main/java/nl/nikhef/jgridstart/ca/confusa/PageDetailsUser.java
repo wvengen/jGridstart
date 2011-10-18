@@ -18,7 +18,7 @@ import nl.nikhef.jgridstart.gui.wizard.ValidationException;
 public class PageDetailsUser extends RequestWizardPage {
 
     public PageDetailsUser() throws ParserConfigurationException, SAXException, IOException {
-	super("details_user", PageDetailsUser.class.getResource("details_user.html"));
+	super("userdetails", PageDetailsUser.class.getResource("details_user.html"));
     }
     
     @Override

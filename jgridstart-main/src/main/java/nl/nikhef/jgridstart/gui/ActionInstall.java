@@ -56,7 +56,7 @@ public class ActionInstall extends CertificateAction {
 	    if (!silent) {
 		// explain what'll happen in password dialog or option pane
 		// this redirects to the RequestWizard's install page for jGridStart
-		URLLauncher.performAction("viewrequest(3)", findWindow(e.getSource()));
+		URLLauncher.performAction("viewrequest(install)", findWindow(e.getSource()));
 		return;
 		
 		// An alternative implementation would be (though the explanation is

@@ -6,7 +6,6 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import oauth.signpost.exception.OAuthCommunicationException;
-import oauth.signpost.exception.OAuthException;
 import oauth.signpost.exception.OAuthNotAuthorizedException;
 
 import org.xml.sax.SAXException;
@@ -28,6 +27,9 @@ import nl.nikhef.jgridstart.gui.wizard.TemplateWizardWorker;
  * The property <tt>jgridstart.ca.oauth.poll</tt> specifies the number of 
  * milliseconds to wait between each poll to the Confusa website to see
  * if the user has authenticated properly.
+ * <p>
+ * This page can only be used in combination with {@link ConfusaCA}, or an
+ * error will be given.
  * 
  * @author wvengen
  *

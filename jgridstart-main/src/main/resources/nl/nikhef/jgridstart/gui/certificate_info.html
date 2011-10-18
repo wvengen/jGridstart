@@ -10,13 +10,13 @@
       This certificate is incomplete, you might consider removing it manually.</p>
 
     <p class="info-ok" if="!${cert} and ${request} and !${request.submitted} and !${request.processed}">
-	  Your request still needs to be <a href="action:viewrequest(1)">submitted</a> to the certificate authority.</p>
+	  Your request still needs to be <a href="action:viewrequest(submit)">submitted</a> to the certificate authority.</p>
 
     <p class="info-ok" if="!${cert} and ${request} and ${request.submitted} and !${request.processed}">
-      Your request is currently awaiting approval (<a href="action:viewrequest(2)">more...</a>).</p>
+      Your request is currently awaiting approval (<a href="action:viewrequest(process)">more...</a>).</p>
 	  
     <p class="info-ok" if="!${cert} and ${request} and ${request.processed}">
-      Your request has been accepted, you can now <a href="action:install(3)">retrieve your certificate</a>.</p>
+      Your request has been accepted, you can now <a href="action:install()">retrieve your certificate</a>.</p>
 	  
 	<p class="info-ok" if="${valid} and ${valid.notafter.warning} and !${renewal.childstarted}">
 	  You have <span c="${valid.notafter.remaining}"/> days left to <a href="action:renew">renew</a> your certificate.</p>
