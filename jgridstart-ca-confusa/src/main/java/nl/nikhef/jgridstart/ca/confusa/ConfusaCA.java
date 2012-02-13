@@ -188,7 +188,9 @@ public class ConfusaCA implements CA {
 	}
 	Element elreq = xmlreq.createElement("signingRequest");
 	xmlreq.appendChild(elreq);
-	elreq.appendChild(xmlreq.createTextNode(req));
+	Element elcsr = xmlreq.createElement("csr");
+	elcsr.appendChild(xmlreq.createTextNode(req));
+	elreq.appendChild(elcsr);
 	Element emails = xmlreq.createElement("emails");
 	elreq.appendChild(emails);
 	if (info.getProperty("email")!=null) {
