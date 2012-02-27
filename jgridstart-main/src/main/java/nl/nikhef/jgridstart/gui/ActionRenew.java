@@ -38,6 +38,8 @@ public class ActionRenew extends CertificateAction {
 	    if (!Boolean.valueOf(getCertificatePair().getProperty("valid"))) return false;
 	    // demo certificates are not eligible for renewal
 	    if (getCertificatePair().getProperty("level") == "demo") return false;
+	    // certificates need to be issued by the issuer we're working with
+	    if (!Boolean.valueOf(getCertificatePair().getProperty("ca_supported"))) return false;
 	    // ok!
 	    return true;
 	} catch (IOException e) {

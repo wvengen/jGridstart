@@ -131,4 +131,7 @@ public interface CA {
     
     /** Return the CA certificate */
     public X509Certificate getCACertificate() throws IOException;
+    
+    /** Return whether a certificate was issued by this CA */
+    public boolean isIssuer(X509Certificate cert);
 }

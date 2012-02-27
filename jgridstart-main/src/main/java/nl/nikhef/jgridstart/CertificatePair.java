@@ -296,6 +296,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		    return "true";
 		return null;
 	    }
+	    if (key.equals("ca_supported")) {
+		return Boolean.toString(CAFactory.getDefault().isIssuer(getCertificate()));
+	    }
 	} catch (Exception e) {
 	    return null;
 	}

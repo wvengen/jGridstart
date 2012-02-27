@@ -15,6 +15,8 @@ import java.security.cert.X509Certificate;
 import nl.nikhef.jgridstart.osutils.ConnectionUtils;
 
 import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.jce.X509Principal;
+
 import nl.nikhef.jgridstart.util.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
 
@@ -34,6 +36,8 @@ public class TestCA implements CA {
     protected String baseCaCert = System.getProperty("jgridstart.ca.base.cacert");
     /** CA certificate (cached) */
     protected static X509Certificate cacert = null;
+    /** CA DN */
+    protected String caDN = System.getProperty("jgridstart.ca.dn");
 
     /** Create new TestCA */
     public TestCA() throws NoSuchAlgorithmException, KeyManagementException {
@@ -44,6 +48,10 @@ public class TestCA implements CA {
 	if (baseCaCert==null) {
 	    baseCaCert = base + "?action=retrieve_ca_cert&install=true";
 	    System.setProperty("jgridstart.ca.base.cacert", baseCaCert);
+	}
+	if (caDN==null) {
+	    caDN = "C=NL, ST=NH, L=Amsterdam, O=Nikhef Test, CN=Nikhef Test CA, emailAddress=wvengen@nikhef.nl";
+	    System.setProperty("jgridstart.ca.dn", caDN);
 	}
     }
     
@@ -154,5 +162,14 @@ public class TestCA implements CA {
 		throw new IOException("CA certificate could not be retrieved: "+scert);
 	}
 	return cacert;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isIssuer(X509Certificate cert) {
+	// TODO cache X500Principal
+	String dn = caDN;
+	if (dn.trim().startsWith("/"))
+	    dn = dn.substring(1).replace('/', ',');
+	return cert.getIssuerDN().equals(new X509Principal(dn));
     }
 }

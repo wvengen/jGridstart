@@ -25,6 +25,7 @@ import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
@@ -176,5 +177,14 @@ public class LocalCA implements CA {
     public X509Certificate getCACertificate() {
 	assert(cacert!=null);
 	return cacert;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isIssuer(X509Certificate cert) {
+	// TODO cache X500Principal
+	String dn = caDN;
+	if (dn.trim().startsWith("/"))
+	    dn = dn.substring(1).replace('/', ',');
+	return cert.getIssuerDN().equals(new X509Principal(dn));
     }
 }

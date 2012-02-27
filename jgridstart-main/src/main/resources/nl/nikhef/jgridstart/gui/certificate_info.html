@@ -18,8 +18,12 @@
     <p class="info-ok" if="!${cert} and ${request} and ${request.processed}">
       Your request has been accepted, you can now <a href="action:install(3)">retrieve your certificate</a>.</p>
 	  
-	<p class="info-ok" if="${valid} and ${valid.notafter.warning} and !${renewal.childstarted}">
+	<p class="info-ok" if="${valid} and ${valid.notafter.warning} and !${renewal.childstarted} and ${ca_supported}">
 	  You have <span c="${valid.notafter.remaining}"/> days left to <a href="action:renew">renew</a> your certificate.</p>
+
+	<p class="info-bad" if="${valid} and ${valid.notafter.warning} and !${renewal.childstarted} and !${ca_supported}">
+	  Your certificate will expire within <span c="${valid.notafter.remaining}"/> days. To renew, please
+	  contact the issuer.</p>
 
 	<p class="info-ok" if="${valid} and ${valid.notafter.warning} and ${renewal.childstarted}">
       Your certificate will expire within <span c="${valid.notafter.remaining}"/> days.</p>
