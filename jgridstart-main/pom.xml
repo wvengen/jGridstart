@@ -5,7 +5,7 @@
   <!-- package information -->
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>jgridstart-main</artifactId>
-  <version>1.11</version>
+  <version>1.12</version>
   <name>jGridstart application</name>
   <url>http://jgridstart.nikhef.nl/</url>
   <description>jGridstart helps grid end-users to request, obtain, install and renew grid certificates in a friendly way.</description>

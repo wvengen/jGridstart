@@ -5,7 +5,7 @@
   <!-- package information -->
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>jgridstart-small</artifactId>
-  <version>1.11</version>
+  <version>1.12</version>
   <name>jGridstart application (compressed)</name>
   <url>http://jgridstart.nikhef.nl/</url>
   <description>Compressed version of jGridstart</description>
@@ -27,7 +27,7 @@
     <dependency>
       <groupId>nl.nikhef.jgridstart</groupId>
       <artifactId>jgridstart-main</artifactId>
-      <version>1.11</version>
+      <version>1.12</version>
     </dependency>
   </dependencies>
 

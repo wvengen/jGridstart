@@ -5,7 +5,7 @@
   <!-- package information -->
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>jgridstart-jws</artifactId>
-  <version>1.11</version>
+  <version>1.12</version>
   <name>jGridstart application (java web start)</name>
   <url>http://jgridstart.nikhef.nl/</url>
   <description>Java Web Start version of jGridstart</description>
@@ -22,7 +22,7 @@
     <dependency>
       <groupId>nl.nikhef.jgridstart</groupId>
       <artifactId>jgridstart-wrapper</artifactId>
-      <version>1.11</version>
+      <version>1.12</version>
     </dependency>
   </dependencies>
 
