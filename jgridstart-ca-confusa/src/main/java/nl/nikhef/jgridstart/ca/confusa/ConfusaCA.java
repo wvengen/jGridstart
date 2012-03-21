@@ -42,6 +42,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.StringEntity;
@@ -308,7 +309,7 @@ public class ConfusaCA implements CA {
 	for (int i=0; data!=null && i<data.length; i+=2) {
 	    params.add(new BasicNameValuePair(data[i], data[i+1]));
 	}
-	req.setEntity(/*new UrlEncodedFormEntity*/ new StringEntity(params.toString()));
+	req.setEntity(new UrlEncodedFormEntity(params));
 	try {
 	    consumer.sign(req);
 	} catch (OAuthException e) {
