@@ -136,7 +136,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     @Override
     protected void initialize() {
 	super.initialize();
-	setPreferredSize(new Dimension(800, 550));
+	setPreferredSize(new Dimension(850, 550));
 	// add the html pages
 	pages.add(getClass().getResource("requestwizard-01.html"));
 	pages.add(getClass().getResource("requestwizard-02.html"));

@@ -20,8 +20,13 @@
   <dependencies>
     <dependency>
       <groupId>org.xhtmlrenderer</groupId>
-      <artifactId>core-renderer</artifactId>
-      <version>R8</version>
+      <artifactId>flying-saucer-core</artifactId>
+      <version>9.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xhtmlrenderer</groupId>
+      <artifactId>flying-saucer-pdf</artifactId>
+      <version>9.0.0</version>
       <!-- we want a different bouncycastle version and don't use the iText 
         cryptography features anyway; to have this working automatically
         in Eclipse this entry is placed after the new bouncycastle dependencies
@@ -37,7 +42,7 @@
 	  <artifactId>bcmail-jdk14</artifactId>
         </exclusion>
         <exclusion>
-	  <groupId>org.bouncycastle</groupId>
+	  <groupId>bouncycastle</groupId>
 	  <artifactId>bctsp-jdk14</artifactId>
         </exclusion>
       </exclusions>

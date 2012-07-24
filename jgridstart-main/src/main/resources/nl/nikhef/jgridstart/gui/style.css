@@ -44,7 +44,7 @@ body#wizard {
 	position: fixed;
 	top: 35pt;
 	left: 0;
-	width: 11em;
+	/*width: 11em;*/
 	height: 100%;
 	margin: 0;
 	padding: 5pt 0 5pt 1.5em;
@@ -71,15 +71,21 @@ body#wizard {
 }
 .wizard-contents li.wizard-done:before {
 	content: '\2713';
-	margin-left: -1em;
-	margin-right: 0.2em;
+	margin-left: -1.22em;
+	margin-right: 0.42em;
 }
 
 .wizard-page {
-	margin-left: 13em; /* = .wizard-contents' horizontal paddings + width */
+	margin-left: 12.2em; /* = .wizard-contents' horizontal paddings + width */
 	margin-top: 35pt;   /* = .wizard-title's vertical paddings + height */
 	padding: 5pt 1em 5pt 1em;
 	background: white;
+}
+
+/* wizard tweaks */
+.wizard-page select {
+	font-size: 90%;
+	width: 31em;
 }
 
 /*
@@ -105,7 +111,8 @@ form table th label:after {
 	content: ":";
 }
 form table input {
-	width: 100%;
+	/*width: 100%;*/
+	width: 26em;
 }
 form table td.legend {
 	padding-top: 15pt;
@@ -131,6 +138,7 @@ form table td.legend:first-child {
 	border: none;
 	color: #888;
 }
+
 
 /*
  * Expandable help
