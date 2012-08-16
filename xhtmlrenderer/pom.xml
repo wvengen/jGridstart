@@ -13,7 +13,7 @@
   <parent>
     <groupId>nl.nikhef.jgridstart</groupId>
     <artifactId>jgridstart</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -21,12 +21,12 @@
     <dependency>
       <groupId>org.xhtmlrenderer</groupId>
       <artifactId>flying-saucer-core</artifactId>
-      <version>9.0.0</version>
+      <version>9.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.xhtmlrenderer</groupId>
       <artifactId>flying-saucer-pdf</artifactId>
-      <version>9.0.0</version>
+      <version>9.0.1</version>
       <!-- we want a different bouncycastle version and don't use the iText 
         cryptography features anyway; to have this working automatically
         in Eclipse this entry is placed after the new bouncycastle dependencies
@@ -75,21 +75,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <!--  XHTMLRenderer's $url/apidocs isn't valid ... -->
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <links>
-            <link>http://pigeonholdings.com/projects/flyingsaucer/R8/javadoc/user/</link>
-          </links>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
 
   <repositories>
     <repository>

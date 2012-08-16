@@ -13,7 +13,7 @@
   <parent>
     <groupId>nl.nikhef.jgridstart</groupId>
     <artifactId>jgridstart</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -35,11 +35,11 @@
   <build>
     <plugins>
 
-      <!-- copy dependencies to lib/ -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
+          <!-- copy dependencies to lib/ -->
           <execution>
             <id>copy-lib</id>
             <phase>compile</phase>
@@ -48,14 +48,8 @@
               <outputDirectory>${project.build.directory}/classes/lib</outputDirectory>
             </configuration>
           </execution>
-        </executions>
-      </plugin>
 
-      <!-- generate list of dependencies so it knows what to load -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
+          <!-- generate list of dependencies so it knows what to load -->
           <execution>
             <id>lib-classpath</id>
             <phase>compile</phase>
@@ -65,6 +59,25 @@
               <prefix>lib</prefix>
             </configuration>
           </execution>
+
+          <!-- put splash screen into wrapper jar too -->
+          <execution>
+            <id>copy-splash</id>
+            <phase>compile</phase>
+            <goals><goal>unpack</goal></goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>nl.nikhef.jgridstart</groupId>
+                  <artifactId>jgridstart-small</artifactId>
+                  <version>1.12</version>
+                  <includes>${splash}</includes>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}/classes</outputDirectory>
+            </configuration>
+          </execution>
+
         </executions>
       </plugin>
 
@@ -84,29 +97,6 @@
         </configuration>
       </plugin>
 
-      <!-- put splash screen into wrapper jar too -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-splash</id>
-            <phase>compile</phase>
-            <goals><goal>unpack</goal></goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>nl.nikhef.jgridstart</groupId>
-                  <artifactId>jgridstart-small</artifactId>
-                  <version>1.12</version>
-                  <includes>${splash}</includes>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${project.build.directory}/classes</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 

@@ -14,7 +14,7 @@
   <parent>
     <groupId>nl.nikhef.jgridstart</groupId>
     <artifactId>jgridstart</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -75,18 +75,14 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration><skipTests>true</skipTests></configuration>
       </plugin>
-    </plugins>
-  </build>
 
-  <!-- don't build JavaDoc -->
-  <reporting>
-    <plugins>
+      <!-- don't build JavaDoc -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration><skip>true</skip></configuration>
       </plugin>
     </plugins>
-  </reporting>
+  </build>
 
 </project>

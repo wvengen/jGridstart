@@ -3,7 +3,7 @@
 
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>jgridstart</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
   <name>jGridstart top-level</name>
   <description>jGridstart full package</description>
   <url>http://jgridstart.nikhef.nl/</url>
@@ -13,7 +13,7 @@
   <parent>
     <groupId>nl.nikhef.jgridstart</groupId>
     <artifactId>mvn-parent</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <relativePath>mvn-parent/pom.xml</relativePath>
   </parent>
   
