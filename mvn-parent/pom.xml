@@ -139,6 +139,28 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <!-- different profile for gui tests
+         specify -DguiTests on the Maven commandline to run gui tests as well -->
+    <profile>
+      <activation><property><name>guiTests</name></property></activation>
+      <build>
+        <plugins>
+          <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <includes>
+              <include>**/*Guitest.java</include>
+              <include>**/*Test.java</include>
+            </includes>
+          </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   
   <!-- get and put locations -->
   <repositories>
