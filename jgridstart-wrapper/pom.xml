@@ -42,7 +42,7 @@
           <!-- copy dependencies to lib/ -->
           <execution>
             <id>copy-lib</id>
-            <phase>compile</phase>
+            <phase>prepare-package</phase>
             <goals><goal>copy-dependencies</goal></goals>
             <configuration>
               <outputDirectory>${project.build.directory}/classes/lib</outputDirectory>
@@ -52,7 +52,7 @@
           <!-- generate list of dependencies so it knows what to load -->
           <execution>
             <id>lib-classpath</id>
-            <phase>compile</phase>
+            <phase>prepare-package</phase>
             <goals><goal>build-classpath</goal></goals>
             <configuration>
               <outputFile>${project.build.directory}/classes/lib/classpath</outputFile>
@@ -63,7 +63,7 @@
           <!-- put splash screen into wrapper jar too -->
           <execution>
             <id>copy-splash</id>
-            <phase>compile</phase>
+            <phase>prepare-package</phase>
             <goals><goal>unpack</goal></goals>
             <configuration>
               <artifactItems>
