@@ -793,7 +793,7 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	keyAlgName = System.getProperty("jgridstart.keyalgname");
 	if (keyAlgName==null) keyAlgName = "RSA";
 
-	int keysize = 1024;
+	int keysize = 2048;
 	if (p.getProperty("keysize")!=null)
 	    keysize = Integer.valueOf(p.getProperty("keysize"));
 	else if (System.getProperty("jgridstart.keysize")!=null)
