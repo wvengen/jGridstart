@@ -1,5 +1,6 @@
 language: java
-script: mvn -DguiTests test
-before_script:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
+# don't enable gui tests yet, since they still need to be finished
+#script: mvn -DguiTests test
+#before_script:
+#  - "export DISPLAY=:99.0"
+#  - "sh -e /etc/init.d/xvfb start"
