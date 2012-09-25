@@ -82,7 +82,14 @@ import org.xml.sax.SAXException;
  * attribute <code>name="<i>something</i>"</code> is present, its readonly attribute
  * will be set automatically. Its use is explained in {@link TemplatePanel}.
  * <p>
- * When a propery cannot be found, it is looked up with {@link System#getProperty}. If
+ * When the attribute <code>selected="true"</code> is present, it is transformed to
+ * <code>selected="selected"</code>, as some html parsers only accept the latter. The
+ * same happens for <code>checked="true"</code>, which is transformed to
+ * <code>checked="checked"</true>. This allows one to use conditionals as property
+ * value, like:
+ * <code>&lt;input type="radio" name="what" checked="${(foo.what)}" /&gt;</code>.
+ * <p>
+ * When a property cannot be found, it is looked up with {@link System#getProperty}. If
  * that fails, {@code null} is assumed as its value.
  * 
  * @author wvengen
@@ -207,6 +214,14 @@ public class TemplateDocument extends DocumentDelegate {
 		attr.setNodeValue("disabled");
 		attrs.setNamedItem(attr);
 	    }
+	    // to ease use of checked/selected attribute on html inputs,
+	    // {@code checked="true"} becomes {@code checked="checked"}
+	    Node checked = attrs.getNamedItem("checked");
+	    if (checked!=null && Boolean.valueOf(checked.getNodeValue()))
+		checked.setNodeValue("checked");
+	    Node selected = attrs.getNamedItem("selected");
+	    if (selected!=null && Boolean.valueOf(selected.getNodeValue()))
+		selected.setNodeValue("selected");
 	}
 	// recursively parse children
 	NodeList nl = node.getChildNodes();
