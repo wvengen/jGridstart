@@ -23,6 +23,9 @@ public class CertificateRequest {
      * <p>
      * The parent is meant for renewing certificates, where most properties
      * need to be copied from the parent certificate, but not all.
+     * <p>
+     * Cryptography-related properties are taken from system defaults, so
+     * that stronger cryptography defaults can be used with renewals.
      * 
      * @param p Properties to set
      * @param parent Parent Properties to copy from 
@@ -48,6 +51,11 @@ public class CertificateRequest {
 	    // and as the organisation can be a virtual property, really copy that
 	    p.setProperty("org", parent.getProperty("org"));
 	}
+	// key properties are not taken from parent, since it would be good to have
+	// renewals default to stronger crypto, when configured so
+	p.setProperty("keyalgname", System.getProperty("jgridstart.keyalgname"));
+	p.setProperty("keysize", System.getProperty("jgridstart.keysize"));
+	p.setProperty("sigalgname", System.getProperty("jgridstart.sigalgname"));
 	// read defaults from system properties
 	for (Enumeration<?> it = System.getProperties().propertyNames(); it.hasMoreElements(); ) {
 	    String name = (String)it.nextElement();

@@ -136,7 +136,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
     @Override
     protected void initialize() {
 	super.initialize();
-	setPreferredSize(new Dimension(850, 550));
+	setPreferredSize(new Dimension(855, 550));
 	// add the html pages
 	pages.add(getClass().getResource("requestwizard-01.html"));
 	pages.add(getClass().getResource("requestwizard-02.html"));
@@ -220,7 +220,7 @@ public class RequestWizard extends TemplateWizard implements TemplateWizard.Page
 	    CertificateRequest.completeData(cert);
 	    if (!data().containsKey("wizard.title"))
 		data().setProperty("wizard.title", "Certificate Request");
-	}	
+	}
 	data().setProperty("wizard.title.volatile", "true");
 	data().setProperty("wizard.title.html", data().getProperty("wizard.title"));
 	data().setProperty("wizard.title.html.volatile", "true");

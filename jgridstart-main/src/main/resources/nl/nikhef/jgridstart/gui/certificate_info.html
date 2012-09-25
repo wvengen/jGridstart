@@ -99,6 +99,13 @@
 			<th class="hash"><label>Subject Hash</label></th>
 			<td class="hash" c="${subject.x-hash}"/>
 		</tr>
+		<tr class="details" if="${view.showdetails} and ${keyalgname}">
+			<th class="hash"><label>Key algorithm</label></th>
+			<td class="hash">
+			  <span c="${keyalgname} ${keysize}" />
+			  <span if="${sigalgname}" c=", ${sigalgname}" />
+			</td>
+		</tr>
 		<tr class="details" if="${view.showdetails} and ${usage}">
 			<th class="usage"><label>Usage</label></th>
 			<td class="usage">

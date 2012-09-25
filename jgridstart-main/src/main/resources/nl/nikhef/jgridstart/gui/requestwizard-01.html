@@ -38,19 +38,39 @@
 		<th><label for="org">Organisation</label></th>
 		<td><select id="org" name="org" c="${organisations.html.options}"/></td>
 	</tr>
-	<tr if="${jgridstart.ca.provider}==DutchGridCA or ${jgridstart.ca.provider}==nl.nikhef.jgridstart.ca.DutchGridCA">
-		<td colspan="2" class="helpbutton_container">
-			<a class="helpbutton" href="action:toggle(wizard.show.advanced)">(advanced)</a>
-		</td>
-	</tr>
-	<tr class="help" if="${jgridstart.ca.provider}==DutchGridCA or ${jgridstart.ca.provider}==nl.nikhef.jgridstart.ca.DutchGridCA">
-		<th if="${wizard.show.advanced}">
+	<td colspan="2" class="helpbutton_container">
+		<a class="helpbutton" href="action:toggle(wizard.show.advanced)">(advanced)</a>
+	</td>
+	<tr class="help" if="${wizard.show.advanced}">
+		<th>
 			<label for="comments">Comments</label>
 		</th>
-		<td if="${wizard.show.advanced}">
+		<td>
 			<input id="comments" name="comments" type="text" size="30"/>
 		</td>
 	</tr>
+	<tr class="help" if="${wizard.show.advanced}">	
+		<th>
+			Crypto:
+		</th>
+		<!-- xhtmlrenderer miscalculates table cell width when multiple input elements
+		     are present; limit maximum width to avoid it taking up too much space -->
+		<td style="max-width:15em">
+			<label for="keysize">size</label>
+			<select id="keysize" name="keysize">
+			  <option value="1024" selected="${(${keysize}==1024)}">1024 (weak)</option>
+			  <option value="2048" selected="${(${keysize}==2048)}">2048 (normal)</option>
+			  <option value="4096" selected="${(${keysize}==4096)}">4096 (strong)</option>
+			</select>
+			<label for="sigalgname">hash</label>
+			<select id="sigalgname" name="sigalgname">
+			  <option value="SHA1WithRSA" checked="${(${sigalgname}==SHA1WithRSA)}">SHA-1</option>
+			  <option value="SHA256WithRSA" checked="${(${sigalgname}==SHA256WithRSA)}">SHA-256</option>
+			  <option value="SHA512WithRSA" checked="${(${sigalgname}==SHA512WithRSA)}">SHA-512</option>
+			</select>
+		</td>
+	</tr>
+
 	<tr if="${renewal}">
 		<td colspan="2" class="legend">
 			Please enter the password of your current certificate key.

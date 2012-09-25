@@ -157,12 +157,16 @@ form table td.legend:first-child {
 	font-size: 90%;
 	padding: 3pt .6em 3pt .6em;
 }
-.wizard-page .helpbutton_container { padding-bottom: 0; } 
+.wizard-page .helpbutton_container { padding-bottom: 0; }
 .wizard-page .helpbutton {
 	font-size: 80%;
 	/*cursor: hand;*/
 	background: #eee;
 	color: black;
+}
+.wizard-page .help tr, .wizard-page .help td {
+	padding-top: 1px;
+	padding-bottom: 0;
 }
 
 .showdetails a {
