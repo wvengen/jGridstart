@@ -1,4 +1,8 @@
 language: java
+jdk:
+- openjdk6
+- openjdk7
+- oraclejdk7
 # don't enable gui tests yet, since they still need to be finished
 #script: mvn -DguiTests test
 #before_script:
