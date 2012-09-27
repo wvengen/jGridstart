@@ -91,19 +91,29 @@ class BrowsersUnix extends BrowsersCommon {
     
     /** Normalise the browser path.
      * <p>
-     * Currently this follows the symlink if its name is x-www-browser, so
+     * Currently this follows the symlink if its name is {@code x-www-browser},
+     * {@code gnome-www-browser}  or {@code sensible-browser}, so
      * that we find the actual browser pointed to by Debian's alternatives.
      */
     private String normaliseBrowserPath(String path) {
-	if (path.equals("x-www-browser") || path.endsWith("/x-www-browser")) {
-	    try {
-		String link1;
-		link1 = readLink(path);
-		if (link1==null) return path;
-		String link2 = readLink(link1);
-		if (link2==null) return link1;
-	    } catch(IOException e) {
-		return path;
+	// handle Debian alternatives
+	final String[] alternatives = new String[] {
+	    "x-www-browser", "gnome-www-browser", "sensible-browser"
+	};
+	for (int i=0; i<alternatives.length; i++) {
+	    if (path.equals(alternatives[i]) || path.endsWith("/"+alternatives[i])) {
+		try {
+		    // A Debian alternative is a symlink to
+		    // /etc/alternatives/something, which in turn is a symlink
+		    // to the real program.
+		    String link1;
+		    link1 = readLink(path);
+		    if (link1==null) return path;
+		    String link2 = readLink(link1);
+		    if (link2==null) return link1;
+		} catch(IOException e) {
+		    return path;
+		}
 	    }
 	}
 	return path;
