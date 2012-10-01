@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
 
 import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -52,20 +54,26 @@ public class LocalCA implements CA {
     
     static final protected Logger logger = Logger.getLogger(LocalCA.class.getName());
     
-    /** temporary CA certificate used to sign requests (generated at instantiation) */
-    protected X509Certificate cacert = null;
-    /** temporary CA private key used to sign requests (generated at instantiation) */
-    protected PrivateKey cakey = null;
+    /** temporary CA certificate for different keyalgorithms  used to sign requests (generated at instantiation) */
+    protected HashMap<String, X509Certificate> cacerts = new HashMap<String, X509Certificate>();
+    /** temporary CA private key for different keyalgorithms used to sign requests (generated at instantiation) */
+    protected HashMap<String, PrivateKey> cakeys = new HashMap<String, PrivateKey>();
     /** serial number of last generated certificate */
     static protected int serial = 1;
     /** DN of local CA */
     static protected String caDN = System.getProperty("jgridstart.ca.local.dn");
     /** number of seconds into the future generated certificates are valid */
     static protected int validtime = 60 * 60; 
+    /** CA key size */
+    final protected int KEYSIZE = 1024;
     
     /**
      * Creates a new LocalCA and generates a self-signed certificate to
      * sign with. It is valid for an hour only.
+     * <p>
+     * By default, an RSA CA certificate is generated. If other key algorithms (like
+     * DSA or ECDSA) are discovered in a CSR, a new CA of that type is generated on
+     * the fly.
      */
     public LocalCA() throws CertificateException, KeyException, NoSuchAlgorithmException, IllegalStateException, NoSuchProviderException, SignatureException {
 	// set defaults
@@ -77,10 +85,16 @@ public class LocalCA implements CA {
 	    } catch(NumberFormatException e) { }
 	}
 	
+	// generate default RSA CA certificate
+	//generateCaCert("RSA");
+    }
+    
+    /** Generates a new CA key/certificate combination for the given algorithm */
+    protected void generateCaCert(String keyalgname) throws CertificateException, KeyException, NoSuchAlgorithmException, IllegalStateException, NoSuchProviderException, SignatureException {
 	// create CA certificate
-	logger.fine("Generating self-signed LocalCA certificate");
-	KeyPairGenerator keygen = KeyPairGenerator.getInstance("RSA");
-	keygen.initialize(1024);
+	logger.fine("Generating self-signed LocalCA certificate ["+keyalgname+"]");
+	KeyPairGenerator keygen = KeyPairGenerator.getInstance(keyalgname);
+	keygen.initialize(KEYSIZE);
 	KeyPair keypair = keygen.generateKeyPair();
 	X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
 	certGen.setSerialNumber(BigInteger.ONE);
@@ -89,15 +103,51 @@ public class LocalCA implements CA {
 	certGen.setNotAfter(new Date(System.currentTimeMillis()+validtime*1000));
 	certGen.setSubjectDN(new X500Principal(caDN));
 	certGen.setPublicKey(keypair.getPublic());
-	certGen.setSignatureAlgorithm("SHA1WithRSAEncryption");
+	certGen.setSignatureAlgorithm("SHA1With"+keyalgname);
 	// CA extensions as defined in http://www.ogf.org/documents/GFD.125.pdf
 	certGen.addExtension(X509Extensions.BasicConstraints, true,
 		new BasicConstraints(true));
 	certGen.addExtension(X509Extensions.KeyUsage, true,
 		new KeyUsage(KeyUsage.keyCertSign|KeyUsage.cRLSign));
 
-	cakey = keypair.getPrivate();
-	cacert = certGen.generate(cakey, "BC");
+	PrivateKey cakey = keypair.getPrivate();
+	cakeys.put(keyalgname, cakey);
+	cacerts.put(keyalgname, certGen.generate(cakey, "BC"));
+    }
+
+    /** Return CA certificate for key algorithm.
+     * <p>
+     * If no CA certificate for that key algorithm name exists, generate
+     * one on the fly.
+     * 
+     * @param keyalgname key algorithm
+     * @return CA certificate
+     * @throws IOException when CA generation fails
+     */
+    protected X509Certificate getCaCert(String keyalgname) throws IOException {
+	if (!cacerts.containsKey(keyalgname)) {
+	    try {
+		generateCaCert(keyalgname);
+	    } catch (Exception e) {
+		throw new IOException(e);
+	    }
+	}
+	return cacerts.get(keyalgname);
+    }
+    /** Return CA private key for key algorithm.
+     * <p>
+     * If no CA key for that key algorithm name exists, generate
+     * one on the fly.
+     * 
+     * @param keyalgname key algorithm
+     * @return CA certificate
+     * @throws IOException when CA generation fails
+     */
+    protected PrivateKey getCaKey(String keyalgname) throws IOException {
+	if (!cakeys.containsKey(keyalgname)) {
+	    getCaCert(keyalgname);
+	}
+	return cakeys.get(keyalgname);
     }
     
     /** Just returns the PEM encoded version of the request. */
@@ -143,6 +193,15 @@ public class LocalCA implements CA {
 	String reqserial = info.getProperty("request.serial");
 	if (reqserial==null)
 	    throw new IOException("Request has no serial number!");
+
+	String sigalgname;
+	try {
+	    sigalgname = req.getPublicKey().getAlgorithm();
+	} catch (Exception e) {
+	    throw new IOException("Could not get key algorithm from CSR", e);
+	}
+	X509Certificate cacert = getCaCert(sigalgname);
+	PrivateKey cakey = getCaKey(sigalgname);
 	
 	try {
 	    certGen.setSerialNumber(BigInteger.valueOf(Integer.valueOf(reqserial)));
@@ -174,9 +233,12 @@ public class LocalCA implements CA {
 	return cert;
     }
     
-    public X509Certificate getCACertificate() {
-	assert(cacert!=null);
-	return cacert;
+    public X509Certificate getCACertificate(String keyalgname) throws IOException {
+	return getCaCert(keyalgname);
+    }
+    /** Return default CA certificate, which is for the RSA algorithm. */
+    public X509Certificate getCACertificate() throws IOException {
+	return getCACertificate("RSA");
     }
 
     /** {@inheritDoc} */
