@@ -54,8 +54,11 @@ public class CertificateRequest {
 	// key properties are not taken from parent, since it would be good to have
 	// renewals default to stronger crypto, when configured so
 	p.setProperty("keyalgname", System.getProperty("jgridstart.keyalgname"));
+	p.setProperty("keyalgname.volatile", "true");
 	p.setProperty("keysize", System.getProperty("jgridstart.keysize"));
+	p.setProperty("keysize.volatile", "true");
 	p.setProperty("sigalgname", System.getProperty("jgridstart.sigalgname"));
+	p.setProperty("sigalgname.volatile", "true");
 	// read defaults from system properties
 	for (Enumeration<?> it = System.getProperties().propertyNames(); it.hasMoreElements(); ) {
 	    String name = (String)it.nextElement();
