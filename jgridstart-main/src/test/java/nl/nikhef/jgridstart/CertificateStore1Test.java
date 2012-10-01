@@ -18,6 +18,7 @@ import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 import org.junit.Test;
 
 /** Test basic operations of a {@link CertificateStore} */
@@ -278,16 +279,26 @@ public class CertificateStore1Test extends CertificateBaseTest {
 	assertEquals(keyalg, cert.getCertificate().getPublicKey().getAlgorithm());
 	if (keyalg.equals("RSA"))
 	    assertEquals(keysize, ((RSAPublicKey)cert.getCertificate().getPublicKey()).getModulus().bitLength());
-	// TODO: else warn
-	assertEquals(sigalg, cert.getCertificate().getSigAlgName());
+	assertEquals(getSigAlgOID(sigalg), getSigAlgOID(cert.getCertificate().getSigAlgOID()));
 	// directly on certificate signing request
 	assertEquals(keyalg, cert.getCSR().getPublicKey().getAlgorithm());
-	assertEquals(keysize, ((RSAPublicKey)cert.getCSR().getPublicKey()).getModulus().bitLength());
+	if (keyalg.equals("RSA"))
+	    assertEquals(keysize, ((RSAPublicKey)cert.getCSR().getPublicKey()).getModulus().bitLength());
 	// don't know how to get algorithm from CSR
 	// and as certificate property
 	assertEquals(keyalg, cert.getProperty("keyalgname"));
 	assertEquals(keysize, (int)Integer.valueOf(cert.getProperty("keysize")));
-	assertEquals(sigalg, cert.getProperty("sigalgname"));
+	assertEquals(getSigAlgOID(sigalg), getSigAlgOID(cert.getProperty("sigalgname")));
+    }
+    /** getSigAlgName() may return slightly different strings than used on
+     *  creation of a certificate. This method returns the OID string, which
+     *  can be compared properly. */
+    static protected String getSigAlgOID(String sigalg) {
+	// if already OID, just return so
+	if (sigalg.matches("^[0-9.]+$")) return sigalg;
+	// else find signature OID
+	final DefaultSignatureAlgorithmIdentifierFinder finder = new DefaultSignatureAlgorithmIdentifierFinder();
+	return finder.find(sigalg).getAlgorithm().getId();
     }
     /* It would be useful if all combinations used on grids are present */
     @Test public void testCryptoAlg_RSA_1024_SHA1() throws Exception {
@@ -305,7 +316,16 @@ public class CertificateStore1Test extends CertificateBaseTest {
     @Test public void testCryptoAlg_RSA_2048_SHA512() throws Exception {
 	algorithmTest("RSA", 2048, "SHA512WithRSAEncryption");
     }
-
+    
+    /* these don't work yet with the current codebase
+    @Test public void testCryptoAlg_DSA_1024_SHA1() throws Exception {
+	algorithmTest("DSA", 1024, "SHA1WithDSA");
+    }
+    @Test public void testCryptoAlg_ECDSA_192_SHA1() throws Exception {
+	algorithmTest("ECDSA", 192, "SHA1WithECDSA");
+    }
+    */
+    
     /** Check that we can make a signature without the "Encryption" in sigalgname */
     @Test
     public void testCryptoAlg_RSA_1024_SHA256_NoEncryption() throws Exception {

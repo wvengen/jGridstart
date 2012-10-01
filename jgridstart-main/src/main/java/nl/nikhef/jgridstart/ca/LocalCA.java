@@ -64,8 +64,6 @@ public class LocalCA implements CA {
     static protected String caDN = System.getProperty("jgridstart.ca.local.dn");
     /** number of seconds into the future generated certificates are valid */
     static protected int validtime = 60 * 60; 
-    /** CA key size */
-    final protected int KEYSIZE = 1024;
     
     /**
      * Creates a new LocalCA and generates a self-signed certificate to
@@ -86,15 +84,20 @@ public class LocalCA implements CA {
 	}
 	
 	// generate default RSA CA certificate
-	//generateCaCert("RSA");
+	generateCaCert("RSA");
     }
     
     /** Generates a new CA key/certificate combination for the given algorithm */
     protected void generateCaCert(String keyalgname) throws CertificateException, KeyException, NoSuchAlgorithmException, IllegalStateException, NoSuchProviderException, SignatureException {
 	// create CA certificate
-	logger.fine("Generating self-signed LocalCA certificate ["+keyalgname+"]");
+	// find out keysize for algorithm
+	int keysize=1024; // RSA, DSA
+	if (keyalgname.equals("EC") || keyalgname.equals("ECDSA")) keysize=192;
+	logger.fine("Generating self-signed LocalCA certificate ["+keyalgname+" "+Integer.toString(keysize)+"]");
+	System.out.println("Generating self-signed LocalCA certificate ["+keyalgname+" "+Integer.toString(keysize)+"]");
+	
 	KeyPairGenerator keygen = KeyPairGenerator.getInstance(keyalgname);
-	keygen.initialize(KEYSIZE);
+	keygen.initialize(keysize);
 	KeyPair keypair = keygen.generateKeyPair();
 	X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
 	certGen.setSerialNumber(BigInteger.ONE);
