@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import nl.nikhef.browsers.exception.BrowserExecutionException;
 import nl.nikhef.browsers.exception.BrowserNotAvailableException;
@@ -116,6 +118,11 @@ abstract class BrowsersCommon implements IBrowsers {
     /** Parse the file {@literal browsers.properties} */ 
     protected HashMap<String, Properties> readKnownBrowsers() throws IOException {
 	knownBrowsers.clear();
+	// OS detection, translate system OS name to keywords used in property names
+	String curOS = System.getProperty("os.name");
+	if (curOS.startsWith("Win")) curOS = "win";
+	else if (curOS.startsWith("Mac")) curOS = "mac";
+	else curOS = "lnx";
 	// load
 	Properties p = new Properties();
 	p.load(getClass().getResourceAsStream("browsers.properties"));
@@ -125,9 +132,20 @@ abstract class BrowsersCommon implements IBrowsers {
 	    String value = p.getProperty(key);
 	    int idx = key.indexOf('.');
 	    String browser = key.substring(0, idx);
+	    key = key.substring(idx+1);
 	    if (!knownBrowsers.containsKey(browser))
 		knownBrowsers.put(browser, new Properties());
-	    knownBrowsers.get(browser).setProperty(key.substring(idx+1), value);
+	    // If this is a system-specific property that matches the
+	    // current system, override the default property; otherwise
+	    // ignore operating-system-specific properties.
+	    final Pattern osKey = Pattern.compile("^(.*)\\.(win|mac|lnx)$");
+	    Matcher osMatch = osKey.matcher(key);
+	    if (osMatch.matches()) {
+		if (curOS.equals(osMatch.group(2)) )
+		    knownBrowsers.get(browser).setProperty(osMatch.group(1), value);
+	    } else {
+		knownBrowsers.get(browser).setProperty(key, value);
+	    }
 	}
 	return knownBrowsers;
     }
