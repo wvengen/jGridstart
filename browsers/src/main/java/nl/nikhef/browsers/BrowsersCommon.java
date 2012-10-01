@@ -135,16 +135,20 @@ abstract class BrowsersCommon implements IBrowsers {
 	    key = key.substring(idx+1);
 	    if (!knownBrowsers.containsKey(browser))
 		knownBrowsers.put(browser, new Properties());
+	    Properties browserProps = knownBrowsers.get(browser);
 	    // If this is a system-specific property that matches the
 	    // current system, override the default property; otherwise
 	    // ignore operating-system-specific properties.
 	    final Pattern osKey = Pattern.compile("^(.*)\\.(win|mac|lnx)$");
 	    Matcher osMatch = osKey.matcher(key);
 	    if (osMatch.matches()) {
+		// override; always, because properties have no order
 		if (curOS.equals(osMatch.group(2)) )
-		    knownBrowsers.get(browser).setProperty(osMatch.group(1), value);
+		    browserProps.setProperty(osMatch.group(1), value);
 	    } else {
-		knownBrowsers.get(browser).setProperty(key, value);
+		// only set if not set before by OS-specific one
+		if (!browserProps.containsKey(key))
+			browserProps.setProperty(key, value);
 	    }
 	}
 	return knownBrowsers;
