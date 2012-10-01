@@ -63,6 +63,7 @@
 			</select>
 			<label for="sigalgname">hash</label>
 			<select id="sigalgname" name="sigalgname">
+			  <!-- for a list, see: http://www.bouncycastle.org/specifications.html -->
 			  <option value="SHA1WithRSA" checked="${(${sigalgname}==SHA1WithRSA)}">SHA-1</option>
 			  <option value="SHA256WithRSA" checked="${(${sigalgname}==SHA256WithRSA)}">SHA-256</option>
 			  <option value="SHA512WithRSA" checked="${(${sigalgname}==SHA512WithRSA)}">SHA-512</option>

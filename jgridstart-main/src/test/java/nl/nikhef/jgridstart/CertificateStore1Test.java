@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Properties;
+
 import nl.nikhef.jgridstart.osutils.FileUtils;
 import nl.nikhef.jgridstart.util.PKCS12KeyStoreUnlimited;
 import nl.nikhef.jgridstart.passwordcache.PasswordCache;
@@ -263,6 +267,81 @@ public class CertificateStore1Test extends CertificateBaseTest {
 	// try to delete, should not delete directory
 	store.delete(0);
 	assertTrue(paths[0].exists());
+    }
+    
+    /** Test that setting certificate crypto parameters give the proper results */
+    public void algorithmTest(String keyalg, int keysize, String sigalg) throws Exception {
+	setAlgorithm(keyalg, keysize, sigalg);
+	CertificateStore store = new CertificateStore(newTestStore(1));
+	CertificatePair cert = store.get(0);
+	// directly on certificate
+	assertEquals(keyalg, cert.getCertificate().getPublicKey().getAlgorithm());
+	if (keyalg.equals("RSA"))
+	    assertEquals(keysize, ((RSAPublicKey)cert.getCertificate().getPublicKey()).getModulus().bitLength());
+	// TODO: else warn
+	assertEquals(sigalg, cert.getCertificate().getSigAlgName());
+	// directly on certificate signing request
+	assertEquals(keyalg, cert.getCSR().getPublicKey().getAlgorithm());
+	assertEquals(keysize, ((RSAPublicKey)cert.getCSR().getPublicKey()).getModulus().bitLength());
+	// don't know how to get algorithm from CSR
+	// and as certificate property
+	assertEquals(keyalg, cert.getProperty("keyalgname"));
+	assertEquals(keysize, (int)Integer.valueOf(cert.getProperty("keysize")));
+	assertEquals(sigalg, cert.getProperty("sigalgname"));
+    }
+    /* It would be useful if all combinations used on grids are present */
+    @Test public void testCryptoAlg_RSA_1024_SHA1() throws Exception {
+	algorithmTest("RSA", 1024, "SHA1WithRSAEncryption");
+    }
+    @Test public void testCryptoAlg_RSA_2048_SHA1() throws Exception {
+	algorithmTest("RSA", 2048, "SHA1WithRSAEncryption");
+    }
+    @Test public void testCryptoAlg_RSA_4096_SHA1() throws Exception {
+	algorithmTest("RSA", 4096, "SHA1WithRSAEncryption");
+    }
+    @Test public void testCryptoAlg_RSA_2048_SHA256() throws Exception {
+	algorithmTest("RSA", 2048, "SHA256WithRSAEncryption");
+    }
+    @Test public void testCryptoAlg_RSA_2048_SHA512() throws Exception {
+	algorithmTest("RSA", 2048, "SHA512WithRSAEncryption");
+    }
+
+    /** Check that we can make a signature without the "Encryption" in sigalgname */
+    @Test
+    public void testCryptoAlg_RSA_1024_SHA256_NoEncryption() throws Exception {
+	String sigalg = "SHA256WithRSA";
+	setAlgorithm("RSA", 2048, sigalg);
+	CertificateStore store = new CertificateStore(newTestStore(1));
+	CertificatePair cert = store.get(0);
+	assertTrue(cert.getCertificate().getSigAlgName().startsWith(sigalg));	
+    }
+    
+    /** Check that setting the signature as certificate property works as well */
+    @Test
+    public void testCryptoCertProperty() throws Exception {
+	final String pw = "foobar123";
+	CertificateStore store = new CertificateStore(newTestStore(0));
+	// different defaults and certificate properties
+	setAlgorithm("RSA", 1024, "SHA1WithRSA");
+	Properties p = new Properties();
+	p.setProperty("subject", "/CN=testCryptoCertProperty");
+	p.setProperty("keysize", "2048");
+	p.setProperty("sigalgname", "SHA256WithRSA");
+	CertificatePair cert = store.generateRequest(p, pw.toCharArray());
+	// check CSR crypto properties
+	assertEquals("RSA", cert.getProperty("keyalgname"));
+	assertEquals("2048", cert.getProperty("keysize"));
+	// get certificate and verify crypto properties
+	PasswordCache.getInstance().set(cert.getKeyFile().getCanonicalPath(), pw.toCharArray());
+	cert.uploadRequest();
+	cert.downloadCertificate();
+	assertEquals("RSA", cert.getProperty("keyalgname"));
+	assertEquals("2048", cert.getProperty("keysize"));
+	assertEquals("SHA256WithRSAEncryption", cert.getProperty("sigalgname"));
+	// make sure it's the same as on the real certificate
+	assertEquals("RSA", cert.getCertificate().getPublicKey().getAlgorithm());
+	assertEquals(2048, ((RSAPublicKey)cert.getCertificate().getPublicKey()).getModulus().bitLength());
+	assertEquals("SHA256WithRSAEncryption", cert.getCertificate().getSigAlgName());
     }
     
     /** Verify that subject is a PRINTABLESTRING (and not UTF8STRING).

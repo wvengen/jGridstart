@@ -151,7 +151,7 @@ public class LocalCA implements CA {
 	    certGen.setNotAfter(new Date(System.currentTimeMillis()+validtime*1000));
 	    certGen.setSubjectDN(req.getCertificationRequestInfo().getSubject());
 	    certGen.setPublicKey(req.getPublicKey());
-	    certGen.setSignatureAlgorithm("SHA1WithRSAEncryption");
+	    certGen.setSignatureAlgorithm(req.getSignatureAlgorithm().getAlgorithm().getId());
 	    certGen.addExtension(X509Extensions.AuthorityKeyIdentifier, false,
 		    new AuthorityKeyIdentifierStructure(cacert));
 	    certGen.addExtension(X509Extensions.SubjectKeyIdentifier, false,
