@@ -76,8 +76,10 @@ The source is split into several modules.
       Currently unusable, needs to be adapted.
 
 
+Compiling & developing
+----------------------
 
-To build the jGridstart application, invoke maven:
+To build the jGridstart application, invoke [Maven]:
 
     mvn package
 
@@ -90,21 +92,21 @@ self-contained and can be run directly from the command-line using
     java -jar jgridstart-wrapper/target/jgridstart-wrapper-[0-9.]*.jar
 
 To use Java Web Start for running jGridstart directly from a website, the
-directory `jgridstart-jws/target/jnlp` contains everything required to do
-so. Since JNLP files contain an absolute base URL, one needs to set these
-using `deploy.sh` in the same directory.
+directory `jgridstart-jws/target/jnlp` contains everything required to do so.
+Since JNLP files contain an absolute base URL, one needs to set these using
+`deploy.sh` in the same directory.
 
 During development it may be useful to run jGridstart without packaging it.
-`jgridstart-main` contains a shellscript `jgridstart.sh` (or batchfile
-`jgridstart.bat` for Windows) to do that. Giving it the command-line
-argument `-screenshots <some_dir>` will run jGridstart in an automated,
-taking screenshots at various places.
+`jgridstart-main` contains a shellscript `jgridstart.sh` (and batch file
+`jgridstart.bat` for Windows) to do that. Giving it the command-line argument
+`-screenshots <some_dir>` will run jGridstart in an automated mode, taking
+screenshots at various places.
 
 
 To use this in the [Eclipse] integrated development environment (with
 [m2eclipse]), I'd suggest to create a new workspace, and then select `File`,
-`Import...` and choose `Maven`, `Existing Maven projects...`. Select this
-folder containing this `README.md` as `Root Directory`, and import the
+`Import...` and choose `Maven`, `Existing Maven projects...`. Select the folder
+containing this `README.md` as `Root Directory`, and import all modules as
 projects.
 
 
@@ -157,6 +159,7 @@ Adapting jGridstart for a new certificate authority requires:
 [PEMWriter]: http://www.bouncycastle.org/docs/pkixdocs1.4/org/bouncycastle/openssl/PEMWriter.html
 [Flying Saucer XHTMLRenderer]: http://code.google.com/p/flying-saucer/
 [ProGuard]: http://proguard.sf.net/
+[Maven]: http://maven.apache.org/
 [Eclipse]: http://www.eclipse.org/
 [m2eclipse]: http://www.eclipse.org/m2e/
 
