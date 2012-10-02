@@ -33,13 +33,13 @@ The source is split into several modules:
       and again (with timeout). Integration with PEMReader and PEMWriter.
 
   - xhtmlrenderer [nl.nikhef.xhtmlrenderer.swing]
-      Templating and enhancements for the flyingsaucer xhtmlrenderer.
+      Templates and enhancements for the flyingsaucer xhtmlrenderer.
 
-  - jgridstart [nl.nikhef.jgridstart]
+  - jgridstart-main [nl.nikhef.jgridstart]
       Main jGridstart application.
 
   - jgridstart-small
-      Creation of a minified jar.
+      Creation of a minified jar using ProGuard.
 
   - jgridstart-wrapper
       Wrapper around jgridstart-small that contains the minified jar as well
