@@ -154,6 +154,12 @@ Adapting jGridstart for a new certificate authority requires:
     want to use a commercial code-signing certificate.
 
 
+License
+-------
+
+The jGridstart source code is fully open source under the [Apache 2.0 License].
+
+
 [DutchGrid]: http://ca.dutchgrid.nl/
 [PEMReader]: http://www.bouncycastle.org/docs/pkixdocs1.4/org/bouncycastle/openssl/PEMReader.html
 [PEMWriter]: http://www.bouncycastle.org/docs/pkixdocs1.4/org/bouncycastle/openssl/PEMWriter.html
@@ -162,4 +168,5 @@ Adapting jGridstart for a new certificate authority requires:
 [Maven]: http://maven.apache.org/
 [Eclipse]: http://www.eclipse.org/
 [m2eclipse]: http://www.eclipse.org/m2e/
+[Apache 2.0 License]: http://www.apache.org/licenses/LICENSE-2.0
 
