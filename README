@@ -52,7 +52,8 @@ The source is split into several modules:
 
   - jgridstart-tests
       Bundle of combined tests of all packages, with dependencies. This is
-      useful for running the tests at different places.
+      useful for running the tests at different places. Contains a test
+      runner class nl.nikhef.AllTests (needs work on diagnostics output).
 
   - testrunner
       GUI for running unit tests on user's computer to analyse problems.
