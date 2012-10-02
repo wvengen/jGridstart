@@ -5,7 +5,7 @@
   <!-- package information -->
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>jgridstart-wrapper</artifactId>
-  <version>1.12</version>
+  <version>1.13</version>
   <name>jGridstart application (wrapper)</name>
   <url>http://jgridstart.nikhef.nl/</url>
   <description>Wrapper for running jGridstart with Java Web Start</description>
@@ -28,7 +28,7 @@
     <dependency>
       <groupId>nl.nikhef.jgridstart</groupId>
       <artifactId>jgridstart-small</artifactId>
-      <version>1.12</version>
+      <version>1.13</version>
     </dependency>
   </dependencies>
 
@@ -70,7 +70,7 @@
                 <artifactItem>
                   <groupId>nl.nikhef.jgridstart</groupId>
                   <artifactId>jgridstart-small</artifactId>
-                  <version>1.12</version>
+                  <version>1.13</version>
                   <includes>${splash}</includes>
                 </artifactItem>
               </artifactItems>

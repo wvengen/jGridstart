@@ -5,7 +5,7 @@
   <!-- package information -->
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>jgridstart-tests</artifactId>
-  <version>1.12</version>
+  <version>1.13</version>
   <name>jGridstart application (tests)</name>
   <url>http://jgridstart.nikhef.nl/</url>
   <description>jGridstart test package</description>
@@ -26,14 +26,14 @@
     <dependency>
       <groupId>nl.nikhef.jgridstart</groupId>
       <artifactId>jgridstart-main</artifactId>
-      <version>1.12</version>
+      <version>1.13</version>
     </dependency>
 
     <!-- and include a number of specific test packages -->
     <dependency>
       <groupId>nl.nikhef.jgridstart</groupId>
       <artifactId>jgridstart-main</artifactId>
-      <version>1.12</version>
+      <version>1.13</version>
       <type>test-jar</type>
     </dependency>
     <dependency>
