@@ -130,6 +130,9 @@ public class CertificateRequest {
 	p.setProperty("subject.lock", Boolean.toString(true));
 	p.setProperty("level.lock", Boolean.toString(true));
 	p.setProperty("org.lock", Boolean.toString(true));
+	p.setProperty("keysize.lock", Boolean.toString(true));
+	p.setProperty("keyalgname.lock", Boolean.toString(true));
+	p.setProperty("sigalgname.lock", Boolean.toString(true));
     }
     
     /** Completes fields from certificate.
