@@ -33,8 +33,14 @@
   (<a href='action:changebrowser'>change browser</a>), follow these steps:</p>
 </div>
 
-
 <form if="${install.browser.certinst} and ${install.browser.certinst}!=manual">
+  <ul>
+    <li>If you have <strong>Firefox 15</strong> or higher, this procedure will fail with
+    a security warning. In that case, please <a href="action:export">export</a>
+    PKCS#12 file and import that into Firefox
+    (<a href="http://ca.dutchgrid.nl/info/browser#firefox">more on importing</a>).</li>
+  </ul>
+  
   <ol>
 	<li>Please enter the private key password that you have given before.<br/>
 		<label for="privkeypass">Password:</label>
