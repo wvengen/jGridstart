@@ -1,17 +1,6 @@
 jGridstart Tests
 ================
 
-In earlier versions of jGridstart, there once was a GUI testing application
-which would run all unit tests and upload the results. This has helped
-enormously in debugging platform-specific problems. And there is quite some
-platform-specific behaviour, for example in the `osutils` module.
-
-With the move to the [Maven] build system, this functionality has not been
-fully restored. There has been little incentive, since most of those issues
-have been solved. Nevertheless, it is still useful to be able to easily run the
-full test suite on a given computer.
-
-
 Test-related modules
 --------------------
 
@@ -19,7 +8,9 @@ In this maven-ised build, two modules are related to tests. `jgridstart-tests`
 gathers all test classes (the parent POM, in module `mvn-parent`, specifies
 that test JARs are built by default) with dependencies in a single JAR. This is
 different from `jgridstart-small`, which omits test classes and their
-dependencies to minimise the filesize.
+dependencies to minimise the filesize. Then there is a module `testrunner`,
+which is meant to provide a graphical user-interface to run unit tests at 
+end users (see [Testrunner]).
 
 At this moment, it is possible to run all tests from the command-line. Before
 running the following commands, you need to have run `mvn install` on the
@@ -76,7 +67,23 @@ directly from `jgridstart-main`'s `jgridstart.sh` (or `jgridstart.bat` on
 Windows) supplying it the `-screenshots screenshot_dir` arguments.
 
 
+Testrunner
+----------
 
+In earlier versions of jGridstart, there used to be a GUI testing application
+which would run all unit tests and upload the results. This has helped
+enormously in debugging platform-specific user problems (there is quite some
+platform-specific behaviour, for example in the `osutils` and `browsers`
+modules).
+
+With the move to the Maven build system, this functionality has not been fully
+restored. There has been little incentive, since most of those issues have been
+solved. Nevertheless, it is still useful to be able to easily run the full test
+suite on a given computer, which is explained earlier in this document.
+
+
+
+[Testrunner]: #testrunner
 [Maven]: http://maven.apache.org/
 [Travis-CI]: http://travis-ci.org/wvengen/jGridstart
 
