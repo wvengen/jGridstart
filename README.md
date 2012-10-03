@@ -20,58 +20,47 @@ Source code layout
 
 The source is split into several modules.
 
-  * _mvn-parent_
-
+  * __mvn-parent__ -
       Maven parent project with common configuration
 
-  * _osutils_ (`nl.nikhef.jgridstart.osutils`)
-
+  * __osutils__ (`nl.nikhef.jgridstart.osutils`) -
       General utilities for interfacing with the operating system. Java is
       not very good in providing complete integration with the underlying
       operating system, like file permissions and process spawning.
 
-  * _browsers_ (`nl.nikhef.browsers`)
-
+  * __browsers__ (`nl.nikhef.browsers`) -
       Interfacing web browsers installed on the user's system (Linux,
       Windows, Mac OS X). Discovery of default and installed browsers,
       opening web pages and installing PKCS#12 files.
 
-  * _passwordcache_ (`nl.nikhef.jgridstart.passwordcache`)
-
+  * __passwordcache__ (`nl.nikhef.jgridstart.passwordcache`) -
       Cache for user-entered passwords to avoid having to type them again
       and again (with timeout). Integration with [PEMReader] and [PEMWriter].
 
-  * _xhtmlrenderer_ (`nl.nikhef.xhtmlrenderer.swing`)
-
+  * __xhtmlrenderer__ (`nl.nikhef.xhtmlrenderer.swing`) -
       Templates and enhancements for the [Flying Saucer XHTMLRenderer].
 
-  * _jgridstart-main_ (`nl.nikhef.jgridstart`)
-
+  * __jgridstart-main__ (`nl.nikhef.jgridstart`) -
       Main jGridstart application.
 
-  * _jgridstart-small_
-
+  * __jgridstart-small__ -
       Creation of a minified jar using [ProGuard].
 
-  * _jgridstart-wrapper_
-
+  * __jgridstart-wrapper__ -
       Wrapper around jgridstart-small that contains the minified jar as well
       as bouncycastle. When it is run, it unpacks them to a temporary directory
       and executes it locally. This is to avoid all kinds of problems when
       using bouncycastle and java web start together.
 
-  * _jgridstart-jws_
-
+  * __jgridstart-jws__ -
       Java Web Start package.
 
-  * _jgridstart-tests_
-
+  * __jgridstart-tests__ -
       Bundle of combined tests of all packages, with dependencies. This is
       useful for running the tests at different places. Contains a test
       runner class `nl.nikhef.AllTests` (needs work on diagnostics output).
 
-  * _testrunner_
-
+  * __testrunner__ -
       GUI for running unit tests on user's computer to analyse problems.
       Currently unusable, needs to be adapted.
 
