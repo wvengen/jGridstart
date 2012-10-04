@@ -34,6 +34,13 @@ adding the following lines to `jgridstart.jnlp` in its `resources` section:
 
 where `jgridstart.ca.base` should point to the URL of this web interface.
 
+If you have changed the CA DN previously by editing `scripts/vars`, it may be
+useful to add another property so that jGridstart knows which certificates can
+be renewed by this certificate authority:
+
+    <property name="jnlp.jgridstart.ca.dn" value="C=DE, C=Berlin, O=GmbH, CN=Herr, emailAddress=berliner@example.com" />
+
+
 
 Other notes
 -----------
