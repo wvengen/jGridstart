@@ -31,7 +31,6 @@ adding the following lines to `jgridstart.jnlp` in its `resources` section:
 
     <property name="jnlp.jgridstart.ca.provider" value="TestCA" />
     <property name="jnlp.jgridstart.ca.base" value="http://example.com/testca/" />
-    <property name="jnlp.jgridstart.ca.dn" value="C=NL, ST=NH, C=Amsterdam, O=ChangeMeOrg, CN=changeme, emailAddress=mail@example.com" />
 
 where `jgridstart.ca.base` should point to the URL of this web interface.
 

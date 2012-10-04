@@ -50,7 +50,7 @@ public class TestCA implements CA {
 	    System.setProperty("jgridstart.ca.base.cacert", baseCaCert);
 	}
 	if (caDN==null) {
-	    caDN = "C=NL, ST=NH, L=Amsterdam, O=Nikhef Test, CN=Nikhef Test CA, emailAddress=wvengen@nikhef.nl";
+	    caDN = "C=NL, ST=NH, L=Amsterdam, O=ChangeMeOrg, CN=changeme, emailAddress=mail@example.org";
 	    System.setProperty("jgridstart.ca.dn", caDN);
 	}
     }
