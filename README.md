@@ -64,6 +64,13 @@ The source is split into several modules.
       GUI for running unit tests on user's computer to analyse problems.
       Currently unusable, needs to be adapted.
 
+  * __testca__ -
+      A simple online certificate authority for testing jGridstart. This is
+      used to provide a way to test the user-interaction with an online
+      certificate authority. jGridstart's `nl.nikhef.jgridstart.ca.TestCA`
+      is the corresponding CA provider.
+      Please see `testca/README.md` for more information.
+
 
 Compiling & developing
 ----------------------

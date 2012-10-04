@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# run-cmd - wrapper for Easy-RSA
+#
+#    This script is part of "Simple Test Certificate Authority" and runs
+#    an Easy-RSA script from its location.
+#
+cd `dirname $0`
+
+# source settings
+. ./vars
+
+PATH=".:$PATH"
+export PATH
+
+# validity of certificate if days
+KEY_EXPIRE=5
+export KEY_EXPIRE
+
+# and run command
+$@
