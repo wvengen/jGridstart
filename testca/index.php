@@ -31,8 +31,9 @@
  * request page. $jgridstart must point to the base url of your jGridstart
  * installation. The instance of jGridstart must be configured to use
  * this certificate authority web interface (see README.md).  */
-$jgridstart = 'http://example.com/jgridstart';
-$jgridstart_jnlp = $jgridstart.'/jgridstart.jnlp';
+//$jgridstart = 'http://example.com/jgridstart';
+//$jgridstart_jnlp = $jgridstart.'/jgridstart.jnlp';
+
 // enable for debugging
 //error_reporting(E_ALL); ini_set('display_errors', 1);
 
