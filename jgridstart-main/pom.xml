@@ -5,7 +5,7 @@
   <!-- package information -->
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>jgridstart-main</artifactId>
-  <version>1.11-multica</version>
+  <version>1.13-multica</version>
   <name>jGridstart application</name>
   <url>http://jgridstart.nikhef.nl/</url>
   <description>jGridstart helps grid end-users to request, obtain, install and renew grid certificates in a friendly way.</description>
@@ -13,7 +13,7 @@
   <parent>
     <groupId>nl.nikhef.jgridstart</groupId>
     <artifactId>jgridstart</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   
@@ -21,7 +21,7 @@
     <!-- Revision is 'dev' by default. Set the property to override, e.g.
            mvn compile -Djgridstart.revision=`svnversion`                 -->
     <jgridstart.revision>dev</jgridstart.revision>
-    <jgridstart.version>${version}</jgridstart.version>
+    <jgridstart.version>${project.version}</jgridstart.version>
   </properties>
 
   <!-- direct dependencies -->

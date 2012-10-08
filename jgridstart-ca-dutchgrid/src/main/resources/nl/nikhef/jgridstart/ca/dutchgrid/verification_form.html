@@ -28,16 +28,16 @@
 	     printing we replace form elements with DIVs, and that needs the data present
 		 in the document itself. -->
 	<div class="userdata">
-	  <table><tr>
+	  <table id="tbl1"><tr>
 	    <td class="userinfo" style="width: 60%" rowspan="2">
 	      <table>
 	        <tr><td colspan="2">Surname <br/><div class="fillin" c="${surname}">Doe</div></td></tr>
 	        <tr><td colspan="2">Given names <br/><div class="fillin" c="${givenname}">John</div></td></tr>
 	        <tr>
-	          <td>Place of Birth <br/><input type="text" class="fillin" name="birthplace" size="20" value="${birthplace}"/></td>
-	          <td style="text-align:right">Date of birth <br/><input type="text" class="fillin" name="birthdate" size="8" value="${birthdate}"/></td>
+	          <td>Place of Birth <br/><input type="text" class="fillin" name="birthplace" size="25" value="${birthplace}"/></td>
+	          <td style="text-align:right">Date of birth <br/><input type="text" class="fillin" name="birthdate" size="10" value="${birthdate}"/></td>
 	        </tr>
-	        <tr><td colspan="2">Identity paper type, number, country <br/><input type="text" class="fillin" name="id" size="30" value="${id}"/></td></tr>
+	        <tr><td colspan="2">Identity paper type, number, country <br/><input type="text" class="fillin" name="id" size="25" value="${id}"/></td></tr>
 	        <tr><td colspan="2">SOFI number <span class="comment">(optional)</span><div class="fillin" c="${sofi}"></div></td></tr>
 	      </table>
 	    </td>
@@ -61,10 +61,10 @@
 	    <h2>Contact Information</h2>
 	  </div>
 	  
-	  <table class="userinfo">
+	  <table class="userinfo" id="tbl2">
 	    <tr>
 	      <td>Name <br/><div class="fillin" c="${givenname} ${surname}">John Doe</div></td>
-	      <td>Street addres <span class="comment">(physical delivery address)</span> <br/><input type="text" class="fillin" name="street" value="${street}"/></td>
+	      <td>Street addres <span class="comment">(physical delivery address)</span> <br/><input type="text" class="fillin" name="street" value="${street}" /></td>
 	    </tr>
 	    <tr>
 	      <td>Organisation <br/><div class="fillin" c="${org.rdn.full}">Foo inc.</div></td>

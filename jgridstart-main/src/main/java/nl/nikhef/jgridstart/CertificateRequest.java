@@ -23,6 +23,9 @@ public class CertificateRequest {
      * <p>
      * The parent is meant for renewing certificates, where most properties
      * need to be copied from the parent certificate, but not all.
+     * <p>
+     * Cryptography-related properties are taken from system defaults, so
+     * that stronger cryptography defaults can be used with renewals.
      * 
      * @param p Properties to set
      * @param parent Parent Properties to copy from 
@@ -48,6 +51,14 @@ public class CertificateRequest {
 	    // and as the organisation can be a virtual property, really copy that
 	    p.setProperty("org", parent.getProperty("org"));
 	}
+	// key properties are not taken from parent, since it would be good to have
+	// renewals default to stronger crypto, when configured so
+	p.setProperty("keyalgname", System.getProperty("jgridstart.keyalgname"));
+	p.setProperty("keyalgname.volatile", "true");
+	p.setProperty("keysize", System.getProperty("jgridstart.keysize"));
+	p.setProperty("keysize.volatile", "true");
+	p.setProperty("sigalgname", System.getProperty("jgridstart.sigalgname"));
+	p.setProperty("sigalgname.volatile", "true");
 	// read defaults from system properties
 	for (Enumeration<?> it = System.getProperties().propertyNames(); it.hasMoreElements(); ) {
 	    String name = (String)it.nextElement();
@@ -119,6 +130,9 @@ public class CertificateRequest {
 	p.setProperty("subject.lock", Boolean.toString(true));
 	p.setProperty("level.lock", Boolean.toString(true));
 	p.setProperty("org.lock", Boolean.toString(true));
+	p.setProperty("keysize.lock", Boolean.toString(true));
+	p.setProperty("keyalgname.lock", Boolean.toString(true));
+	p.setProperty("sigalgname.lock", Boolean.toString(true));
     }
     
     /** Completes fields from certificate.

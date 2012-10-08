@@ -20,6 +20,7 @@ import nl.nikhef.jgridstart.util.CryptoUtils;
 
 import org.apache.commons.lang.WordUtils;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.mail.smime.SMIMEException;
 import nl.nikhef.jgridstart.util.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
@@ -40,6 +41,8 @@ public class DutchGridCA implements CA {
     protected String baseQuery = System.getProperty("jgridstart.ca.base.query");
     /** CA entry point: CA cert */
     protected String baseCaCert = System.getProperty("jgridstart.ca.base.cacert");
+    /** CA DN */
+    protected String caDN = System.getProperty("jgridstart.ca.dn");
     
     /** CA certificate (cached) */
     protected static X509Certificate cacert = null;
@@ -60,6 +63,10 @@ public class DutchGridCA implements CA {
 	if (baseCaCert==null) {
 	    baseCaCert = "https://ca.dutchgrid.nl/cgi-bin/nikhef-ms?certder";
 	    System.setProperty("jgridstart.ca.base.cacert", baseCaCert);
+	}
+	if (caDN==null) {
+	    caDN = "C=NL, O=NIKHEF, CN=NIKHEF medium-security certification auth";
+	    System.setProperty("jgridstart.ca.dn", caDN);
 	}
     }
     
@@ -202,5 +209,14 @@ public class DutchGridCA implements CA {
 		throw new IOException("CA certificate could not be retrieved: "+scert);
 	}
 	return cacert;
+    }
+    
+    /** {@inheritDoc} */
+    public boolean isIssuer(X509Certificate cert) {
+	// TODO cache X500Principal
+	String dn = caDN;
+	if (dn.trim().startsWith("/"))
+	    dn = dn.substring(1).replace('/', ',');
+	return cert.getIssuerDN().equals(new X509Principal(dn));
     }
 }

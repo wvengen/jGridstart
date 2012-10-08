@@ -126,20 +126,20 @@ public abstract class CertificateBaseTest extends TestCase {
     
     /** Set the certificate algorithm for new certificates.
      * 
-     * @param alg Algorithm, either "RSA" or "DSA"
+     * @param keyalg Algorithm, either "RSA" or "DSA"
+     * @param keysize Key size, e.g. 1024, 2048, 4096
+     * @param sigalg Signature algorithm, e.g. "SHA1WithRSA"
      */
+    protected void setAlgorithm(String keyalg, int keysize, String sigalg) throws GeneralSecurityException {
+	System.setProperty("jgridstart.keyalgname", keyalg);
+	System.setProperty("jgridstart.keysize", Integer.toString(keysize));
+	System.setProperty("jgridstart.sigalgname", sigalg);
+    }
+    protected void setAlgorithm(String alg, int keysize) throws GeneralSecurityException {
+	setAlgorithm(alg, 1024, "SHA1With"+alg);
+    }
     protected void setAlgorithm(String alg) throws GeneralSecurityException {
-	if (alg=="RSA") {
-	    System.setProperty("jgridstart.keyalgname", "RSA");
-	    System.setProperty("jgridstart.keysize", "1024");
-	    System.setProperty("jgridstart.sigalgname", "SHA1WithRSA");
-	} else if (alg=="DSA") {
-	    System.setProperty("jgridstart.keyalgname", "DSA");
-	    System.setProperty("jgridstart.keysize", "1024");
-	    System.setProperty("jgridstart.sigalgname", "SHA1WithDSA");
-	} else {
-	    throw new GeneralSecurityException("Invalid algorithm requested: "+alg);
-	}
+	setAlgorithm(alg, 1024);
     }
 
     /** Generate test certificate.

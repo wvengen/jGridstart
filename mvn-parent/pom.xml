@@ -20,7 +20,7 @@
   <!-- package details -->
   <groupId>nl.nikhef.jgridstart</groupId>
   <artifactId>mvn-parent</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
   <name>Parent POM</name>
   <description>Common configuration jGridstart related projects</description>
   <packaging>pom</packaging>
@@ -51,16 +51,40 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.5.1</version>
         <configuration>
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
         </configuration>
       </plugin>
 
+      <!-- some package versions -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.5</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.7.1</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.12.2</version>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo.webstart</groupId>
+	<artifactId>webstart-maven-plugin</artifactId>
+        <version>1.0-beta-2</version>
+      </plugin>
+
       <!-- also package tests -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -69,10 +93,26 @@
         </executions>
       </plugin>
 
-      <!-- license headers (don't run by default) -->
+      <!-- specify ProGuard to use -->
+      <plugin>
+        <groupId>com.github.wvengen</groupId>
+        <artifactId>proguard-maven-plugin</artifactId>
+        <version>2.0.5</version>
+        <dependencies> 
+          <dependency> 
+            <groupId>net.sf.proguard</groupId> 
+            <artifactId>proguard-base</artifactId> 
+            <version>4.8</version> 
+            <scope>runtime</scope>
+          </dependency>
+        </dependencies>
+      </plugin>
+
+      <!-- license headers (not run by default) -->
       <plugin>
         <groupId>com.mycila.maven-license-plugin</groupId>
         <artifactId>maven-license-plugin</artifactId>
+        <version>1.10.b1</version>
         <configuration>
           <header>http://jgridstart.nikhef.nl/license-header.txt</header>
           <strictCheck>true</strictCheck>
@@ -86,22 +126,41 @@
           </excludes>
         </configuration>
       </plugin>
-    </plugins>
-  </build>
 
-  <!-- build Javadoc with links -->
-  <reporting>
-    <plugins>
+      <!-- build Javadoc with links -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.8.1</version>
         <configuration>
           <!-- <detectLinks>true</detectLinks> --> <!-- http://jira.codehaus.org/browse/MJAVADOC-273 -->
           <detectJavaApiLink>true</detectJavaApiLink>
         </configuration>
       </plugin>
     </plugins>
-  </reporting>
+  </build>
+
+  <profiles>
+    <!-- different profile for gui tests
+         specify -DguiTests on the Maven commandline to run gui tests as well -->
+    <profile>
+      <activation><property><name>guiTests</name></property></activation>
+      <build>
+        <plugins>
+          <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <includes>
+              <include>**/*Guitest.java</include>
+              <include>**/*Test.java</include>
+            </includes>
+          </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   
   <!-- get and put locations -->
   <repositories>

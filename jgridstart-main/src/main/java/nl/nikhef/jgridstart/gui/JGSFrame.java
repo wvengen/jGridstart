@@ -376,7 +376,10 @@ public class JGSFrame extends JFrame {
 	
 	certInfoButtons.get("import").setVisible(c==null);
 	certInfoButtons.get("request").setVisible(c==null);
-	certInfoButtons.get("renew").setVisible(c!=null && Boolean.valueOf(c.getProperty("valid.notafter.warning")));
+	certInfoButtons.get("renew").setVisible(c!=null &&
+		Boolean.valueOf(c.getProperty("valid.notafter.warning")) &&
+		Boolean.valueOf(c.getProperty("ca_supported"))
+		);
 	
 	// also update selected item in menu
 	if (store.size() > 1 && selection.getIndex() >= 0)

@@ -39,7 +39,7 @@
 	color: #888888;
 }
 .form .fillin, .form .fillin-fixed, .form .replaced-form-element {
-	width: 100%;
+	/*width: 100%; results in zero width with flyingsaucer 9 :( */
 	font-family: monospace;
 	font-size: 11pt;
 	font-weight: bold;
@@ -138,6 +138,17 @@
 	font-size: 12pt;
 	font-weight: normal;
 }
+
+ /* workaround for nested table height miscomputation in userinfo table */
+.form table#tbl1 {
+	min-height: 45ex;
+}
+/* workaround for relative widths not working on input elements
+ * bug http://code.google.com/p/flying-saucer/issues/detail?id=208 */
+.form table#tbl2 input {
+	width: 18em;
+}
+
 /*
  * PoP challenge box 
  */

@@ -4,6 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import nl.nikhef.browsers.exception.BrowserExecutionException;
 import nl.nikhef.browsers.exception.BrowserNotAvailableException;
@@ -16,6 +22,8 @@ import org.apache.commons.cli.*;
  * @author wvengen
  */
 public class BrowserTool {
+    
+    static protected Logger logger = Logger.getLogger("nl.nikhef.browsers");
 
     @SuppressWarnings("static-access") // to use OptionBuilder conveniently
     public static void main(String[] args) throws Exception {
@@ -40,9 +48,38 @@ public class BrowserTool {
 	    opts.addOption(OptionBuilder.withArgName("browser id").hasArg()
 		    .withDescription("use the specified web browser (see list)")
 		    .withLongOpt("browser").create('b'));
+	    opts.addOption(OptionBuilder.withArgName("level").hasArg()
+		    .withDescription("debugging level (use 'help' as level for details)")
+		    .withLongOpt("debug").create('d'));
 
 	    CommandLineParser parser = new GnuParser();
 	    CommandLine line = parser.parse(opts, args);
+	    
+	    if (line.hasOption("debug")) {
+		if (line.getOptionValue("debug").toLowerCase().equals("help")) {
+		    // show available debug levels and quit
+		    System.out.println("The debug level can be an integer value, or one of:");
+		    System.out.println("  off, severe, warning, info, config, fine, finer, finest, all");
+		    System.out.println("Please refer to the Java logging documentation for more details.");
+		    System.out.println("http://java.sun.com/j2se/1.4.2/docs/api/java/util/logging/Level.html");
+		    System.exit(0);
+		}
+		Level level = Level.parse(line.getOptionValue("debug").toUpperCase());
+		logger.setLevel(level);
+		// include default log handler if none present
+		if (logger.getHandlers().length==0) {
+		    Handler handler = new ConsoleHandler();
+		    handler.setFormatter(new SimpleFormatter() {
+			public String format(LogRecord record) {
+		                return record.getLevel() + ": " + record.getMessage() + "\r\n";
+		        }			
+		    });
+		    logger.addHandler(handler);
+		}
+		// set logging level for all handlers as well
+		for (int i=0; i<logger.getHandlers().length; i++)
+		    logger.getHandlers()[i].setLevel(level);
+	    }
 
 	    if (line.hasOption("help"))
 		actionHelp(line, opts);

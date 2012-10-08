@@ -228,6 +228,14 @@ public class CertificatePair extends Properties implements ItemSelectable {
 		}
 		return this.getProperty("subject.o");
 	    }
+	    if (key.equals("keysize"))
+		if (getCertificate()!=null) return Integer.toString(((RSAPublicKey)getCertificate().getPublicKey()).getModulus().bitLength());
+		else if (getCSR()!=null) return Integer.toString(((RSAPublicKey)getCSR().getPublicKey()).getModulus().bitLength());
+	    if (key.equals("keyalgname"))
+		if (getCertificate()!=null) return getCertificate().getPublicKey().getAlgorithm();
+		else if (getCSR()!=null) return getCSR().getPublicKey().getAlgorithm();
+	    if (key.equals("sigalgname"))
+		if (getCertificate()!=null) return getCertificate().getSigAlgName();
 	    if (key.equals("modulus"))
 		if (getCertificate()!=null) return ((RSAPublicKey)getCertificate().getPublicKey()).getModulus().toString(16);
 		else if (getCSR()!=null) return ((RSAPublicKey)getCSR().getPublicKey()).getModulus().toString(16);
@@ -295,6 +303,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
 			&& usage.contains(KeyPurposeId.id_kp_OCSPSigning.toString())) )
 		    return "true";
 		return null;
+	    }
+	    if (key.equals("ca_supported")) {
+		return Boolean.toString(CAFactory.getDefault().isIssuer(getCertificate()));
 	    }
 	} catch (Exception e) {
 	    return null;
@@ -752,7 +763,11 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * <p>
      * Details of the certificate are specified by the supplied
      * {@linkplain Properties}. Currently only the property {@code subject}
-     * is used, which dictates the subject (DN) to use.
+     * is used, which dictates the subject (DN) to use, as well as the optional
+     * property {@code keysize}, to override the keysize to use. If the keysize
+     * is not specified, the system property {@code jgridstart.keysize} is used.
+     * The same holds for the optional properties {@code sigalgname} and
+     * {@code keyalgname}.
      * 
      * @param dst Destination directory (subdir of a store)
      * @param p Properties according to which to generate request
@@ -770,13 +785,18 @@ public class CertificatePair extends Properties implements ItemSelectable {
 	CertificatePair cert = new CertificatePair();
 	cert.path = dst;
 
-	String sigAlgName = System.getProperty("jgridstart.sigalgname");
+	String sigAlgName = p.getProperty("sigalgname");
+	if (sigAlgName==null) sigAlgName = System.getProperty("jgridstart.sigalgname");
 	if (sigAlgName==null) sigAlgName = "SHA1WithRSA";
-	String keyAlgName = System.getProperty("jgridstart.keyalgname");
-	if (keyAlgName==null) keyAlgName = "RSA";
 	
-	int keysize = 1024;
-	if (System.getProperty("jgridstart.keysize")!=null)
+	String keyAlgName = p.getProperty("keyalgname");
+	keyAlgName = System.getProperty("jgridstart.keyalgname");
+	if (keyAlgName==null) keyAlgName = "RSA";
+
+	int keysize = 2048;
+	if (p.getProperty("keysize")!=null)
+	    keysize = Integer.valueOf(p.getProperty("keysize"));
+	else if (System.getProperty("jgridstart.keysize")!=null)
 	    keysize = Integer.valueOf(System.getProperty("jgridstart.keysize"));
 
 	// need comma-notation, so convert if slash-notation

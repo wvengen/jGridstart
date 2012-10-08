@@ -1,0 +1,64 @@
+h1 {
+ margin-bottom: -0.5em;
+}
+ul.nav {
+ list-style-type: none;
+ text-align: right;
+ border-bottom: 1px solid gray;
+}
+ul.nav li {
+ display: inline;
+ margin-left: 0.2em;
+ padding: 0.2em;
+ border: 1px solid gray;
+ background: white;
+ color: darkblue;
+}
+ul.nav li#navactive {
+ border-bottom: none;
+}
+ul.nav li a:link, ul.nav a:visited {
+ background: white;
+ color: darkblue;
+}
+ul.nav li a:hover {
+ background: lightyellow;
+ color: darkblue;
+}
+
+.footer {
+ border-top: 1px solid gray;
+ padding-top: 1em;
+}
+
+.error {
+ font-weight: bold;
+}
+
+table.certsummary tr {
+ border-bottom: 1px solid gray;
+ border-top: 1px solid gray;
+}
+table.certsummary td, table.certsummary th {
+ margin: 0.2em;
+}
+table.certsummary .serial {
+ text-align: right;
+ padding-right: 0.3em;
+}
+table.certsummary td.subject, table.certsummary td.email {
+ font-family: monospace;
+}
+
+table .status {
+ padding-right: 1em;
+}
+table .actions {
+ text-align: right;
+}
+
+a img {
+ border: none;
+ padding-left: 1px;
+}
+

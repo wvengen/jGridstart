@@ -105,7 +105,7 @@ public class XHTMLPanel extends org.xhtmlrenderer.simple.XHTMLPanel implements I
 		    // workaround Linux where it seems too large
 		    String osName = System.getProperty("os.name");
 		    if (!osName.startsWith("Mac OS") && !osName.startsWith("Windows"))
-			font = font.deriveFont(font.getSize2D()*0.86f);
+			font = font.deriveFont(font.getSize2D()*0.88f);
 		    
 		    // add to UA stylesheet
 		    _defaultStylesheet = super.getDefaultStylesheet(factory);

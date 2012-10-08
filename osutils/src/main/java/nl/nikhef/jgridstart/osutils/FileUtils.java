@@ -449,21 +449,9 @@ public class FileUtils {
 	return ret;
     }
     
-    /** Execute a command and return the exit code while storing stdout and stderr.
-     * 
-     * @param cmd command to run
-     * @param output String to which stdin and stdout is appended.
-     * @return process exit code
-     * 
-     * @throws IOException
-     */
-    public static int Exec(String[] cmd, String output) throws IOException {
-	return Exec(cmd, null, null);
-    }
-    
     /** Execute a command and return the exit code 
      * @throws IOException */
     public static int Exec(String[] cmd) throws IOException {
-	return Exec(cmd, null);
+	return Exec(cmd, null, null);
     }
 }

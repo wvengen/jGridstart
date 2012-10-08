@@ -106,7 +106,7 @@ public class RequestWizardCommon extends TemplateWizard implements IRequestWizar
     @Override
     protected void initialize() {
 	super.initialize();
-	setPreferredSize(new Dimension(800, 550));
+	setPreferredSize(new Dimension(855, 565));
 	// extra special handling of "action:" links
 	replaceLinkListener(new LinkListener() {
 	    @Override

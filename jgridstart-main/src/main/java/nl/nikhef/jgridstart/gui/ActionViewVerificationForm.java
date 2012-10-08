@@ -79,7 +79,7 @@ public class ActionViewVerificationForm extends CertificateAction {
 		form.setData(data);
 		add(form);
 		setTitle(form.getDocumentTitle());
-		setPreferredSize(new Dimension(750, 470));
+		setPreferredSize(new Dimension(800, 470));
 		// min size to avoid fixed-size fields overlap text
 		//  setMinimumSize is Java 1.6 or higher, so don't complain in that case
 		try { setMinimumSize(new Dimension(700, 400)); }

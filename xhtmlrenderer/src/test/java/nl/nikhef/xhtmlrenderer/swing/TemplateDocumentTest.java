@@ -260,6 +260,12 @@ public class TemplateDocumentTest extends TestCase {
     }
     
     @Test
+    public void testSelectedChecked() throws Exception {
+	templateTest("<input type='radio' selected='true'/>", "<input type='radio' selected='selected'/>");
+	templateTest("<select><option/><option selected='true'/></select>", "<select><option/><option selected='selected'/></select>");
+    }
+        
+    @Test
     public void testRefresh() throws Exception {
 	String body = "<p c='${txt}'/>";
 	TemplateDocument template = new TemplateDocument(parseBody(body));

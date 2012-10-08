@@ -13,7 +13,7 @@
   <parent>
     <groupId>nl.nikhef.jgridstart</groupId>
     <artifactId>jgridstart</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -37,7 +37,7 @@
   </dependencies>
   
   <!--  bouncycastle's $url/apidocs isn't valid ... -->
-  <reporting>
+  <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -49,5 +49,5 @@
         </configuration>
       </plugin>
     </plugins>
-  </reporting>
+  </build>
 </project>

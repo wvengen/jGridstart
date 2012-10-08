@@ -1,1 +1,16 @@
+#
+# .travis.yml
+#
+#    Configuration file for the Travis Continuous Integration system
+#    http://travis-ci.org/wvengen/jGridstart
+#
 language: java
+jdk:
+- openjdk6
+- openjdk7
+- oraclejdk7
+# don't enable gui tests, since they are somewhat unstable
+#script: mvn -DguiTests test
+#before_script:
+#  - "export DISPLAY=:99.0"
+#  - "sh -e /etc/init.d/xvfb start"

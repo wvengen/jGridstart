@@ -33,7 +33,7 @@ public class ActionViewRequest extends CertificateAction {
     
     public ActionViewRequest(JFrame parent, CertificateSelection s) {
 	super(parent, s);
-	putValue(NAME, "Request...");
+	putValue(NAME, "Current Request...");
 	putValue(MNEMONIC_KEY, new Integer('R'));
 	URLLauncherCertificate.addAction("viewrequest", this);
     }

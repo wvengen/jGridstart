@@ -33,7 +33,6 @@
   (<a href='action:changebrowser'>change browser</a>), follow these steps:</p>
 </div>
 
-
 <form if="${install.browser.certinst} and ${install.browser.certinst}!=manual">
   <ol>
 	<li>Please enter the private key password that you have given before.<br/>
@@ -47,7 +46,18 @@
 	  -->
 	
 	  <li if="${install.browser.certinst}==mozilla">
-	    When an <em>Internet Security</em> dialog appears, choose <em>Allow</em>.</li>
+	    When an <em>Internet Security</em> dialog appears, choose <em>Allow</em>.
+	    <br/>
+	    <a class="helpbutton" href="action:toggle(wizard.show.firefox15+)">If you
+	    see an error dialog instead, read more here.</a>
+	    <div class="help" if="${wizard.show.firefox15+}">
+	      Recent versions of Firefox have more strict security settings. This means that
+	      you cannot use the procedure describes here. Instead, please
+	      <a href="action:export">export</a> your certificate to a PKCS#12 file
+	      and import that into Firefox
+	      (<a href="http://ca.dutchgrid.nl/info/browser#firefox">read more about importing</a>).
+	    </div>
+	    </li>
 	
 	  <li if="${install.browser.certinst}==mozilla">
 	    If you have set a master password, enter it in the dialog that pops up.</li>
