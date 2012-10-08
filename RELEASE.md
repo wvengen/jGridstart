@@ -20,11 +20,15 @@ This would involve the following steps:
    If you just changed `jgridstart-main`, you can run the following commands
    (using [xmlstarlet]) to update the relevant modules to version x.y:
 
+        VERSION=x.y
         xmlstarlet ed -P -L -N m=http://maven.apache.org/POM/4.0.0 \
-            -u "/m:project/m:version" -v x.y \
+            -u "/m:project/m:version" -v "$VERSION" \
             -u "/m:project/m:dependencies/m:dependency[child::m:groupId='nl.nikhef.jgridstart' \
-                        and starts-with(child::m:artifactId,'jgridstart-')]/m:version" -v x.y \
+                        and starts-with(child::m:artifactId,'jgridstart-')]/m:version" -v "$VERSION" \
+            -u "m:artifactItems/m:artifactItem[child::m:groupId='nl.nikhef.jgridstart' \
+                        and starts-with(child::m:artifactId,'jgridstart-')]/m:version" -v "$VERSION" \
             jgridstart-*/pom.xml
+        sed -si '/^<?xml.*$/d; s/\( xsi:schemaLocation\)/\n \1/' jgridstart-*/pom.xml
 
    To view the version numbers of all modules, you use the following command:
    
