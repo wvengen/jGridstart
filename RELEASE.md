@@ -25,7 +25,7 @@ This would involve the following steps:
             -u "/m:project/m:version" -v "$VERSION" \
             -u "/m:project/m:dependencies/m:dependency[child::m:groupId='nl.nikhef.jgridstart' \
                         and starts-with(child::m:artifactId,'jgridstart-')]/m:version" -v "$VERSION" \
-            -u "m:artifactItems/m:artifactItem[child::m:groupId='nl.nikhef.jgridstart' \
+            -u "/descendant::m:artifactItems/m:artifactItem[child::m:groupId='nl.nikhef.jgridstart' \
                         and starts-with(child::m:artifactId,'jgridstart-')]/m:version" -v "$VERSION" \
             jgridstart-*/pom.xml
         sed -si '/^<?xml.*$/d; s/\( xsi:schemaLocation\)/\n \1/' jgridstart-*/pom.xml
