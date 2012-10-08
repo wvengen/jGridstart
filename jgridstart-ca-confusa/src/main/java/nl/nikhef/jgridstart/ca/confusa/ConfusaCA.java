@@ -49,6 +49,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
 import org.w3c.dom.Document;
@@ -76,6 +77,8 @@ public class ConfusaCA implements CA {
     
     /** CA certificate (cached) */
     protected static X509Certificate cacert = null;
+    /** CA DN */
+    protected String caDN = null;
     /** OAuth consumer */
     protected OAuthConsumer consumer = null;
     /** OAuth provider */
@@ -94,6 +97,8 @@ public class ConfusaCA implements CA {
 	baseCert = dflProp("jgridstart.ca.base.cert", base + "api/certificates.php");
 	baseInfo = dflProp("jgridstart.ca.base.info", base + "api/infopoint.php");
 	baseCaCert = dflProp("jgridstart.ca.base.cacert", base + "root_cert.php?link=cacert");
+
+	caDN = dflProp("jgridstart.ca.dn", "C=NL, O=TERENA, CN=TERENA eScience Personal CA");
 	
 	// client can be re-used between OAuth and requests (pipelining)
 	//   and we want to set a custom http user-agent string
@@ -438,5 +443,14 @@ public class ConfusaCA implements CA {
 	    userInfo = p;
 	}
 	return userInfo;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isIssuer(X509Certificate cert) {
+	// TODO cache X500Principal
+	String dn = caDN;
+	if (dn.trim().startsWith("/"))
+	    dn = dn.substring(1).replace('/', ',');
+	return cert.getIssuerDN().equals(new X509Principal(dn));
     }
 }
