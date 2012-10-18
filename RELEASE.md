@@ -61,7 +61,14 @@ This would involve the following steps:
 
 
 6. *Publish javadoc.*
-   TODO: This is something that still needs to be put in place.
+   Generate javadocs by running the following command from the top-level
+   directory, which puts the API documentation from all modules into
+   `target/site/apidocs`:
+
+       TITLE='jGridstart top-level x.y API'
+       mvn javadoc:aggregate -Ddoctitle="$TITLE" -Dwindowtitle="$TITLE"
+
+   TODO: Publish on Github Pages.
 
 
 7. *Update the Wiki.*
