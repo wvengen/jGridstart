@@ -68,7 +68,16 @@ This would involve the following steps:
        TITLE='jGridstart top-level x.y API'
        mvn javadoc:aggregate -Ddoctitle="$TITLE" -Dwindowtitle="$TITLE"
 
-   TODO: Publish on Github Pages.
+   Now publish it on Github using the gh-pages branch, assuming that once exists
+   ([create](https://help.github.com/articles/creating-project-pages-manually)
+   a new orphaned branch, if not):
+
+       git checkout gh-pages
+       rm -Rf javadoc
+       mv target/site/apidocs javadoc
+       git add javadoc
+       git commit -m 'release documentation for jGridstart x.y' -a
+       git push
 
 
 7. *Update the Wiki.*
