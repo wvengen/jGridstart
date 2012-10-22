@@ -158,6 +158,10 @@ public class CertificatePair extends Properties implements ItemSelectable {
      *     Specific fields can be requested as well, e.g. {@code subject.o} for
      *     a comma-separated list of subject organisations; see
      *     {@link #getSubjectPrincipalValue}.</dd>
+     * <dt>cert.serial</dt>
+     *     <dd>certificate serial number, when certificate is present</dd>
+     * <dt>path</dt>
+     *     <dd>filesystem path of the directory the certificate and pair live in</dd>
      * <dt>usage</dt>
      *     <dd>is {@code true} when child keys can be present</dd>
      * <dt>usage.any, usage.serverauth, usage.clientauth, usage.codesigning,
@@ -165,6 +169,11 @@ public class CertificatePair extends Properties implements ItemSelectable {
      *     are {@code true} when they are defined in the extended key usage</dd>
      * <dt>modulus, modulus.first20</dt>
      *     <dd>the public key's modulus, and its first 20 characters</dd>
+     * <dt>keysize, keyalgname, sigalgname</dt>
+     *     <dd>Cryptographic properties of the certificate:
+     *     size of the key (in bits),
+     *     algorithm name of the key (usually "RSA"),
+     *     signature algorithm name (see <a href="http://www.bouncycastle.org/specifications.html">Signature Algorithms</a>).</dd>
      * <dt>org</dt>
      *     <dd>the certificate's (or request's) organisation; this is the last
      *     last organisation RDN, optionally with one or more organisation-unit
@@ -172,6 +181,9 @@ public class CertificatePair extends Properties implements ItemSelectable {
      * <dt>state.icon</dt>
      *     <dd>Icon for certificate state, one of {@code valid}, {@code warning},
      *     {@code renew} or {@code error}.</dd>
+     * <dt>ca_supported</dt>
+     *     <dd>if the this certificate is issued by the CA jGridstart is
+     *     connected to.</dd>
      * </dl>
      * 
      * You can postfix each property with {@code .html} to get an html representation.
