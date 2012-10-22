@@ -20,11 +20,15 @@ This would involve the following steps:
    If you just changed `jgridstart-main`, you can run the following commands
    (using [xmlstarlet]) to update the relevant modules to version x.y:
 
+        VERSION=x.y
         xmlstarlet ed -P -L -N m=http://maven.apache.org/POM/4.0.0 \
-            -u "/m:project/m:version" -v x.y \
+            -u "/m:project/m:version" -v "$VERSION" \
             -u "/m:project/m:dependencies/m:dependency[child::m:groupId='nl.nikhef.jgridstart' \
-                        and starts-with(child::m:artifactId,'jgridstart-')]/m:version" -v x.y \
+                        and starts-with(child::m:artifactId,'jgridstart-')]/m:version" -v "$VERSION" \
+            -u "/descendant::m:artifactItems/m:artifactItem[child::m:groupId='nl.nikhef.jgridstart' \
+                        and starts-with(child::m:artifactId,'jgridstart-')]/m:version" -v "$VERSION" \
             jgridstart-*/pom.xml
+        sed -si '/^<?xml.*$/d; s/\( xsi:schemaLocation\)/\n \1/' jgridstart-*/pom.xml
 
    To view the version numbers of all modules, you use the following command:
    
@@ -57,7 +61,23 @@ This would involve the following steps:
 
 
 6. *Publish javadoc.*
-   TODO: This is something that still needs to be put in place.
+   Generate javadocs by running the following command from the top-level
+   directory, which puts the API documentation from all modules into
+   `target/site/apidocs`:
+
+       TITLE='jGridstart top-level x.y API'
+       mvn javadoc:aggregate -Ddoctitle="$TITLE" -Dwindowtitle="$TITLE"
+
+   Now publish it on Github using the gh-pages branch, assuming that once exists
+   ([create](https://help.github.com/articles/creating-project-pages-manually)
+   a new orphaned branch, if not):
+
+       git checkout gh-pages
+       rm -Rf javadoc
+       mv target/site/apidocs javadoc
+       git add javadoc
+       git commit -m 'release documentation for jGridstart x.y' -a
+       git push
 
 
 7. *Update the Wiki.*

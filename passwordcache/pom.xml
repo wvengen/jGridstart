@@ -35,19 +35,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
-  <!--  bouncycastle's $url/apidocs isn't valid ... -->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <links>
-            <link>http://www.bouncycastle.org/docs/docs1.5/</link>
-          </links>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
