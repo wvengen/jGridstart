@@ -2,15 +2,16 @@
 <body>
 Graphical user-interface
 <p>
-The {@link Main} program creates the main window {@link JGSFrame}, containing
-a {@link ComponentCertificateList} showing the available certificates, and a
-{@link nl.nikhef.xhtmlrenderer.swing.TemplatePanel TemplatePanel} with
-certificate details; the latter contains one of the html files present in this
-package.
+The {@link nl.nikhef.jgridstart.gui.Main Main} program creates the main window
+{@link nl.nikhef.jgridstart.gui.JGSFrame JGSFrame}, containing a
+{@link nl.nikhef.jgridstart.gui.ComponentCertificateList ComponentCertificateList}
+showing the available certificates, and a
+{@link nl.nikhef.xhtmlrenderer.swing.TemplatePanel TemplatePanel} with certificate
+details; the latter contains one of the html files present in this package.
 <p>
 Menu and shortcuts are populated by children of {@link javax.swing.Action Action}s.
 Some of these work on the currently selected certificate (which is kept track of
 by {@link nl.nikhef.jgridstart.gui.util.CertificateSelection CertificateSelection}),
-and these actions are children of {@link CertificateAction}.
+and these actions are children of {@link nl.nikhef.jgridstart.gui.CertificateAction CertificateAction}.
 </body>
 </html>
