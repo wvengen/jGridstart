@@ -43,8 +43,18 @@ The source is split into several modules.
   * __jgridstart-main__ (`nl.nikhef.jgridstart`) -
       Main jGridstart application.
 
+  * __jgridstart-ca-dutchgrid__ (`nl.nikhef.jgridstart.ca.dutchgrid`) -
+      [DutchGrid] CA package, providing an interface to the DutchGrid authority
+      to submit and retrieve certificates, as well as its request wizard.
+
+  * __jgridstart-ca-confusa__ (`nl.nikhef.jgridstart.ca.confusa`) -
+      [Confusa] CA package, providing an OAuth-based interaction with the
+      Confusa certificate authority to submit and retrieve certificates, as well
+      as the corresponding request wizard.
+
   * __jgridstart-small__ -
-      Creation of a minified jar using [ProGuard].
+      Creation of a minified jar using [ProGuard]. Currently this is also the place
+      where the included ca packages are selected.
 
   * __jgridstart-wrapper__ -
       Wrapper around jgridstart-small that contains the minified jar as well
@@ -118,36 +128,37 @@ Adapting jGridstart for a new certificate authority requires:
      application, properties can be overridden in the jnlp file
      (optionally prefixed with `jnlp.` to avoid a security warning).
 
-2. _Selection of a CA interface (module jgridstart)_
+2. _Selection of a CA interface (ca-specific module)_
 
-     The `nl.nikhef.jgridstart.ca` package contains the interface CA, which
-     provides an interface between jGridstart and the CA. The specific
-     implementation used is specified in the global configuration file.
-     You probably need to write one tailored to your CA interface. Please
-     see DutchGridCA, TestCA and LocalCA for examples. Please send us your
-     implementation so we can add it to jGridstart.
+     Most probably you'll need to implement the Java interface for talking
+     to your certificate authority. You can copy one of the existing ca
+     modules, and adapt it for your situation. Please use a package name
+     that reflects your domain (e.g. `org.example.jgridstart.ca`).
+     You can also look at jGridstart's TestCA and LocalCA as examples.
+     Then add this module as a dependency to the jgridstart-wrapper module.
 
-3. _Customization of the request wizard (module jgridstart)_
+3. _Customization of the request wizard (ca-specific module)_
 
-     `RequestWizard` (in package `nl.nikhef.jgridstart.gui`) contains the
-     user-interface logic for requesting/renew certificates. The contents
-     of the wizard's pages are present in the files `requestwizard-xx.html`.
-     Currently, one would need to rewrite RequestWizard for your specific
-     request process. In the future this should become more easily
-     customizable.
+     Each certificate authority's process is slightly different, that's why
+     you'd write your own request wizard process. You could start off from
+     jgridstart-ca-dutchgrid, which has an off-line CA process.
 
-4. _Specification of organisations for which one can signup_
+     The contents of the wizard's pages are typically present in files named
+     `requestwizard-xx.html`. These are added as pages to a subclass of
+     `nl.nikhef.jgridstart.gui.wizard.RequestWizardCommon`. Please see the
+     existing CA's as examples of usage details.
+
+4. _Specification of organisations for which one can signup (jgridstart module)_
 
     In `jgridstart/src/main/resources/conf/cert_signup.conf`, see comments.
     At the moment one also needs to update `CertificateRequest#postFillData`
     (in package `nl.nikhef.jgridstart`) and specify how to create a full
-    DN from user information. This is scheduled for improvement as well.
+    DN from user information.
 
-5. _Signing of the resulting JAR_
-
-    This is required for running jGridstart as a java web start application.
-    By default a temporary generated key is used. For production you may
-    want to use a commercial code-signing certificate.
+With this adapted, you'll need to build your own jGridstart distribution (as
+explained above). Then sign it using a commercial code-signing certificate.
+When you contribute your module, we can include it and add it to the official
+jGridstart releases.
 
 
 License
