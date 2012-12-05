@@ -50,7 +50,7 @@ The source is split into several modules.
       Wrapper around jgridstart-small that contains the minified jar as well
       as bouncycastle. When it is run, it unpacks them to a temporary directory
       and executes it locally. This is to avoid all kinds of problems when
-      using bouncycastle and java web start together.
+      using [bouncycastle and java web start] together.
 
   * __jgridstart-jws__ -
       Java Web Start package.
@@ -161,6 +161,7 @@ The jGridstart source code is fully open source under the [Apache 2.0 License].
 [PEMWriter]: http://www.bouncycastle.org/docs/pkixdocs1.4/org/bouncycastle/openssl/PEMWriter.html
 [Flying Saucer XHTMLRenderer]: http://code.google.com/p/flying-saucer/
 [ProGuard]: http://proguard.sf.net/
+[bouncycastle and java web start]: http://jgridstart.nikhef.nl/Bouncycastle_and_Java_Web_start
 [Maven]: http://maven.apache.org/
 [Eclipse]: http://www.eclipse.org/
 [m2eclipse]: http://www.eclipse.org/m2e/
