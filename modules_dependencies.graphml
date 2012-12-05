@@ -1,0 +1,884 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+    Copyright 2012 Stichting FOM <jgridstart@biggrid.nl>
+    Author W. van Engen <wvengen@nikhef.nl>
+   
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not
+    use this file except in compliance with the License.  You may obtain a copy
+    of the License at
+   
+        http://www.apache.org/licenses/LICENSE-2.0
+   
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+    License for the specific language governing permissions and limitations
+    under the License.
+ -->
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:y="http://www.yworks.com/xml/graphml" xmlns:yed="http://www.yworks.com/xml/yed/3" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://www.yworks.com/xml/schema/graphml/1.1/ygraphml.xsd">
+  <!--Created by yFiles for Java 2.10-->
+  <key for="graphml" id="d0" yfiles.type="resources"/>
+  <key for="port" id="d1" yfiles.type="portgraphics"/>
+  <key for="port" id="d2" yfiles.type="portgeometry"/>
+  <key for="port" id="d3" yfiles.type="portuserdata"/>
+  <key attr.name="url" attr.type="string" for="node" id="d4"/>
+  <key attr.name="description" attr.type="string" for="node" id="d5"/>
+  <key for="node" id="d6" yfiles.type="nodegraphics"/>
+  <key for="edge" id="d7" yfiles.type="portconstraints"/>
+  <key attr.name="url" attr.type="string" for="edge" id="d8"/>
+  <key attr.name="description" attr.type="string" for="edge" id="d9"/>
+  <key for="edge" id="d10" yfiles.type="edgegraphics"/>
+  <graph edgedefault="directed" id="G">
+    <node id="n0">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="50.0" width="120.0" x="1421.5500982318272" y="339.13583034779793"/>
+          <y:Fill color="#FFCFCF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="52.890625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="102.41015625" x="8.794921875" y="-1.4453125">org.jdesktop
+:swing-worker
+:1.1</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n1">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="50.0" width="120.0" x="1224.1573595284872" y="485.5939835894482"/>
+          <y:Fill color="#FFCFCF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="52.890625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="97.515625" x="11.2421875" y="-1.4453125">commons-cli
+:commons-cli
+:1.1</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n2">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="180.0" x="941.25" y="334.13583034779793"/>
+          <y:Fill color="#CCFFCC" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="2.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="56.359375" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="142.06884765625" x="18.965576171875" y="1.8203125">nl.nikhef.jgridstart
+:osutils
+:1.0</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n3">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="50.0" width="180.0" x="529.3418467583506" y="444.1309187564423"/>
+          <y:Fill color="#FFCFCF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="52.890625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="124.4013671875" x="27.79931640625" y="-1.4453125">org.bouncycastle
+:bcmail-jdk15
+:1.46</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n4">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="50.0" width="180.0" x="244.8585461689588" y="444.1309187564423"/>
+          <y:Fill color="#FFEFEF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="52.890625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="132.7001953125" x="23.64990234375" y="-1.4453125">org.xhtmlrenderer
+:flying-saucer-pdf
+:9.0.1</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n5">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="50.0" width="180.0" x="529.3418467583506" y="372.4580307407253"/>
+          <y:Fill color="#FFCFCF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="52.890625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="124.4013671875" x="27.79931640625" y="-1.4453125">org.bouncycastle
+:bcprov-jdk15
+:1.46</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n6">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="180.0" x="244.85854616895875" y="224.13583034779793"/>
+          <y:Fill color="#CCFFCC" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="2.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="56.359375" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="117.31298828125" x="31.343505859375" y="1.8203125">nl.nikhef
+:xhtmlrenderer
+:1.0</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n7">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="180.0" x="941.25" y="-110.0"/>
+          <y:Fill color="#CCFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="2.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="56.359375" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="145.01318359375" x="17.493408203125" y="1.8203125">nl.nikhef.jgridstart
+:jgridstart-wrapper
+:1.13</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n8">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="78.81262278978392" width="234.59233791748528" x="913.9538310412573" y="61.553561192591644"/>
+          <y:Fill color="#CCFFCC" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="4.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="16" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="59.921875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="175.0234375" x="29.78445020874267" y="9.445373894891958">nl.nikhef.jgridstart
+:jgridstart-main
+:1.13</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n9">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="180.0" x="941.25" y="-40.0"/>
+          <y:Fill color="#CCFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="2.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="56.359375" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="142.06884765625" x="18.965576171875" y="1.8203125">nl.nikhef.jgridstart
+:jgridstart-small
+:1.13</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n10">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="50.0" width="120.0" x="1333.084479371316" y="412.3649069686231"/>
+          <y:Fill color="#FFCFCF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="52.890625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="112.267578125" x="3.8662109375" y="-1.4453125">commons-lang
+:commons-lang
+:2.5</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n11">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="50.0" width="120.0" x="1080.0" y="515.8038067721593"/>
+          <y:Fill color="#FFCFCF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="52.890625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="93.263671875" x="13.3681640625" y="-1.4453125">at.jta
+:WinRegistry
+:4.4</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n12">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="50.0" width="180.0" x="244.85854616895875" y="372.4580307407253"/>
+          <y:Fill color="#FFEFEF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="52.890625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="135.017578125" x="22.4912109375" y="-1.4453125">org.xhtmlrenderer
+:flying-saucer-core
+:9.0.1</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n13">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="180.0" x="810.0" y="224.13583034779793"/>
+          <y:Fill color="#CCFFCC" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="2.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="56.359375" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="142.06884765625" x="18.965576171875" y="1.8203125">nl.nikhef.jgridstart
+:passwordcache
+:1.0</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n14">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="50.0" width="180.0" x="244.8585461689588" y="515.8038067721593"/>
+          <y:Fill color="#FFEFEF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="52.890625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="92.224609375" x="43.8876953125" y="-1.4453125">com.lowagie
+:itext
+:2.1.7</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n15">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="180.0" x="941.25" y="-180.0"/>
+          <y:Fill color="#CCFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="2.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="56.359375" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="142.06884765625" x="18.965576171875" y="1.8203125">nl.nikhef.jgridstart
+:jgridstart-jws
+:1.13</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n16">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="50.0" width="180.0" x="529.3418467583506" y="515.8038067721593"/>
+          <y:Fill color="#FFECEC" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="52.890625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="124.4013671875" x="27.79931640625" y="-1.4453125">org.bouncycastle
+:bctsp-jdk15
+:1.46</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n17">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="180.0" x="1066.8565815324166" y="224.13583034779793"/>
+          <y:Fill color="#CCFFCC" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="2.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="56.359375" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="77.212890625" x="51.3935546875" y="1.8203125">nl.nikhef
+:browsers
+:1.0</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n18">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="37.98133595284878" width="263.1001964636542" x="203.30844793713172" y="610.6618617819825"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="30" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.921875" modelName="internal" modelPosition="c" textColor="#808080" visible="true" width="220.5185546875" x="21.290820888077093" y="-0.4702695235756664">xhtmlrenderer</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n19">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="37.98133595284878" width="263.1001964636542" x="487.79174852652346" y="610.6618617819825"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="30" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.921875" modelName="internal" modelPosition="c" textColor="#808080" visible="true" width="202.7353515625" x="30.18242245057712" y="-0.4702695235756664">bouncycastle</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n20">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="37.98133595284878" width="132.69155206286842" x="1073.654223968566" y="610.6618617819825"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="30" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.921875" modelName="internal" modelPosition="c" textColor="#808080" visible="true" width="119.6494140625" x="6.521069000184298" y="-0.47026952357555274">registry</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n21">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="37.98133595284878" width="161.5363457760314" x="1256.471512770138" y="610.6618617819825"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="30" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.921875" modelName="internal" modelPosition="c" textColor="#808080" visible="true" width="150.2939453125" x="5.62120023176567" y="-0.4702695235756664">commons</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n22">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="37.98133595284878" width="107.93320235756374" x="1433.6168958742635" y="610.6618617819825"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="30" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.921875" modelName="internal" modelPosition="c" textColor="#808080" visible="true" width="107.388671875" x="0.27226524128195706" y="-0.4702695235756664">worker</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n23">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="89.12317485265237" width="220.68320628683688" x="222.3809901768174" y="641.1246437073264"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="node_width" configuration="CroppingLabel" fontFamily="Dialog" fontSize="11" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="70.0625" modelName="internal" modelPosition="tl" textColor="#666666" visible="true" width="220.68320628683688" x="4.0" y="4.0">xhtml renderer and gui widget to handle parts of the user-interface.
+nl.nikhef.xhtmlrenderer adds a templating system and some tweaks;
+lso supports rendering to pdf.</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n24">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="89.12317485265237" width="220.68320628683685" x="509.0002436149322" y="641.1246437073264"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="node_width" configuration="CroppingLabel" fontFamily="Dialog" fontSize="11" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="70.0625" modelName="internal" modelPosition="tl" textColor="#666666" visible="true" width="220.68320628683685" x="4.0" y="4.0">general-purpose cryptography library
+used for basically all cryptographic
+operations like generating certificate
+requests, reading/writing pkcs#12 files
+and signing certificate renewals.</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n25">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="89.12317485265237" width="176.6939750876957" x="1051.6530124561523" y="641.1246437073264"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="node_width" configuration="CroppingLabel" fontFamily="Dialog" fontSize="11" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="57.25" modelName="internal" modelPosition="tl" textColor="#666666" visible="true" width="176.6939750876957" x="4.0" y="4.0">accessing the windows registry
+using a pure-java library; used
+for finding the default system
+web browser.</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n26">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="89.12317485265237" width="153.9575311201991" x="1260.2609200980542" y="641.1246437073264"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="node_width" configuration="CroppingLabel" fontFamily="Dialog" fontSize="11" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="57.25" modelName="internal" modelPosition="tl" textColor="#666666" visible="true" width="153.9575311201991" x="4.0" y="4.0">often used utility libraries
+for parsing command-line
+options and things like
+array conversion.</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n27">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="89.12317485265237" width="127.15982244434056" x="1425.7766371903917" y="641.1246437073264"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="node_width" configuration="CroppingLabel" fontFamily="Dialog" fontSize="11" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="44.4375" modelName="internal" modelPosition="tl" textColor="#666666" visible="true" width="127.15982244434056" x="4.0" y="4.0">using a worker-thread
+with a swing gui that
+responds to updates.</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n28">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="78.81262278978392" width="153.9575311201992" x="944.2343975047338" y="394.13583034779793"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="node_width" configuration="CroppingLabel" fontFamily="Dialog" fontSize="11" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="57.25" modelName="internal" modelPosition="tl" textColor="#666666" visible="true" width="153.9575311201992" x="4.0" y="4.0">operating system utilities 
+for writing and managing
+files securely, executing
+programs and reading urls.</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n29">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="89.12317485265237" width="145.6463528724651" x="768.5880446322685" y="284.13583034779793"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="node_width" configuration="CroppingLabel" fontFamily="Dialog" fontSize="11" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="82.875" modelName="internal" modelPosition="tl" textColor="#666666" visible="true" width="145.6463528724651" x="4.0" y="4.0">time-limited cache for
+passwords entered by
+the user, as well as a
+user-interface for entry
+of passwords; integration
+for accessing pem files.</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n30">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="37.98133595284878" width="243.5072620326569" x="1137.0002380973294" y="-168.9906679764244"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Dialog" fontSize="30" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.921875" modelName="internal" modelPosition="l" textColor="#808080" visible="true" width="217.837890625" x="4.0" y="-0.4702695235756096">java web start</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n31">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="37.98133595284878" width="243.5072620326569" x="1137.0002380973294" y="-28.99066797642439"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Dialog" fontSize="30" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.921875" modelName="internal" modelPosition="l" textColor="#808080" visible="true" width="97.22265625" x="4.0" y="-0.4702695235756096">minify</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n32">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="37.98133595284878" width="243.5072620326569" x="1137.0002380973294" y="-98.99066797642439"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Dialog" fontSize="30" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.921875" modelName="internal" modelPosition="l" textColor="#808080" visible="true" width="78.296875" x="4.0" y="-0.4702695235756096">wrap</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n33">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="37.98133595284878" width="243.5072620326569" x="1163.318969215154" y="61.553561192591644"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Dialog" fontSize="34" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="43.578125" modelName="internal" modelPosition="l" textColor="#808080" visible="true" width="88.9501953125" x="4.0" y="-2.7983945235756096">main</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n34">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="105.0" width="153.9575311201991" x="1179.126948251117" y="284.13583034779793"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="node_width" configuration="CroppingLabel" fontFamily="Dialog" fontSize="11" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="70.0625" modelName="internal" modelPosition="tl" textColor="#666666" visible="true" width="153.9575311201991" x="4.0" y="4.0">opening web pages and
+importing pkcs#12 files
+into web browsers, as well
+as discovering which web
+browsers are installed.</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n35">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="38.57003618255112" width="279.5642296903476" x="642.3683324687345" y="-29.28501809127556"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="node_width" configuration="CroppingLabel" fontFamily="Dialog" fontSize="11" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="57.25" modelName="internal" modelPosition="r" textColor="#666666" visible="true" width="279.5642296903476" x="-4.0" y="-9.33998190872444">all jGridstart's dependencies are packed into a
+single jar, and unused code is removed; this
+considerably reduces the total file size; only
+bouncycastle needs to remain a separate jar.</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n36">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="42.58226915520629" width="279.5642296903476" x="636.1626527104263" y="-106.12261050932173"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="node_width" configuration="CroppingLabel" fontFamily="Dialog" fontSize="11" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="44.4375" modelName="internal" modelPosition="tl" textColor="#666666" visible="true" width="279.5642296903476" x="4.0" y="4.0">to use bouncycastle with java web start, the best
+approach is to run a wrapper that unpacks them
+and runs them outside of java web start.</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n37">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="14.922667946747069" width="285.7699094486559" x="633.0598128312721" y="-161.3620469643101"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="node_width" configuration="CroppingLabel" fontFamily="Dialog" fontSize="11" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.8125" modelName="internal" modelPosition="tl" textColor="#666666" visible="true" width="285.7699094486559" x="4.0" y="4.0">prepare for running jGridstart from a web browser</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n38">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="78.81262278978392" width="299.1153022038354" x="203.3084479371317" y="-180.0"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="60" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="73.84375" modelName="internal" modelPosition="tl" textColor="#808080" visible="true" width="286.333984375" x="4.0" y="4.0">jGridstart</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n39">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="42.58226915520629" width="299.1153022038354" x="224.0806005496234" y="-118.18358667845865"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Dialog" fontSize="30" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.921875" modelName="internal" modelPosition="tl" textColor="#808080" visible="true" width="323.0576171875" x="4.0" y="4.0">dependency diagram</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n40">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="24.5747162851157" width="74.09292153918295" x="480.5293301579434" y="-84.93774960297736"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="20.296875" modelName="internal" modelPosition="tr" textColor="#C0C0C0" visible="true" width="69.802734375" x="0.290187164182953" y="4.0">nov 2012</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n41">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="24.57471628511564" width="550.3556553398353" x="200.85439236937563" y="732.9961530715007"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="15.640625" modelName="internal" modelPosition="tl" textColor="#C0C0C0" visible="true" width="603.7314453125" x="4.0" y="4.0">initial diagram created by running mvn com.github.janssk1:maven-dependencygraph-plugin:1.1:graph on jgridstart-jws</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <edge id="e0" source="n2" target="n10">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="78.75" sy="30.0" tx="-60.0" ty="-3.22907662082514">
+            <y:Point x="1110.0" y="422.8221218488132"/>
+            <y:Point x="1121.3137084989849" y="434.13583034779793"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e1" source="n3" target="n5">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="-24.9853515625" tx="0.0" ty="24.9853515625"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e2" source="n4" target="n14">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-4.85854616895881" sy="25.0" tx="-4.85854616895881" ty="-25.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e3" source="n4" target="n12">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-4.85854616895881" sy="-25.0" tx="-4.858546168958753" ty="25.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e4" source="n6" target="n12">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-4.858546168958753" sy="30.0" tx="-4.858546168958753" ty="-25.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e5" source="n6" target="n4">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-90.0" sy="0.0" tx="-90.0" ty="-4.995088408644392">
+            <y:Point x="225.65685424949237" y="254.13583034779793"/>
+            <y:Point x="220.0" y="259.7926845972903"/>
+            <y:Point x="220.0" y="458.47897609830557"/>
+            <y:Point x="225.65685424949237" y="464.13583034779793"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e6" source="n6" target="n5">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="90.0" sy="-10.0" tx="-79.34184675835058" ty="-25.0">
+            <y:Point x="518.7867965644036" y="244.13583034779793"/>
+            <y:Point x="540.0" y="265.34903378339436"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e7" source="n6" target="n3">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="90.0" sy="0.0" tx="-90.0" ty="-4.995088408644392">
+            <y:Point x="478.7867965644036" y="254.13583034779793"/>
+            <y:Point x="500.0" y="275.34903378339436"/>
+            <y:Point x="500.0" y="457.06476253593246"/>
+            <y:Point x="507.0710678118655" y="464.13583034779793"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e8" source="n6" target="n16">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="90.0" sy="10.0" tx="-90.0" ty="-6.667976424361427">
+            <y:Point x="471.6152236891498" y="264.13583034779793"/>
+            <y:Point x="490.0" y="282.52060665864815"/>
+            <y:Point x="490.0" y="524.2363354111862"/>
+            <y:Point x="499.8994949366117" y="534.135830347798"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e9" source="n7" target="n9">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-1.25" sy="25.0" tx="-1.25" ty="-25.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e10" source="n8" target="n17">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="78.75" sy="39.40631139489196" tx="-46.85658153241661" ty="-30.0"/>
+          <y:LineStyle color="#000000" type="line" width="2.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e11" source="n8" target="n2">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="39.4189027437761" tx="0.0" ty="-30.0390625"/>
+          <y:LineStyle color="#000000" type="line" width="2.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e12" source="n8" target="n5">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-117.26623894891952" sy="3.1759577603143327" tx="70.65815324164942" ty="-25.0">
+            <y:Point x="711.2132034355964" y="104.13583034779793"/>
+            <y:Point x="690.0" y="124.32836472893743"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="2.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e13" source="n8" target="n3">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-117.27367620605924" sy="23.175159320373268" tx="90.0" ty="-4.995088408644392">
+            <y:Point x="772.5607321365027" y="124.13503190785687"/>
+            <y:Point x="747.5529151033232" y="147.12213348127955"/>
+            <y:Point x="747.5529151033232" y="455.65054897355935"/>
+            <y:Point x="740.5201174028008" y="464.13583034779793"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="2.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e14" source="n8" target="n6">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-117.29616895874267" sy="-16.824042239685667" tx="-4.858546168958753" ty="-30.0">
+            <y:Point x="351.2132034355964" y="84.13583034779793"/>
+            <y:Point x="330.0" y="105.34903378339436"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="2.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e15" source="n8" target="n13">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-81.25" sy="39.40631139489196" tx="50.0" ty="-30.0"/>
+          <y:LineStyle color="#000000" type="line" width="2.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e16" source="n8" target="n10">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="117.29616895874256" sy="27.948489685658174" tx="-20.899516810997284" ty="-25.0">
+            <y:Point x="1352.3859726870955" y="128.9083622731418"/>
+            <y:Point x="1372.1849625603188" y="148.7073521463651"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="2.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e17" source="n8" target="n0">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="117.29616895874256" sy="15.032846267190607" tx="0.0" ty="-25.0">
+            <y:Point x="1460.3368947962308" y="115.99271885467421"/>
+            <y:Point x="1481.5500982318272" y="137.20592229027062"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="2.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e18" source="n9" target="n8">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-1.25" sy="25.0" tx="-1.25" ty="-39.40631139489196"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e19" source="n13" target="n5">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="22.50447371601217" sy="29.970668513991598" tx="89.99597727937885" ty="-5.868156746893362">
+            <y:Point x="922.5044737160122" y="375.5071961049436"/>
+            <y:Point x="907.7939458091166" y="391.58987399383193"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e20" source="n13" target="n2">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="60.0" sy="30.0" tx="-71.25" ty="-30.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e21" source="n15" target="n7">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-1.25" sy="25.0" tx="-1.25" ty="-25.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e22" source="n16" target="n5">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="90.0" sy="-6.667976424361427" tx="90.01675116850333" ty="9.550759986668197">
+            <y:Point x="725.7573593128807" y="534.135830347798"/>
+            <y:Point x="730.0" y="529.8931896606787"/>
+            <y:Point x="730.0" y="414.22926992388847"/>
+            <y:Point x="724.3431457505076" y="407.0087907273935"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e23" source="n16" target="n3">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="-24.9853515625" tx="0.0" ty="24.9853515625"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e24" source="n17" target="n2">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-66.85658153241661" sy="30.0" tx="58.75" ty="-30.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e25" source="n17" target="n11">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-9.311757366432403" sy="30.028194337841455" tx="7.54482416598421" ty="-24.977092738560827"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e26" source="n17" target="n1">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="13.143418467583388" sy="30.0" tx="-60.0" ty="-16.45815324165028">
+            <y:Point x="1170.0" y="478.5794811616939"/>
+            <y:Point x="1185.556349186104" y="494.13583034779793"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+  </graph>
+  <data key="d0">
+    <y:Resources/>
+  </data>
+</graphml>
