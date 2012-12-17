@@ -17,11 +17,15 @@ public class Main {
     static {
 	LogHelper.setupLogging(false);
     }
-    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart");
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.gui");
 
     /** graphical user-interface entry point */
     public static void main(String[] args) {
-	logger.addHandler(LogWindowHandler.getInstance());
+	// we want to receive log messages in the logging window
+	//   the logging window is for the graphical user-interface only, so it
+	//   is added as a handler here, as an extra gui-feature
+	Logger.getLogger("").addHandler(LogWindowHandler.getInstance());
+	// log information about this computer
 	LogHelper.logEnvironment();
 	
 	// load system properties if not yet set, not fatal if it fails

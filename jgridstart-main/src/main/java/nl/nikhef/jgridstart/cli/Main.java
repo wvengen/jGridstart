@@ -38,7 +38,7 @@ public class Main {
     static {
 	LogHelper.setupLogging(false);
     }
-    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart");
+    static private Logger logger = Logger.getLogger("nl.nikhef.jgridstart.cli");
     static private CertificateStore store = null;
     
     /** command-line interface entry point */
